@@ -1,22 +1,47 @@
 package fi.dy.masa.litematica.gui.widget.list.entry;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import javax.annotation.Nullable;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.LitematicaIcons;
 import fi.dy.masa.litematica.gui.SchematicPlacementsListScreen;
+import fi.dy.masa.litematica.schematic.SchematicMetadata;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.icon.Icon;
+import fi.dy.masa.malilib.gui.widget.IconWidget;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.overlay.message.MessageHelpers;
+import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.util.FileNameUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<SchematicPlacementUnloaded>
 {
-    /*
     protected final SchematicPlacementManager manager;
     protected final SchematicPlacementsListScreen gui;
-    protected final SchematicPlacementUnloaded placement;
     @Nullable protected final SchematicPlacement loadedPlacement;
+    protected final GenericButton configureButton;
+    protected final GenericButton duplicateButton;
+    protected final GenericButton removeButton;
+    protected final GenericButton saveToFileButton;
+    protected final GenericButton toggleEnabledButton;
+    protected final IconWidget lockedIcon;
+    protected final IconWidget modificationNoticeIcon;
+    protected final IconWidget schematicTypeIcon;
     protected int buttonsStartX;
-    */
 
     public SchematicPlacementEntryWidget(SchematicPlacementUnloaded placement,
                                          DataListEntryWidgetData constructData,
@@ -24,216 +49,205 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
     {
         super(placement, constructData);
 
-        /*
         this.gui = gui;
-        this.placement = placement;
         this.loadedPlacement = placement.isLoaded() ? (SchematicPlacement) placement : null;
         this.manager = DataManager.getSchematicPlacementManager();
 
-        int posX = x + width - 2;
-        int posY = y + 1;
-
-        // Note: These are placed from right to left
+        this.lockedIcon = new IconWidget(LitematicaIcons.LOCK_LOCKED);
+        this.modificationNoticeIcon = new IconWidget(LitematicaIcons.NOTICE_EXCLAMATION_11);
 
         if (this.useIconButtons())
         {
-            posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.REMOVE);
-            posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.SAVE);
-            posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.DUPLICATE);
-            posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
-            posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.CONFIGURE);
+            this.configureButton     = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.CONFIGURATION, this::openConfigurationMenu);
+            this.duplicateButton     = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.DUPLICATE,     this::duplicatePlacement);
+            this.removeButton        = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.TRASH_CAN,     this::removePlacement);
+            this.saveToFileButton    = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.SAVE_TO_DISK,  this::saveToFile);
+            this.toggleEnabledButton = OnOffButton.onOff(20, "%s", placement::isEnabled, this::toggleEnabled);
         }
         else
         {
-            posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.REMOVE);
-            posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.SAVE);
-            posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.DUPLICATE);
-            posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
-            posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.CONFIGURE);
+            this.configureButton     = GenericButton.create("litematica.button.misc.configure", this::openConfigurationMenu);
+            this.duplicateButton     = GenericButton.create("litematica.button.misc.duplicate", this::duplicatePlacement);
+            this.removeButton        = GenericButton.create("litematica.button.misc.remove", this::removePlacement);
+            this.saveToFileButton    = GenericButton.create("litematica.button.misc.save", this::saveToFile);
+            this.toggleEnabledButton = OnOffButton.onOff(20, "litematica.button.placement_list.placement_enabled", placement::isEnabled, this::toggleEnabled);
         }
 
-        this.buttonsStartX = posX;
-        */
+        this.lockedIcon.translateAndAddHoverString("litematica.hover.placement_list.icon.placement_locked");
+        this.modificationNoticeIcon.translateAndAddHoverString("litematica.hover.placement_list.icon.placement_modified");
+
+        this.configureButton.translateAndAddHoverString("litematica.hover.button.placement_list.configure");
+        this.duplicateButton.translateAndAddHoverString("litematica.hover.button.placement_list.duplicate");
+        this.removeButton.translateAndAddHoverString("litematica.hover.button.placement_list.remove");
+        this.saveToFileButton.translateAndAddHoverString("litematica.hover.button.placement_list.save");
+        this.toggleEnabledButton.translateAndAddHoverString("litematica.hover.button.schematic_list.toggle_enabled");
+
+        this.configureButton.setHoverInfoRequiresShift(true);
+        this.duplicateButton.setHoverInfoRequiresShift(true);
+        this.removeButton.setHoverInfoRequiresShift(true);
+        this.saveToFileButton.setHoverInfoRequiresShift(true);
+        this.toggleEnabledButton.setHoverInfoRequiresShift(true);
+
+        Icon icon = this.loadedPlacement != null && this.loadedPlacement.getSchematicFile() != null ? this.loadedPlacement.getSchematic().getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
+        this.schematicTypeIcon = new IconWidget(icon);
+        this.textOffset.setXOffset(icon.getWidth() + 4);
+        this.textSettings.setTextColor(placement.isEnabled() ? 0xFF00FF00 : 0xFFFF0000);
+
+        // boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
+
+        this.getBackgroundRenderer().getNormalSettings().setEnabled(true);
+        this.setText(StyledTextLine.of(placement.getName()));
+        this.addHoverInfo(placement);
     }
 
-    /*
-    private boolean useIconButtons()
+    @Override
+    public void reAddSubWidgets()
     {
-        return Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue();
-    }
+        super.reAddSubWidgets();
 
-    private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
-    {
-        GenericButton button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
-        button.translateAndAddHoverString(type.getHoverKey());
+        this.addWidget(this.schematicTypeIcon);
+        this.addWidget(this.configureButton);
+        this.addWidget(this.duplicateButton);
+        this.addWidget(this.removeButton);
+        this.addWidget(this.saveToFileButton);
+        this.addWidget(this.toggleEnabledButton);
 
-        return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
-    }
-
-    private int createButtonIconOnly(int xRight, int y, ButtonListener.ButtonType type)
-    {
-        Icon icon = type.getIcon();
-        GenericButton button;
-        int size = 20;
-
-        if (icon != null)
+        if (this.data.isRegionPlacementModified())
         {
-            button = new GenericButton(xRight - size, y, size, size, "", icon, type.getHoverKey());
-        }
-        else
-        {
-            button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
-            button.translateAndAddHoverString(type.getHoverKey());
+            this.addWidget(this.modificationNoticeIcon);
         }
 
-        return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
+        if (this.data.isLocked())
+        {
+            this.addWidget(this.lockedIcon);
+        }
     }
 
-    private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
+    @Override
+    public void updateSubWidgetPositions()
     {
-        String key = this.useIconButtons() ? "%s" : type.getTranslationKey();
-        OnOffButton button = new OnOffButton(xRight, y, -1, true, key, isCurrentlyOn);
-        button.translateAndAddHoverString(type.getHoverKey());
+        super.updateSubWidgetPositions();
 
-        return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
+        this.schematicTypeIcon.centerVerticallyInside(this);
+        this.modificationNoticeIcon.centerVerticallyInside(this);
+        this.lockedIcon.centerVerticallyInside(this);
+        this.configureButton.centerVerticallyInside(this);
+        this.duplicateButton.centerVerticallyInside(this);
+        this.removeButton.centerVerticallyInside(this);
+        this.saveToFileButton.centerVerticallyInside(this);
+        this.toggleEnabledButton.centerVerticallyInside(this);
+
+        this.schematicTypeIcon.setX(this.getX() + 2);
+        this.removeButton.setRight(this.getRight() - 2);
+        this.saveToFileButton.setRight(this.removeButton.getX() - 1);
+        this.duplicateButton.setRight(this.saveToFileButton.getX() - 1);
+        this.toggleEnabledButton.setRight(this.duplicateButton.getX() - 1);
+        this.configureButton.setRight(this.toggleEnabledButton.getX() - 1);
+        this.modificationNoticeIcon.setRight(this.configureButton.getX() - 2);
+        this.lockedIcon.setRight(this.modificationNoticeIcon.getX() - 1);
+
+        this.buttonsStartX = this.lockedIcon.getX() - 1;
     }
 
     @Override
     public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
-        return mouseX < this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
+        return mouseX <= this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
-    @Override
-    public void render(int mouseX, int mouseY, boolean isActiveGui, boolean hovered)
+    protected void addHoverInfo(SchematicPlacementUnloaded placement)
     {
-        RenderUtils.color(1f, 1f, 1f, 1f);
+        File schematicFile = placement.getSchematicFile();
+        SchematicMetadata metadata = this.loadedPlacement != null ? this.loadedPlacement.getSchematic().getMetadata() : null;
+        String fileName = schematicFile != null ? schematicFile.getName() :
+                          StringUtils.translate("litematica.hover.schematic_list.in_memory_only");
+        List<String> lines = new ArrayList<>();
+        boolean saved = placement.isSavedToFile();
 
-        boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
-        int x = this.getX();
-        int y = this.getY();
-        int z = this.getZ();
-        int width = this.getWidth();
-        int height = this.getHeight();
+        if (metadata != null)
+        {
+            lines.add(StringUtils.translate("litematica.hover.schematic_list.schematic_name", metadata.getName()));
+        }
 
-        // Draw a lighter background for the hovered and the selected entry
-        if (placementSelected || this.isMouseOver(mouseX, mouseY))
+        lines.add(StringUtils.translate("litematica.hover.schematic_list.schematic_file", fileName));
+        lines.add(StringUtils.translate("litematica.hover.placement_list.is_loaded",
+                                        MessageHelpers.getYesNoColored(placement.isLoaded(), false)));
+
+        // Get a cached value, to not query and read the file every rendered frame...
+        if (saved && this.gui.getCachedWasModifiedSinceSaved(placement))
         {
-            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0707070);
+            lines.add(StringUtils.translate("litematica.hover.placement_list.saved_to_file.modified"));
         }
-        else if (this.isOdd)
-        {
-            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0101010);
-        }
-        // Draw a slightly lighter background for even entries
         else
         {
-            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0303030);
+            lines.add(StringUtils.translate("litematica.hover.placement_list.saved_to_file.not_modified",
+                                            MessageHelpers.getYesNoColored(saved, false)));
         }
 
-        if (placementSelected)
+        BlockPos o = placement.getOrigin();
+        lines.add(StringUtils.translate("litematica.hover.placement_list.origin", o.getX(), o.getY(), o.getZ()));
+
+        if (metadata != null)
         {
-            ShapeRenderUtils.renderOutline(x, y, z, width, height, 1, 0xFFE0E0E0);
+            lines.add(StringUtils.translate("litematica.hover.placement_list.sub_region_count",
+                                            this.loadedPlacement.getSubRegionCount()));
+
+            Vec3i size = metadata.getEnclosingSize();
+            lines.add(StringUtils.translate("litematica.hover.placement_list.enclosing_size",
+                                            size.getX(), size.getY(), size.getZ()));
         }
 
-        String name = this.placement.getName();
-        String pre = this.placement.isEnabled() ? BaseScreen.TXT_GREEN : BaseScreen.TXT_RED;
-        this.drawString(x + 20, y + 7, 0xFFFFFFFF, pre + name);
-
-        Icon icon;
-
-        if (this.loadedPlacement != null)
-        {
-            if (this.loadedPlacement.getSchematicFile() != null)
-            {
-                icon = this.loadedPlacement.getSchematic().getType().getIcon();
-            }
-            else
-            {
-                icon = LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
-            }
-
-            icon.renderAt(x + 2, y + 5, z + 0.1f, false, false);
-        }
-
-        if (this.placement.isRegionPlacementModified())
-        {
-            icon = LitematicaIcons.NOTICE_EXCLAMATION_11;
-            icon.renderAt(this.buttonsStartX - 13, y + 6, z + 0.1f, false, false);
-        }
-
-        if (this.placement.isLocked())
-        {
-            icon = LitematicaIcons.LOCK_LOCKED;
-            icon.renderAt(this.buttonsStartX - 26, y + 6, z + 0.1f, false, false);
-        }
-
-        super.render(mouseX, mouseY, isActiveGui, placementSelected);
+        this.getHoverInfoFactory().addStrings(lines);
     }
 
-    @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
+    protected boolean useIconButtons()
     {
-        int x = this.getX();
-        int y = this.getY();
-        int z = this.getZ() + 1;
-        int height = this.getHeight();
-
-        if (this.placement.isLocked() &&
-            BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 38, y + 6, 11, 11))
-        {
-            String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_locked");
-            TextRenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
-        }
-        else if (this.placement.isRegionPlacementModified() &&
-                 BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
-        {
-            String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_modified");
-            TextRenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
-        }
-        else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 18, height))
-        {
-            File schematicFile = this.placement.getSchematicFile();
-            SchematicMetadata metadata = this.loadedPlacement != null ? this.loadedPlacement.getSchematic().getMetadata() : null;
-            String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.hover.in_memory");
-            List<String> text = new ArrayList<>();
-            boolean saved = this.placement.isSavedToFile();
-
-            if (metadata != null)
-            {
-                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_name", metadata.getName()));
-            }
-
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_loaded", MessageHelpers.getYesNoColored(this.placement.isLoaded(), false)));
-
-            // Get a cached value, to not query and read the file every rendered frame...
-            if (saved && this.gui.getCachedWasModifiedSinceSaved(this.placement))
-            {
-                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_saved_to_file_modified"));
-            }
-            else
-            {
-                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_saved_to_file_not_modified", MessageHelpers.getYesNoColored(saved, false)));
-            }
-
-            BlockPos o = this.placement.getOrigin();
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.origin", o.getX(), o.getY(), o.getZ()));
-
-            if (metadata != null)
-            {
-                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.sub_region_count", this.loadedPlacement.getSubRegionCount()));
-
-                Vec3i size = metadata.getEnclosingSize();
-                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enclosing_size", size.getX(), size.getY(), size.getZ()));
-            }
-
-            TextRenderUtils.renderHoverText(mouseX, mouseY, z, text);
-        }
-
-        super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
+        return Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue();
     }
-    */
+
+    protected void duplicatePlacement()
+    {
+        DataManager.getSchematicPlacementManager().duplicateSchematicPlacement(this.getData());
+        this.listWidget.refreshEntries();
+    }
+
+    protected void openConfigurationMenu()
+    {
+        /* TODO FIXME malilib refactor
+        GuiPlacementConfiguration gui = new GuiPlacementConfiguration((SchematicPlacement) this.widget.placement);
+        gui.setParent(this.widget.gui);
+        BaseScreen.openScreen(gui);
+        */
+    }
+
+    protected void removePlacement()
+    {
+        SchematicPlacementUnloaded placement = this.getData();
+
+        if (placement.isLocked() && BaseScreen.isShiftDown() == false)
+        {
+            MessageDispatcher.error("litematica.message.error.placement_list.remove_failed_locked");
+        }
+        else
+        {
+            this.manager.removeSchematicPlacement(placement);
+            this.listWidget.refreshEntries();
+        }
+    }
+
+    protected void saveToFile()
+    {
+        if (this.getData().saveToFileIfChanged() == false)
+        {
+            MessageDispatcher.error("litematica.message.error.placement_list.save_failed");
+        }
+    }
+
+    protected void toggleEnabled()
+    {
+        DataManager.getSchematicPlacementManager().toggleEnabled(this.getData());
+        this.listWidget.refreshEntries();
+    }
 
     public static boolean placementSearchFilter(SchematicPlacementUnloaded entry, List<String> searchTerms)
     {
@@ -260,102 +274,4 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
         return false;
     }
-
-    /*
-    static class ButtonListener implements ButtonActionListener
-    {
-        private final ButtonType type;
-        private final SchematicPlacementEntryWidget widget;
-
-        public ButtonListener(ButtonType type, SchematicPlacementEntryWidget widget)
-        {
-            this.type = type;
-            this.widget = widget;
-        }
-
-        @Override
-        public void actionPerformedWithButton(BaseButton button, int mouseButton)
-        {
-            if (this.type == ButtonType.REMOVE)
-            {
-                if (this.widget.placement.isLocked() && BaseScreen.isShiftDown() == false)
-                {
-                    this.widget.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_placements.remove_fail_locked");
-                }
-                else
-                {
-                    this.widget.manager.removeSchematicPlacement(this.widget.placement);
-                    this.widget.listWidget.refreshEntries();
-                }
-            }
-            else if (this.type == ButtonType.SAVE)
-            {
-                if (this.widget.placement.saveToFileIfChanged() == false)
-                {
-                    this.widget.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_placements.save_failed");
-                }
-            }
-            else if (this.type == ButtonType.TOGGLE_ENABLED)
-            {
-                DataManager.getSchematicPlacementManager().toggleEnabled(this.widget.placement);
-                this.widget.listWidget.refreshEntries();
-            }
-            else if (this.type == ButtonType.DUPLICATE)
-            {
-                DataManager.getSchematicPlacementManager().duplicateSchematicPlacement(this.widget.placement);
-                this.widget.listWidget.refreshEntries();
-            }
-            else if (this.widget.placement.isLoaded())
-            {
-                if (this.type == ButtonType.CONFIGURE)
-                {
-                    GuiPlacementConfiguration gui = new GuiPlacementConfiguration((SchematicPlacement) this.widget.placement);
-                    gui.setParent(this.widget.gui);
-                    BaseScreen.openScreen(gui);
-                }
-            }
-        }
-
-        public enum ButtonType
-        {
-            CONFIGURE       (LitematicaIcons.CONFIGURATION, "litematica.gui.button.schematic_placements.configure", "litematica.gui.hover.schematic_placement.button.configure"),
-            DUPLICATE       (LitematicaIcons.DUPLICATE, "litematica.gui.button.schematic_placements.duplicate", "litematica.gui.hover.schematic_placement.button.duplicate"),
-            REMOVE          (LitematicaIcons.TRASH_CAN, "litematica.gui.button.schematic_placements.remove", "litematica.gui.hover.schematic_placement.button.remove"),
-            SAVE            (LitematicaIcons.SAVE_DISK, "litematica.gui.button.schematic_placements.save", "litematica.gui.hover.schematic_placement.button.save"),
-            TOGGLE_ENABLED  (null,                              "litematica.gui.button.schematic_placements.placement_enabled", "litematica.gui.hover.schematic_placement.button.toggle_enabled");
-
-            @Nullable private final Icon icon;
-            private final String translationKey;
-            private final String hoverKey;
-
-            private ButtonType(@Nullable Icon icon, String translationKey, String hoverKey)
-            {
-                this.icon = icon;
-                this.translationKey = translationKey;
-                this.hoverKey = hoverKey;
-            }
-
-            @Nullable
-            public Icon getIcon()
-            {
-                return this.icon;
-            }
-
-            public String getTranslationKey()
-            {
-                return this.translationKey;
-            }
-
-            public String getHoverKey()
-            {
-                return this.hoverKey;
-            }
-
-            public String getDisplayName()
-            {
-                return StringUtils.translate(this.translationKey);
-            }
-        }
-    }
-    */
 }

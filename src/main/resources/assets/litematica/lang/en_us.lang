@@ -20,47 +20,78 @@ litematica.button.change_menu.schematic_manager=Schematic Manager
 litematica.button.change_menu.schematic_placements=Schematic Placements
 litematica.button.change_menu.schematic_vcs=Schematic VCS
 litematica.button.change_menu.task_manager=Task Manager
+litematica.button.main_menu.area_selection_mode=Area Selection Mode: %s
+litematica.button.main_menu.tool_mode=Tool Mode: %s
+litematica.button.placement_list.placement_enabled=Placement: %s
+litematica.button.schematic_list.create_placement=Create Placement
+litematica.button.schematic_list.reload=Reload
+litematica.button.schematic_list.save_to_file=Save To File
+litematica.button.schematic_list.unload=Unload
 litematica.button.placement_list.icon_vs_text.icons=Buttons: Icons
 litematica.button.placement_list.icon_vs_text.text=Buttons: Text
 litematica.button.placement_list.open_placement_browser=Saved Placements
 
-litematica.button.main_menu.area_selection_mode=Area Selection Mode: %s
-litematica.button.main_menu.tool_mode=Tool Mode: %s
+litematica.button.misc.configure=Configure
+litematica.button.misc.duplicate=Duplicate
+litematica.button.misc.remove=Remove
+litematica.button.misc.save=Save
 
 litematica.hover.button.icon_vs_text_buttons=Whether to use normal text buttons or smaller icon-only buttons
+litematica.hover.button.placement_list.configure=Edit the properties of this placement, such as the position, rotation or mirror values or sub-regions properties etc.
+litematica.hover.button.placement_list.duplicate=Creates a new identical copy of this placement
+litematica.hover.button.placement_list.remove=Removes this placement.\n\nRemoving a placement won't unload the schematic itself from memory. To unload the schematic too, unload it on the §eLoaded Schematics List§r screen. Unloading a schematic via there automatically removes all placements of it.\n\n§6Note:§r If you may need the placement again later on, you can save it first using the §eSave§r button. You can then load it back later on via the §eSaved Placements§r menu if you need it again.
+litematica.hover.button.placement_list.save=Save this placement to a separate file on disk.\n\nThis allows you to remove it from this list, but still load it back later on via the §eSaved Placements§r menu if you need it again.
+litematica.hover.button.schematic_list.create_placement=Create a new placement of this schematic.\n\nHold §6Shift§r to create the placement as disabled to begin with.
+litematica.hover.button.schematic_list.reload_schematic=Reload the schematic from file.\n\nThis can be useful if you make a mistake in the Schematic Edit mode, or just want to revert the changes made to the in-memory copy of the schematic. Or if the schematic file was changed externally and you want to load the updated version.
+litematica.hover.button.schematic_list.save_to_file=Save this schematic to a file (with a user-chosen name).\n\nUse this if you want to keep the changes you have made with the Schematic Edit mode.\n\nThis can also be used to save an already-loaded schematic in a different schematic format, or to just save a copy to a different file/directory.
+litematica.hover.button.schematic_list.toggle_enabled=Toggles this placement on/off.\n\nDisabling a placement is the recommended way of "not seeing it" while you don't need it, as this will remove it entirely from the schematic world and thus decrease the amount of work the mod has to do to update things when the player moves around.
+litematica.hover.button.schematic_list.unload=Unload this schematic from memory.\n\n§6Note:§r Unloading a schematic will also remove all the placements created from it!
+litematica.hover.placement_list.enclosing_size=Enclosing size: §b%s§r x §b%s§r x §b%s§r
+litematica.hover.placement_list.icon.placement_locked=§6This placement has been locked and can't be modified without unlocking it first
+litematica.hover.placement_list.icon.placement_modified=§6This placement has been modified
+litematica.hover.placement_list.is_loaded=Loaded: %s
+litematica.hover.placement_list.origin=Origin: x: §b%s§7 y: §b%s§7 z: §b%s
+litematica.hover.placement_list.saved_to_file.modified=Saved to file: §ayes§7 - §6modified§7 since saved
+litematica.hover.placement_list.saved_to_file.not_modified=Saved to file: %s
+litematica.hover.placement_list.sub_region_count=Sub-regions: §b%s
+litematica.hover.schematic_list.in_memory_only=§dIN-MEMORY ONLY
+litematica.hover.schematic_list.modified_on=Modified @ §6%s§r
+litematica.hover.schematic_list.schematic_file=Schematic file: §3%s
+litematica.hover.schematic_list.schematic_name=Schematic name: §a%s
+litematica.hover.schematic_list.schematic_type=Type: §b%s
 
 litematica.hud.status_info.easy_place_enabled=Easy Place: §aON§r
-litematica.hud.status_info.render_layer_mode=Layer Mode: §b%s§r - §a%s§r = §6%s
-litematica.hud.status_info.render_layer_mode_all=Render Layer Mode: §b%s
+litematica.hud.status_info.render_layer_mode=Layer Mode: §6%s§r - §a%s§r = §b%s
+litematica.hud.status_info.render_layer_mode_all=Render Layer Mode: §6%s
 litematica.hud.status_info.renderer_status=Renderers: All: %s Sch: %s Bl: %s Ov: %s Sel: %s
 litematica.hud.status_info.placement_restriction_enabled=Placement Restriction: §aON§r
 litematica.hud.status_info.schematic_vcs_mode=§6Schematic VCS mode§r
-litematica.hud.tool_hud.area_selection.dimensions_positions=Dim: §a%s x %s x %s§r - pos1: §a%s, %s, %s§r, pos2: §a%s, %s, %s§r
-litematica.hud.tool_hud.area_selection.corners_mode=Corners Mode: §b%s
-litematica.hud.tool_hud.area_selection.origin.normal=Origin: §9%s, %s, %s§r [§b%s§r] - Boxes: §6%s
-litematica.hud.tool_hud.area_selection.origin.simple=Origin: §9%s, %s, %s§r [§b%s§r]
-litematica.hud.tool_hud.area_selection.selected_area.normal=Area: §a%s
-litematica.hud.tool_hud.area_selection.selected_area.simple=Area [§6Simple mode§r]: §a%s
+litematica.hud.tool_hud.area_selection.dimensions_positions=Size: §a%s x %s x %s§r - pos1: §a%s, %s, %s§r pos2: §a%s, %s, %s
+litematica.hud.tool_hud.area_selection.corners_mode=Corners Mode: §6%s
+litematica.hud.tool_hud.area_selection.origin.normal=Origin: §a%s, %s, %s§r [§6%s§r] - Boxes: §b%s
+litematica.hud.tool_hud.area_selection.origin.simple=Origin: §a%s, %s, %s§r [§6%s§r]
+litematica.hud.tool_hud.area_selection.selected_area.normal=Area: [§6Multi-box§r]: §a%s
+litematica.hud.tool_hud.area_selection.selected_area.simple=Area [§6Simple§r]: §a%s
 litematica.hud.tool_hud.area_selection.selected_sub_region=Sub-region: §a%s
 litematica.hud.tool_hud.block_state_string_no_facing=§a%s (%s)
-litematica.hud.tool_hud.block_state_string_with_facing=§a%s (%s)§r - Facing: §b%s
-litematica.hud.tool_hud.delete.target_mode=Delete Target: §b%s
+litematica.hud.tool_hud.block_state_string_with_facing=§a%s (%s)§r - Facing: §6%s
+litematica.hud.tool_hud.delete.target_mode=Delete Target: §6%s
 litematica.hud.tool_hud.delete.target_mode.area=Area Selection
 litematica.hud.tool_hud.delete.target_mode.placement=Schematic Placement
 litematica.hud.tool_hud.replaced_block=Replace: §a%s
 litematica.hud.tool_hud.schematic_paste.replace_mode.none=Replace Blocks: §c%s
 litematica.hud.tool_hud.schematic_paste.replace_mode.some=Replace Blocks: §6%s
-litematica.hud.tool_hud.schematic_placement.origin=Origin: §9%s, %s, %s§r
+litematica.hud.tool_hud.schematic_placement.origin=Origin: §a%s, %s, %s§r
 litematica.hud.tool_hud.schematic_placement.selected_placement=Placement: §a%s
 litematica.hud.tool_hud.schematic_placement.selected_sub_region=Sub-region: §a%s§r - Modified: %s
-litematica.hud.tool_hud.schematic_placement.region_count_and_modified=Region Count: §6%s§r - Modified: %s
-litematica.hud.tool_hud.schematic_placement.sub_region_origin=Region origin: §a%s, %s, %s
+litematica.hud.tool_hud.schematic_placement.region_count_and_modified=Region Count: §b%s§r - Modified: %s
+litematica.hud.tool_hud.schematic_placement.sub_region_origin=Region origin: §b%s, %s, %s
 litematica.hud.tool_hud.schematic_projects.current_version_date=Date: §a%s
-litematica.hud.tool_hud.schematic_projects.current_version=Version: §6%s§r/§6%s§r - Name: §a%s
+litematica.hud.tool_hud.schematic_projects.current_version=Version: §a%s§r/§a%s§r - Name: §a%s
 litematica.hud.tool_hud.schematic_projects.no_versions=<no versions>
 litematica.hud.tool_hud.schematic_projects.origin=Project origin: §a%s
 litematica.hud.tool_hud.schematic_projects.project_name=Project: §a%s
-litematica.hud.tool_hud.tool_mode=Mode: §a%s§r [§a%s§r/§a%s§r]: §a%s
+litematica.hud.tool_hud.tool_mode=Mode: [§a%s§r/§a%s§r]: §a%s§r
 litematica.hud.tool_hud.used_block=Block: §a%s
 
 litematica.hud.value.on.colored=§aON§r
@@ -69,11 +100,11 @@ litematica.hud.value.off.colored=§cOFF§r
 litematica.hud.area_selection.mode.corners=Corners
 litematica.hud.area_selection.mode.expand=Expand
 
-litematica.label.misc.none.brackets=<none>
 litematica.label.misc.null.brackets=<null>
 litematica.label.misc.origin.auto=Auto
 litematica.label.misc.origin.manual=Manual
 litematica.label.schematic_projects.current_version_date=Date: %s
+litematica.label.tool_hud.none_brackets=§c<none>§r
 litematica.label.widget.schematic_vcs.version_entry=Ver. %d - %s
 
 litematica.name.schematic_verifier.all=All (non-ignored)
@@ -94,6 +125,15 @@ litematica.name.schematic_verifier.wrong_blocks.title=<c=f00><b>Wrong Blocks§r
 litematica.name.schematic_verifier.wrong_state=Wrong States
 litematica.name.schematic_verifier.wrong_state.pos_line=<c=ffaf00>x: %s y: %s z: %s§r
 litematica.name.schematic_verifier.wrong_state.title=<c=ffaf00><b>Wrong States§r
+litematica.name.tool_mode.area_selection=Area Selection
+litematica.name.tool_mode.delete=Delete
+litematica.name.tool_mode.fill=Fill
+litematica.name.tool_mode.grid_paste=Grid Paste Schematic in World
+litematica.name.tool_mode.move=Move
+litematica.name.tool_mode.paste_schematic=Paste Schematic in World
+litematica.name.tool_mode.rebuild=§dSchematic Edit§r
+litematica.name.tool_mode.replace_block=Replace Blocks in World
+litematica.name.tool_mode.schematic_placement=Schematic Placement
 
 litematica.title.hud.block_info_lines.client=§nClient:
 litematica.title.hud.block_info_lines.schematic=§nSchematic:
@@ -105,6 +145,9 @@ litematica.title.hud.missing_chunks.schematic_paste=§f§lPaste, un-seen chunks 
 litematica.title.hud.schematic_verifier.errors=<b>Schematic Verifier Errors</b>
 
 litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
+
+litematica.message.error.placement_list.remove_failed_locked=The placement is locked!\nHold §6Shift§r to force remove it
+litematica.message.error.placement_list.save_failed=Failed to save the placement to file
 
 litematica.error.area_selection.copy_failed=Failed to copy the selection
 litematica.error.area_selection.create_failed=Failed to create a new selection by the name '%s', file already exists
@@ -149,8 +192,6 @@ litematica.error.schematic_manager.schematic_has_no_thumbnail=The selected schem
 litematica.error.schematic_placements.coordinate_locked=Can't move because of an active coordinate lock
 litematica.error.schematic_placements.load_fail=Failed to load the placement from file '%s'
 litematica.error.schematic_placements.load_fail.already_loaded=Failed to load the placement '%s' from file, that placement seems to already be loaded
-litematica.error.schematic_placements.remove_fail_locked=The placement is locked!\n- Hold Shift to force remove it
-litematica.error.schematic_placements.save_failed=Failed to save the placement to file
 litematica.error.schematic_placements.settings_load.invalid_data=Failed to load placement settings, invalid (non-JSON?) data
 litematica.error.schematic_placements.settings_load.missing_data=Failed to load placement settings, missing some of the required data!
 
@@ -215,11 +256,6 @@ litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
 
-litematica.gui.button.hover.schematic_list.create_new_placement_shift_to_disable=§7Create a new placement of this schematic.\n§7Hold shift to create the placement as disabled.
-litematica.gui.button.hover.schematic_list.reload_schematic=§7Reloads the schematic from file.\n§7This can be useful if you make a mistake in the\n§7Schematic Rebuild mode, or change the schematic file externally.
-litematica.gui.button.hover.schematic_list.save_to_file=§7Save this schematic to file (with a user-chosen name).\n§7Use this if you want to keep the changes\n§7you have made with the Schematic Rebuild mode.\n§7This can also be used to save an already-loaded schematic\n§7in a different schematic format.
-litematica.gui.button.hover.schematic_list.unload=§7Unload this schematic from memory.\n§6Note: Unloading a schematic will also remove\n§6all the placements created from it.
-
 litematica.gui.button.hover.schematic_manager.convert_format=Convert the selected schematic to another schematic format
 
 litematica.gui.button.hover.schematic_placement.copy_paste_settings=§6Copy or Paste placement settings\n- Click to open a text field where you can copy\n   or paste the setting string from/to\n- Shift + Left click to copy the settings directly to the clip board\n- Ctrl + Shift + Right click to directly paste the settings from the clip board
@@ -257,15 +293,10 @@ litematica.gui.button.schematic_placement.hover.enclosing_box=§7Enclosing box r
 litematica.gui.button.schematic_placement.hover.grid_settings_shift_to_toggle=§7Hold shift to just toggle the grid repeat on/off
 litematica.gui.button.schematic_placement.hover.lock=§7Locking a placement prevents moving or\n§7otherwise changing it (accidentally)
 
-litematica.gui.button.schematic_placements.configure=Configure
-litematica.gui.button.schematic_placements.duplicate=Duplicate
 litematica.gui.button.schematic_placements.disable=Disable
 litematica.gui.button.schematic_placements.load=Load
 litematica.gui.button.schematic_placements.locked=Locked: %s
-litematica.gui.button.schematic_placements.placement_enabled=Placement: %s
-litematica.gui.button.schematic_placements.remove=Remove
 litematica.gui.button.schematic_placements.rendering_enabled=Rendering: %s
-litematica.gui.button.schematic_placements.save=Save
 litematica.gui.button.schematic_placements.select=Select
 
 litematica.gui.button.schematic_projects.close_project=Close current project
@@ -294,7 +325,6 @@ litematica.gui.button.configure=Configure
 litematica.gui.button.convert_format=Convert Format
 litematica.gui.button.copy=Copy
 litematica.gui.button.create_directory=Create New Directory
-litematica.gui.button.create_placement=Create placement
 litematica.gui.button.delete=Delete
 litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
@@ -302,7 +332,6 @@ litematica.gui.button.load_schematic_to_memory=Load Schematic
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
 litematica.gui.button.ok=Ok
-litematica.gui.button.reload=Reload
 litematica.gui.button.remove=Remove
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
@@ -311,18 +340,11 @@ litematica.gui.button.rename_schematic=Rename Schematic
 litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_new_schematic_version=Save Version
 litematica.gui.button.save_schematic=Save Schematic
-litematica.gui.button.save_to_file=Save to file
 litematica.gui.button.schematic_verifier=Schematic Verifier
 litematica.gui.button.set_preview=Set preview
-litematica.gui.button.unload=Unload
 litematica.gui.button.unlocked=Unlocked
 
 litematica.gui.hover.schematic_placement.button.load=§7Load this placement to the list of "active placements"
-litematica.gui.hover.schematic_placement.button.configure=§7Edit the properties of this placement,\n§7such as the position, rotation and mirror values etc.
-litematica.gui.hover.schematic_placement.button.duplicate=§7Creates a new identical copy of this placement
-litematica.gui.hover.schematic_placement.button.remove=§7Removes this placement.\n§6If you may need the placement later on,\n§6you can save it first using the Save button.\n§7Removing a placement won't unload the schematic\n§7itself from memory. To unload the schematic too,\n§7unload it from the Loaded Schematics list.\n§7Unloading the schematic will automatically remove all\n§7placements of it.
-litematica.gui.hover.schematic_placement.button.save=§7Save this placement to a separate file on disk.\n§7This allows you to remove it from this list,\n§7but still reload it via the Placement Browser\n§7later if you need it again.
-litematica.gui.hover.schematic_placement.button.toggle_enabled=§7Turns this placement on/off.\n§7Disabling a placement is the recommended\n§7way of "not seeing it" while you don't need it,\n§7as it will remove it from the schematic world,\n§7and thus decreases the work the mod has to do\n§7when the player moves around.
 
 litematica.gui.hover.schematic_save.update_dependent_placements=§7Select whether or not to update all or just the currently\n§7selected placement of this schematic to point to the new file\n§7instead, so that when the placements are next reloaded from file, they\n§7will load the currently being saved version of the schematic\n§7instead of the original. This can be useful especially when\n§7using the Schematic Rebuild/Edit mode on a schematic.
 
@@ -347,8 +369,6 @@ litematica.gui.label.area_selection.mode.simple=Simple
 
 litematica.gui.label.block_info_list_type.all=All
 litematica.gui.label.block_info_list_type.render_layers=Render Layers
-
-litematica.gui.label.loaded_schematic.modified_on=§6Modified on %s§r
 
 litematica.gui.label.material_list.abbr.shulker_box=SB
 litematica.gui.label.material_list.title.available=Available
@@ -415,19 +435,9 @@ litematica.gui.label.schematic_placement.saved_to_file=Successfully saved the pl
 litematica.gui.label.schematic_placement.sub_regions=Sub-regions (%s):
 
 litematica.gui.label.schematic_placement.hover.enabled=§7Placement: %s
-litematica.gui.label.schematic_placement.hover.enclosing_size=§7Enclosing size: §9%s x %s x %s
-litematica.gui.label.schematic_placement.hover.in_memory=§bIN-MEMORY ONLY
-litematica.gui.label.schematic_placement.hover.is_loaded=§7Loaded: %s
-litematica.gui.label.schematic_placement.hover.is_saved_to_file_modified=§7Saved to file: §ayes§7 - §6modified§7 since saved
-litematica.gui.label.schematic_placement.hover.is_saved_to_file_not_modified=§7Saved to file: %s
 litematica.gui.label.schematic_placement.hover.name=§7Name: §2%s
-litematica.gui.label.schematic_placement.hover.origin=§7Origin - x: §9%s§7, y: §9%s§7, z: §9%s
 litematica.gui.label.schematic_placement.hover.rotation_mirror=§7Rotation: §b%s§7, Mirror: §b%s
 litematica.gui.label.schematic_placement.hover.placement_file=§7Placement file: §3%s
-litematica.gui.label.schematic_placement.hover.schematic_file=§7Schematic file: §3%s
-litematica.gui.label.schematic_placement.hover.schematic_name=§7Schematic name: §2%s
-litematica.gui.label.schematic_placement.hover.schematic_type=§7Type: §b%s
-litematica.gui.label.schematic_placement.hover.sub_region_count=§7Sub-regions: §6%s
 
 litematica.gui.label.schematic_projects.currently_open_project=Currently open project: %s
 litematica.gui.label.schematic_projects.origin=Origin:
@@ -505,8 +515,6 @@ litematica.gui.title.task_manager=Task Manager
 litematica.hud.misc.none_brackets=<none>
 
 litematica.hud.schematic_placement.hover_info.lock_coordinate=§7Lock this coordinate\n§7This allows changing the other coordinates\n§7without (accidentally) affecting the locked ones
-litematica.hud.schematic_placement.hover_info.placement_locked=§6This placement has been locked and can't\n§6be modified without unlocking it first
-litematica.hud.schematic_placement.hover_info.placement_modified=§6This placement has been modified
 litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=§6This sub-region has been modified
 
 litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
@@ -576,8 +584,8 @@ litematica.message.material_list_written_to_file=Material list written to file '
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
 litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
-litematica.message.placement.moved_placement_origin=Moved placement origin from §b%s, %s, %s§r to §b%s, %s, %s§r
-litematica.message.placement.moved_subregion_to=Moved sub-region to x: §b%s1r, y: §b%s§r, z: §b%s§r
+litematica.message.placement.moved_placement_origin=Moved placement origin §a%s, %s, %s§r => §a%s, %s, %s§r
+litematica.message.placement.moved_subregion_to=Moved sub-region to x: §a%s§r y: §a%s§r z: §a%s§r
 litematica.message.placement.settings_copied_to_clipboard=Settings copied to clip board
 litematica.message.placement.settings_loaded_from_clipboard=Settings loaded from clip board
 litematica.message.placement_restriction_fail=Action prevented by Placement Restriction mode
@@ -618,16 +626,6 @@ litematica.message.warn.schematic_verifier.overlay_disabled=Warning: The verifie
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
 
 litematica.warning.area_editor.area_rendering_disabled=Note: The Area Selection boxes rendering is currently disabled\nSee Visuals -> %s, or Hotkeys -> %s ['%s']
-
-litematica.tool_mode.name.area_selection=Area Selection
-litematica.tool_mode.name.delete=Delete
-litematica.tool_mode.name.fill=Fill
-litematica.tool_mode.name.grid_paste=Grid Paste Schematic in world
-litematica.tool_mode.name.move=Move
-litematica.tool_mode.name.paste_schematic=Paste Schematic in world
-litematica.tool_mode.name.rebuild=Rebuild (= edit) Schematic
-litematica.tool_mode.name.replace_block=Replace block
-litematica.tool_mode.name.schematic_placement=Schematic Placement
 
 litematica.config.comment.areaselectionsperworld=Use per-world or per-server root directories for the area selections\n§6NOTE: Don't switch this OFF while you are live streaming, as then the Area Selection browser will show the server IP in the navigation widget and also in the current selection name/path until you change the current directory and selection again.
 litematica.config.comment.betterrenderorder=If enabled, then the schematic rendering is done by injecting the different render call into the vanilla rendering code. This should result in better translucent block rendering/ordering and schematic blocks not getting rendered through the client world blocks/terrain. If the rendering doesn't work (for example with Optifine), then try disabling this option.

@@ -9,17 +9,17 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public enum ToolMode
 {
-    AREA_SELECTION      ("litematica.tool_mode.name.area_selection",        false, false),
-    SCHEMATIC_PLACEMENT ("litematica.tool_mode.name.schematic_placement",   false, true),
-    FILL                ("litematica.tool_mode.name.fill",                  true, false, true, false),
-    REPLACE_BLOCK       ("litematica.tool_mode.name.replace_block",         true, false, true, true),
-    PASTE_SCHEMATIC     ("litematica.tool_mode.name.paste_schematic",       true, true),
-    GRID_PASTE          ("litematica.tool_mode.name.grid_paste",            true, true),
-    MOVE                ("litematica.tool_mode.name.move",                  true, false),
-    DELETE              ("litematica.tool_mode.name.delete",                true, false),
-    REBUILD             ("litematica.tool_mode.name.rebuild",               false, true, true, false);
+    AREA_SELECTION      ("litematica.name.tool_mode.area_selection",        false, false),
+    SCHEMATIC_PLACEMENT ("litematica.name.tool_mode.schematic_placement",   false, true),
+    FILL                ("litematica.name.tool_mode.fill",                  true, false, true, false),
+    REPLACE_BLOCK       ("litematica.name.tool_mode.replace_block",         true, false, true, true),
+    PASTE_SCHEMATIC     ("litematica.name.tool_mode.paste_schematic",       true, true),
+    GRID_PASTE          ("litematica.name.tool_mode.grid_paste",            true, true),
+    MOVE                ("litematica.name.tool_mode.move",                  true, false),
+    DELETE              ("litematica.name.tool_mode.delete",                true, false),
+    REBUILD             ("litematica.name.tool_mode.rebuild",               false, true, true, false);
 
-    private final String unlocName;
+    private final String translationKey;
     private final boolean creativeOnly;
     private final boolean usesSchematic;
     private final boolean usesBlockPrimary;
@@ -30,14 +30,14 @@ public enum ToolMode
 
     public static final ImmutableList<ToolMode> VALUES = ImmutableList.copyOf(values());
 
-    ToolMode(String unlocName, boolean creativeOnly, boolean usesSchematic)
+    ToolMode(String translationKey, boolean creativeOnly, boolean usesSchematic)
     {
-        this(unlocName, creativeOnly, usesSchematic, false, false);
+        this(translationKey, creativeOnly, usesSchematic, false, false);
     }
 
-    ToolMode(String unlocName, boolean creativeOnly, boolean usesSchematic, boolean usesBlockPrimary, boolean usesBlockSecondary)
+    ToolMode(String translationKey, boolean creativeOnly, boolean usesSchematic, boolean usesBlockPrimary, boolean usesBlockSecondary)
     {
-        this.unlocName = unlocName;
+        this.translationKey = translationKey;
         this.creativeOnly = creativeOnly;
         this.usesSchematic = usesSchematic;
         this.usesBlockPrimary = usesBlockPrimary;
@@ -91,9 +91,9 @@ public enum ToolMode
         this.blockSecondary = state;
     }
 
-    public String getName()
+    public String getDisplayName()
     {
-        return StringUtils.translate(this.unlocName);
+        return StringUtils.translate(this.translationKey);
     }
 
     public ToolMode cycle(EntityPlayer player, boolean forward)

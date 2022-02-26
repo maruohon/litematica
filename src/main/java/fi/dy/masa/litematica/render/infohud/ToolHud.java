@@ -117,7 +117,7 @@ public class ToolHud extends InfoHud
         {
             this.addSchematicPlacementLines(lines, mode);
 
-            if (mode == ToolMode.PASTE_SCHEMATIC)
+            if (mode == ToolMode.PASTE_SCHEMATIC || mode == ToolMode.GRID_PASTE)
             {
                 ReplaceBehavior replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getValue();
 
@@ -137,7 +137,7 @@ public class ToolHud extends InfoHud
         if (hasTool || mode == ToolMode.REBUILD)
         {
             lines.add(StringUtils.translate("litematica.hud.tool_hud.tool_mode",
-                                            mode.ordinal() + 1, ToolMode.VALUES.size(), mode.getName()));
+                                            mode.ordinal() + 1, ToolMode.VALUES.size(), mode.getDisplayName()));
         }
     }
 
@@ -199,7 +199,7 @@ public class ToolHud extends InfoHud
                 if (p1 != null && p2 != null)
                 {
                     Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPositionAbs(p2.subtract(p1));
-                    lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.dimensions_position",
+                    lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.dimensions_positions",
                                                     size.getX(), size.getY(), size.getZ(),
                                                     p1.getX(), p1.getY(), p1.getZ(),
                                                     p2.getX(), p2.getY(), p2.getZ()));
@@ -253,7 +253,7 @@ public class ToolHud extends InfoHud
         }
         else
         {
-            String str = StringUtils.translate("litematica.label.misc.none.brackets");
+            String str = StringUtils.translate("litematica.label.tool_hud.none_brackets");
             lines.add(StringUtils.translate("litematica.hud.tool_hud.schematic_placement.selected_placement", str));
         }
     }

@@ -319,7 +319,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
                 ToolModeData.DELETE.toggleUsePlacement();
                 return ActionResult.SUCCESS;
             }
-            else if (mode == ToolMode.PASTE_SCHEMATIC)
+            else if (mode == ToolMode.PASTE_SCHEMATIC || mode == ToolMode.GRID_PASTE)
             {
                 Configs.Generic.PASTE_REPLACE_BEHAVIOR.cycleValue(false);
                 return ActionResult.SUCCESS;

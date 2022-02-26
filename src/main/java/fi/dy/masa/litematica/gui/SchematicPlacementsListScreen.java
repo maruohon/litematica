@@ -43,7 +43,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.iconsTextToggleButton.setIsRightAligned(true);
         this.iconsTextToggleButton.setActionListener(() -> {
             Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue();
-            this.iconsTextToggleButton.updateButtonState();
+            this.initScreen();
         });
 
         this.manager = DataManager.getSchematicPlacementManager();
@@ -73,13 +73,11 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     {
         super.updateWidgetPositions();
 
-        int x = this.getRight() - 22;
-        int y = this.y + 10;
-        this.iconsTextToggleButton.setRight(x);
-        this.iconsTextToggleButton.setY(y);
+        this.iconsTextToggleButton.setRight(this.getRight() - 22);
+        this.iconsTextToggleButton.setY(this.y + 8);
 
-        x = this.x + 12;
-        y = this.getBottom() - 26;
+        int x = this.x + 12;
+        int y = this.getBottom() - 26;
         this.loadedSchematicsListScreenButton.setPosition(x, y);
         x = this.loadedSchematicsListScreenButton.getRight() + 2;
 

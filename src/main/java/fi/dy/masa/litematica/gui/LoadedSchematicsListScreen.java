@@ -32,8 +32,8 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
         this.iconsTextToggleButton.translateAndAddHoverString("litematica.hover.button.icon_vs_text_buttons");
         this.iconsTextToggleButton.setIsRightAligned(true);
         this.iconsTextToggleButton.setActionListener(() -> {
-            Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue();
-            this.iconsTextToggleButton.updateButtonState();
+            Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.toggleBooleanValue();
+            this.initScreen();
         });
 
         // TODO FIXME malilib refactor
@@ -61,7 +61,7 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
         super.updateWidgetPositions();
 
         this.iconsTextToggleButton.setRight(this.getRight() - 22);
-        this.iconsTextToggleButton.setY(this.y + 10);
+        this.iconsTextToggleButton.setY(this.y + 8);
 
         int y = this.getBottom() - 26;
         this.loadSchematicsScreenButton.setPosition(this.x + 12, y);

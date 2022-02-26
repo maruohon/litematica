@@ -39,7 +39,7 @@ public class LitematicaIcons extends BaseMultiIcon
     public static final LitematicaIcons LOADED_SCHEMATICS           = new LitematicaIcons(102, 14, 14, 14);
     public static final LitematicaIcons PLACEMENT                   = new LitematicaIcons(102, 196, 14, 14);
     public static final LitematicaIcons RELOAD                      = new LitematicaIcons(102, 182, 14, 14);
-    public static final LitematicaIcons SAVE_DISK                   = new LitematicaIcons(102, 140, 14, 14);
+    public static final LitematicaIcons SAVE_TO_DISK                = new LitematicaIcons(102, 140, 14, 14);
     public static final LitematicaIcons SCHEMATIC_BROWSER           = new LitematicaIcons(102, 28, 14, 14);
     public static final LitematicaIcons SCHEMATIC_MANAGER           = new LitematicaIcons(102, 56, 14, 14);
     public static final LitematicaIcons SCHEMATIC_PLACEMENTS        = new LitematicaIcons(102, 42, 14, 14);

@@ -5,7 +5,6 @@ import java.util.List;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.InteractableWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -132,7 +131,7 @@ public class MainMenuScreen extends BaseScreen
 
         x = this.schematicPlacementsListScreenButton.getRight() + 20;
         this.configScreenButton.setPosition(x, y);
-        this.schematicManagerScreenButton.setPosition(x, y + 44);
+        this.schematicManagerScreenButton.setPosition(x, y + 88);
         this.taskManagerScreenButton.setPosition(x, y + 110);
         this.schematicVcsScreenButton.setPosition(x, y + 132);
     }
@@ -154,7 +153,7 @@ public class MainMenuScreen extends BaseScreen
     public static void openMainMenuScreen()
     {
         MainMenuScreen screen = new MainMenuScreen();
-        screen.setParent(GuiUtils.getCurrentScreen());
+        //screen.setParent(GuiUtils.getCurrentScreen());
         BaseScreen.openScreen(screen);
     }
 
@@ -166,7 +165,7 @@ public class MainMenuScreen extends BaseScreen
 
     public static String getToolModeButtonLabel()
     {
-        String modeName = DataManager.getToolMode().getName();
+        String modeName = DataManager.getToolMode().getDisplayName();
         return StringUtils.translate("litematica.button.main_menu.tool_mode", modeName);
     }
 }
