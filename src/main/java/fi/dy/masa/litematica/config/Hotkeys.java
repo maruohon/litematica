@@ -9,6 +9,7 @@ public class Hotkeys
 {
     public static final HotkeyConfig ADD_SELECTION_BOX                      = new HotkeyConfig("addSelectionBox", "");
     public static final HotkeyConfig CLONE_SELECTION                        = new HotkeyConfig("cloneSelection", "");
+    public static final HotkeyConfig CREATE_SCHEMATIC_IN_MEMORY             = new HotkeyConfig("createSchematicInMemory", "");
     public static final HotkeyConfig DELETE_SELECTION_BOX                   = new HotkeyConfig("deleteSelectionBox", "");
     public static final HotkeyConfig DUPLICATE_PLACEMENT                    = new HotkeyConfig("duplicatePlacement", "");
     public static final HotkeyConfig EASY_PLACE_ACTIVATION                  = new HotkeyConfig("easyPlaceActivation", "", KeyBindSettings.INGAME_MODIFIER_EMPTY);
@@ -44,7 +45,6 @@ public class Hotkeys
     public static final HotkeyConfig REFRESH_SCHEMATIC_RENDERER             = new HotkeyConfig("refreshSchematicRenderer", "F3,M");
     public static final HotkeyConfig ROTATE_PLACEMENT_CW                    = new HotkeyConfig("rotatePlacementCW", "");
     public static final HotkeyConfig ROTATE_PLACEMENT_CCW                   = new HotkeyConfig("rotatePlacementCCW", "");
-    public static final HotkeyConfig SAVE_SCHEMATIC_IN_MEMORY               = new HotkeyConfig("saveSchematicInMemory", "");
     public static final HotkeyConfig SAVE_SCHEMATIC_TO_FILE                 = new HotkeyConfig("saveSchematicToFile", "LCONTROL,LMENU,S");
     public static final HotkeyConfig SCHEMATIC_EDIT_ACCEPT_REPLACEMENT      = new HotkeyConfig("schematicEditAcceptReplacement", "");
     public static final HotkeyConfig SCHEMATIC_EDIT_BREAK_ALL               = new HotkeyConfig("schematicEditBreakPlaceAll", "", KeyBindSettings.INGAME_MODIFIER);
@@ -80,6 +80,7 @@ public class Hotkeys
     public static final List<HotkeyConfig> HOTKEY_LIST = ImmutableList.of(
             ADD_SELECTION_BOX,
             CLONE_SELECTION,
+            CREATE_SCHEMATIC_IN_MEMORY,
             DELETE_SELECTION_BOX,
             DUPLICATE_PLACEMENT,
             EASY_PLACE_ACTIVATION,
@@ -115,7 +116,6 @@ public class Hotkeys
             REFRESH_SCHEMATIC_RENDERER,
             ROTATE_PLACEMENT_CW,
             ROTATE_PLACEMENT_CCW,
-            SAVE_SCHEMATIC_IN_MEMORY,
             SAVE_SCHEMATIC_TO_FILE,
             SCHEMATIC_EDIT_ACCEPT_REPLACEMENT,
             SCHEMATIC_EDIT_BREAK_ALL,

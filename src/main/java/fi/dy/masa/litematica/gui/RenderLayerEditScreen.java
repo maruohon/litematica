@@ -14,6 +14,7 @@ public class RenderLayerEditScreen extends BaseRenderLayerEditScreen
 
         this.addPlayerFollowingOptions = true;
         this.addLayerRangeHotkeyCheckboxes = true;
+        this.shouldCreateTabButtons = true;
         this.controlsStartX = 10;
         this.controlsStartY = 60;
     }

@@ -382,7 +382,7 @@ public class DataManager implements DirectoryCache
 
     public static File getSchematicsBaseDirectory()
     {
-        boolean custom = Configs.Generic.CUSTOM_SCHEMATIC_DIR_ENABLED.getBooleanValue();
+        boolean custom = Configs.Generic.USE_CUSTOM_SCHEMATIC_DIRECTORY.getBooleanValue();
         File dir = null;
 
         if (custom)

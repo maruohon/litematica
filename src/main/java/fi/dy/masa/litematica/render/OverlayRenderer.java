@@ -174,14 +174,14 @@ public class OverlayRenderer
                     Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoundingBoxColor();
                     RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
 
-                    if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX.getBooleanValue())
+                    if (Configs.Visuals.PLACEMENT_ENCLOSING_BOX.getBooleanValue())
                     {
                         if (schematicPlacement.shouldRenderEnclosingBox())
                         {
                             Box box = schematicPlacement.getEclosingBox();
                             RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
 
-                            if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
+                            if (Configs.Visuals.PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
                             {
                                 float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
                                 color = new Color4f(color.r, color.g, color.b, alpha);
@@ -283,10 +283,10 @@ public class OverlayRenderer
                 RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
 
                 if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
-                      Configs.Visuals.RENDER_AREA_SELECTION_BOX_SIDES.getBooleanValue())
+                      Configs.Visuals.AREA_SELECTION_BOX_SIDES.getBooleanValue())
                     ||
                      ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
-                       Configs.Visuals.RENDER_PLACEMENT_BOX_SIDES.getBooleanValue()))
+                       Configs.Visuals.PLACEMENT_BOX_SIDES.getBooleanValue()))
                 {
                     RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
                 }
@@ -362,7 +362,7 @@ public class OverlayRenderer
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
         MismatchRenderPos lookedEntry = null;
         MismatchRenderPos prevEntry = null;
-        boolean connections = Configs.Visuals.RENDER_ERROR_MARKER_CONNECTIONS.getBooleanValue();
+        boolean connections = Configs.Visuals.ERROR_MARKER_CONNECTIONS.getBooleanValue();
 
         for (MismatchRenderPos entry : posList)
         {
@@ -401,7 +401,7 @@ public class OverlayRenderer
 
         tessellator.draw();
 
-        if (Configs.Visuals.RENDER_ERROR_MARKER_SIDES.getBooleanValue())
+        if (Configs.Visuals.ERROR_MARKER_SIDES.getBooleanValue())
         {
             GlStateManager.enableBlend();
             GlStateManager.disableCull();

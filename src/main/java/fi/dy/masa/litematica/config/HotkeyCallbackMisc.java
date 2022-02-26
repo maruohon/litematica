@@ -275,7 +275,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
                 return ActionResult.SUCCESS;
             }
         }
-        else if (key == Hotkeys.SAVE_SCHEMATIC_IN_MEMORY.getKeyBind())
+        else if (key == Hotkeys.CREATE_SCHEMATIC_IN_MEMORY.getKeyBind())
         {
             return SchematicUtils.saveSchematic(true);
         }

@@ -80,7 +80,7 @@ public class StatusInfoRenderer implements IInfoHudRenderer
         String strAll = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() ? strOn : strOff;
         String strSch = Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() ? strOn : strOff;
         String strBlk = Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue() ? strOn : strOff;
-        String strOvl = Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.getBooleanValue() ? strOn : strOff;
+        String strOvl = Configs.Visuals.SCHEMATIC_OVERLAY.getBooleanValue() ? strOn : strOff;
         String strSel = Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue() ? strOn : strOff;
 
         lines.add(StringUtils.translate("litematica.hud.status_info.renderer_status", strAll, strSch, strBlk, strOvl, strSel));
@@ -109,7 +109,7 @@ public class StatusInfoRenderer implements IInfoHudRenderer
                 Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() == false ||
                 Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() == false ||
                 Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue() == false ||
-                Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.getBooleanValue() == false ||
+                Configs.Visuals.SCHEMATIC_OVERLAY.getBooleanValue() == false ||
                 Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue() == false;
     }
 }

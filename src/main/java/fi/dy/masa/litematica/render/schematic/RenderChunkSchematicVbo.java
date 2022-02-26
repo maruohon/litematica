@@ -776,7 +776,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         synchronized (this.boxes)
         {
             this.ignoreClientWorldFluids = Configs.Visuals.IGNORE_EXISTING_FLUIDS.getBooleanValue();
-            this.overlayEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.getBooleanValue();
+            this.overlayEnabled = Configs.Visuals.SCHEMATIC_OVERLAY.getBooleanValue();
             this.overlayReducedInnerSides = Configs.Visuals.OVERLAY_REDUCED_INNER_SIDES.getBooleanValue();
             this.overlayLinesEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINES.getBooleanValue();
             this.overlayModelLines = Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue();

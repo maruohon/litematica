@@ -36,7 +36,7 @@ public class Configs
         public static final BooleanConfig BETTER_RENDER_ORDER                       = new BooleanConfig("betterRenderOrder", true);
         public static final BooleanConfig CHANGE_SELECTED_CORNER                    = new BooleanConfig("changeSelectedCornerOnMove", true);
         public static final BooleanConfig CLONE_AT_ORIGINAL_POS                     = new BooleanConfig("cloneAtOriginalPosition", false);
-        public static final BooleanConfig CUSTOM_SCHEMATIC_DIR_ENABLED              = new BooleanConfig("useCustomSchematicDirectory", false);
+        public static final StringConfig  COMMAND_NAME_SETBLOCK                     = new StringConfig("commandNameSetblock", "setblock");
         public static final DirectoryConfig CUSTOM_SCHEMATIC_DIRECTORY              = new DirectoryConfig("customSchematicDirectory", FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics")));
         public static final BooleanConfig DEBUG_MESSAGES                            = new BooleanConfig("debugMessages", false);
         public static final BooleanConfig EASY_PLACE_CLICK_ADJACENT                 = new BooleanConfig("easyPlaceClickAdjacent", false);
@@ -49,13 +49,13 @@ public class Configs
         public static final BooleanConfig MATERIALS_FROM_CONTAINER                  = new BooleanConfig("materialListFromContainer", true);
         public static final IntegerConfig PASTE_COMMAND_INTERVAL                    = new IntegerConfig("pasteCommandInterval", 1, 1, 1000);
         public static final IntegerConfig PASTE_COMMAND_LIMIT                       = new IntegerConfig("pasteCommandLimit", 64, 1, 1000);
-        public static final StringConfig  PASTE_COMMAND_SETBLOCK                    = new StringConfig( "pasteCommandNameSetblock", "setblock");
         public static final BooleanConfig PICK_BLOCK_IGNORE_NBT                     = new BooleanConfig("pickBlockIgnoreNBT", true);
         public static final StringConfig  PICK_BLOCKABLE_SLOTS                      = new StringConfig( "pickBlockableSlots", "6-9");
         public static final BooleanConfig PLACEMENTS_INFRONT                        = new BooleanConfig("placementInfrontOfPlayer", false);
         public static final BooleanConfig RENDER_MATERIALS_IN_GUI                   = new BooleanConfig("renderMaterialListInGuis", true);
         public static final BooleanConfig RENDER_THREAD_NO_TIMEOUT                  = new BooleanConfig("renderThreadNoTimeout", true);
         public static final StringConfig  TOOL_ITEM                                 = new StringConfig( "toolItem", "minecraft:stick");
+        public static final BooleanConfig USE_CUSTOM_SCHEMATIC_DIRECTORY            = new BooleanConfig("useCustomSchematicDirectory", false);
 
         public static final OptionListConfig<ReplaceBehavior> PASTE_REPLACE_BEHAVIOR        = new OptionListConfig<>("pasteReplaceBehavior", ReplaceBehavior.NONE, ReplaceBehavior.VALUES);
         public static final OptionListConfig<CornerSelectionMode> SELECTION_CORNERS_MODE    = new OptionListConfig<>("selectionCornersMode", CornerSelectionMode.CORNERS, CornerSelectionMode.VALUES);
@@ -65,7 +65,8 @@ public class Configs
                 BETTER_RENDER_ORDER,
                 CHANGE_SELECTED_CORNER,
                 CLONE_AT_ORIGINAL_POS,
-                CUSTOM_SCHEMATIC_DIR_ENABLED,
+                COMMAND_NAME_SETBLOCK,
+                USE_CUSTOM_SCHEMATIC_DIRECTORY,
                 CUSTOM_SCHEMATIC_DIRECTORY,
                 DEBUG_MESSAGES,
                 EASY_PLACE_CLICK_ADJACENT,
@@ -80,7 +81,6 @@ public class Configs
                 PASTE_REPLACE_BEHAVIOR,
                 PASTE_COMMAND_INTERVAL,
                 PASTE_COMMAND_LIMIT,
-                PASTE_COMMAND_SETBLOCK,
                 PICK_BLOCK_AUTO,
                 PICK_BLOCK_ENABLED,
                 PICK_BLOCK_IGNORE_NBT,
@@ -111,23 +111,22 @@ public class Configs
         public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE             = new HotkeyedBooleanConfig("mainRenderingToggle", true, "M,R");
         public static final HotkeyedBooleanConfig RENDER_COLLIDING_SCHEMATIC_BLOCKS = new HotkeyedBooleanConfig("renderCollidingSchematicBlocks", false, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_BLOCKS_RENDERING        = new HotkeyedBooleanConfig("schematicBlocksRendering", true, "M,B");
-        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_RENDERING       = new HotkeyedBooleanConfig("schematicOverlayRendering", true, "");
+        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY                 = new HotkeyedBooleanConfig("schematicOverlayRendering", true, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_RENDERING               = new HotkeyedBooleanConfig("schematicRendering", true, "M,G");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_RENDER_THROUGH  = new HotkeyedBooleanConfig("schematicOverlayRenderThrough", false, "");
         public static final HotkeyedBooleanConfig TRANSLUCENT_SCHEMATIC_RENDERING   = new HotkeyedBooleanConfig("translucentSchematicRendering", false, "");
 
-        public static final BooleanConfig IGNORE_EXISTING_FLUIDS                    = new BooleanConfig("ignoreExistingFluids", false);
+        public static final BooleanConfig AREA_SELECTION_BOX_SIDES                  = new BooleanConfig("areaSelectionBoxSides", true);
+        public static final BooleanConfig ERROR_MARKER_CONNECTIONS                  = new BooleanConfig("errorMarkerConnections", false);
+        public static final BooleanConfig ERROR_MARKER_SIDES                        = new BooleanConfig("errorMarkerSides", true);
+        public static final BooleanConfig IGNORE_EXISTING_FLUIDS                    = new BooleanConfig("ignoreExistingFluids", true);
         public static final BooleanConfig OVERLAY_REDUCED_INNER_SIDES               = new BooleanConfig("overlayReducedInnerSides", false);
-        public static final BooleanConfig PLACEMENT_BOX_RENDERING                   = new BooleanConfig("enablePlacementBoxesRendering", true);
+        public static final BooleanConfig PLACEMENT_BOX_RENDERING                   = new BooleanConfig("placementBoundingBoxRendering", true);
+        public static final BooleanConfig PLACEMENT_BOX_SIDES                       = new BooleanConfig("placementBoxSides", false);
         public static final DoubleConfig  PLACEMENT_BOX_SIDE_ALPHA                  = new DoubleConfig( "placementBoxSideAlpha", 0.2, 0.0, 1.0);
-        public static final BooleanConfig RENDER_AREA_SELECTION_BOX_SIDES           = new BooleanConfig("renderAreaSelectionBoxSides", true);
+        public static final BooleanConfig PLACEMENT_ENCLOSING_BOX                   = new BooleanConfig("placementEnclosingBox", true);
+        public static final BooleanConfig PLACEMENT_ENCLOSING_BOX_SIDES             = new BooleanConfig("placementEnclosingBoxSides", false);
         public static final BooleanConfig RENDER_COLLIDING_BLOCK_AT_CURSOR          = new BooleanConfig("renderCollidingBlockAtCursor", false);
-        public static final BooleanConfig RENDER_ERROR_MARKER_CONNECTIONS           = new BooleanConfig("renderErrorMarkerConnections", false);
-        public static final BooleanConfig RENDER_ERROR_MARKER_SIDES                 = new BooleanConfig("renderErrorMarkerSides", true);
-        public static final BooleanConfig RENDER_PLACEMENT_BOX_SIDES                = new BooleanConfig("renderPlacementBoxSides", false);
-        public static final BooleanConfig RENDER_PLACEMENT_ENCLOSING_BOX            = new BooleanConfig("renderPlacementEnclosingBox", true);
-        public static final BooleanConfig RENDER_PLACEMENT_ENCLOSING_BOX_SIDES      = new BooleanConfig("renderPlacementEnclosingBoxSides", false);
-        public static final BooleanConfig RENDER_TRANSLUCENT_INNER_SIDES            = new BooleanConfig("renderTranslucentBlockInnerSides", false);
         public static final BooleanConfig SCHEMATIC_OVERLAY_MODEL_OUTLINE           = new BooleanConfig("schematicOverlayModelOutline", true);
         public static final BooleanConfig SCHEMATIC_OVERLAY_MODEL_SIDES             = new BooleanConfig("schematicOverlayModelSides", true);
         public static final BooleanConfig SCHEMATIC_OVERLAY_OUTLINES                = new BooleanConfig("schematicOverlayOutlines", true);
@@ -139,50 +138,49 @@ public class Configs
         public static final BooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK        = new BooleanConfig("schematicOverlayTypeWrongBlock", true);
         public static final BooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_STATE        = new BooleanConfig("schematicOverlayTypeWrongState", true);
         public static final BooleanConfig SCHEMATIC_VERIFIER_BLOCK_MODELS           = new BooleanConfig("schematicVerifierUseBlockModels", false);
+        public static final BooleanConfig TRANSLUCENT_INNER_SIDES                   = new BooleanConfig("translucentBlockInnerSides", false);
         public static final DoubleConfig  TRANSLUCENT_SCHEMATIC_ALPHA               = new DoubleConfig( "translucentSchematicAlpha", 0.5, 0.0, 1.0);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
-                MAIN_RENDERING_TOGGLE,
-                SCHEMATIC_RENDERING,
-                SCHEMATIC_BLOCKS_RENDERING,
-                SCHEMATIC_OVERLAY_RENDERING,
+                AREA_SELECTION_BOX_SIDES,
                 AREA_SELECTION_RENDERING,
-
+                ERROR_MARKER_CONNECTIONS,
+                ERROR_MARKER_SIDES,
                 IGNORE_EXISTING_FLUIDS,
+                MAIN_RENDERING_TOGGLE,
                 OVERLAY_REDUCED_INNER_SIDES,
                 PLACEMENT_BOX_RENDERING,
-                RENDER_AREA_SELECTION_BOX_SIDES,
-                TRANSLUCENT_SCHEMATIC_RENDERING,
+                PLACEMENT_BOX_SIDES,
+                PLACEMENT_BOX_SIDE_ALPHA,
+                PLACEMENT_ENCLOSING_BOX,
+                PLACEMENT_ENCLOSING_BOX_SIDES,
                 RENDER_COLLIDING_BLOCK_AT_CURSOR,
                 RENDER_COLLIDING_SCHEMATIC_BLOCKS,
-                RENDER_ERROR_MARKER_CONNECTIONS,
-                RENDER_ERROR_MARKER_SIDES,
-                RENDER_PLACEMENT_BOX_SIDES,
-                RENDER_PLACEMENT_ENCLOSING_BOX,
-                RENDER_PLACEMENT_ENCLOSING_BOX_SIDES,
-                RENDER_TRANSLUCENT_INNER_SIDES,
+                SCHEMATIC_BLOCKS_RENDERING,
+                SCHEMATIC_OVERLAY,
                 SCHEMATIC_OVERLAY_OUTLINES,
-                SCHEMATIC_OVERLAY_SIDES,
                 SCHEMATIC_OVERLAY_MODEL_OUTLINE,
                 SCHEMATIC_OVERLAY_MODEL_SIDES,
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH,
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH,
                 SCHEMATIC_OVERLAY_RENDER_THROUGH,
+                SCHEMATIC_OVERLAY_SIDES,
                 SCHEMATIC_OVERLAY_TYPE_EXTRA,
                 SCHEMATIC_OVERLAY_TYPE_MISSING,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_STATE,
+                SCHEMATIC_RENDERING,
                 SCHEMATIC_VERIFIER_BLOCK_MODELS,
-
-                PLACEMENT_BOX_SIDE_ALPHA,
-                SCHEMATIC_OVERLAY_OUTLINE_WIDTH,
-                SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH,
-                TRANSLUCENT_SCHEMATIC_ALPHA
+                TRANSLUCENT_INNER_SIDES,
+                TRANSLUCENT_SCHEMATIC_ALPHA,
+                TRANSLUCENT_SCHEMATIC_RENDERING
         );
 
         public static final ImmutableList<HotkeyedBooleanConfig> HOTKEYS = ImmutableList.of(
                 AREA_SELECTION_RENDERING,
                 MAIN_RENDERING_TOGGLE,
                 SCHEMATIC_BLOCKS_RENDERING,
-                SCHEMATIC_OVERLAY_RENDERING,
+                SCHEMATIC_OVERLAY,
                 SCHEMATIC_RENDERING,
                 TRANSLUCENT_SCHEMATIC_RENDERING,
                 RENDER_COLLIDING_SCHEMATIC_BLOCKS,

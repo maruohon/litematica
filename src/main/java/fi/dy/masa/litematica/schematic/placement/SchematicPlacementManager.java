@@ -1020,8 +1020,9 @@ public class SchematicPlacementManager
             {
                 this.moveSubRegionTo(schematicPlacement, schematicPlacement.getSelectedSubRegionName(), pos);
 
-                String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                MessageDispatcher.success().translate("litematica.message.placement.moved_subregion_to", posStr);
+                MessageDispatcher.success().customHotbar()
+                        .translate("litematica.message.placement.moved_subregion_to",
+                                   pos.getX(), pos.getY(), pos.getZ());
             }
             // Moving the origin point
             else
@@ -1031,9 +1032,10 @@ public class SchematicPlacementManager
 
                 if (old.equals(schematicPlacement.getOrigin()) == false)
                 {
-                    String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
-                    String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    MessageDispatcher.success().translate("litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
+                    MessageDispatcher.generic().customHotbar()
+                            .translate("litematica.message.placement.moved_placement_origin",
+                                       old.getX(), old.getY(), old.getZ(),
+                                       pos.getX(), pos.getY(), pos.getZ());
                 }
             }
         }

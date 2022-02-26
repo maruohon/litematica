@@ -220,7 +220,7 @@ public class LitematicaRenderer
     {
         boolean invert = Hotkeys.INVERT_OVERLAY_RENDER_STATE.getKeyBind().isKeyBindHeld();
 
-        if (Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.getBooleanValue() != invert)
+        if (Configs.Visuals.SCHEMATIC_OVERLAY.getBooleanValue() != invert)
         {
             boolean renderThrough = Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue() || Hotkeys.RENDER_OVERLAY_THROUGH_BLOCKS.getKeyBind().isKeyBindHeld();
             float lineWidth = (float) (renderThrough ? Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH.getDoubleValue() : Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());

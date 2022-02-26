@@ -56,7 +56,7 @@ public class HotkeyCallbacks
         Hotkeys.REFRESH_SCHEMATIC_RENDERER.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.ROTATE_PLACEMENT_CW.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.ROTATE_PLACEMENT_CCW.getKeyBind().setCallback(hotkeyCallbackMisc);
-        Hotkeys.SAVE_SCHEMATIC_IN_MEMORY.getKeyBind().setCallback(hotkeyCallbackMisc);
+        Hotkeys.CREATE_SCHEMATIC_IN_MEMORY.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SAVE_SCHEMATIC_TO_FILE.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SCHEMATIC_EDIT_ACCEPT_REPLACEMENT.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeyBind().setCallback(hotkeyCallbackMisc);
@@ -87,14 +87,14 @@ public class HotkeyCallbacks
         Configs.Visuals.MAIN_RENDERING_TOGGLE.addValueChangeListener(refreshCallback);
         Configs.Visuals.OVERLAY_REDUCED_INNER_SIDES.addValueChangeListener(refreshCallback);
         Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.addValueChangeListener(refreshCallback);
-        Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.addValueChangeListener(refreshCallback);
+        Configs.Visuals.TRANSLUCENT_INNER_SIDES.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINES.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH.addValueChangeListener(refreshCallback);
-        Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.addValueChangeListener(refreshCallback);
+        Configs.Visuals.SCHEMATIC_OVERLAY.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_SIDES.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_EXTRA.addValueChangeListener(refreshCallback);
