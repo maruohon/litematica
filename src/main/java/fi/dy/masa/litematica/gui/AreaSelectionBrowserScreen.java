@@ -95,7 +95,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         File dir = DataManager.getAreaSelectionsBaseDirectory();
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE, "area_selections");
 
-        listWidget.setListEntryWidgetFixedHeight(22);
+        listWidget.setListEntryWidgetFixedHeight(18);
         listWidget.setParentScreen(this.getParent());
         listWidget.setFileFilter(FileUtils.JSON_FILEFILTER);
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);

@@ -95,6 +95,7 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
         // boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
 
+        this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0x70606060 : 0x70909090);
         this.getBackgroundRenderer().getNormalSettings().setEnabled(true);
         this.setText(StyledTextLine.of(placement.getName()));
         this.addHoverInfo(placement);
@@ -147,6 +148,12 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         this.lockedIcon.setRight(this.modificationNoticeIcon.getX() - 1);
 
         this.buttonsStartX = this.lockedIcon.getX() - 1;
+    }
+
+    @Override
+    protected boolean isSelected()
+    {
+        return this.manager.getSelectedSchematicPlacement() == this.data;
     }
 
     @Override

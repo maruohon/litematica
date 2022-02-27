@@ -54,10 +54,10 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         this.isSelectionEntry = this.fileType == FileType.JSON && entry.getType() == DirectoryEntryType.FILE;
         this.textOffset.setXOffset(5);
 
-        this.configureButton = GenericButton.create("litematica.button.misc.configure", this::openAreaEditor);
-        this.copyButton      = GenericButton.create("litematica.button.misc.copy", this::copySelection);
-        this.removeButton    = GenericButton.create("litematica.button.misc.remove.minus", this::removeSelection);
-        this.renameButton    = GenericButton.create("litematica.button.misc.rename", this::renameSelection);
+        this.configureButton = GenericButton.create(16, "litematica.button.misc.configure", this::openAreaEditor);
+        this.copyButton      = GenericButton.create(16, "litematica.button.misc.copy", this::copySelection);
+        this.removeButton    = GenericButton.create(16, "litematica.button.misc.remove.minus", this::removeSelection);
+        this.renameButton    = GenericButton.create(16, "litematica.button.misc.rename", this::renameSelection);
 
         if (this.isSelectionEntry)
         {
