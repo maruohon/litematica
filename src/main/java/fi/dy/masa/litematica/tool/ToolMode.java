@@ -17,7 +17,7 @@ public enum ToolMode
     GRID_PASTE          ("litematica.name.tool_mode.grid_paste",            true, true),
     MOVE                ("litematica.name.tool_mode.move",                  true, false),
     DELETE              ("litematica.name.tool_mode.delete",                true, false),
-    REBUILD             ("litematica.name.tool_mode.rebuild",               false, true, true, false);
+    SCHEMATIC_EDIT      ("litematica.name.tool_mode.schematic_edit",        false, true, true, false);
 
     private final String translationKey;
     private final boolean creativeOnly;

@@ -113,7 +113,7 @@ public class ToolHud extends InfoHud
             String str = Configs.Generic.SELECTION_CORNERS_MODE.getValue().getDisplayName();
             lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.corners_mode", str));
         }
-        else if ((hasTool || mode == ToolMode.REBUILD) && mode.getUsesSchematic())
+        else if ((hasTool || mode == ToolMode.SCHEMATIC_EDIT) && mode.getUsesSchematic())
         {
             this.addSchematicPlacementLines(lines, mode);
 
@@ -134,7 +134,7 @@ public class ToolHud extends InfoHud
             }
         }
 
-        if (hasTool || mode == ToolMode.REBUILD)
+        if (hasTool || mode == ToolMode.SCHEMATIC_EDIT)
         {
             lines.add(StringUtils.translate("litematica.hud.tool_hud.tool_mode",
                                             mode.ordinal() + 1, ToolMode.VALUES.size(), mode.getDisplayName()));
@@ -228,7 +228,7 @@ public class ToolHud extends InfoHud
             IBlockState state = mode.getPrimaryBlock();
             ItemStack stack = this.mc.player.getHeldItemMainhand();
 
-            if (state != null && mode == ToolMode.REBUILD &&
+            if (state != null && mode == ToolMode.SCHEMATIC_EDIT &&
                 (stack.isEmpty() || EntityUtils.hasToolItem(this.mc.player)))
             {
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.used_block", this.getBlockStateString(state)));

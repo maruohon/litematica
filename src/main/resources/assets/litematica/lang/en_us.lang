@@ -144,7 +144,7 @@ litematica.name.tool_mode.fill=Fill
 litematica.name.tool_mode.grid_paste=Grid Paste Schematic in World
 litematica.name.tool_mode.move=Move
 litematica.name.tool_mode.paste_schematic=Paste Schematic in World
-litematica.name.tool_mode.rebuild=§dSchematic Edit§r
+litematica.name.tool_mode.schematic_edit=§dSchematic Edit§r
 litematica.name.tool_mode.replace_block=Replace Blocks in World
 litematica.name.tool_mode.schematic_placement=Schematic Placement
 

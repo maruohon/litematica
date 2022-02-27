@@ -47,7 +47,7 @@ public class SchematicEditUtils
     public static boolean rebuildHandleBlockBreak(Minecraft mc)
     {
         if (mc.player != null &&
-            DataManager.getToolMode() == ToolMode.REBUILD &&
+            DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
             if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
@@ -70,7 +70,7 @@ public class SchematicEditUtils
     public static boolean rebuildHandleBlockPlace(Minecraft mc)
     {
         if (mc.player != null &&
-            DataManager.getToolMode() == ToolMode.REBUILD &&
+            DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
             if (Hotkeys.SCHEMATIC_EDIT_REPLACE_DIRECTION.getKeyBind().isKeyBindHeld())
@@ -273,7 +273,7 @@ public class SchematicEditUtils
         ItemStack stack = mc.player.getHeldItemMainhand();
 
         if ((stack.isEmpty() == false && (stack.getItem() instanceof ItemBlock || stack.getItem() instanceof ItemBlockSpecial)) ||
-            (stack.isEmpty() && ToolMode.REBUILD.getPrimaryBlock() != null))
+            (stack.isEmpty() && ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null))
         {
             WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
             Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
@@ -300,9 +300,9 @@ public class SchematicEditUtils
                     stateNew = ((IMixinItemBlockSpecial) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
                                     side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, 0, mc.player);
                 }
-                else if (ToolMode.REBUILD.getPrimaryBlock() != null)
+                else if (ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null)
                 {
-                    stateNew = ToolMode.REBUILD.getPrimaryBlock();
+                    stateNew = ToolMode.SCHEMATIC_EDIT.getPrimaryBlock();
                 }
 
                 return new ReplacementInfo(pos, side, hitVec, stateOriginal, stateNew);

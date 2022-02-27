@@ -46,7 +46,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
                 }
             }
 
-            if (DataManager.getToolMode() == ToolMode.REBUILD)
+            if (DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT)
             {
                 OverlayRenderer.getInstance().renderSchematicRebuildTargetingOverlay(partialTicks);
             }

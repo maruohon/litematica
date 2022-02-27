@@ -232,7 +232,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             // with all the rebuild actions...
             // Also don't do the pick block from here if pickBlockAuto is enabled,
             // since in that case it's done from the vanilla right click handling code.
-            if (DataManager.getToolMode() != ToolMode.REBUILD &&
+            if (DataManager.getToolMode() != ToolMode.SCHEMATIC_EDIT &&
                 Configs.Generic.PICK_BLOCK_AUTO.getBooleanValue() == false &&
                 EntityUtils.shouldPickBlock(this.mc.player))
             {

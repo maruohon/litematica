@@ -108,7 +108,7 @@ public class EasyPlaceUtils
 
     public static boolean shouldDoEasyPlaceActions()
     {
-        return Configs.Generic.EASY_PLACE_MODE.getBooleanValue() && DataManager.getToolMode() != ToolMode.REBUILD &&
+        return Configs.Generic.EASY_PLACE_MODE.getBooleanValue() && DataManager.getToolMode() != ToolMode.SCHEMATIC_EDIT &&
                Hotkeys.EASY_PLACE_ACTIVATION.getKeyBind().isKeyBindHeld();
     }
 
