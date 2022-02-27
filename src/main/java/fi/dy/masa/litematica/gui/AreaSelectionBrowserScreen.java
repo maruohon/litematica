@@ -46,7 +46,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         this.selectionFromPlacementButton.setEnabled(DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement() != null);
 
         this.setTitle("litematica.gui.title.area_selection_browser");
-        this.updateCurrentSelectionLabelWidget();
+        this.updateCurrentSelectionLabel();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
         if (this.selectionManager.getSelectionMode() == SelectionMode.SIMPLE)
         {
-            MessageDispatcher.warning(8000).translate("litematica.message.warn.area_selection_browser.in_simple_mode");
+            MessageDispatcher.warning(5000).translate("litematica.message.warn.area_selection_browser.in_simple_mode");
         }
     }
 
@@ -69,11 +69,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         this.addWidget(this.openAreaEditorButton);
         this.addWidget(this.selectionFromPlacementButton);
         this.addWidget(this.unselectButton);
-
-        if (this.selectionManager.getCurrentNormalSelectionId() != null)
-        {
-            this.addWidget(this.currentSelectionLabel);
-        }
+        this.addWidget(this.currentSelectionLabel);
     }
 
     @Override
@@ -110,7 +106,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         return listWidget;
     }
 
-    protected void updateCurrentSelectionLabelWidget()
+    protected void updateCurrentSelectionLabel()
     {
         String currentSelection = this.selectionManager.getCurrentNormalSelectionId();
 
@@ -121,8 +117,13 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
             if (currentSelection.length() > len + 1)
             {
                 currentSelection = FileNameUtils.getFileNameWithoutExtension(currentSelection.substring(len + 1));
-                this.currentSelectionLabel.setText("litematica.label.area_selection_browser.current_selection", currentSelection);
+                String key = "litematica.label.area_selection_browser.current_selection";
+                this.currentSelectionLabel.setText(key, currentSelection);
             }
+        }
+        else
+        {
+            this.currentSelectionLabel.clearText();
         }
     }
 
@@ -137,7 +138,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         File dir = this.getListWidget().getCurrentDirectory();
         this.selectionManager.createNewSelection(dir, name);
         this.getListWidget().refreshEntries();
-        this.updateCurrentSelectionLabelWidget();
+        this.updateCurrentSelectionLabel();
         return true;
     }
 
@@ -163,9 +164,10 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
         if (placement != null && this.selectionManager.createSelectionFromPlacement(dir, placement, name))
         {
-            MessageDispatcher.success().translate("litematica.message.area_selections.selection_created_from_placement", name);
+            String key = "litematica.message.area_selections.selection_created_from_placement";
+            MessageDispatcher.success().translate(key, name);
             this.getListWidget().refreshEntries();
-            this.updateCurrentSelectionLabelWidget();
+            this.updateCurrentSelectionLabel();
             return true;
         }
 
@@ -175,7 +177,8 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     protected void unselect()
     {
         DataManager.getSelectionManager().setCurrentSelection(null);
-        this.getListWidget().reCreateListEntryWidgets();
+        this.updateCurrentSelectionLabel();
+        this.getListWidget().updateEntryWidgetStates();
     }
 
     public void onSelectionChange(BaseFileBrowserWidget.DirectoryEntry entry)
@@ -193,9 +196,9 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
             {
                 this.selectionManager.setCurrentSelection(selectionId);
             }
-
-            this.getListWidget().reCreateListEntryWidgets();
-            this.updateCurrentSelectionLabelWidget();
         }
+
+        this.updateCurrentSelectionLabel();
+        this.getListWidget().updateEntryWidgetStates();
     }
 }

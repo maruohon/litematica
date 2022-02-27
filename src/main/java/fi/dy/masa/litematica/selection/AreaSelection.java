@@ -95,11 +95,14 @@ public class AreaSelection
         this.originSelected = selected;
     }
 
+    public boolean hasManualOrigin()
+    {
+        return this.explicitOrigin != null;
+    }
+
     /**
-     * Returns the effective origin point. This is the explicit origin point, if one has been set,
-     * otherwise it's an automatically calculated origin point, located at the minimum corner
-     * of all the boxes.
-     * @return
+     * @return Returns the effective origin point. This is the explicit origin point if one has been set,
+     *         otherwise it's an automatically calculated origin point, located at the minimum corner of all the boxes.
      */
     public BlockPos getEffectiveOrigin()
     {
@@ -119,8 +122,7 @@ public class AreaSelection
     }
 
     /**
-     * Get the explicitly defined origin point, if any.
-     * @return
+     * @return the explicitly defined origin point, if any.
      */
     @Nullable
     public BlockPos getExplicitOrigin()

@@ -16,21 +16,26 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 
 public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 {
     protected final SelectionManager selectionManager;
     protected final FileType fileType;
+    protected final String selectionId;
     protected final GenericButton configureButton;
     protected final GenericButton copyButton;
     protected final GenericButton removeButton;
     protected final GenericButton renameButton;
+    @Nullable protected final AreaSelection selection;
     protected final boolean isSelectionEntry;
+    protected boolean isSelected;
     protected int buttonsStartX;
 
     public AreaSelectionEntryWidget(DirectoryEntry entry,
@@ -41,9 +46,12 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
     {
         super(entry, constructData, fileBrowserWidget, iconProvider);
 
-        this.fileType = FileType.fromFileName(this.entry.getFullPath());
+        File file = this.entry.getFullPath();
+        this.selectionId = file.getAbsolutePath();
+        this.selection = selectionManager.getOrLoadSelection(this.selectionId);
+        this.fileType = FileType.fromFileName(file);
         this.selectionManager = selectionManager;
-        this.isSelectionEntry = this.fileType == FileType.JSON && entry.getType() == BaseFileBrowserWidget.DirectoryEntryType.FILE;
+        this.isSelectionEntry = this.fileType == FileType.JSON && entry.getType() == DirectoryEntryType.FILE;
         this.textOffset.setXOffset(5);
 
         this.configureButton = GenericButton.create("litematica.button.misc.configure", this::openAreaEditor);
@@ -53,6 +61,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
         if (this.isSelectionEntry)
         {
+            this.isSelected = this.selectionId.equals(this.selectionManager.getCurrentNormalSelectionId());
             this.addHoverTooltip();
         }
     }
@@ -92,29 +101,14 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         }
     }
 
-    protected void addHoverTooltip()
+    @Override
+    public void updateWidgetState()
     {
-        String selectionId = this.getDirectoryEntry().getFullPath().getAbsolutePath();
-        AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(selectionId);
+        super.updateWidgetState();
 
-        if (selection != null)
+        if (this.isSelectionEntry)
         {
-            List<String> lines = new ArrayList<>();
-            BlockPos o = selection.getExplicitOrigin();
-            String key = o == null ? "litematica.hover.area_selection_browser.origin.auto" :
-                                     "litematica.hover.area_selection_browser.origin.manual";
-
-            if (o == null)
-            {
-                o = selection.getEffectiveOrigin();
-            }
-
-            lines.add(StringUtils.translate(key, o.getX(), o.getY(), o.getZ()));
-
-            int count = selection.getAllSubRegionBoxes().size();
-            lines.add(StringUtils.translate("litematica.hover.area_selection_browser.region_count", count));
-
-            this.getHoverInfoFactory().addStrings(lines);
+            this.isSelected = this.selectionId.equals(this.selectionManager.getCurrentNormalSelectionId());
         }
     }
 
@@ -129,17 +123,66 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         return super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
+    @Override
+    public boolean isSelected()
+    {
+        return this.isSelected;
+    }
+
+    @Override
+    protected String getDisplayName()
+    {
+        if (this.isSelectionEntry)
+        {
+            if (this.selection != null)
+            {
+                String prefix = this.entry.getDisplayNamePrefix();
+                String selectionName = this.selection.getName();
+                return  prefix != null ? prefix + selectionName : selectionName;
+            }
+            else
+            {
+                return "<error>";
+            }
+        }
+
+        return super.getDisplayName();
+    }
+
+    protected void addHoverTooltip()
+    {
+        if (this.selection != null)
+        {
+            List<String> lines = new ArrayList<>();
+
+            if (this.selection.hasManualOrigin())
+            {
+                String key = "litematica.hover.area_selection_browser.origin.manual";
+                BlockPos o = this.selection.getExplicitOrigin();
+                lines.add(StringUtils.translate(key, o.getX(), o.getY(), o.getZ()));
+            }
+            else
+            {
+                String key = "litematica.hover.area_selection_browser.origin.auto";
+                BlockPos o = this.selection.getEffectiveOrigin();
+                lines.add(StringUtils.translate(key, o.getX(), o.getY(), o.getZ()));
+            }
+
+            int count = this.selection.getAllSubRegionBoxes().size();
+            lines.add(StringUtils.translate("litematica.hover.area_selection_browser.region_count", count));
+
+            this.getHoverInfoFactory().addStrings(lines);
+        }
+    }
+
     protected void openAreaEditor()
     {
-        String selectionId = this.getDirectoryEntry().getFullPath().getAbsolutePath();
-        AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
-
-        if (selection != null)
+        if (this.selection != null)
         {
             /* TODO FIXME malilib refactor
             GuiAreaSelectionEditorNormal gui = new GuiAreaSelectionEditorNormal(selection);
             gui.setParent(GuiUtils.getCurrentScreen());
-            gui.setSelectionId(selectionId);
+            gui.setSelectionId(this.selectionId);
             BaseScreen.openScreen(gui);
             */
         }
@@ -147,15 +190,13 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
     protected void copySelection()
     {
-        String selectionId = this.getDirectoryEntry().getFullPath().getAbsolutePath();
-        AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
-
-        if (selection != null)
+        if (this.selection != null)
         {
-            String title = StringUtils.translate("litematica.title.screen.area_selection_browser.copy_selection", selection.getName());
-            BaseScreen.openPopupScreen(new TextInputScreen(title, selection.getName(),
-                                                           (str) -> this.renameSelectionUsingName(str, true),
-                                                           GuiUtils.getCurrentScreen()));
+            String titleKey = "litematica.title.screen.area_selection_browser.copy_selection";
+            String selectionName = this.selection.getName();
+            String title = StringUtils.translate(titleKey, selectionName);
+            ResultingStringConsumer callback = (str) -> this.renameSelectionUsingName(str, true);
+            BaseScreen.openPopupScreen(new TextInputScreen(title, selectionName, callback, GuiUtils.getCurrentScreen()));
         }
         else
         {
@@ -165,65 +206,29 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
     protected void renameSelection()
     {
-        String selectionId = this.getDirectoryEntry().getFullPath().getAbsolutePath();
         String title = "litematica.title.screen.area_selection_browser.rename_selection";
-        AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
-        String name = selection != null ? selection.getName() : "<error>";
-        BaseScreen.openPopupScreen(new TextInputScreen(title, name,
-                                                       (str) -> this.renameSelectionUsingName(str, false),
-                                                       GuiUtils.getCurrentScreen()));
+        String name = this.selection != null ? this.selection.getName() : "<error>";
+        ResultingStringConsumer callback = (str) -> this.renameSelectionUsingName(str, false);
+        BaseScreen.openPopupScreen(new TextInputScreen(title, name, callback, GuiUtils.getCurrentScreen()));
     }
 
     protected boolean renameSelectionUsingName(String name, boolean copy)
     {
-        DirectoryEntry entry = this.getDirectoryEntry();
-        String selectionId = entry.getFullPath().getAbsolutePath();
-        File dir = entry.getDirectory();
-        return this.selectionManager.renameSelection(dir, selectionId, name, copy, MessageOutput.MESSAGE_OVERLAY);
+        File dir = this.entry.getDirectory();
+        return this.selectionManager.renameSelection(dir, this.selectionId, name, copy, MessageOutput.MESSAGE_OVERLAY);
     }
 
     protected void removeSelection()
     {
-        String selectionId = this.getDirectoryEntry().getFullPath().getAbsolutePath();
-        String current = this.selectionManager.getCurrentNormalSelectionId();
-
-        if (this.selectionManager.removeSelection(selectionId) &&
+        if (this.selectionManager.removeSelection(this.selectionId) &&
             this.selectionManager.getSelectionMode() == SelectionMode.NORMAL &&
-            selectionId.equals(current))
+            this.selectionId.equals(this.selectionManager.getCurrentNormalSelectionId()))
         {
             GuiUtils.reInitCurrentScreen();
         }
-
-        this.listWidget.refreshEntries();
-    }
-
-    /*
-    @Override
-    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId, boolean selected)
-    {
-        if (this.entry.getType() == DirectoryEntryType.FILE && this.fileType == FileType.JSON)
-        {
-            selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentNormalSelectionId());
-            super.render(mouseX, mouseY, isActiveGui, hoveredWidgetId, selected);
-        }
         else
         {
-            super.render(mouseX, mouseY, isActiveGui, hoveredWidgetId, selected);
+            this.listWidget.refreshEntries();
         }
-    }
-    */
-
-    @Override
-    protected String getDisplayName()
-    {
-        if (this.isSelectionEntry)
-        {
-            String selectionId = this.getDirectoryEntry().getFullPath().getAbsolutePath();
-            AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(selectionId);
-            String prefix = this.entry.getDisplayNamePrefix();
-            return selection != null ? (prefix != null ? prefix + selection.getName() : selection.getName()) : "<error>";
-        }
-
-        return super.getDisplayName();
     }
 }
