@@ -98,13 +98,6 @@ public class ToolHud extends InfoHud
 
         ToolMode mode = DataManager.getToolMode();
 
-        if (hasTool && mode == ToolMode.DELETE)
-        {
-            String key = ToolModeData.DELETE.getUsePlacement() ? "litematica.hud.tool_hud.delete.target_mode.placement" :
-                                                                 "litematica.hud.tool_hud.delete.target_mode.area";
-            lines.add(StringUtils.translate("litematica.hud.tool_hud.delete.target_mode", StringUtils.translate(key)));
-        }
-
         if (hasTool && mode.getUsesAreaSelection())
         {
             this.addAreaSelectionLines(lines);
@@ -132,6 +125,13 @@ public class ToolHud extends InfoHud
                                                     replace.getDisplayName()));
                 }
             }
+        }
+
+        if (hasTool && mode == ToolMode.DELETE)
+        {
+            String key = ToolModeData.DELETE.getUsePlacement() ? "litematica.hud.tool_hud.delete.target_mode.placement" :
+                                                                 "litematica.hud.tool_hud.delete.target_mode.area";
+            lines.add(StringUtils.translate("litematica.hud.tool_hud.delete.target_mode", StringUtils.translate(key)));
         }
 
         if (hasTool || mode == ToolMode.SCHEMATIC_EDIT)
@@ -174,12 +174,12 @@ public class ToolHud extends InfoHud
             {
                 int count = selection.getAllSubRegionBoxes().size();
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.origin.normal",
-                                                o.getX(), o.getY(), o.getZ(), originMode, count));
+                                                originMode, o.getX(), o.getY(), o.getZ(), count));
             }
             else
             {
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.origin.simple",
-                                                o.getX(), o.getY(), o.getZ(), originMode));
+                                                originMode, o.getX(), o.getY(), o.getZ()));
             }
 
             String subRegionName = selection.getCurrentSubRegionBoxName();
