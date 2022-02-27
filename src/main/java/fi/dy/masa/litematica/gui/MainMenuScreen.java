@@ -46,9 +46,8 @@ public class MainMenuScreen extends BaseScreen
         // TODO FIXME malilib refactor
         //this.loadSchematicsScreenButton.setActionListener(() -> this.openScreen(new GuiSchematicLoad()));
 
-        this.areaEditorScreenButton.setActionListener(DataManager.getSelectionManager()::openEditGuiWithParent);
-        // TODO FIXME malilib refactor
-        //this.areaSelectionBrowserScreenButton.setActionListener(() -> this.openScreen(new GuiAreaSelectionManager()));
+        this.areaEditorScreenButton.setActionListener(DataManager.getSelectionManager()::openAreaEditorScreenWithParent);
+        this.areaSelectionBrowserScreenButton.setActionListener(() -> this.openScreen(new AreaSelectionBrowserScreen()));
         this.cycleAreaSelectionModeButton.setActionListener(() -> {
             DataManager.getSelectionManager().switchSelectionMode();
             this.cycleAreaSelectionModeButton.updateButtonState();

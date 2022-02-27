@@ -733,7 +733,7 @@ public class SelectionManager
         return new MainMenuScreen();
     }
 
-    public void openEditGuiWithParent()
+    public void openAreaEditorScreenWithParent()
     {
         this.openEditGui(GuiUtils.getCurrentScreen());
     }

@@ -46,7 +46,7 @@ import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class DataManager implements DirectoryCache
 {
-    private static final DataManager INSTANCE = new DataManager();
+    public static final DataManager INSTANCE = new DataManager();
 
     private static final Pattern PATTERN_ITEM_META_NBT = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)@(?<meta>[0-9]+)(?<nbt>\\{.*\\})$");
     private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)@(?<meta>[0-9]+)$");
@@ -72,11 +72,6 @@ public class DataManager implements DirectoryCache
     }
 
     private static DataManager getInstance()
-    {
-        return INSTANCE;
-    }
-
-    public static DirectoryCache getDirectoryCache()
     {
         return INSTANCE;
     }
@@ -180,7 +175,7 @@ public class DataManager implements DirectoryCache
     @Override
     public void setCurrentDirectoryForContext(String context, File dir)
     {
-        LAST_DIRECTORIES.put(context, dir);
+        LAST_DIRECTORIES.put(context, FileUtils.getCanonicalFileIfPossible(dir));
     }
 
     public static void clear()

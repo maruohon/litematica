@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.config;
 import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.AreaSelectionBrowserScreen;
 import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.gui.LoadedSchematicsListScreen;
 import fi.dy.masa.litematica.gui.MainMenuScreen;
@@ -63,6 +64,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_LOAD_SCHEMATICS_SCREEN.getKeyBind())
         {
+            // TODO FIXME malilib refactor
             //BaseScreen.openScreen(new GuiSchematicLoad());
         }
         else if (key == Hotkeys.OPEN_LOADED_SCHEMATICS_SCREEN.getKeyBind())
@@ -91,6 +93,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
             if (materialList != null)
             {
+                // TODO FIXME malilib refactor
                 //BaseScreen.openScreen(new GuiMaterialList(materialList));
             }
         }
@@ -102,6 +105,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             {
                 if (placement.isRepeatedPlacement() == false)
                 {
+                    // TODO FIXME malilib refactor
                     //BaseScreen.openScreen(new GuiPlacementGridSettings(placement, null));
                 }
                 else
@@ -120,10 +124,12 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
                 if (placement != null)
                 {
+                    // TODO FIXME malilib refactor
                     //BaseScreen.openScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
                 }
                 else
                 {
+                    // TODO FIXME malilib refactor
                     //BaseScreen.openScreen(new GuiPlacementConfiguration(schematicPlacement));
                 }
             }
@@ -146,6 +152,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
             if (schematicPlacement != null)
             {
+                // TODO FIXME malilib refactor
                 //BaseScreen.openScreen(new GuiSchematicVerifier(schematicPlacement));
             }
             else
@@ -157,7 +164,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         {
             if (DataManager.getSchematicProjectsManager().hasProjectOpen() == false)
             {
-                //BaseScreen.openScreen(new GuiAreaSelectionManager());
+                BaseScreen.openScreen(new AreaSelectionBrowserScreen());
             }
             else
             {
