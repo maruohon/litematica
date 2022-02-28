@@ -23,8 +23,8 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.util.position.Coordinate;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class SchematicPlacement extends SchematicPlacementUnloaded
 {
@@ -379,9 +379,9 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         this.locked = ! this.locked;
     }
 
-    public void setCoordinateLocked(CoordinateType coord, boolean locked)
+    public void setCoordinateLocked(Coordinate coordinate, boolean locked)
     {
-        int mask = 0x1 << coord.ordinal();
+        int mask = 0x1 << coordinate.ordinal();
 
         if (locked)
         {
@@ -393,9 +393,9 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         }
     }
 
-    public boolean isCoordinateLocked(CoordinateType coord)
+    public boolean isCoordinateLocked(Coordinate coordinate)
     {
-        int mask = 0x1 << coord.ordinal();
+        int mask = 0x1 << coordinate.ordinal();
         return (this.coordinateLockMask & mask) != 0;
     }
 

@@ -37,7 +37,7 @@ import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.position.Coordinate;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
@@ -515,45 +515,6 @@ public class PositionUtils
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    /**
-     * Returns the given position adjusted such that the coordinate indicated by <b>type</b>
-     * is set to the value in <b>value</b>
-     * @param pos
-     * @param value
-     * @param type
-     * @return
-     */
-    public static BlockPos getModifiedPosition(Vec3i pos, int value, CoordinateType type)
-    {
-
-        switch (type)
-        {
-            case X:
-                pos = new BlockPos(     value, pos.getY(), pos.getZ());
-                break;
-            case Y:
-                pos = new BlockPos(pos.getX(),      value, pos.getZ());
-                break;
-            case Z:
-                pos = new BlockPos(pos.getX(), pos.getY(),      value);
-                break;
-        }
-
-        return new BlockPos(pos);
-    }
-
-    public static int getCoordinate(Vec3i pos, CoordinateType type)
-    {
-        switch (type)
-        {
-            case X: return pos.getX();
-            case Y: return pos.getY();
-            case Z: return pos.getZ();
-        }
-
-        return 0;
-    }
-
     public static Box expandOrShrinkBox(Box box, int amount, EnumFacing side)
     {
         BlockPos pos1 = box.getPos1();
@@ -1021,17 +982,17 @@ public class PositionUtils
             int y = posNew.getY();
             int z = posNew.getZ();
 
-            if ((lockMask & (0x1 << CoordinateType.X.ordinal())) != 0)
+            if ((lockMask & (0x1 << Coordinate.X.ordinal())) != 0)
             {
                 x = posOriginal.getX();
             }
 
-            if ((lockMask & (0x1 << CoordinateType.Y.ordinal())) != 0)
+            if ((lockMask & (0x1 << Coordinate.Y.ordinal())) != 0)
             {
                 y = posOriginal.getY();
             }
 
-            if ((lockMask & (0x1 << CoordinateType.Z.ordinal())) != 0)
+            if ((lockMask & (0x1 << Coordinate.Z.ordinal())) != 0)
             {
                 z = posOriginal.getZ();
             }

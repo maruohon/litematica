@@ -7,7 +7,7 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.position.Coordinate;
 
 public class Box
 {
@@ -98,18 +98,9 @@ public class Box
         return corner == Corner.CORNER_1 ? this.getPos1() : this.getPos2();
     }
 
-    public int getCoordinate(Corner corner, CoordinateType type)
+    public int getCoordinate(Corner corner, Coordinate coordinate)
     {
-        BlockPos pos = this.getPosition(corner);
-
-        switch (type)
-        {
-            case X: return pos.getX();
-            case Y: return pos.getY();
-            case Z: return pos.getZ();
-        }
-
-        return 0;
+        return coordinate.asInt(this.getPosition(corner));
     }
 
     protected void setPosition(BlockPos pos, Corner corner)
@@ -124,10 +115,10 @@ public class Box
         }
     }
 
-    public void setCoordinate(int value, Corner corner, CoordinateType type)
+    public void setCoordinate(int value, Corner corner, Coordinate coordinate)
     {
         BlockPos pos = this.getPosition(corner);
-        pos = PositionUtils.getModifiedPosition(pos, value, type);
+        pos = coordinate.modifyBlockPos(value, pos);
         this.setPosition(pos, corner);
     }
 

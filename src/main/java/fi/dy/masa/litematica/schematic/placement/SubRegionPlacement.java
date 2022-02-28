@@ -10,7 +10,7 @@ import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.position.Coordinate;
 
 public class SubRegionPlacement
 {
@@ -59,9 +59,9 @@ public class SubRegionPlacement
         return this.ignoreEntities;
     }
 
-    public void setCoordinateLocked(CoordinateType coord, boolean locked)
+    public void setCoordinateLocked(Coordinate coordinate, boolean locked)
     {
-        int mask = 0x1 << coord.ordinal();
+        int mask = 0x1 << coordinate.ordinal();
 
         if (locked)
         {
@@ -73,20 +73,15 @@ public class SubRegionPlacement
         }
     }
 
-    public boolean isCoordinateLocked(CoordinateType coord)
+    public boolean isCoordinateLocked(Coordinate coordinate)
     {
-        int mask = 0x1 << coord.ordinal();
+        int mask = 0x1 << coordinate.ordinal();
         return (this.coordinateLockMask & mask) != 0;
     }
 
     public boolean matchesRequirement(RequiredEnabled required)
     {
-        switch (required)
-        {
-            case ANY:               return true;
-            case PLACEMENT_ENABLED: return this.isEnabled();
-            default:                return this.isEnabled();
-        }
+        return required == RequiredEnabled.ANY || this.isEnabled();
     }
 
     public String getName()

@@ -4,10 +4,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.position.Coordinate;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 
 public class GridSettings
 {
@@ -88,23 +87,23 @@ public class GridSettings
         this.initialized = true;
     }
 
-    public void setSize(CoordinateType coord, int value)
+    public void setSize(Coordinate coordinate, int value)
     {
         Vec3i oldSize = this.getSize();
-        int defaultValue = PositionUtils.getCoordinate(this.defaultSize, coord);
+        int defaultValue = coordinate.asInt(this.defaultSize);
         // Don't allow shrinking the grid size smaller than the placement enclosing box
         int newValue = Math.max(defaultValue, value);
 
-        this.setSize(PositionUtils.getModifiedPosition(oldSize, newValue, coord));
+        this.setSize(coordinate.modifyVec3i(newValue, oldSize));
         this.initialized = true;
     }
 
-    public void modifySize(CoordinateType coord, int amount)
+    public void modifySize(Coordinate coordinate, int amount)
     {
         Vec3i oldSize = this.getSize();
-        int oldValue = PositionUtils.getCoordinate(oldSize, coord);
+        int oldValue = coordinate.asInt(oldSize);
         int newValue = Math.max(1, oldValue + amount);
-        this.setSize(coord, newValue);
+        this.setSize(coordinate, newValue);
     }
 
     public GridSettings copy()

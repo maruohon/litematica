@@ -23,7 +23,7 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.position.Coordinate;
 
 public class AreaSelection
 {
@@ -395,16 +395,16 @@ public class AreaSelection
         }
     }
 
-    public void setCoordinate(@Nullable Box box, Corner corner, CoordinateType type, int value)
+    public void setCoordinate(@Nullable Box box, Corner corner, Coordinate coordinate, int value)
     {
         if (box != null && corner != null && corner != Corner.NONE)
         {
-            box.setCoordinate(value, corner, type);
+            box.setCoordinate(value, corner, coordinate);
             this.markDirty();
         }
         else if (this.explicitOrigin != null)
         {
-            this.setExplicitOrigin(PositionUtils.getModifiedPosition(this.explicitOrigin, value, type));
+            this.setExplicitOrigin(coordinate.modifyBlockPos(value, this.explicitOrigin));
         }
     }
 
