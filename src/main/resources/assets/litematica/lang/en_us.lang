@@ -10,11 +10,16 @@ litematica.hotkeys.category.hotkeys=Hotkeys
 litematica.hotkeys.category.overlays=Info Overlays
 litematica.hotkeys.category.visuals=Visuals
 
+litematica.button.area_editor.area_analyzer=Area Analyzer
+litematica.button.area_editor.corners_mode=Corners Mode: §e%s§r
+litematica.button.area_editor.manual_origin=Manual Origin: %s
+litematica.button.area_editor.save_schematic=Save Schematic
+litematica.button.area_editor.selection_mode=Selection Mode: §e%s§r
 litematica.button.area_selection_browser.create_selection=New Selection
 litematica.button.area_selection_browser.from_placement=From Placement
 litematica.button.area_selection_browser.unselect=Unselect
 litematica.button.change_menu.area_editor=Area Editor
-litematica.button.change_menu.area_selection_browser=Area Selection Browser
+litematica.button.change_menu.area_selection_browser=Area Browser
 litematica.button.change_menu.config_menu=Configuration Menu
 litematica.button.change_menu.load_schematics=Load Schematics
 litematica.button.change_menu.loaded_schematics=Loaded Schematics
@@ -23,7 +28,7 @@ litematica.button.change_menu.schematic_manager=Schematic Manager
 litematica.button.change_menu.schematic_placements=Schematic Placements
 litematica.button.change_menu.schematic_vcs=Schematic VCS
 litematica.button.change_menu.task_manager=Task Manager
-litematica.button.main_menu.area_selection_mode=Area Selection Mode: %s
+litematica.button.main_menu.area_selection_mode=Area Mode: %s
 litematica.button.main_menu.tool_mode=Tool Mode: %s
 litematica.button.placement_list.placement_enabled=Placement: %s
 litematica.button.schematic_list.create_placement=Create Placement
@@ -41,6 +46,11 @@ litematica.button.misc.remove=Remove
 litematica.button.misc.remove.minus=§c-
 litematica.button.misc.rename=Rename
 litematica.button.misc.save=Save
+litematica.button.misc.set=Set
+
+litematica.checkmark.area_editor.corner1=Corner 1
+litematica.checkmark.area_editor.corner2=Corner 2
+litematica.checkmark.area_editor.origin=Origin
 
 litematica.hover.button.area_selection_browser.from_placement=Creates a new Area Selection from the currently selected Schematic Placement. This will essentially replicate the original selection that was used to create the schematic in the first place.
 litematica.hover.button.area_selection_browser.unselect=Unselects the current Area Selection (if any)
@@ -54,6 +64,8 @@ litematica.hover.button.schematic_list.reload_schematic=Reload the schematic fro
 litematica.hover.button.schematic_list.save_to_file=Save this schematic to a file (with a user-chosen name).\n\nUse this if you want to keep the changes you have made with the Schematic Edit mode.\n\nThis can also be used to save an already-loaded schematic in a different schematic format, or to just save a copy to a different file/directory.
 litematica.hover.button.schematic_list.toggle_enabled=Toggles this placement on/off.\n\nDisabling a placement is the recommended way of "not seeing it" while you don't need it, as this will remove it entirely from the schematic world and thus decrease the amount of work the mod has to do to update things when the player moves around.
 litematica.hover.button.schematic_list.unload=Unload this schematic from memory.\n\n§6Note:§r Unloading a schematic will also remove all the placements created from it!
+litematica.hover.checkmark.area_editor.select_this_element=Select this element
+
 litematica.hover.area_selection_browser.origin.auto=Origin [§6Auto§r]: x: §b%s§r y: §b%s§r z: §b%s§r
 litematica.hover.area_selection_browser.origin.manual=Origin [§6Manual§r]: x: §b%s§r y: §b%s§r z: §b%s§r
 litematica.hover.area_selection_browser.region_count=Sub-regions: §b%d
@@ -111,6 +123,10 @@ litematica.hud.value.off.colored=§cOFF§r
 litematica.hud.area_selection.mode.corners=Corners
 litematica.hud.area_selection.mode.expand=Expand
 
+litematica.label.area_editor.area_selection_name=Area Selection name
+litematica.label.area_editor.sub_region_name=Sub-Region name
+litematica.label.area_selection.mode.normal=Multi-Box
+litematica.label.area_selection.mode.simple=Simple
 litematica.label.area_selection_browser.current_selection=Current Selection: §a%s
 litematica.label.area_selection_browser.selections=selections
 litematica.label.misc.null.brackets=<null>
@@ -157,6 +173,8 @@ litematica.title.hud.missing_chunks=§f§l%s, un-seen chunks (%s)
 litematica.title.hud.missing_chunks.schematic_paste=§f§lPaste, un-seen chunks (%s)
 litematica.title.hud.schematic_verifier.errors=<b>Schematic Verifier Errors</b>
 
+litematica.title.screen.area_editor.simple=Area Editor (§eSimple§r mode)
+litematica.title.screen.area_editor.schematic_vcs=Area Editor (§eSchematic VCS mode area§r)
 litematica.title.screen.area_selection_browser.copy_selection=Copy Area Selection '%s'
 litematica.title.screen.area_selection_browser.rename_selection=Rename Area Selection
 litematica.title.screen.area_selection_browser.selection_from_placement=Create a new Area Selection from a Schematic Placement
@@ -247,14 +265,7 @@ litematica.info.schematic_manager.preview.info=Use the '%s' hotkey ['%s'] to set
 litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the button to cancel a pending preview task
 litematica.info.schematic_manager.preview.success=Schematic preview image successfully set
 
-litematica.gui.button.area_editor.analyze_area=Analyze Area
-litematica.gui.button.area_editor.change_corner_mode=Corner Mode: %s
-litematica.gui.button.area_editor.change_selection_mode=Selection Mode: %s
-litematica.gui.button.area_editor.create_schematic=Save Schematic
 litematica.gui.button.area_editor.create_sub_region=New sub-region
-litematica.gui.button.area_editor.origin_enabled=Manual Origin: %s
-litematica.gui.button.area_editor.set_box_name=Set
-litematica.gui.button.area_editor.set_selection_name=Set
 
 litematica.gui.button.area_selections.create_directory=Create directory
 
@@ -358,8 +369,6 @@ litematica.gui.hover.schematic_placement.button.load=§7Load this placement to t
 
 litematica.gui.hover.schematic_save.update_dependent_placements=§7Select whether or not to update all or just the currently\n§7selected placement of this schematic to point to the new file\n§7instead, so that when the placements are next reloaded from file, they\n§7will load the currently being saved version of the schematic\n§7instead of the original. This can be useful especially when\n§7using the Schematic Rebuild/Edit mode on a schematic.
 
-litematica.gui.label.area_editor.box_name=Sub-region box name
-litematica.gui.label.area_editor.selection_name=Selection name
 litematica.gui.label.area_editor.corner_1=Corner 1
 litematica.gui.label.area_editor.corner_2=Corner 2
 litematica.gui.label.area_editor.origin=Origin
@@ -367,9 +376,6 @@ litematica.gui.label.area_editor.dimensions=Dimensions
 litematica.gui.label.area_editor.pos1=Corner 1
 litematica.gui.label.area_editor.pos2=Corner 2
 litematica.gui.label.area_editor.sub_regions=Sub-regions (%s)
-
-litematica.gui.label.area_selection.mode.normal=Normal
-litematica.gui.label.area_selection.mode.simple=Simple
 
 litematica.gui.label.block_info_list_type.all=All
 litematica.gui.label.block_info_list_type.render_layers=Render Layers
@@ -474,8 +480,6 @@ litematica.gui.message.schematic_projects.confirm_delete_area=Do you want to del
 litematica.gui.message.schematic_projects.confirm_place_to_world=Do you want to place this version to the world?\nIt will delete whatever blocks are within the area that the project manager last placed to the world, or last saved as a version. (Basically the "last seen affected area", such that if you were to cycle versions, it would not leave blocks behind from the previous version.)
 
 litematica.gui.title.area_editor_normal=Area Editor (Normal/Multi-box mode)
-litematica.gui.title.area_editor_normal_schematic_projects=Area Editor (§6§lSchematic Projects area§r)
-litematica.gui.title.area_editor_simple=Area Editor (Simple mode)
 litematica.gui.title.area_editor_sub_region=Area Editor (sub-region)
 litematica.gui.title.area_editor.sub_region_name=Sub-region name
 litematica.gui.title.area_selection_browser=Area Selection Browser

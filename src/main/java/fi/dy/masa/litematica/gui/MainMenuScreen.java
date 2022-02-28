@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.InteractableWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
@@ -48,6 +49,7 @@ public class MainMenuScreen extends BaseScreen
 
         this.areaEditorScreenButton.setActionListener(DataManager.getSelectionManager()::openAreaEditorScreenWithParent);
         this.areaSelectionBrowserScreenButton.setActionListener(() -> this.openScreen(new AreaSelectionBrowserScreen()));
+        this.cycleAreaSelectionModeButton.getTextOffset().setCenterHorizontally(false);
         this.cycleAreaSelectionModeButton.setActionListener(() -> {
             DataManager.getSelectionManager().switchSelectionMode();
             this.cycleAreaSelectionModeButton.updateButtonState();
@@ -96,6 +98,14 @@ public class MainMenuScreen extends BaseScreen
 
         if (isInitial)
         {
+            // FIXME meh what a mess...
+            String modeName1 = SelectionMode.SIMPLE.getDisplayName();
+            String modeName2 = SelectionMode.NORMAL.getDisplayName();
+            String s1 = StringUtils.translate("litematica.button.main_menu.area_selection_mode", modeName1);
+            String s2 = StringUtils.translate("litematica.button.main_menu.area_selection_mode", modeName2);
+            this.equalWidthWidgetMaxWidth = Math.max(this.equalWidthWidgetMaxWidth, this.getStringWidth(s1) + 10);
+            this.equalWidthWidgetMaxWidth = Math.max(this.equalWidthWidgetMaxWidth, this.getStringWidth(s2) + 10);
+
             int width = this.equalWidthWidgetMaxWidth + 10;
 
             for (InteractableWidget widget : list)

@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.MainMenuScreen;
+import fi.dy.masa.litematica.gui.SimpleModeAreaEditorScreen;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -730,7 +730,14 @@ public class SelectionManager
             return new GuiAreaSelectionEditorSimple(selection);
         }
         */
-        return new MainMenuScreen();
+        AreaSelection selection = this.getCurrentSelection();
+
+        if (this.getSelectionMode() == SelectionMode.SIMPLE && selection != null)
+        {
+            return new SimpleModeAreaEditorScreen(selection);
+        }
+
+        return null;
     }
 
     public void openAreaEditorScreenWithParent()

@@ -1,15 +1,18 @@
 package fi.dy.masa.litematica.selection;
 
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum SelectionMode
 {
-    NORMAL  ("litematica.gui.label.area_selection.mode.normal"),
-    SIMPLE  ("litematica.gui.label.area_selection.mode.simple");
+    NORMAL  ("litematica.label.area_selection.mode.normal"),
+    SIMPLE  ("litematica.label.area_selection.mode.simple");
+
+    public static final ImmutableList<SelectionMode> VALUES = ImmutableList.copyOf(values());
 
     private final String translationKey;
 
-    private SelectionMode(String translationKey)
+    SelectionMode(String translationKey)
     {
         this.translationKey = translationKey;
     }
@@ -30,7 +33,7 @@ public enum SelectionMode
 
         if (forward)
         {
-            if (++id >= values().length)
+            if (++id >= 2)
             {
                 id = 0;
             }
@@ -39,16 +42,16 @@ public enum SelectionMode
         {
             if (--id < 0)
             {
-                id = values().length - 1;
+                id = 2 - 1;
             }
         }
 
-        return values()[id % values().length];
+        return values()[id % 2];
     }
 
     public static SelectionMode fromString(String name)
     {
-        for (SelectionMode mode : SelectionMode.values())
+        for (SelectionMode mode : VALUES)
         {
             if (mode.name().equalsIgnoreCase(name))
             {

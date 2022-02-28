@@ -31,11 +31,10 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
 
         this.iconsTextToggleButton               = GenericButton.create(this::getIconVsTextButtonLabel);
         this.loadedSchematicsListScreenButton    = GenericButton.create("litematica.button.change_menu.loaded_schematics", LitematicaIcons.LOADED_SCHEMATICS);
-        this.mainMenuButton                      = GenericButton.create("litematica.button.change_menu.main_menu");
+        this.mainMenuButton                      = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.schematicPlacementFileBrowserButton = GenericButton.create("litematica.button.placement_list.open_placement_browser");
 
         this.loadedSchematicsListScreenButton.setActionListener(() -> this.openScreen(new LoadedSchematicsListScreen()));
-        this.mainMenuButton.setActionListener(MainMenuScreen::openMainMenuScreen);
         //this.schematicPlacementFileBrowserButton.setActionListener(() -> this.openScreen(new GuiSchematicPlacementFileBrowser()));
         // TODO FIXME malilib refactor
 
