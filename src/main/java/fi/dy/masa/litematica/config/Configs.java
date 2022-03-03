@@ -107,14 +107,18 @@ public class Configs
 
     public static class Visuals
     {
-        public static final HotkeyedBooleanConfig AREA_SELECTION_RENDERING          = new HotkeyedBooleanConfig("areaSelectionRendering", true, "");
-        public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE             = new HotkeyedBooleanConfig("mainRenderingToggle", true, "M,R");
-        public static final HotkeyedBooleanConfig RENDER_COLLIDING_SCHEMATIC_BLOCKS = new HotkeyedBooleanConfig("renderCollidingSchematicBlocks", false, "");
-        public static final HotkeyedBooleanConfig SCHEMATIC_BLOCKS_RENDERING        = new HotkeyedBooleanConfig("schematicBlocksRendering", true, "M,B");
-        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY                 = new HotkeyedBooleanConfig("schematicOverlayRendering", true, "");
-        public static final HotkeyedBooleanConfig SCHEMATIC_RENDERING               = new HotkeyedBooleanConfig("schematicRendering", true, "M,G");
-        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_RENDER_THROUGH  = new HotkeyedBooleanConfig("schematicOverlayRenderThrough", false, "");
-        public static final HotkeyedBooleanConfig TRANSLUCENT_SCHEMATIC_RENDERING   = new HotkeyedBooleanConfig("translucentSchematicRendering", false, "");
+        public static final HotkeyedBooleanConfig AREA_SELECTION_RENDERING              = new HotkeyedBooleanConfig("areaSelectionRendering", true, "");
+        public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE                 = new HotkeyedBooleanConfig("mainRenderingToggle", true, "M,R");
+        public static final HotkeyedBooleanConfig RENDER_COLLIDING_SCHEMATIC_BLOCKS     = new HotkeyedBooleanConfig("renderCollidingSchematicBlocks", false, "");
+        public static final HotkeyedBooleanConfig SCHEMATIC_BLOCKS_RENDERING            = new HotkeyedBooleanConfig("schematicBlocksRendering", true, "M,B");
+        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY                     = new HotkeyedBooleanConfig("schematicOverlayRendering", true, "");
+        public static final HotkeyedBooleanConfig SCHEMATIC_RENDERING                   = new HotkeyedBooleanConfig("schematicRendering", true, "M,G");
+        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_RENDER_THROUGH      = new HotkeyedBooleanConfig("schematicOverlayRenderThrough", false, "");
+        public static final HotkeyedBooleanConfig TRANSLUCENT_SCHEMATIC_RENDERING       = new HotkeyedBooleanConfig("translucentSchematicRendering", false, "");
+        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_EXTRA          = new HotkeyedBooleanConfig("schematicOverlayTypeExtra", true, "");
+        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_MISSING        = new HotkeyedBooleanConfig("schematicOverlayTypeMissing", true, "");
+        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK    = new HotkeyedBooleanConfig("schematicOverlayTypeWrongBlock", true, "");
+        public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_STATE    = new HotkeyedBooleanConfig("schematicOverlayTypeWrongState", true, "");
 
         public static final BooleanConfig AREA_SELECTION_BOX_SIDES                  = new BooleanConfig("areaSelectionBoxSides", true);
         public static final BooleanConfig ERROR_MARKER_CONNECTIONS                  = new BooleanConfig("errorMarkerConnections", false);
@@ -133,10 +137,6 @@ public class Configs
         public static final DoubleConfig  SCHEMATIC_OVERLAY_OUTLINE_WIDTH           = new DoubleConfig( "schematicOverlayOutlineWidth", 1.0, 0.1, 64.0);
         public static final DoubleConfig  SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH   = new DoubleConfig( "schematicOverlayOutlineWidthThrough", 3.0, 0.1, 64.0);
         public static final BooleanConfig SCHEMATIC_OVERLAY_SIDES                   = new BooleanConfig("schematicOverlaySides", true);
-        public static final BooleanConfig SCHEMATIC_OVERLAY_TYPE_EXTRA              = new BooleanConfig("schematicOverlayTypeExtra", true);
-        public static final BooleanConfig SCHEMATIC_OVERLAY_TYPE_MISSING            = new BooleanConfig("schematicOverlayTypeMissing", true);
-        public static final BooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK        = new BooleanConfig("schematicOverlayTypeWrongBlock", true);
-        public static final BooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_STATE        = new BooleanConfig("schematicOverlayTypeWrongState", true);
         public static final BooleanConfig SCHEMATIC_VERIFIER_BLOCK_MODELS           = new BooleanConfig("schematicVerifierUseBlockModels", false);
         public static final BooleanConfig TRANSLUCENT_INNER_SIDES                   = new BooleanConfig("translucentBlockInnerSides", false);
         public static final DoubleConfig  TRANSLUCENT_SCHEMATIC_ALPHA               = new DoubleConfig( "translucentSchematicAlpha", 0.5, 0.0, 1.0);
