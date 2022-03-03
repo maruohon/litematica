@@ -150,7 +150,7 @@ public class ToolHud extends InfoHud
         {
             if (sm.getSelectionMode() == SelectionMode.NORMAL)
             {
-                lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.selected_area.normal", selection.getName()));
+                lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.selected_area.multi_region", selection.getName()));
             }
             else
             {
@@ -173,7 +173,7 @@ public class ToolHud extends InfoHud
             if (sm.getSelectionMode() == SelectionMode.NORMAL)
             {
                 int count = selection.getAllSubRegionBoxes().size();
-                lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.origin.normal",
+                lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.origin.multi_region",
                                                 originMode, o.getX(), o.getY(), o.getZ(), count));
             }
             else

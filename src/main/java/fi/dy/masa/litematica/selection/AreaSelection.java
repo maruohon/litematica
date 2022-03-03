@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.selection;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,9 +169,11 @@ public class AreaSelection
         return this.currentBox != null ? this.subRegionBoxes.get(this.currentBox) : null;
     }
 
-    public Collection<String> getAllSubRegionNames()
+    public List<String> getAllSubRegionNames()
     {
-        return this.subRegionBoxes.keySet();
+        List<String> list = new ArrayList<>(this.subRegionBoxes.keySet());
+        list.sort(Comparator.naturalOrder());
+        return list;
     }
 
     public List<SelectionBox> getAllSubRegionBoxes()

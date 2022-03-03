@@ -42,13 +42,13 @@ public class MainMenuScreen extends BaseScreen
         this.schematicVcsScreenButton     = GenericButton.create("litematica.button.change_menu.schematic_vcs",     LitematicaIcons.SCHEMATIC_VCS);
         this.taskManagerScreenButton      = GenericButton.create("litematica.button.change_menu.task_manager",      LitematicaIcons.TASK_MANAGER);
 
-        this.schematicPlacementsListScreenButton.setActionListener(() -> this.openScreen(new SchematicPlacementsListScreen()));
-        this.loadedSchematicsListScreenButton.setActionListener(() -> this.openScreen(new LoadedSchematicsListScreen()));
+        this.schematicPlacementsListScreenButton.setActionListener(() -> openScreenWithParent(new SchematicPlacementsListScreen()));
+        this.loadedSchematicsListScreenButton.setActionListener(() -> openScreenWithParent(new LoadedSchematicsListScreen()));
         // TODO FIXME malilib refactor
         //this.loadSchematicsScreenButton.setActionListener(() -> this.openScreen(new GuiSchematicLoad()));
 
         this.areaEditorScreenButton.setActionListener(DataManager.getSelectionManager()::openAreaEditorScreenWithParent);
-        this.areaSelectionBrowserScreenButton.setActionListener(() -> this.openScreen(new AreaSelectionBrowserScreen()));
+        this.areaSelectionBrowserScreenButton.setActionListener(() -> openScreenWithParent(new AreaSelectionBrowserScreen()));
         this.cycleAreaSelectionModeButton.getTextOffset().setCenterHorizontally(false);
         this.cycleAreaSelectionModeButton.setActionListener(() -> {
             DataManager.getSelectionManager().switchSelectionMode();
@@ -66,7 +66,7 @@ public class MainMenuScreen extends BaseScreen
         // TODO FIXME malilib refactor
         //this.schematicManagerScreenButton.setActionListener(() -> this.openScreen(new GuiSchematicManager()));
         this.schematicVcsScreenButton.setActionListener(DataManager.getSchematicProjectsManager()::openSchematicProjectsGui);
-        this.taskManagerScreenButton.setActionListener(() -> this.openScreen(new TaskManagerScreen()));
+        this.taskManagerScreenButton.setActionListener(() -> openScreenWithParent(new TaskManagerScreen()));
 
         String version = String.format("v%s", Reference.MOD_VERSION);
         this.setTitle("litematica.gui.title.litematica_main_menu", version);
@@ -101,8 +101,8 @@ public class MainMenuScreen extends BaseScreen
             // FIXME meh what a mess...
             String modeName1 = SelectionMode.SIMPLE.getDisplayName();
             String modeName2 = SelectionMode.NORMAL.getDisplayName();
-            String s1 = StringUtils.translate("litematica.button.main_menu.area_selection_mode", modeName1);
-            String s2 = StringUtils.translate("litematica.button.main_menu.area_selection_mode", modeName2);
+            String s1 = StringUtils.translate("litematica.button.area_editor.selection_mode", modeName1);
+            String s2 = StringUtils.translate("litematica.button.area_editor.selection_mode", modeName2);
             this.equalWidthWidgetMaxWidth = Math.max(this.equalWidthWidgetMaxWidth, this.getStringWidth(s1) + 10);
             this.equalWidthWidgetMaxWidth = Math.max(this.equalWidthWidgetMaxWidth, this.getStringWidth(s2) + 10);
 
@@ -153,12 +153,6 @@ public class MainMenuScreen extends BaseScreen
         this.addWidget(widget);
     }
 
-    protected void openScreen(BaseScreen screen)
-    {
-        screen.setParent(this);
-        BaseScreen.openScreen(screen);
-    }
-
     public static void openMainMenuScreen()
     {
         MainMenuScreen screen = new MainMenuScreen();
@@ -169,7 +163,7 @@ public class MainMenuScreen extends BaseScreen
     public static String getAreaSelectionModeButtonLabel()
     {
         String modeName = DataManager.getSelectionManager().getSelectionMode().getDisplayName();
-        return StringUtils.translate("litematica.button.main_menu.area_selection_mode", modeName);
+        return StringUtils.translate("litematica.button.area_editor.selection_mode", modeName);
     }
 
     public static String getToolModeButtonLabel()

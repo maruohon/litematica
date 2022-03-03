@@ -5,7 +5,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public enum SelectionMode
 {
-    NORMAL  ("litematica.label.area_selection.mode.normal"),
+    NORMAL  ("litematica.label.area_selection.mode.multi_region"),
     SIMPLE  ("litematica.label.area_selection.mode.simple");
 
     public static final ImmutableList<SelectionMode> VALUES = ImmutableList.copyOf(values());

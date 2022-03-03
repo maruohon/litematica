@@ -18,6 +18,7 @@ import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.NormalModeAreaEditorScreen;
 import fi.dy.masa.litematica.gui.SimpleModeAreaEditorScreen;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
@@ -29,6 +30,7 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
@@ -364,11 +366,12 @@ public class SelectionManager
         return false;
     }
 
-    public boolean createNewSubRegionIfNotExists(String name, Minecraft mc)
+    public boolean createNewSubRegionIfNotExists(String name)
     {
         AreaSelection selection = this.getCurrentSelection();
+        Entity cameraEntity = EntityUtils.getCameraEntity();
 
-        if (selection != null && mc.player != null)
+        if (selection != null && cameraEntity != null)
         {
             if (selection.getSubRegionBox(name) != null)
             {
@@ -376,7 +379,7 @@ public class SelectionManager
                 return false;
             }
 
-            BlockPos pos = new BlockPos(mc.player.getPositionVector());
+            BlockPos pos = new BlockPos(cameraEntity.getPositionVector());
 
             if (selection.createNewSubRegionBox(pos, name) != null)
             {
@@ -709,30 +712,19 @@ public class SelectionManager
     @Nullable
     public BaseScreen getEditGui()
     {
-        /* TODO FIXME malilib refactor
         AreaSelection selection = this.getCurrentSelection();
+
+        if (selection == null)
+        {
+            MessageDispatcher.warning().screenOrActionbar().translate("litematica.error.area_editor.open_gui.no_selection");
+            return null;
+        }
 
         if (this.getSelectionMode() == SelectionMode.NORMAL)
         {
-            if (selection != null)
-            {
-                return new GuiAreaSelectionEditorNormal(selection);
-            }
-            else
-            {
-                MessageDispatcher.warning().screenOrActionbar()
-                        .translate("litematica.error.area_editor.open_gui.no_selection");
-                return null;
-            }
+            return new NormalModeAreaEditorScreen(selection);
         }
-        else
-        {
-            return new GuiAreaSelectionEditorSimple(selection);
-        }
-        */
-        AreaSelection selection = this.getCurrentSelection();
-
-        if (this.getSelectionMode() == SelectionMode.SIMPLE && selection != null)
+        else if (this.getSelectionMode() == SelectionMode.SIMPLE)
         {
             return new SimpleModeAreaEditorScreen(selection);
         }
