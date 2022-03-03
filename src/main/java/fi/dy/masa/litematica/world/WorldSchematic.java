@@ -19,7 +19,6 @@ import net.minecraft.recipe.RecipeManager;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.tag.TagManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
@@ -30,6 +29,7 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.MutableWorldProperties;
@@ -55,18 +55,20 @@ public class WorldSchematic extends World
     private final MinecraftClient mc;
     private final WorldRendererSchematic worldRenderer;
     private final ChunkManagerSchematic chunkManagerSchematic;
-    private final Biome biome;
+    private final RegistryEntry<Biome> biome;
     private int nextEntityId;
     private int entityCount;
 
-    protected WorldSchematic(MutableWorldProperties mutableWorldProperties, DimensionType dimensionType, Supplier<Profiler> supplier)
+    protected WorldSchematic(MutableWorldProperties mutableWorldProperties,
+                             RegistryEntry<DimensionType> dimensionType,
+                             Supplier<Profiler> supplier)
     {
         super(mutableWorldProperties, REGISTRY_KEY, dimensionType, supplier, true, true, 0L);
 
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
         this.chunkManagerSchematic = new ChunkManagerSchematic(this);
-        this.biome = BuiltinRegistries.BIOME.get(BiomeKeys.PLAINS);
+        this.biome = RegistryEntry.of(BuiltinRegistries.BIOME.get(BiomeKeys.PLAINS));
     }
 
     public ChunkManagerSchematic getChunkProvider()
@@ -116,7 +118,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public Biome getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ)
+    public RegistryEntry<Biome> getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ)
     {
         return this.biome;
     }
@@ -208,12 +210,6 @@ public class WorldSchematic extends World
     public RecipeManager getRecipeManager()
     {
         return this.mc.world != null ? this.mc.world.getRecipeManager() : null;
-    }
-
-    @Override
-    public TagManager getTagManager()
-    {
-        return this.mc.world != null ? this.mc.world.getTagManager() : null;
     }
 
     @Override

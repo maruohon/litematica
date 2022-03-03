@@ -53,9 +53,9 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    public void onClose()
+    public void close()
     {
-        super.onClose();
+        super.close();
 
         this.clearPreviewImages();
     }

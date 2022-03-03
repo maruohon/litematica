@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.11-SNAPSHOT'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -33,17 +33,13 @@ dependencies {
 	modCompileOnly "com.terraformersmc:modmenu:${config.mod_menu_version}"
 }
 
-minecraft {
-	ext.mod_version = config.mod_version
-
-	if (mod_version.endsWith('-dev')) {
-		mod_version = mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
-	}
-}
-
 group = config.group + "." + config.mod_id
 archivesBaseName = config.mod_file_name + '-' + config.minecraft_version_out
-version = project.minecraft.mod_version
+version = config.mod_version
+
+if (version.endsWith('-dev')) {
+	version += "." + new Date().format('yyyyMMdd.HHmmss')
+}
 
 processResources {
 	// Exclude the GIMP image files
@@ -53,10 +49,10 @@ processResources {
 	// this will ensure that this task is redone when the versions change.
 	//inputs.property "minecraft_version", project.config.minecraft_version
 
-	inputs.property "mod_version", project.minecraft.mod_version
+	inputs.property "mod_version", config.mod_version
 
 	filesMatching("fabric.mod.json") {
-		expand "mod_version": project.minecraft.mod_version
+		expand "mod_version": config.mod_version
 	}
 }
 

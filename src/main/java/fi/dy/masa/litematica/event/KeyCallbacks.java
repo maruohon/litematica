@@ -439,7 +439,7 @@ public class KeyCallbacks
                 {
                     // Only do the pick block here, if it's not bound to the use button.
                     // If it's bound to the use button, then it will be done from the input handling.
-                    if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, this.mc.options.keyUse) == false)
+                    if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, this.mc.options.useKey) == false)
                     {
                         WorldUtils.doSchematicWorldPickBlock(false, this.mc);
                     }

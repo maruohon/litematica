@@ -143,7 +143,7 @@ public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
     @Override
     public int getColor(BlockPos pos, ColorResolver colorResolver)
     {
-        return colorResolver.getColor(this.worldClient.getBiome(pos), pos.getX(), pos.getZ());
+        return colorResolver.getColor(this.worldClient.getBiome(pos).value(), pos.getX(), pos.getZ());
     }
 
     @Override

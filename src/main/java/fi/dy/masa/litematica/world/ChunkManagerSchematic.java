@@ -96,7 +96,7 @@ public class ChunkManagerSchematic extends ChunkManager
     }
 
     @Override
-    public void tick(BooleanSupplier booleanSupplier)
+    public void tick(BooleanSupplier shouldKeepTicking, boolean tickChunks)
     {
         // NO-OP
     }

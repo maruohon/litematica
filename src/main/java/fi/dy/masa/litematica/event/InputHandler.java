@@ -64,15 +64,15 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             MinecraftClient mc = MinecraftClient.getInstance();
 
-            if (mc.options.keyUse.matchesKey(keyCode, scanCode))
+            if (mc.options.useKey.matchesKey(keyCode, scanCode))
             {
                 return this.handleUseKey(mc);
             }
-            else if (mc.options.keyAttack.matchesKey(keyCode, scanCode))
+            else if (mc.options.attackKey.matchesKey(keyCode, scanCode))
             {
                 return this.handleAttackKey(mc);
             }
-            else if (mc.options.keyScreenshot.matchesKey(keyCode, scanCode) && GuiSchematicManager.hasPendingPreviewTask())
+            else if (mc.options.screenshotKey.matchesKey(keyCode, scanCode) && GuiSchematicManager.hasPendingPreviewTask())
             {
                 return GuiSchematicManager.setPreviewImage();
             }
@@ -89,11 +89,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         // Tool enabled, and not in a GUI
         if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null && eventButtonState)
         {
-            if (eventButtonState && mc.options.keyUse.matchesMouse(eventButton))
+            if (eventButtonState && mc.options.useKey.matchesMouse(eventButton))
             {
                 return this.handleUseKey(mc);
             }
-            else if (eventButtonState && mc.options.keyAttack.matchesMouse(eventButton))
+            else if (eventButtonState && mc.options.attackKey.matchesMouse(eventButton))
             {
                 return this.handleAttackKey(mc);
             }
@@ -299,7 +299,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
             else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
             {
-                if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, mc.options.keyUse))
+                if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, mc.options.useKey))
                 {
                     WorldUtils.doSchematicWorldPickBlock(false, mc);
                 }
