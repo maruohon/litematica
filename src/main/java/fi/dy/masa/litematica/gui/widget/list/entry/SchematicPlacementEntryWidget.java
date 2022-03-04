@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.LitematicaIcons;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.SchematicPlacementsListScreen;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;

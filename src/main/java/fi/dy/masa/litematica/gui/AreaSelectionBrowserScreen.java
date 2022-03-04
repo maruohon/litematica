@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.widget.list.entry.AreaSelectionEntryWidget;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;

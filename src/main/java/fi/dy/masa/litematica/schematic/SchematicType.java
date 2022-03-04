@@ -7,8 +7,8 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NBTTagCompound;
-import fi.dy.masa.litematica.gui.LitematicaIcons;
 import fi.dy.masa.malilib.gui.icon.Icon;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 

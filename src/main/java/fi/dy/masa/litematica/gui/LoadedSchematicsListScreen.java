@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.widget.list.entry.SchematicEntryWidget;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.gui.BaseListScreen;
@@ -25,9 +26,9 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
         super(12, 30, 20, 68);
 
         this.iconsTextToggleButton               = GenericButton.create(this::getIconVsTextButtonLabel);
-        this.loadSchematicsScreenButton          = GenericButton.create("litematica.button.change_menu.load_schematics",        LitematicaIcons.SCHEMATIC_BROWSER);
+        this.loadSchematicsScreenButton          = GenericButton.create("litematica.button.change_menu.load_schematics", LitematicaIcons.SCHEMATIC_BROWSER);
         this.mainMenuScreenButton                = GenericButton.create("litematica.button.change_menu.main_menu");
-        this.schematicPlacementsListScreenButton = GenericButton.create("litematica.button.change_menu.schematic_placements",   LitematicaIcons.SCHEMATIC_PLACEMENTS);
+        this.schematicPlacementsListScreenButton = GenericButton.create("litematica.button.change_menu.schematic_placements", LitematicaIcons.SCHEMATIC_PLACEMENTS);
 
         this.iconsTextToggleButton.translateAndAddHoverString("litematica.hover.button.icon_vs_text_buttons");
         this.iconsTextToggleButton.setIsRightAligned(true);

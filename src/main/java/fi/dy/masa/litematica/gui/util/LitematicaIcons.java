@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.gui;
+package fi.dy.masa.litematica.gui.util;
 
 import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.Reference;

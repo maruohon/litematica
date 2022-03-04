@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.widget.list.entry.SchematicPlacementEntryWidget;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;

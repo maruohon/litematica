@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.widget.list.entry.AreaSubRegionEntryWidget;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
