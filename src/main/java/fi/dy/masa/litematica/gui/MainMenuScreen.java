@@ -45,8 +45,7 @@ public class MainMenuScreen extends BaseScreen
 
         this.schematicPlacementsListScreenButton.setActionListener(() -> openScreenWithParent(new SchematicPlacementsListScreen()));
         this.loadedSchematicsListScreenButton.setActionListener(() -> openScreenWithParent(new LoadedSchematicsListScreen()));
-        // TODO FIXME malilib refactor
-        //this.loadSchematicsScreenButton.setActionListener(() -> this.openScreen(new GuiSchematicLoad()));
+        this.loadSchematicsScreenButton.setActionListener(() -> openScreenWithParent(new SchematicBrowserScreen()));
 
         this.areaEditorScreenButton.setActionListener(DataManager.getSelectionManager()::openAreaEditorScreenWithParent);
         this.areaSelectionBrowserScreenButton.setActionListener(() -> openScreenWithParent(new AreaSelectionBrowserScreen()));

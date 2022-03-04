@@ -1,14 +1,16 @@
 package fi.dy.masa.litematica.schematic;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NBTTagCompound;
-import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.malilib.gui.icon.MultiIcon;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
@@ -39,7 +41,7 @@ public class SchematicType<S extends ISchematic>
             .setFactory(SpongeSchematic::new)
             .setDataValidator(SpongeSchematic::isValidSchematic)
             .setExtension(SpongeSchematic.FILE_NAME_EXTENSION)
-            .setExtensionValidator((ext) -> { return SpongeSchematic.FILE_NAME_EXTENSION.equals(ext) || SchematicaSchematic.FILE_NAME_EXTENSION.equals(ext); })
+            .setExtensionValidator((ext) -> SpongeSchematic.FILE_NAME_EXTENSION.equals(ext) || SchematicaSchematic.FILE_NAME_EXTENSION.equals(ext))
             .setIcon(LitematicaIcons.FILE_ICON_SPONGE)
             .setHasName(true)
             .build();
@@ -56,8 +58,10 @@ public class SchematicType<S extends ISchematic>
 
     public static final ImmutableList<SchematicType<?>> KNOWN_TYPES = ImmutableList.of(LITEMATICA, SCHEMATICA, SPONGE, VANILLA);
 
+    public static final FileFilter SCHEMATIC_FILE_FILTER = (file) -> file.isFile() && file.canRead() && getPossibleTypesFromFileName(file).isEmpty() == false;
+
     private final String extension;
-    private final Icon icon;
+    private final MultiIcon icon;
     private final Function<File, S> factory;
     private final Function<String, Boolean> extensionValidator;
     private final Function<NBTTagCompound, Boolean> dataValidator;
@@ -65,7 +69,7 @@ public class SchematicType<S extends ISchematic>
     private final boolean hasName;
 
     private SchematicType(String displayName, Function<File, S> factory, Function<NBTTagCompound, Boolean> dataValidator,
-                          String extension, Function<String, Boolean> extensionValidator, Icon icon, boolean hasName)
+                          String extension, Function<String, Boolean> extensionValidator, MultiIcon icon, boolean hasName)
     {
         this.displayName = displayName;
         this.extension = extension;
@@ -86,7 +90,7 @@ public class SchematicType<S extends ISchematic>
         return this.displayName;
     }
 
-    public Icon getIcon()
+    public MultiIcon getIcon()
     {
         return this.icon;
     }
@@ -137,7 +141,7 @@ public class SchematicType<S extends ISchematic>
 
     public static List<SchematicType<?>> getPossibleTypesFromFileName(String fileName)
     {
-        String extension = "." + FileNameUtils.getFileNameExtension(fileName);
+        String extension = "." + FileNameUtils.getFileNameExtension(fileName.toLowerCase(Locale.ROOT));
         List<SchematicType<?>> list = new ArrayList<>();
 
         for (SchematicType<?> type : KNOWN_TYPES)
@@ -208,7 +212,7 @@ public class SchematicType<S extends ISchematic>
     public static class Builder<S extends ISchematic>
     {
         private String extension = null;
-        private Icon icon = null;
+        private MultiIcon icon = null;
         private Function<File, S> factory = null;
         private Function<String, Boolean> extensionValidator = null;
         private Function<NBTTagCompound, Boolean> dataValidator = null;
@@ -251,7 +255,7 @@ public class SchematicType<S extends ISchematic>
             return this;
         }
 
-        public Builder<S> setIcon(Icon icon)
+        public Builder<S> setIcon(MultiIcon icon)
         {
             this.icon = icon;
             return this;

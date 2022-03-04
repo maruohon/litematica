@@ -41,7 +41,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         this.currentSelectionLabel = new LabelWidget();
 
         this.openAreaEditorButton.setActionListener(DataManager.getSelectionManager()::openAreaEditorScreenWithParent);
-        this.selectionFromPlacementButton.translateAndAddHoverString("litematica.hover.button.area_selection_browser.from_placement");
+        this.selectionFromPlacementButton.translateAndAddHoverString("litematica.info.area_browser.from_placement");
         this.unselectButton.translateAndAddHoverString("litematica.hover.button.area_selection_browser.unselect");
 
         this.selectionFromPlacementButton.setEnabled(DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement() != null);
@@ -150,7 +150,10 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         if (placement != null)
         {
             String title = "litematica.title.screen.area_selection_browser.selection_from_placement";
-            BaseScreen.openPopupScreen(new TextInputScreen(title, placement.getName(), this::selectionFromPlacementByName, this));
+            TextInputScreen screen = new TextInputScreen(title, placement.getName(),
+                                                         this::selectionFromPlacementByName, this);
+            screen.setInfoText("litematica.info.area_browser.from_placement");
+            BaseScreen.openPopupScreen(screen);
         }
         else
         {

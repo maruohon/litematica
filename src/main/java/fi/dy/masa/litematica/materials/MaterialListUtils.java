@@ -10,9 +10,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.StringListSelectionScreen;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.util.inventory.InventoryUtils;
 import fi.dy.masa.malilib.util.data.ItemType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -149,5 +153,32 @@ public class MaterialListUtils
             int countAvailable = playerInvItems.getInt(type);
             entry.setCountAvailable(countAvailable);
         }
+    }
+
+    public static void openMaterialListScreenFor(ISchematic schematic)
+    {
+        if (BaseScreen.isShiftDown())
+        {
+            StringListSelectionScreen screen = new StringListSelectionScreen(schematic.getRegionNames(),
+                                                    (strings) -> createMaterialListOfRegions(schematic, strings));
+            screen.setTitle("litematica.title.screen.material_list.select_schematic_regions", schematic.getMetadata().getName());
+            screen.setParent(GuiUtils.getCurrentScreen());
+            BaseScreen.openScreen(screen);
+        }
+        else
+        {
+            MaterialListSchematic materialList = new MaterialListSchematic(schematic, true);
+            DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
+            // TODO FIXME malilib refactor
+            //BaseScreen.openScreen(new GuiMaterialList(materialList));
+        }
+    }
+
+    public static void createMaterialListOfRegions(ISchematic schematic, Collection<String> regions)
+    {
+        MaterialListSchematic materialList = new MaterialListSchematic(schematic, regions, true);
+        DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
+        // TODO FIXME malilib refactor
+        //BaseScreen.openScreen(new GuiMaterialList(materialList));
     }
 }

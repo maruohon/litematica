@@ -47,6 +47,7 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.config.value.LayerMode;
 import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
@@ -1164,6 +1165,16 @@ public class SchematicPlacementManager
         }
 
         return false;
+    }
+
+    public void createPlacementForNewlyLoadedSchematic(ISchematic schematic, boolean createAsEnabled)
+    {
+        BlockPos pos = EntityUtils.getCameraEntityBlockPos();
+        String name = schematic.getMetadata().getName();
+        SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, createAsEnabled);
+
+        this.addSchematicPlacement(placement, true);
+        this.setSelectedSchematicPlacement(placement);
     }
 
     public JsonObject toJson()

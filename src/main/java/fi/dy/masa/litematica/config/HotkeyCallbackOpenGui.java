@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.gui.LoadedSchematicsListScreen;
 import fi.dy.masa.litematica.gui.MainMenuScreen;
 import fi.dy.masa.litematica.gui.RenderLayerEditScreen;
+import fi.dy.masa.litematica.gui.SchematicBrowserScreen;
 import fi.dy.masa.litematica.gui.SchematicPlacementsListScreen;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -64,8 +65,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_LOAD_SCHEMATICS_SCREEN.getKeyBind())
         {
-            // TODO FIXME malilib refactor
-            //BaseScreen.openScreen(new GuiSchematicLoad());
+            BaseScreen.openScreen(new SchematicBrowserScreen());
         }
         else if (key == Hotkeys.OPEN_LOADED_SCHEMATICS_SCREEN.getKeyBind())
         {

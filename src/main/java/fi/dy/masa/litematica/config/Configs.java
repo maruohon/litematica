@@ -17,6 +17,7 @@ import fi.dy.masa.malilib.config.option.HotkeyedBooleanConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.option.StringConfig;
+import fi.dy.masa.malilib.config.value.FileBrowserColumns;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -58,6 +59,7 @@ public class Configs
         public static final BooleanConfig USE_CUSTOM_SCHEMATIC_DIRECTORY            = new BooleanConfig("useCustomSchematicDirectory", false);
 
         public static final OptionListConfig<ReplaceBehavior> PASTE_REPLACE_BEHAVIOR        = new OptionListConfig<>("pasteReplaceBehavior", ReplaceBehavior.NONE, ReplaceBehavior.VALUES);
+        public static final OptionListConfig<FileBrowserColumns> SCHEMATIC_BROWSER_COLUMNS  = new OptionListConfig<>("schematicBrowserColumns", FileBrowserColumns.MTIME, FileBrowserColumns.VALUES);
         public static final OptionListConfig<CornerSelectionMode> SELECTION_CORNERS_MODE    = new OptionListConfig<>("selectionCornersMode", CornerSelectionMode.CORNERS, CornerSelectionMode.VALUES);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
@@ -89,6 +91,7 @@ public class Configs
                 PLACEMENTS_INFRONT,
                 RENDER_MATERIALS_IN_GUI,
                 RENDER_THREAD_NO_TIMEOUT,
+                SCHEMATIC_BROWSER_COLUMNS,
                 SELECTION_CORNERS_MODE,
                 SIGN_TEXT_PASTE,
                 TOOL_ITEM_ENABLED,

@@ -31,6 +31,8 @@ litematica.button.change_menu.schematic_vcs=Schematic VCS
 litematica.button.change_menu.task_manager=Task Manager
 litematica.button.main_menu.tool_mode=Tool Mode: %s
 litematica.button.placement_list.placement_enabled=Placement: %s
+litematica.button.schematic_browser.load_schematic=Load Schematic
+litematica.button.schematic_browser.material_list=Material List
 litematica.button.schematic_list.create_placement=Create Placement
 litematica.button.schematic_list.reload=Reload
 litematica.button.schematic_list.save_to_file=Save To File
@@ -51,15 +53,16 @@ litematica.button.misc.set=Set
 litematica.checkmark.area_editor.corner1=Corner 1
 litematica.checkmark.area_editor.corner2=Corner 2
 litematica.checkmark.area_editor.origin=Origin
+litematica.checkmark.schematic_browser.create_placement=Create Placement
 
 litematica.hover.button.area_editor.manual_origin=Enabling a manual origin allows you to define the origin point of the area selection in a custom location/offset in relation to the sub-regions.\n\nThe automatic origin point would be at the minimum coordinate of all the sub-regions. In other words if you were to create an enclosing box around all the sub-regions, the automatic origin is the minimum coordinate corner of that box.\n\nDefining a manual origin is mostly useful if you want to be able to automatically load the schematic (or rather create the placement) in the correct/specific location while standing at a certain location.\n\nBasically when you create a placement, the origin point is by default at the player's location. And the origin point of a placement is the same as the origin point of an area selection. (Not in absolute coordinates when creating a selection, but rather the relative positions of all the sub-regions.)
-litematica.hover.button.area_selection_browser.from_placement=Creates a new Area Selection from the currently selected Schematic Placement. This will essentially replicate the original selection that was used to create the schematic in the first place.
 litematica.hover.button.area_selection_browser.unselect=Unselects the current Area Selection (if any)
 litematica.hover.button.icon_vs_text_buttons=Whether to use normal text buttons or smaller icon-only buttons
 litematica.hover.button.placement_list.configure=Edit the properties of this placement, such as the position, rotation or mirror values or sub-regions properties etc.
 litematica.hover.button.placement_list.duplicate=Creates a new identical copy of this placement
 litematica.hover.button.placement_list.remove=Removes this placement.\n\nRemoving a placement won't unload the schematic itself from memory. To unload the schematic too, unload it on the §eLoaded Schematics List§r screen. Unloading a schematic via there automatically removes all placements of it.\n\n§6Note:§r If you may need the placement again later on, you can save it first using the §eSave§r button. You can then load it back later on via the §eSaved Placements§r menu if you need it again.
 litematica.hover.button.placement_list.save=Save this placement to a separate file on disk.\n\nThis allows you to remove it from this list, but still load it back later on via the §eSaved Placements§r menu if you need it again.
+litematica.hover.button.schematic_browser.create_material_list=Hold shift to select which sub-regions are used for the Material List. By default all regions will be included.
 litematica.hover.button.schematic_list.create_placement=Create a new placement of this schematic.\n\nHold §6Shift§r to create the placement as disabled to begin with.
 litematica.hover.button.schematic_list.reload_schematic=Reload the schematic from file.\n\nThis can be useful if you make a mistake in the Schematic Edit mode, or just want to revert the changes made to the in-memory copy of the schematic. Or if the schematic file was changed externally and you want to load the updated version.
 litematica.hover.button.schematic_list.save_to_file=Save this schematic to a file (with a user-chosen name).\n\nUse this if you want to keep the changes you have made with the Schematic Edit mode.\n\nThis can also be used to save an already-loaded schematic in a different schematic format, or to just save a copy to a different file/directory.
@@ -81,6 +84,7 @@ litematica.hover.placement_list.origin=Origin: x: §b%s§7 y: §b%s§7 z: §b%s
 litematica.hover.placement_list.saved_to_file.modified=Saved to file: §ayes§7 - §6modified§7 since saved
 litematica.hover.placement_list.saved_to_file.not_modified=Saved to file: %s
 litematica.hover.placement_list.sub_region_count=Sub-regions: §b%s
+litematica.hover.schematic_browser.create_placement=Automatically create a new placement of the loaded schematic, and select that newly created placement
 litematica.hover.schematic_list.in_memory_only=§dIN-MEMORY ONLY
 litematica.hover.schematic_list.modified_on=Modified @ §6%s§r
 litematica.hover.schematic_list.schematic_file=Schematic file: §3%s
@@ -127,6 +131,8 @@ litematica.hud.value.off.colored=§cOFF§r
 litematica.hud.area_selection.mode.corners=Corners
 litematica.hud.area_selection.mode.expand=Expand
 
+litematica.info.area_browser.from_placement=Create a new Area Selection from the currently selected Schematic Placement. This will basically re-create the same Area Selection that was originally used to save the schematic.
+
 litematica.label.area_browser.entry_name=%s [§b%s§r]
 litematica.label.area_editor.area_selection_name=Area Selection name
 litematica.label.area_editor.sub_region_name=Sub-Region name
@@ -137,6 +143,21 @@ litematica.label.area_selection_browser.selections=selections
 litematica.label.misc.null.brackets=<null>
 litematica.label.misc.origin.auto=Auto
 litematica.label.misc.origin.manual=Manual
+litematica.label.schematic_browser.schematics=schematics
+litematica.label.schematic_info.description=<c=aaa>Description:
+litematica.label.schematic_info.dimensions_value=§b%s<c=aaa> x §b%s<c=aaa> x §b%s
+litematica.label.schematic_info.enclosing_size=<c=aaa>Enclosing size:
+litematica.label.schematic_info.enclosing_size.value=  §a%s
+litematica.label.schematic_info.enclosing_size_and_value=<c=aaa>Enclosing size: %s
+litematica.label.schematic_info.name=<c=aaa>Name:
+litematica.label.schematic_info.name.value=  <c=7f7>%s
+litematica.label.schematic_info.region_count=<c=aaa>Regions: §6%s
+litematica.label.schematic_info.schematic_author=<c=aaa>Schematic by: <c=eee>%s
+litematica.label.schematic_info.time_created=<c=aaa>Created: <c=77f>%s
+litematica.label.schematic_info.time_modified=<c=aaa>Modified: <c=77f>%s
+litematica.label.schematic_info.total_blocks=<c=aaa>Total blocks: §6%d
+litematica.label.schematic_info.total_blocks_and_volume=<c=aaa>Blocks/Volume: §6%s<c=aaa>/§6%s
+litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s <c=bbb>blocks
 litematica.label.schematic_projects.current_version_date=Date: %s
 litematica.label.tool_hud.none_brackets=§c<none>§r
 litematica.label.widget.schematic_vcs.version_entry=Ver. %d - %s
@@ -186,14 +207,19 @@ litematica.title.screen.area_editor.schematic_vcs=Area Editor (§eSchematic VCS 
 litematica.title.screen.area_editor.sub_region=Area Editor (§eMulti-Region§r mode) => Sub-Region
 litematica.title.screen.area_selection_browser.copy_selection=Copy Area Selection '%s'
 litematica.title.screen.area_selection_browser.rename_selection=Rename Area Selection
-litematica.title.screen.area_selection_browser.selection_from_placement=Create a new Area Selection from a Schematic Placement
+litematica.title.screen.area_selection_browser.selection_from_placement=Area Selection from Placement
 litematica.title.screen.create_area_selection=Create a new Area Selection
+litematica.title.screen.material_list.select_schematic_regions=Select the sub-regions to use for the Material List for '%s'
 litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
+litematica.title.screen.schematic_browser=Schematic Browser
 
 litematica.message.error.area_selection_browser.failed_to_load=Failed to load the Area Selection
 litematica.message.error.area_selection_browser.no_placement_selected=No Schematic Placement selected!
 litematica.message.error.placement_list.remove_failed_locked=The placement is locked!\nHold §6Shift§r to force remove it
 litematica.message.error.placement_list.save_failed=Failed to save the placement to file
+litematica.message.error.schematic_load.invalid_schematic_file=Invalid or broken schematic file!
+litematica.message.error.schematic_load.no_schematic_selected=No schematic file selected!
+litematica.message.info.schematic_loaded_to_memory=Schematic '%s' successfully loaded to memory
 litematica.message.warn.area_selection_browser.in_simple_mode=Note: You are currently in the §eSimple§r Area Selection mode. These area selection save files are only used in the §e"Normal"/Multi-box§r selection mode.
 
 litematica.error.area_selection.copy_failed=Failed to copy the selection
@@ -226,7 +252,6 @@ litematica.error.schematic.create.no_selections=No valid selection regions!
 
 litematica.error.schematic_load.cant_read_file=Can't read the schematic file '%s' (doesn't exist or permission issue)
 litematica.error.schematic_load.failed=Failed to read the schematic from file '%s'
-litematica.error.schematic_load.no_schematic_selected=No Schematic file selected!
 litematica.error.schematic_load.no_schematic_version_information=The schematic doesn't have version information, and can't be safely loaded!
 litematica.error.schematic_load.unsupported_schematic_version=Unsupported or future schematic version '%d'
 litematica.error.schematic_load.unsupported_type=Unknown or unsupported file type for '%s'
@@ -269,7 +294,6 @@ litematica.error.schematic_write_to_file_failed.exists=Failed to write the schem
 litematica.error.structure_write_to_file_failed.exception=Failed to write the structure to file '%s' (exception)
 litematica.error.structure_write_to_file_failed.exists=Failed to write the structure to file '%s', file already exists
 
-litematica.info.schematic_load.schematic_loaded=Schematic '%s' successfully loaded to memory
 litematica.info.schematic_manager.preview.info=Use the '%s' hotkey ['%s'] to set the schematic preview.\nOr right click the Set preview button to cancel the preview task.
 litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the button to cancel a pending preview task
 litematica.info.schematic_manager.preview.success=Schematic preview image successfully set
@@ -283,7 +307,6 @@ litematica.gui.button.hover.area_editor.shift_for_in_memory=§7Hold Shift to cre
 
 litematica.gui.button.hover.material_list.clear_cache=Clears the Material Cache\nNormally this should not be needed\nThis can be used instead of deleting the 'material_cache.nbt'\nfile in case the cache has some wrong data, like items\nstored for blocks that shouldn't have them, like piston heads
 litematica.gui.button.hover.material_list.write_hold_shift_for_csv=Hold shift to write to a CSV file,\ninstead of the normal ASCII-art table text file
-litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift to select the sub regions used for the Material List
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
 
@@ -298,7 +321,6 @@ litematica.gui.button.hover.schematic_projects.place_to_world_warning=§6Warning
 litematica.gui.button.hover.schematic_projects.save_new_version=Saves a new schematic/version to the current project
 litematica.gui.button.hover.use_text_or_icon_buttons=§7Whether to use normal text buttons or smaller icon-only buttons
 
-litematica.gui.button.material_list=Material List
 litematica.gui.button.material_list.clear_cache=Clear cache
 litematica.gui.button.material_list.clear_ignored=Clear ignored
 litematica.gui.button.material_list.hide_available=Hide available: %s
@@ -357,7 +379,6 @@ litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.delete=Delete
 litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
-litematica.gui.button.load_schematic_to_memory=Load Schematic
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
 litematica.gui.button.ok=Ok
@@ -428,21 +449,6 @@ litematica.gui.label.schematic_save.upldate_placements_option.dont_update=Don't 
 litematica.gui.label.schematic_save.upldate_placements_option.update_all=Update all dependent placements
 litematica.gui.label.schematic_save.upldate_placements_option.update_selected=Update currently selected placement
 
-litematica.gui.label.schematic_info.schematic_author=Schematic by: §f%s§r
-litematica.gui.label.schematic_info.description=Description:
-litematica.gui.label.schematic_info.enclosing_size=Enclosing size:
-litematica.gui.label.schematic_info.enclosing_size_value=Enclosing size: §f%s§r
-litematica.gui.label.schematic_info.name=Name:
-litematica.gui.label.schematic_info.region_count=Regions: §f%d§r
-litematica.gui.label.schematic_info.time_created=Created: §f%s§r
-litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
-litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
-litematica.gui.label.schematic_info.total_blocks_and_volume=Blocks/Volume: §f%d§r/§f%d§r
-litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
-
-litematica.gui.label.schematic_load.checkbox.create_placement=Create a placement
-litematica.gui.label.schematic_load.hoverinfo.create_placement=Immediately create a new placement\nand select that placement
-
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:
 litematica.gui.label.schematic_placement.saved_to_file=Successfully saved the placement to file '%s'
@@ -495,12 +501,10 @@ litematica.gui.title.create_directory=Create a new directory
 litematica.gui.title.create_in_memory_schematic=Create an in-memory Schematic
 litematica.gui.title.create_schematic_project=Create a new schematic project
 litematica.gui.title.litematica_main_menu=Litematica %s
-litematica.gui.title.load_schematic=Load Schematic
 litematica.gui.title.manage_schematic_placements=Manage Schematic Placements
 litematica.gui.title.material_list.area_analyzer=Area Analysis for selection '%s'
 litematica.gui.title.material_list.placement=Material List for placement '%s'
 litematica.gui.title.material_list.schematic=Material List for schematic '%s' (%s of %s regions)
-litematica.gui.title.material_list.select_schematic_regions=Select the sub-regions for the Material List for '%s'
 litematica.gui.title.rename_file=Rename File
 litematica.gui.title.rename_schematic=Rename Schematic
 litematica.gui.title.create_schematic_from_selection=Save the currently selected area as a Schematic
@@ -659,6 +663,7 @@ litematica.config.comment.placementrestriction=When enabled, blocks can only be 
 litematica.config.comment.placementinfrontofplayer=When enabled, created or moved placements are positioned so that they are fully infront of the player, instead of the placement's origin point being at the player's location
 litematica.config.comment.rendermateriallistinguis=Whether or not the material list should be rendered behind GUIs, ie. while any GUIs are open
 litematica.config.comment.renderthreadnotimeout=Removes the timeout from the rendering worker threads. If you get very stuttery rendering when moving around or dealing with large schematics, try disabling this. It will however make the schematic rendering a lot slower in some cases.
+litematica.config.comment.schematicbrowsercolumns=The "extra" columns that should be enabled by default in all the schematic browser screens. The file name column is always enabled. These columns can also be toggled temporarily by right clicking on the list widget, but not on a list entry, so for example by right clicking on the header widget/search bar area.
 litematica.config.comment.selectioncornersmode=The Area Selection corners mode (tool item behavior) to use. In the §bCorners§r mode you left click to set the primary corner and right click to set the secondary corner. In the §bExpand§r mode you right click to reset/collapse the selection box to the clicked position, and then you left click to expand the selection around all the clicked points.\n\n§dTip:§r The §bExpand§r mode is almost always superior, the only downside being that it can't shrink by clicking (other than fully collapsing the seelction). Because there is always a block somewhere at each side of the thing you want to select, you can always use the §bExpand§r mode to select anything, while in the §bCorners§r mode you often don't have a block at the opposite corners of the build, which would require using annoying temporary blocks.\n\n§dTL;DR;§r Use the §bExpand§r mode, it's much more Pog :kappa:
 litematica.config.comment.signtextpaste=Automatically add the sign text from the schematic to the sign GUI when placing a sign
 litematica.config.comment.toolitem=The item to use as the "tool item" for the mod actions such as controlling area selection boxes. You can also use an empty hand as the "tool" by leaving this text field empty, or putting in the literal word §a"empty"§r.
@@ -773,6 +778,7 @@ litematica.config.name.placementrestriction=Placement Restriction
 litematica.config.name.placementinfrontofplayer=Placement Infront of Player
 litematica.config.name.rendermateriallistinguis=Render Material List in GUIs
 litematica.config.name.renderthreadnotimeout=Render Thread No Timeout
+litematica.config.name.schematicbrowsercolumns=Schematic Browser Columns
 litematica.config.name.selectioncornersmode=Selection Corners Mode
 litematica.config.name.signtextpaste=Sign Text Paste
 litematica.config.name.toolitem=Tool Item
