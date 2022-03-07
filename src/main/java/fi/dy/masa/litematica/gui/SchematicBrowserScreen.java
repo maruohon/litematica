@@ -87,7 +87,7 @@ public class SchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWidget
     protected void onScreenClosed()
     {
         super.onScreenClosed();
-        this.schematicInfoWidget.onScreenClosed();
+        this.schematicInfoWidget.clearCache();
     }
 
     @Override

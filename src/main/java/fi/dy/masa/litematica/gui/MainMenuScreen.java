@@ -63,8 +63,7 @@ public class MainMenuScreen extends BaseScreen
         });
 
         this.configScreenButton.setActionListener(ConfigScreen::openConfigScreen);
-        // TODO FIXME malilib refactor
-        //this.schematicManagerScreenButton.setActionListener(() -> this.openScreen(new GuiSchematicManager()));
+        this.schematicManagerScreenButton.setActionListener(() -> openScreenWithParent(new SchematicManagerScreen()));
         this.schematicVcsScreenButton.setActionListener(DataManager.getSchematicProjectsManager()::openSchematicProjectsGui);
         this.taskManagerScreenButton.setActionListener(() -> openScreenWithParent(new TaskManagerScreen()));
 

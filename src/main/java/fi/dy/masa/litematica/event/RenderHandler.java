@@ -8,6 +8,8 @@ import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.SetSchematicPreviewTask;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
 import fi.dy.masa.malilib.event.PostWorldRenderer;
@@ -66,12 +68,12 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
                 ToolHud.getInstance().renderHud();
                 OverlayRenderer.getInstance().renderHoverInfo(mc);
 
-                /* TODO FIXME malilib refactor
-                if (GuiSchematicManager.hasPendingPreviewTask())
+                SetSchematicPreviewTask task = TaskScheduler.getInstanceClient().getFirstTaskOfType(SetSchematicPreviewTask.class);
+
+                if (task != null)
                 {
                     OverlayRenderer.getInstance().renderPreviewFrame();
                 }
-                */
             }
         }
     }

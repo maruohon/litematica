@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskTimer;
@@ -83,6 +84,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     public void stop()
     {
         this.notifyListener();
+        InfoHud.getInstance().removeInfoHudRenderer(this, false);
     }
 
     protected void notifyListener()

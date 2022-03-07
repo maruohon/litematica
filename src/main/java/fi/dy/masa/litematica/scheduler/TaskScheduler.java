@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 
@@ -113,6 +114,23 @@ public class TaskScheduler
             }
 
             return false;
+        }
+    }
+
+    @Nullable
+    public <T extends ITask> T getFirstTaskOfType(Class <? extends T> clazz)
+    {
+        synchronized (this)
+        {
+            for (ITask task : this.tasks)
+            {
+                if (clazz.isAssignableFrom(task.getClass()))
+                {
+                    return clazz.cast(task);
+                }
+            }
+
+            return null;
         }
     }
 

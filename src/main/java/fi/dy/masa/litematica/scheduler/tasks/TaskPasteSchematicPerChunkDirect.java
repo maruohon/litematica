@@ -7,7 +7,6 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
@@ -111,8 +110,6 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
         {
             MessageDispatcher.error().screenOrActionbar().translate("litematica.message.error.schematic_paste_failed");
         }
-
-        InfoHud.getInstance().removeInfoHudRenderer(this, false);
 
         super.stop();
     }

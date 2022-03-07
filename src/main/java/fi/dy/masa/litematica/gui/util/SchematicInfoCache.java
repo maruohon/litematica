@@ -35,7 +35,7 @@ public class SchematicInfoCache
         }
     }
 
-    public void deleteTextures()
+    public void clearCache()
     {
         for (SchematicInfo info : this.cachedData.values())
         {
@@ -44,6 +44,8 @@ public class SchematicInfoCache
                 this.mc.getTextureManager().deleteTexture(info.iconName);
             }
         }
+
+        this.cachedData.clear();
     }
 
     protected void cacheSchematicInfo(File file)

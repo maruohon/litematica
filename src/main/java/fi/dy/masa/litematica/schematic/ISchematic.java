@@ -21,26 +21,22 @@ public interface ISchematic
     void clear();
 
     /**
-     * Returns the file this schematic was read from, if any.
-     * @return
+     * @return the file this schematic was read from, or null if this is an in-memory-only schematic.
      */
     @Nullable File getFile();
 
     /**
-     * Returns the metadata object for this schematic
-     * @return
+     * @return the metadata object for this schematic
      */
     SchematicMetadata getMetadata();
 
     /**
-     * Returns the type of this schematic
-     * @return
+     * @return the type of this schematic
      */
     SchematicType<?> getType();
 
     /**
-     * Returns the number of (sub-)regions in this schematic
-     * @return
+     * @return the number of (sub-)regions in this schematic
      */
     default int getSubRegionCount()
     {
@@ -48,40 +44,32 @@ public interface ISchematic
     }
 
     /**
-     * Returns the enclosing size of all the (sub-)regions in this schematic
-     * @return
+     * @return the enclosing size of all the (sub-)regions in this schematic
      */
     Vec3i getEnclosingSize();
 
     /**
-     * Returns a list of all the (sub-)region names that exist in this schematic
-     * @return
+     * @return a list of all the (sub-)region names that exist in this schematic
      */
     ImmutableList<String> getRegionNames();
 
     /**
-     * Returns a map of all the (sub-)regions in this schematic
-     * @return
+     * @return a map of all the (sub-)regions in this schematic
      */
     ImmutableMap<String, ISchematicRegion> getRegions();
 
     /**
-     * Returns the schematic (sub-)region by the given name, if it exists
-     * @param regionName
-     * @return
+     * @return the schematic (sub-)region by the given name, if it exists
      */
     @Nullable ISchematicRegion getSchematicRegion(String regionName);
 
     /**
      * Reads the data from the provided other schematic
-     * @param other
      */
     void readFrom(ISchematic other);
 
     /**
      * Clears the schematic, and then reads the contents from the provided compound tag
-     * @param tag
-     * @return
      */
     boolean fromTag(NBTTagCompound tag);
 
@@ -92,15 +80,18 @@ public interface ISchematic
     NBTTagCompound toTag();
 
     /**
-     * Writes this schematic with the provided filename, in the provided directory
-     * @param dir
-     * @param fileNameIn
-     * @param override
-     * @return
+     * Writes this schematic to a file by the given file name, in the given directory
+     * @return true on success, false on failure
      */
-    default boolean writeToFile(File dir, String fileNameIn, boolean override)
+    default boolean writeToFile(File dir, String fileName, boolean override)
     {
-        String fileName = fileNameIn;
+        if (dir.exists() == false && dir.mkdirs() == false)
+        {
+            String key = "litematica.error.schematic_write_to_file_failed.directory_creation_failed";
+            MessageDispatcher.error().translate(key, dir.getAbsolutePath());
+            return false;
+        }
+
         String extension = this.getType().getFileNameExtension();
 
         if (fileName.endsWith(extension) == false)
@@ -110,15 +101,17 @@ public interface ISchematic
 
         File file = new File(dir, fileName);
 
+        return this.writeToFile(file, override);
+    }
+
+    /**
+     * Writes this schematic to the given file.
+     * @return true on success, false on failure
+     */
+    default boolean writeToFile(File file, boolean override)
+    {
         try
         {
-            if (dir.exists() == false && dir.mkdirs() == false)
-            {
-                String key = "litematica.error.schematic_write_to_file_failed.directory_creation_failed";
-                MessageDispatcher.error().translate(key, dir.getAbsolutePath());
-                return false;
-            }
-
             if (override == false && file.exists())
             {
                 MessageDispatcher.error().translate("litematica.error.schematic_write_to_file_failed.exists",
@@ -150,7 +143,7 @@ public interface ISchematic
     /**
      *
      * Tries to read the contents of this schematic from the file that was set on creation of this schematic.
-     * @return
+     * @return true on success, false on failure
      */
     default boolean readFromFile()
     {

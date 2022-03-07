@@ -27,7 +27,7 @@ public class SchematicMetadata
 
     public String getAuthor()
     {
-        return author;
+        return this.author;
     }
 
     public String getDescription()
@@ -38,7 +38,7 @@ public class SchematicMetadata
     @Nullable
     public int[] getPreviewImagePixelData()
     {
-        return thumbnailPixelData;
+        return this.thumbnailPixelData;
     }
 
     public int getRegionCount()
@@ -63,12 +63,12 @@ public class SchematicMetadata
 
     public long getTimeCreated()
     {
-        return timeCreated;
+        return this.timeCreated;
     }
 
     public long getTimeModified()
     {
-        return timeModified;
+        return this.timeModified;
     }
 
     public boolean hasBeenModified()
@@ -106,7 +106,7 @@ public class SchematicMetadata
         this.description = description;
     }
 
-    public void setPreviewImagePixelData(int[] pixelData)
+    public void setPreviewImagePixelData(@Nullable int[] pixelData)
     {
         this.thumbnailPixelData = pixelData;
     }

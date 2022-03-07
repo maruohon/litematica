@@ -43,11 +43,6 @@ public class SchematicInfoWidget extends ContainerWidget
         this.reCreateSubWidgets();
     }
 
-    public void onScreenClosed()
-    {
-        this.infoCache.deleteTextures();
-    }
-
     protected void reCreateSubWidgets()
     {
         this.clearWidgets();
@@ -57,34 +52,28 @@ public class SchematicInfoWidget extends ContainerWidget
             return;
         }
 
-        SchematicMetadata meta = this.currentInfo.schematic.getMetadata();
-
-        LabelWidget label = this.createInfoLabelWidget(meta);
         int x = this.getX() + 4;
         int y = this.getY() + 4;
-        label.setPosition(x, y);
-        label.setLineHeight(12);
+        SchematicMetadata meta = this.currentInfo.schematic.getMetadata();
+        LabelWidget label = this.createInfoLabelWidget(x, y, meta);
         this.addWidget(label);
 
         if (this.currentInfo.texture != null)
         {
-            y = label.getBottom() + 4;
-            int iconSize = (int) Math.sqrt(this.currentInfo.texture.getTextureData().length);
-            int textureSize = iconSize;
-            int usableHeight = this.getBottom() - y - 4;
-
-            if (usableHeight < iconSize)
-            {
-                iconSize = usableHeight;
-            }
-
-            Icon icon = new BaseIcon(0, 0, iconSize, iconSize, textureSize, textureSize, this.currentInfo.iconName);
-            IconWidget iconWidget = new IconWidget(icon);
-            iconWidget.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
-            iconWidget.setPosition(x, y);
-
+            IconWidget iconWidget = this.createPreviewIconWidget(x, label.getBottom() + 4);
             this.addWidget(iconWidget);
         }
+    }
+
+    @Nullable
+    public SchematicInfo getSelectedSchematicInfo()
+    {
+        return this.currentInfo;
+    }
+
+    public void clearCache()
+    {
+        this.infoCache.clearCache();
     }
 
     public void onSelectionChange(@Nullable DirectoryEntry entry)
@@ -102,7 +91,26 @@ public class SchematicInfoWidget extends ContainerWidget
         this.reCreateSubWidgets();
     }
 
-    protected LabelWidget createInfoLabelWidget(SchematicMetadata meta)
+    protected IconWidget createPreviewIconWidget(int x, int y)
+    {
+        int iconSize = (int) Math.sqrt(this.currentInfo.texture.getTextureData().length);
+        int textureSize = iconSize;
+        int usableHeight = this.getBottom() - y - 4;
+
+        if (usableHeight < iconSize)
+        {
+            iconSize = usableHeight;
+        }
+
+        Icon icon = new BaseIcon(0, 0, iconSize, iconSize, textureSize, textureSize, this.currentInfo.iconName);
+        IconWidget iconWidget = new IconWidget(icon);
+        iconWidget.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
+        iconWidget.setPosition(x, y);
+
+        return iconWidget;
+    }
+
+    protected LabelWidget createInfoLabelWidget(int x, int y, SchematicMetadata meta)
     {
         List<StyledTextLine> lines = new ArrayList<>();
 
@@ -147,6 +155,8 @@ public class SchematicInfoWidget extends ContainerWidget
         }
 
         LabelWidget label = new LabelWidget();
+        label.setPosition(x, y);
+        label.setLineHeight(12);
         label.setLabelStyledTextLines(lines);
 
         return label;

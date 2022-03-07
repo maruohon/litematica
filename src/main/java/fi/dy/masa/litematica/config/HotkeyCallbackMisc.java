@@ -5,6 +5,8 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.SetSchematicPreviewTask;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.util.SchematicEditUtils;
@@ -362,13 +364,15 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.SET_SCHEMATIC_PREVIEW.getKeyBind())
         {
-            /* TODO FIXME malilib refactor
-            if (GuiSchematicManager.hasPendingPreviewTask())
+            SetSchematicPreviewTask task = TaskScheduler.getInstanceClient().getFirstTaskOfType(SetSchematicPreviewTask.class);
+
+            if (task != null)
             {
-                GuiSchematicManager.setPreviewImage();
+                task.setPreview();
                 return ActionResult.SUCCESS;
             }
-            */
+
+            return ActionResult.FAIL;
         }
         else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeyBind() ||
                  key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeyBind())
