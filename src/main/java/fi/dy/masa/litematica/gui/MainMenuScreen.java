@@ -5,8 +5,10 @@ import java.util.List;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.InteractableWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -64,7 +66,7 @@ public class MainMenuScreen extends BaseScreen
 
         this.configScreenButton.setActionListener(ConfigScreen::openConfigScreen);
         this.schematicManagerScreenButton.setActionListener(() -> openScreenWithParent(new SchematicManagerScreen()));
-        this.schematicVcsScreenButton.setActionListener(DataManager.getSchematicProjectsManager()::openSchematicProjectsGui);
+        this.schematicVcsScreenButton.setActionListener(MainMenuScreen::openSchematicProjectsScreen);
         this.taskManagerScreenButton.setActionListener(() -> openScreenWithParent(new TaskManagerScreen()));
 
         this.setTitle("litematica.title.screen.main_menu", Reference.MOD_VERSION);
@@ -115,7 +117,8 @@ public class MainMenuScreen extends BaseScreen
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             this.areaSelectionBrowserScreenButton.setEnabled(false);
-            this.areaSelectionBrowserScreenButton.translateAndAddHoverString("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+            this.areaSelectionBrowserScreenButton.getHoverInfoFactory().removeAll();
+            this.areaSelectionBrowserScreenButton.translateAndAddHoverString("litematica.hover.button.main_menu.area_browser_in_vcs_mode");
         }
     }
 
@@ -156,6 +159,24 @@ public class MainMenuScreen extends BaseScreen
         MainMenuScreen screen = new MainMenuScreen();
         //screen.setParent(GuiUtils.getCurrentScreen());
         BaseScreen.openScreen(screen);
+    }
+
+    public static void openSchematicProjectsScreen()
+    {
+        SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
+
+        if (project != null)
+        {
+            SchematicVcsProjectManagerScreen screen = new SchematicVcsProjectManagerScreen(project);
+            screen.setParent(GuiUtils.getCurrentScreen());
+            BaseScreen.openScreen(screen);
+        }
+        else
+        {
+            SchematicVcsProjectBrowserScreen screen = new SchematicVcsProjectBrowserScreen();
+            screen.setParent(GuiUtils.getCurrentScreen());
+            BaseScreen.openScreen(screen);
+        }
     }
 
     public static String getAreaSelectionModeButtonLabel()

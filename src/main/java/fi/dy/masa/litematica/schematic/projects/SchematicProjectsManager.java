@@ -5,36 +5,14 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 
 public class SchematicProjectsManager
 {
     //private static final Pattern PATTERN_NAME_NUMBER = Pattern.compile("(.*)([0-9]+)$");
-    private final Minecraft mc = Minecraft.getMinecraft();
-
-    @Nullable
-    private SchematicProject currentProject;
-
-    public void openSchematicProjectsGui()
-    {
-        /* TODO FIXME malilib refactor
-        if (this.currentProject != null)
-        {
-            GuiSchematicProjectManager gui = new GuiSchematicProjectManager(this.currentProject);
-            gui.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(gui);
-        }
-        else
-        {
-            GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
-            gui.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(gui);
-        }
-        */
-    }
+    @Nullable private SchematicProject currentProject;
 
     @Nullable
     public SchematicProject getCurrentProject()
@@ -47,29 +25,22 @@ public class SchematicProjectsManager
         return this.currentProject != null;
     }
 
-    public void createNewProject(File dir, String projectName)
+    public void createAndOpenProject(File dir, String projectName)
     {
         this.closeCurrentProject();
 
         this.currentProject = new SchematicProject(dir, new File(dir, projectName + ".json"));
         this.currentProject.setName(projectName);
-        this.currentProject.setOrigin(new BlockPos(this.mc.player));
+        this.currentProject.setOrigin(EntityUtils.getCameraEntityBlockPos());
         this.currentProject.saveToFile();
     }
 
-    public boolean openProject(File projectFile)
+    @Nullable
+    public SchematicProject openProject(File projectFile)
     {
         this.closeCurrentProject();
-
         this.currentProject = this.loadProjectFromFile(projectFile, true);
-
-        if (this.currentProject == null)
-        {
-            MessageDispatcher.error().translate("litematica.error.schematic_projects.failed_to_load_project");
-            return false;
-        }
-
-        return true;
+        return this.currentProject;
     }
 
     @Nullable

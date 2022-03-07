@@ -3,24 +3,33 @@ package fi.dy.masa.litematica.schematic.projects;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.malilib.util.JsonUtils;
 
 public class SchematicVersion
 {
-    private final String name;
-    private final String fileName;
-    private final BlockPos areaOffset;
-    private final int version;
-    private final long timeStamp;
+    protected final SchematicProject project;
+    protected final String name;
+    protected final String fileName;
+    protected final Vec3i areaOffset;
+    protected final int version;
+    protected final long timeStamp;
 
-    SchematicVersion(String name, String fileName, BlockPos areaOffset, int version, long timeStamp)
+    SchematicVersion(SchematicProject project, String name, String fileName,
+                     Vec3i areaOffset, int version, long timeStamp)
     {
+        this.project = project;
         this.name = name;
         this.fileName = fileName;
         this.areaOffset = areaOffset;
         this.version = version;
         this.timeStamp = timeStamp;
+    }
+
+    public SchematicProject getProject()
+    {
+        return this.project;
     }
 
     public String getName()
@@ -33,7 +42,7 @@ public class SchematicVersion
         return this.fileName;
     }
 
-    public BlockPos getAreaOffset()
+    public Vec3i getAreaOffset()
     {
         return this.areaOffset;
     }
@@ -62,7 +71,7 @@ public class SchematicVersion
     }
 
     @Nullable
-    public static SchematicVersion fromJson(JsonObject obj)
+    public static SchematicVersion fromJson(JsonObject obj, SchematicProject project)
     {
         BlockPos areaOffset = JsonUtils.blockPosFromJson(obj, "area_offset");
 
@@ -75,7 +84,7 @@ public class SchematicVersion
             int version = JsonUtils.getInteger(obj, "version");
             long timeStamp = JsonUtils.getLong(obj, "timestamp");
 
-            return new SchematicVersion(name, fileName, areaOffset, version, timeStamp);
+            return new SchematicVersion(project, name, fileName, areaOffset, version, timeStamp);
         }
 
         return null;

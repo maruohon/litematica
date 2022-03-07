@@ -90,8 +90,8 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
         Icon icon = this.loadedPlacement != null && this.loadedPlacement.getSchematicFile() != null ? this.loadedPlacement.getSchematic().getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
         this.schematicTypeIcon = new IconWidget(icon);
-        this.textOffset.setXOffset(icon.getWidth() + 4);
-        this.textSettings.setTextColor(placement.isEnabled() ? 0xFF00FF00 : 0xFFFF0000);
+        this.textOffset.setXOffset(icon.getWidth() + 6);
+        this.textSettings.setTextColor(placement.isEnabled() ? 0xFF60FF60 : 0xFFFF3030);
 
         // boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
 

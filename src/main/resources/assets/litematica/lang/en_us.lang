@@ -43,6 +43,17 @@ litematica.button.schematic_manager.remove_preview=§cRemove Preview
 litematica.button.schematic_manager.rename_file=Rename File
 litematica.button.schematic_manager.rename_schematic=Rename Schematic
 litematica.button.schematic_manager.set_preview=Set Preview
+litematica.button.schematic_vcs.close_project=Close Current Project
+litematica.button.schematic_vcs.create_project=New Project
+litematica.button.schematic_vcs.delete_area=§cDelete Area
+litematica.button.schematic_vcs.delete_project=§cDelete Project
+litematica.button.schematic_vcs.load_project=Load Project
+litematica.button.schematic_vcs.move_origin_to_player=Move to Player
+litematica.button.schematic_vcs.open_area_editor=Open Area Editor
+litematica.button.schematic_vcs.open_manager=Open Manager
+litematica.button.schematic_vcs.open_project_browser=Open Projects Browser
+litematica.button.schematic_vcs.place_to_world=Place to World
+litematica.button.schematic_vcs.save_version=Save New Version
 litematica.button.placement_list.icon_vs_text.icons=Buttons: Icons
 litematica.button.placement_list.icon_vs_text.text=Buttons: Text
 litematica.button.placement_list.open_placement_browser=Saved Placements
@@ -64,6 +75,7 @@ litematica.checkmark.schematic_browser.create_placement=Create Placement
 litematica.hover.button.area_editor.manual_origin=Enabling a manual origin allows you to define the origin point of the area selection in a custom location/offset in relation to the sub-regions.\n\nThe automatic origin point would be at the minimum coordinate of all the sub-regions. In other words if you were to create an enclosing box around all the sub-regions, the automatic origin is the minimum coordinate corner of that box.\n\nDefining a manual origin is mostly useful if you want to be able to automatically load the schematic (or rather create the placement) in the correct/specific location while standing at a certain location.\n\nBasically when you create a placement, the origin point is by default at the player's location. And the origin point of a placement is the same as the origin point of an area selection. (Not in absolute coordinates when creating a selection, but rather the relative positions of all the sub-regions.)
 litematica.hover.button.area_selection_browser.unselect=Unselects the current Area Selection (if any)
 litematica.hover.button.icon_vs_text_buttons=Whether to use normal text buttons or smaller icon-only buttons
+litematica.hover.button.main_menu.area_browser_in_vcs_mode=There is currently a Schematic VCS Project open.\nThe Schematic VCS Project overrides the normal Area Selection functionality, and the selections are stored in the project data.
 litematica.hover.button.placement_list.configure=Edit the properties of this placement, such as the position, rotation or mirror values or sub-regions properties etc.
 litematica.hover.button.placement_list.duplicate=Creates a new identical copy of this placement
 litematica.hover.button.placement_list.remove=Removes this placement.\n\nRemoving a placement won't unload the schematic itself from memory. To unload the schematic too, unload it on the §eLoaded Schematics List§r screen. Unloading a schematic via there automatically removes all placements of it.\n\n§6Note:§r If you may need the placement again later on, you can save it first using the §eSave§r button. You can then load it back later on via the §eSaved Placements§r menu if you need it again.
@@ -75,6 +87,10 @@ litematica.hover.button.schematic_list.save_to_file=Save this schematic to a fil
 litematica.hover.button.schematic_list.toggle_enabled=Toggles this placement on/off.\n\nDisabling a placement is the recommended way of "not seeing it" while you don't need it, as this will remove it entirely from the schematic world and thus decrease the amount of work the mod has to do to update things when the player moves around.
 litematica.hover.button.schematic_list.unload=Unload this schematic from memory.\n\n§6Note:§r Unloading a schematic will also remove all the placements created from it!
 litematica.hover.button.schematic_manager.convert_format=Convert the selected schematic to another schematic format
+litematica.hover.button.schematic_vcs.delete_area=Delete the last placed or saved area.\n§cBE CAREFUL§r with this, as the affected area might not be obvious!
+litematica.hover.button.schematic_vcs.move_origin=Move the project origin to the player's current position (actually the camera entity's position, in case you are using for example Tweakeroo's Free Camera feature).\n\nThis will also move the Area Selection and Placement so that they remain at the same relative position to the origin as they were originally.
+litematica.hover.button.schematic_vcs.place_to_world=§cWARNING:§r This will delete/overwrite the blocks in the world §6within the area that was previously placed from a VCS system schematic version, or saved as a version.§r\n\nBasically the last seen "effective area selection" within the VCS project system.
+litematica.hover.button.schematic_vcs.save_new_version=Saves a new Schematic Version to the current project using the current Area Selection
 litematica.hover.checkmark.area_editor.select_this_element=Select this element
 
 litematica.hover.area_editor.multi_region.sub_region.dimensions=Dimensions: §b%s§r x §b%s§r x §b%s§r
@@ -103,7 +119,7 @@ litematica.hud.status_info.render_layer_mode=Layer Mode: §6%s§r - §a%s§r = �
 litematica.hud.status_info.render_layer_mode_all=Render Layer Mode: §6%s
 litematica.hud.status_info.renderer_status=Renderers: All: %s Sch: %s Bl: %s Ov: %s Sel: %s
 litematica.hud.status_info.placement_restriction_enabled=Placement Restriction: §aON§r
-litematica.hud.status_info.schematic_vcs_mode=§6Schematic VCS mode§r
+litematica.hud.status_info.schematic_vcs_mode=§dSchematic VCS mode§r
 litematica.hud.tool_hud.area_selection.dimensions_positions=Size: §b%s§r x §b%s§r x §b%s§r - pos1: §a%s, %s, %s§r pos2: §a%s, %s, %s
 litematica.hud.tool_hud.area_selection.corners_mode=Corners Mode: §6%s
 litematica.hud.tool_hud.area_selection.origin.multi_region=Origin [§6%s§r]: §a%s, %s, %s§r - Boxes: §b%s
@@ -124,8 +140,8 @@ litematica.hud.tool_hud.schematic_placement.selected_placement=Placement: §a%s
 litematica.hud.tool_hud.schematic_placement.selected_sub_region=Sub-Region: §a%s§r - Modified: %s
 litematica.hud.tool_hud.schematic_placement.region_count_and_modified=Region Count: §b%s§r - Modified: %s
 litematica.hud.tool_hud.schematic_placement.sub_region_origin=Region origin: §b%s, %s, %s
-litematica.hud.tool_hud.schematic_projects.current_version_date=Date: §a%s
-litematica.hud.tool_hud.schematic_projects.current_version=Version: §a%s§r/§a%s§r - Name: §a%s
+litematica.hud.tool_hud.schematic_projects.current_version_date=Date: <c=77f>%s
+litematica.hud.tool_hud.schematic_projects.current_version=Version: §b%s§r / §b%s§r - Name: §a%s
 litematica.hud.tool_hud.schematic_projects.no_versions=<no versions>
 litematica.hud.tool_hud.schematic_projects.origin=Project origin: §a%s
 litematica.hud.tool_hud.schematic_projects.project_name=Project: §a%s
@@ -141,6 +157,9 @@ litematica.hud.area_selection.mode.expand=Expand
 litematica.info.area_browser.from_placement=Create a new Area Selection from the currently selected Schematic Placement. This will basically re-create the same Area Selection that was originally used to save the schematic.
 litematica.info.schematic_manager.confirm_file_deletion=Are you sure you want to delete the file §e'%s'§r?
 litematica.info.schematic_manager.confirm_preview_removal=Are you sure you want to remove the preview image from the schematic §e%s§r?
+litematica.info.schematic_vcs.confirm_area_deletion=Do you want to delete the "last affected" area of the project?\n\nThis will delete whatever blocks and entities are within the area that the project manager last placed to the world, or last saved as a version.\n\nThat's basically the "last seen affected area", such that if you were to cycle between versions, it would not leave blocks behind from the previous version.
+litematica.info.schematic_vcs.confirm_place_to_world=Do you want to place this version to the world?\n\nThis will first delete whatever blocks and entities are within the area that the project manager last placed to the world, or last saved as a version.\n\nThat's basically the "last seen affected area", such that if you were to cycle between versions, it would not leave blocks behind from the previous version.
+litematica.info.schematic_vcs.confirm_project_removal=Are you sure you want to delete the VCS Project\n§e%s§r ?\n\nNote that this will only remove the project (version) data storage json file, not the schematics saved from the project.
 
 litematica.label.area_browser.entry_name=%s [§b%s§r]
 litematica.label.area_editor.area_selection_name=Area Selection name
@@ -168,9 +187,16 @@ litematica.label.schematic_info.total_blocks=<c=aaa>Total blocks: §6%d
 litematica.label.schematic_info.total_blocks_and_volume=<c=aaa>Blocks/Volume: §6%s<c=aaa> / §6%s
 litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s <c=bbb>blocks
 litematica.label.schematic_projects.current_version_date=Date: %s
-litematica.label.task.set_schematic_preview=Set Preview image for schematic §e%s§r
+litematica.label.schematic_vcs.browser_root_dir_name=projects
+litematica.label.schematic_vcs.current_project=Current Project: §e%s
+litematica.label.schematic_vcs.info_widget.current_version=<c=aaa>Version: §6%s <c=aaa>(of §6%s<c=aaa>)
+litematica.label.schematic_vcs.info_widget.origin=<c=aaa>Project Origin:\n  x: §6%s\n  <c=aaa>y: §6%s\n  <c=aaa>z: §6%s
+litematica.label.schematic_vcs.info_widget.project=<c=aaa>Project:\n  <c=7f7>%s
+litematica.label.schematic_vcs.info_widget.version_name=<c=aaa>Version Name:\n  <c=7f7>%s
+litematica.label.schematic_vcs.info_widget.version_time=<c=aaa>Version Saved:\n  <c=77f>%s
+litematica.label.task.set_schematic_preview=Set Preview image for schematic §e%s
 litematica.label.tool_hud.none_brackets=§c<none>§r
-litematica.label.widget.schematic_vcs.version_entry=Ver. %d - %s
+litematica.label.widget.schematic_vcs.version_entry=Ver. §6%d§r - %s
 
 litematica.name.schematic_verifier.all=All (non-ignored)
 litematica.name.schematic_verifier.all.pos_line=§fx: %s y: %s z: %s§r
@@ -224,6 +250,7 @@ litematica.title.screen.create_area_selection=Create a new Area Selection
 litematica.title.screen.material_list.select_schematic_regions=Select the sub-regions to use for the Material List for '%s'
 litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
 litematica.title.screen.main_menu=Litematica %s
+litematica.title.screen.save_in_memory_schematic=Create an In-Memory-Only Schematic
 litematica.title.screen.schematic_browser=Litematica %s - Schematic Browser
 litematica.title.screen.schematic_manager=Litematica %s - Schematic Manager
 litematica.title.screen.schematic_manager.confirm_file_deletion=Confirm File Deletion
@@ -231,6 +258,13 @@ litematica.title.screen.schematic_manager.confirm_preview_removal=Confirm Previe
 litematica.title.screen.schematic_manager.rename_file=Rename File
 litematica.title.screen.schematic_manager.rename_schematic=Rename Schematic
 litematica.title.screen.schematic_placements_list=Litematica %s - Schematic Placements List
+litematica.title.screen.schematic_vcs.confirm_delete_area=Confirm Area Deletion
+litematica.title.screen.schematic_vcs.confirm_delete_project=Confirm VCS Project Deletion
+litematica.title.screen.schematic_vcs.confirm_place_to_world=Confirm Place Version to World
+litematica.title.screen.schematic_vcs.create_new_project=Create a New Schematic VCS Project
+litematica.title.screen.schematic_vcs.project_browser=Litematica %s - Schematic VCS Project Browser
+litematica.title.screen.schematic_vcs.project_manager=Litematica %s - Schematic VCS Project Manager
+litematica.title.screen.schematic_vcs.save_new_version=Save New Schematic VCS Version
 litematica.title.screen.task_manager=Litematica %s - Task Manager
 
 litematica.message.error.area_selection_browser.failed_to_load=Failed to load the Area Selection
@@ -243,10 +277,14 @@ litematica.message.error.schematic_manager.failed_to_save_schematic=Failed to sa
 litematica.message.error.schematic_manager.schematic_type_has_no_name=The selected schematic type (§e%s§r) does not store a name
 litematica.message.error.schematic_manager.schematic_type_has_no_preview=The selected schematic type (§e%s§r) does not store a preview/thumbnail image
 litematica.message.error.schematic_preview_set_failed=Exception while trying to set the schematic preview image for schematic §e%s§r
+litematica.message.error.schematic_vcs.failed_to_load_project=Failed to load Schematic VCS Project §e%s§r
+litematica.message.error.schematic_vcs.project_already_exists=Schematic VCS Project §e%s§r already exists
 litematica.message.info.schematic_loaded_to_memory=Schematic '%s' successfully loaded to memory
 litematica.message.info.schematic_manager.preview_removed=Schematic preview image removed
 litematica.message.info.schematic_manager.set_preview=Use the §e%s§r hotkey [§e%s§r] to set the schematic preview image.\n\nYou can remove the pending preview task(s) via the Litematica Task Manager screen. If you start multiple preview tasks at once, they will get executed in order when you use the hotkey.
 litematica.message.info.schematic_manager.set_preview.success=Schematic preview image has been set for schematic §e%s§r
+litematica.message.info.schematic_vcs.project_created=Schematic VCS Project §e%s§r created
+litematica.message.info.schematic_vcs.project_loaded=Schematic VCS Project §e%s§r loaded
 litematica.message.warn.area_selection_browser.in_simple_mode=Note: You are currently in the §eSimple§r Area Selection mode. These area selection save files are only used in the §e"Normal"/Multi-box§r selection mode.
 
 litematica.error.area_selection.copy_failed=Failed to copy the selection
@@ -290,7 +328,6 @@ litematica.error.schematic_placements.settings_load.invalid_data=Failed to load 
 litematica.error.schematic_placements.settings_load.missing_data=Failed to load placement settings, missing some of the required data!
 
 litematica.error.schematic_projects.empty_selection=Empty Area Selection (0 sub-regions)
-litematica.error.schematic_projects.failed_to_load_project=Failed to load project
 litematica.error.schematic_projects.failed_to_load_schematic=Failed to load schematic for the current version
 litematica.error.schematic_projects.failed_to_rename_project_file_exception=Failed to rename project file as '%s' (exception)
 litematica.error.schematic_projects.failed_to_rename_project_file_exists=Can't rename project to '%s', file already exists
@@ -298,7 +335,6 @@ litematica.error.schematic_projects.invalid_project_directory=Invalid or non-exi
 litematica.error.schematic_projects.no_project_open=No project open
 litematica.error.schematic_projects.in_projects_mode_but_no_project_open=Currently in Schematic Projects mode, but there is currently no project open
 litematica.error.schematic_projects.null_player=Player was null
-litematica.error.schematic_projects.project_already_exists=Project '%s' already exists
 litematica.error.schematic_projects.save_already_in_progress=Save already in progress
 
 litematica.error.schematic_read_from_file_failed.cant_read=Failed to read schematic from file '%s'
@@ -334,11 +370,6 @@ litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase
 
 litematica.gui.button.hover.schematic_placement.copy_paste_settings=§6Copy or Paste placement settings\n- Click to open a text field where you can copy\n   or paste the setting string from/to\n- Shift + Left click to copy the settings directly to the clip board\n- Ctrl + Shift + Right click to directly paste the settings from the clip board
 
-litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode=There is currently a Schematic Project open.\nThe Schematic Project overrides the normal area selection functionality
-litematica.gui.button.hover.schematic_projects.delete_area=§6Delete the last placed or saved area§r
-litematica.gui.button.hover.schematic_projects.move_origin_to_player=Move the project origin to the player's current position\nThis will also move the area selection and placement
-litematica.gui.button.hover.schematic_projects.place_to_world_warning=§6Warning: This will delete/overwrite the current blocks\n§6in the world within the area that was previously\n§6placed from a version, or saved as a version\n§6(basically the last seen "effective area selection")
-litematica.gui.button.hover.schematic_projects.save_new_version=Saves a new schematic/version to the current project
 litematica.gui.button.hover.use_text_or_icon_buttons=§7Whether to use normal text buttons or smaller icon-only buttons
 
 litematica.gui.button.material_list.clear_cache=Clear cache
@@ -371,17 +402,6 @@ litematica.gui.button.schematic_placements.load=Load
 litematica.gui.button.schematic_placements.locked=Locked: %s
 litematica.gui.button.schematic_placements.rendering_enabled=Rendering: %s
 litematica.gui.button.schematic_placements.select=Select
-
-litematica.gui.button.schematic_projects.close_project=Close current project
-litematica.gui.button.schematic_projects.create_project=Create project
-litematica.gui.button.schematic_projects.delete_area=Delete Area
-litematica.gui.button.schematic_projects.load_project=Load project
-litematica.gui.button.schematic_projects.move_origin_to_player=Move to player
-litematica.gui.button.schematic_projects.open_area_editor=Area Editor
-litematica.gui.button.schematic_projects.open_manager_gui=Open Manager
-litematica.gui.button.schematic_projects.open_project_browser=Projects Browser
-litematica.gui.button.schematic_projects.place_to_world=Place to world
-litematica.gui.button.schematic_projects.save_version=Save Version
 
 litematica.gui.button.schematic_verifier.ignore=Ignore
 litematica.gui.button.schematic_verifier.range_type=Range: %s
@@ -475,9 +495,6 @@ litematica.gui.label.schematic_placement.hover.rotation_mirror=§7Rotation: §b%
 litematica.gui.label.schematic_placement.hover.placement_file=§7Placement file: §3%s
 
 litematica.gui.label.schematic_projects.currently_open_project=Currently open project: %s
-litematica.gui.label.schematic_projects.origin=Origin:
-litematica.gui.label.schematic_projects.project=Project:
-litematica.gui.label.schematic_projects.version=Version: %s (of %s)
 litematica.gui.label.schematic_projects.version_name=Version name:
 
 litematica.gui.label.schematic_save.checkbox.ignore_entities=Ignore entities
@@ -500,15 +517,10 @@ litematica.gui.label.task_name.save_schematic=Save Schematic
 litematica.gui.label.task_name.update_blocks=Update Blocks
 litematica.gui.label.task_name.verifier=Verifier
 
-litematica.gui.message.schematic_projects.confirm_delete_area=Do you want to delete the "last affected" area?\nThis will delete whatever blocks and entities are within the area that the project manager last placed to the world, or last saved as a version. (Basically the "last seen affected area", such that if you were to cycle versions, it would not leave blocks behind from the previous version.)
-litematica.gui.message.schematic_projects.confirm_place_to_world=Do you want to place this version to the world?\nIt will delete whatever blocks are within the area that the project manager last placed to the world, or last saved as a version. (Basically the "last seen affected area", such that if you were to cycle versions, it would not leave blocks behind from the previous version.)
-
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
 litematica.gui.title.convert_schematic_format=Save schematic '%s' in a different schematic format
 litematica.gui.title.create_directory=Create a new directory
-litematica.gui.title.create_in_memory_schematic=Create an in-memory Schematic
-litematica.gui.title.create_schematic_project=Create a new schematic project
 litematica.gui.title.material_list.area_analyzer=Area Analysis for selection '%s'
 litematica.gui.title.material_list.placement=Material List for placement '%s'
 litematica.gui.title.material_list.schematic=Material List for schematic '%s' (%s of %s regions)
@@ -519,11 +531,6 @@ litematica.gui.title.schematic_manager=Schematic Manager
 litematica.gui.title.schematic_placement.copy_or_load_settings=Copy or load placement settings
 litematica.gui.title.schematic_placement_browser=Saved Schematic Placements
 litematica.gui.title.schematic_placement_grid_settings=Grid/Repeat settings for placement '%s'
-litematica.gui.title.schematic_project_manager=Schematic Project Manager
-litematica.gui.title.schematic_projects.confirm_delete_area=Confirm Delete area
-litematica.gui.title.schematic_projects.confirm_place_to_world=Confirm Place to world action
-litematica.gui.title.schematic_projects.save_new_version=Save new schematic version
-litematica.gui.title.schematic_projects_browser=Schematic Projects Browser
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
 
 litematica.hud.misc.none_brackets=<none>
@@ -624,8 +631,6 @@ litematica.message.set_currently_held_item_as_tool=§aSet the currently held ite
 litematica.message.set_selection_box_point=Set/moved point %d to %s
 litematica.message.toggled=Toggled %s %s
 
-litematica.message.schematic_projects.project_created=Project '%s' created
-litematica.message.schematic_projects.project_loaded=Project '%s' loaded
 litematica.message.schematic_projects.version_saved=New version (#%s) saved as '%s'
 
 litematica.message.warn.layer_mode_currently_at=Note: You are currently in the '%s' render layer mode

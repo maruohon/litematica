@@ -144,7 +144,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_SCHEMATIC_VCS_SCREEN.getKeyBind())
         {
-            DataManager.getSchematicProjectsManager().openSchematicProjectsGui();
+            MainMenuScreen.openSchematicProjectsScreen();
         }
         else if (key == Hotkeys.OPEN_SCHEMATIC_VERIFIER_SCREEN.getKeyBind())
         {
@@ -168,7 +168,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageDispatcher.warning().translate("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+                MessageDispatcher.warning().translate("litematica.hover.button.main_menu.area_browser_in_vcs_mode");
             }
         }
 

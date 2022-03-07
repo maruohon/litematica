@@ -423,6 +423,18 @@ public class DataManager implements DirectoryCache
         return dir;
     }
 
+    public static File getVCSProjectsBaseDirectory()
+    {
+        File dir = new File(getSchematicsBaseDirectory(), "VCS");
+
+        if (dir.exists() == false && dir.mkdirs() == false)
+        {
+            Litematica.logger.warn("Failed to create the VCS Projects base directory '{}'", dir.getAbsolutePath());
+        }
+
+        return dir;
+    }
+
     public static File getPerWorldDataBaseDirectory()
     {
         return getDataBaseDirectory("world_specific_data");
