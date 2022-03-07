@@ -160,13 +160,13 @@ public class SchematicProjectsManager
         return false;
     }
 
-    public boolean deleteLastSeenArea(Minecraft mc)
+    public boolean deleteLastSeenArea()
     {
         SchematicProject project = this.getCurrentProject();
 
         if (project != null)
         {
-            project.deleteLastSeenArea(mc);
+            project.deleteLastSeenArea();
             return true;
         }
 

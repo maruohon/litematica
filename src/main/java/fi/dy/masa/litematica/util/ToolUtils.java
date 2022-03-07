@@ -35,6 +35,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class ToolUtils
@@ -110,7 +111,7 @@ public class ToolUtils
         }
     }
 
-    public static void deleteSelectionVolumes(boolean removeEntities, Minecraft mc)
+    public static void deleteSelectionVolumes(boolean removeEntities)
     {
         AreaSelection area = null;
 
@@ -128,18 +129,20 @@ public class ToolUtils
             area = DataManager.getSelectionManager().getCurrentSelection();
         }
 
-        deleteSelectionVolumes(area, removeEntities, mc);
+        deleteSelectionVolumes(area, removeEntities);
     }
 
-    public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities, Minecraft mc)
+    public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities)
     {
-        deleteSelectionVolumes(area, removeEntities, null, mc);
+        deleteSelectionVolumes(area, removeEntities, null);
     }
 
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities,
-                                              @Nullable TaskCompletionListener listener, Minecraft mc)
+                                              @Nullable TaskCompletionListener listener)
     {
-        if (mc.player != null && mc.player.capabilities.isCreativeMode)
+        EntityPlayer player = GameUtils.getClientPlayer();
+
+        if (player != null && player.capabilities.isCreativeMode)
         {
             if (area == null)
             {
@@ -174,7 +177,7 @@ public class ToolUtils
         }
     }
 
-    public static void updateSelectionVolumes(Minecraft mc)
+    public static void updateSelectionVolumes()
     {
         AreaSelection area = null;
 
@@ -192,12 +195,14 @@ public class ToolUtils
             area = DataManager.getSelectionManager().getCurrentSelection();
         }
 
-        updateSelectionVolumes(area, mc);
+        updateSelectionVolumes(area);
     }
 
-    public static void updateSelectionVolumes(@Nullable final AreaSelection area, Minecraft mc)
+    public static void updateSelectionVolumes(@Nullable final AreaSelection area)
     {
-        if (mc.player != null && mc.player.capabilities.isCreativeMode && mc.isSingleplayer())
+        EntityPlayer player = GameUtils.getClientPlayer();
+
+        if (player != null && player.capabilities.isCreativeMode && GameUtils.isSinglePlayer())
         {
             if (area == null)
             {

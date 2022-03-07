@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
@@ -76,7 +77,8 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
         this.originCheckbox.setListener(this::onOriginCheckboxClick);
 
         Box box = selection.getSelectedSubRegionBox();
-        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, box.getPos1(), selection::setExplicitOrigin);
+        BlockPos pos = box != null ? box.getPos1() : BlockPos.ORIGIN;
+        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, pos, selection::setExplicitOrigin);
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {

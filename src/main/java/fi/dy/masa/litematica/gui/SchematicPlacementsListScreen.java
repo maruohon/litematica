@@ -31,14 +31,16 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     {
         super(12, 30, 20, 64);
 
+        this.manager = DataManager.getSchematicPlacementManager();
+
         this.iconsTextToggleButton               = GenericButton.create(this::getIconVsTextButtonLabel);
         this.loadedSchematicsListScreenButton    = GenericButton.create("litematica.button.change_menu.loaded_schematics", LitematicaIcons.LOADED_SCHEMATICS);
         this.mainMenuButton                      = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.schematicPlacementFileBrowserButton = GenericButton.create("litematica.button.placement_list.open_placement_browser");
 
         this.loadedSchematicsListScreenButton.setActionListener(() -> this.openScreen(new LoadedSchematicsListScreen()));
-        //this.schematicPlacementFileBrowserButton.setActionListener(() -> this.openScreen(new GuiSchematicPlacementFileBrowser()));
         // TODO FIXME malilib refactor
+        //this.schematicPlacementFileBrowserButton.setActionListener(() -> this.openScreen(new GuiSchematicPlacementFileBrowser()));
 
         this.iconsTextToggleButton.translateAndAddHoverString("litematica.hover.button.icon_vs_text_buttons");
         this.iconsTextToggleButton.setIsRightAligned(true);
@@ -47,7 +49,6 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
             this.initScreen();
         });
 
-        this.manager = DataManager.getSchematicPlacementManager();
         this.setTitle("litematica.title.screen.schematic_placements_list", Reference.MOD_VERSION);
     }
 

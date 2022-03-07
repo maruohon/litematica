@@ -10,7 +10,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
@@ -27,6 +27,7 @@ import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 
 public class SchematicProject
@@ -214,7 +215,8 @@ public class SchematicProject
 
                     if (time != version.getTimeStamp())
                     {
-                        version = new SchematicVersion(version.getName(), version.getFileName(), version.getAreaOffset(), version.getVersion(), time);
+                        version = new SchematicVersion(this, version.getName(), version.getFileName(),
+                                                       version.getAreaOffset(), version.getVersion(), time);
                         this.versions.set(this.currentVersionId, version);
                         this.dirty = true;
                     }
@@ -233,9 +235,9 @@ public class SchematicProject
     {
         if (this.currentPlacement != null)
         {
-            Minecraft mc = Minecraft.getMinecraft();
+            EntityPlayer player = GameUtils.getClientPlayer();
 
-            if (mc.player == null || mc.player.capabilities.isCreativeMode == false)
+            if (player == null || player.capabilities.isCreativeMode == false)
             {
                 MessageDispatcher.error().translate("litematica.error.generic.creative_mode_only");
                 return;
@@ -243,13 +245,14 @@ public class SchematicProject
 
             this.cacheCurrentAreaFromPlacement();
 
-            ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, () -> SchematicPlacingUtils.pastePlacementToWorld(this.currentPlacement, false, mc), mc);
+            TaskCompletionListener completionListener = () -> SchematicPlacingUtils.pastePlacementToWorld(this.currentPlacement, false);
+            ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, completionListener);
         }
     }
 
-    public void deleteLastSeenArea(Minecraft mc)
+    public void deleteLastSeenArea()
     {
-        ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, mc);
+        ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true);
     }
 
     public void removeCurrentPlacement()
@@ -313,19 +316,18 @@ public class SchematicProject
     {
         if (this.checkCanSaveOrPrintError())
         {
-            Minecraft mc = Minecraft.getMinecraft();
-            String author = mc.player.getName();
+            String author = GameUtils.getClientPlayer().getName();
             String fileName = this.getNextFileName();
-
             AreaSelection selection = this.getSelection();
+            BlockPos areaOffset = selection.getEffectiveOrigin().subtract(this.origin);
+
             LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(selection, author);
             schematic.getMetadata().setName(name);
-            BlockPos areaOffset = selection.getEffectiveOrigin().subtract(this.origin);
-            SaveCompletionListener listener = new SaveCompletionListener(name, fileName, areaOffset);
 
             TaskSaveSchematic task = new TaskSaveSchematic(this.directory, fileName, schematic, selection.copy(), true, false);
-            task.setCompletionListener(listener);
+            task.setCompletionListener(new SaveCompletionListener(name, fileName, areaOffset));
             TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 2);
+
             this.saveInProgress = true;
             this.dirty = true;
             this.saveToFile();
@@ -340,7 +342,8 @@ public class SchematicProject
     {
         String nameBase = this.projectName + "_";
         int version = 1;
-        int failsafe = 10000000;
+        int failsafe = 10000;
+        // FIXME wtf is this shit
 
         while (failsafe-- > 0)
         {
@@ -450,7 +453,7 @@ public class SchematicProject
 
                     if (el.isJsonObject())
                     {
-                        SchematicVersion version = SchematicVersion.fromJson(el.getAsJsonObject());
+                        SchematicVersion version = SchematicVersion.fromJson(el.getAsJsonObject(), project);
 
                         if (version != null)
                         {
@@ -502,7 +505,7 @@ public class SchematicProject
             return false;
         }
 
-        if (Minecraft.getMinecraft().player == null)
+        if (GameUtils.getClientPlayer() == null)
         {
             MessageDispatcher.error().translate("litematica.error.schematic_projects.null_player");
             return false;
@@ -529,21 +532,13 @@ public class SchematicProject
         @Override
         public void onTaskCompleted()
         {
-            Minecraft mc = Minecraft.getMinecraft();
-
-            if (mc.isCallingFromMinecraftThread())
-            {
-                this.saveVersion();
-            }
-            else
-            {
-                mc.addScheduledTask(SaveCompletionListener.this::saveVersion);
-            }
+            GameUtils.scheduleToClientThread(this::saveVersion);
         }
 
         private void saveVersion()
         {
-            SchematicVersion version = new SchematicVersion(this.name, this.fileName, this.areaOffset, this.version, System.currentTimeMillis());
+            SchematicVersion version = new SchematicVersion(SchematicProject.this, this.name, this.fileName,
+                                                            this.areaOffset, this.version, System.currentTimeMillis());
             SchematicProject.this.versions.add(version);
             SchematicProject.this.switchVersion(SchematicProject.this.versions.size() - 1, true);
             SchematicProject.this.cacheCurrentAreaFromPlacement();

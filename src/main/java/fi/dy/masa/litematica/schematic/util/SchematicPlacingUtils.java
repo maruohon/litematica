@@ -10,9 +10,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
@@ -43,18 +43,19 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class SchematicPlacingUtils
 {
-    public static void pasteCurrentPlacementToWorld(Minecraft mc)
+    public static void pasteCurrentPlacementToWorld()
     {
         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-        pastePlacementToWorld(manager.getSelectedSchematicPlacement(), true, mc);
+        pastePlacementToWorld(manager.getSelectedSchematicPlacement(), true);
     }
 
-    public static void gridPasteCurrentPlacementToWorld(Minecraft mc)
+    public static void gridPasteCurrentPlacementToWorld()
     {
         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
         SchematicPlacement placement = manager.getSelectedSchematicPlacement();
@@ -68,11 +69,11 @@ public class SchematicPlacingUtils
                 placements.add(placement);
                 placements.addAll(manager.getGridPlacementsForBasePlacement(placement));
 
-                pastePlacementsToWorld(placements, true, true, mc);
+                pastePlacementsToWorld(placements, true, true);
             }
             else
             {
-                pastePlacementToWorld(placement, true, mc);
+                pastePlacementToWorld(placement, true);
                 MessageDispatcher.warning(8000).translate("litematica.message.grid_paste.warning.select_base_placement_for_grid_paste");
             }
         }
@@ -82,11 +83,11 @@ public class SchematicPlacingUtils
         }
     }
 
-    public static void pastePlacementToWorld(@Nullable SchematicPlacement placement, boolean changedBlocksOnly, Minecraft mc)
+    public static void pastePlacementToWorld(@Nullable SchematicPlacement placement, boolean changedBlocksOnly)
     {
         if (placement != null)
         {
-            pastePlacementsToWorld(Lists.newArrayList(placement), changedBlocksOnly, true, mc);
+            pastePlacementsToWorld(Lists.newArrayList(placement), changedBlocksOnly, true);
         }
         else
         {
@@ -96,16 +97,17 @@ public class SchematicPlacingUtils
 
     private static void pastePlacementsToWorld(List<SchematicPlacement> placements,
                                                boolean changedBlocksOnly,
-                                               boolean printMessage,
-                                               Minecraft mc)
+                                               boolean printMessage)
     {
-        if (mc.player != null && mc.player.capabilities.isCreativeMode)
+        EntityPlayer player = GameUtils.getClientPlayer();
+
+        if (player != null && player.capabilities.isCreativeMode)
         {
             if (placements.isEmpty() == false)
             {
                 LayerRange range = DataManager.getRenderLayerRange().copy();
 
-                if (mc.isSingleplayer())
+                if (GameUtils.isSinglePlayer())
                 {
                     TaskPasteSchematicPerChunkDirect task = new TaskPasteSchematicPerChunkDirect(placements, range, changedBlocksOnly);
                     TaskScheduler.getInstanceServer().scheduleTask(task, 20);
@@ -587,11 +589,11 @@ public class SchematicPlacingUtils
 
         if (notifyNeighbors)
         {
-            for (int y = startX; y <= endY; ++y)
+            for (int y = startY; y <= endY; ++y)
             {
-                for (int z = startY; z <= endZ; ++z)
+                for (int z = startZ; z <= endZ; ++z)
                 {
-                    for (int x = startZ; x <= endX; ++x)
+                    for (int x = startX; x <= endX; ++x)
                     {
                         posMutable.setPos(  posMinRel.getX() + x - regionPos.getX(),
                                             posMinRel.getY() + y - regionPos.getY(),

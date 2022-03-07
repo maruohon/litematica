@@ -27,7 +27,7 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
 
         this.iconsTextToggleButton               = GenericButton.create(this::getIconVsTextButtonLabel);
         this.loadSchematicsScreenButton          = GenericButton.create("litematica.button.change_menu.load_schematics", LitematicaIcons.SCHEMATIC_BROWSER);
-        this.mainMenuScreenButton                = GenericButton.create("litematica.button.change_menu.main_menu");
+        this.mainMenuScreenButton                = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.schematicPlacementsListScreenButton = GenericButton.create("litematica.button.change_menu.schematic_placements", LitematicaIcons.SCHEMATIC_PLACEMENTS);
 
         this.iconsTextToggleButton.translateAndAddHoverString("litematica.hover.button.icon_vs_text_buttons");
@@ -37,9 +37,7 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
             this.initScreen();
         });
 
-        // TODO FIXME malilib refactor
-        //this.loadSchematicsScreenButton.setActionListener(() -> this.openScreen(new GuiSchematicLoad()));
-        this.mainMenuScreenButton.setActionListener(MainMenuScreen::openMainMenuScreen);
+        this.loadSchematicsScreenButton.setActionListener(() -> this.openScreen(new SchematicBrowserScreen()));
         this.schematicPlacementsListScreenButton.setActionListener(() -> this.openScreen(new SchematicPlacementsListScreen()));
 
         this.setTitle("litematica.title.screen.loaded_schematics", Reference.MOD_VERSION);

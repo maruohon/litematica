@@ -126,12 +126,12 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             }
             else if (mode == ToolMode.PASTE_SCHEMATIC)
             {
-                SchematicPlacingUtils.pasteCurrentPlacementToWorld(this.mc);
+                SchematicPlacingUtils.pasteCurrentPlacementToWorld();
                 return ActionResult.SUCCESS;
             }
             else if (mode == ToolMode.GRID_PASTE)
             {
-                SchematicPlacingUtils.gridPasteCurrentPlacementToWorld(this.mc);
+                SchematicPlacingUtils.gridPasteCurrentPlacementToWorld();
                 return ActionResult.SUCCESS;
             }
             else if (mode == ToolMode.FILL && mode.getPrimaryBlock() != null)
@@ -147,7 +147,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             else if (mode == ToolMode.DELETE)
             {
                 boolean removeEntities = true; // TODO
-                ToolUtils.deleteSelectionVolumes(removeEntities, this.mc);
+                ToolUtils.deleteSelectionVolumes(removeEntities);
                 return ActionResult.SUCCESS;
             }
         }
@@ -417,7 +417,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.UPDATE_BLOCKS.getKeyBind())
         {
-            ToolUtils.updateSelectionVolumes(this.mc);
+            ToolUtils.updateSelectionVolumes();
             return ActionResult.SUCCESS;
         }
 
