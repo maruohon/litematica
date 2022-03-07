@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.gui.widget.list.entry.TaskEntryWidget;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
@@ -18,7 +19,7 @@ public class TaskManagerScreen extends BaseListScreen<DataListWidget<ITask>>
         super(12, 30, 20, 60);
 
         this.mainMenuButton = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
-        this.setTitle("litematica.gui.title.task_manager");
+        this.setTitle("litematica.title.screen.task_manager", Reference.MOD_VERSION);
     }
 
     @Override

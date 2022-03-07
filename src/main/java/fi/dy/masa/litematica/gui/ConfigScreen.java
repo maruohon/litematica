@@ -68,21 +68,24 @@ public class ConfigScreen
 
     public static BaseConfigScreen create()
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC, "litematica.gui.title.configs");
+        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC,
+                                                       "litematica.title.screen.configs", Reference.MOD_VERSION);
         screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
         return screen;
     }
 
     public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC, "litematica.gui.title.configs");
+        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC,
+                                                       "litematica.title.screen.configs", Reference.MOD_VERSION);
         screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
         return screen;
     }
 
     public static BaseConfigScreen createOnTab(ConfigTab tab)
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC, "litematica.gui.title.configs");
+        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC,
+                                                       "litematica.title.screen.configs", Reference.MOD_VERSION);
         screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
         screen.setCurrentTab(tab);
         DataManager.setConfigGuiTab(tab);

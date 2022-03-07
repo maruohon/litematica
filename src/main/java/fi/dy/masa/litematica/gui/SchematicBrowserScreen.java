@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Configs.Generic;
 import fi.dy.masa.litematica.data.DataManager;
@@ -49,7 +50,7 @@ public class SchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWidget
         this.mainMenuScreenButton.setActionListener(MainMenuScreen::openMainMenuScreen);
         this.schematicInfoWidget = new SchematicInfoWidget(170, 290);
 
-        this.setTitle("litematica.title.screen.schematic_browser");
+        this.setTitle("litematica.title.screen.schematic_browser", Reference.MOD_VERSION);
     }
 
     @Override

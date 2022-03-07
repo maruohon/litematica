@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.widget.list.entry.AreaSelectionEntryWidget;
@@ -46,7 +47,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
         this.selectionFromPlacementButton.setEnabled(DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement() != null);
 
-        this.setTitle("litematica.gui.title.area_selection_browser");
+        this.setTitle("litematica.title.screen.area_selection_browser", Reference.MOD_VERSION);
         this.updateCurrentSelectionLabel();
     }
 

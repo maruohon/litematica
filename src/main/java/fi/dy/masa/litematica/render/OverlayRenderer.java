@@ -58,6 +58,7 @@ public class OverlayRenderer
 
     private final Minecraft mc;
     private final Map<SchematicPlacement, ImmutableMap<String, SelectionBox>> placements = new HashMap<>();
+    private final List<String> blockInfoLines = new ArrayList<>();
     private Color4f colorPos1 = new Color4f(1f, 0.0625f, 0.0625f);
     private Color4f colorPos2 = new Color4f(0.0625f, 0.0625f, 1f);
     private Color4f colorOverlapping = new Color4f(1f, 0.0625f, 1f);
@@ -70,7 +71,6 @@ public class OverlayRenderer
     private Color4f colorAreaOrigin = new Color4f(1f, 0x90 / 255f, 0x10 / 255f);
 
     private long infoUpdateTime;
-    private List<String> blockInfoLines = new ArrayList<>();
     private int blockInfoX;
     private int blockInfoY;
     private int blockInfoInvOffY;

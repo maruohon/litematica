@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
@@ -47,7 +48,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         });
 
         this.manager = DataManager.getSchematicPlacementManager();
-        this.setTitle("litematica.gui.title.manage_schematic_placements");
+        this.setTitle("litematica.title.screen.schematic_placements_list", Reference.MOD_VERSION);
     }
 
     @Override

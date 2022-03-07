@@ -68,8 +68,7 @@ public class MainMenuScreen extends BaseScreen
         this.schematicVcsScreenButton.setActionListener(DataManager.getSchematicProjectsManager()::openSchematicProjectsGui);
         this.taskManagerScreenButton.setActionListener(() -> openScreenWithParent(new TaskManagerScreen()));
 
-        String version = String.format("v%s", Reference.MOD_VERSION);
-        this.setTitle("litematica.gui.title.litematica_main_menu", version);
+        this.setTitle("litematica.title.screen.main_menu", Reference.MOD_VERSION);
     }
 
     @Override

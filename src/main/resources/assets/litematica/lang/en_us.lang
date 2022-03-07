@@ -205,13 +205,18 @@ litematica.title.screen.area_editor.rename_sub_region=Rename Sub Region
 litematica.title.screen.area_editor.simple=Area Editor (§eSimple§r mode)
 litematica.title.screen.area_editor.schematic_vcs=Area Editor (§eSchematic VCS mode area§r)
 litematica.title.screen.area_editor.sub_region=Area Editor (§eMulti-Region§r mode) => Sub-Region
+litematica.title.screen.area_selection_browser=Litematica %s - Area Selection Browser
 litematica.title.screen.area_selection_browser.copy_selection=Copy Area Selection '%s'
 litematica.title.screen.area_selection_browser.rename_selection=Rename Area Selection
 litematica.title.screen.area_selection_browser.selection_from_placement=Area Selection from Placement
+litematica.title.screen.configs=Litematica %s - Configs
 litematica.title.screen.create_area_selection=Create a new Area Selection
 litematica.title.screen.material_list.select_schematic_regions=Select the sub-regions to use for the Material List for '%s'
 litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
-litematica.title.screen.schematic_browser=Schematic Browser
+litematica.title.screen.main_menu=Litematica %s
+litematica.title.screen.schematic_browser=Litematica %s - Schematic Browser
+litematica.title.screen.schematic_placements_list=Litematica %s - Schematic Placements List
+litematica.title.screen.task_manager=Litematica %s - Task Manager
 
 litematica.message.error.area_selection_browser.failed_to_load=Failed to load the Area Selection
 litematica.message.error.area_selection_browser.no_placement_selected=No Schematic Placement selected!
@@ -489,19 +494,13 @@ litematica.gui.message.confirm_file_deletion=Do you want to delete the file '%s'
 litematica.gui.message.schematic_projects.confirm_delete_area=Do you want to delete the "last affected" area?\nThis will delete whatever blocks and entities are within the area that the project manager last placed to the world, or last saved as a version. (Basically the "last seen affected area", such that if you were to cycle versions, it would not leave blocks behind from the previous version.)
 litematica.gui.message.schematic_projects.confirm_place_to_world=Do you want to place this version to the world?\nIt will delete whatever blocks are within the area that the project manager last placed to the world, or last saved as a version. (Basically the "last seen affected area", such that if you were to cycle versions, it would not leave blocks behind from the previous version.)
 
-litematica.gui.title.area_editor_normal=Area Editor (Normal/Multi-box mode)
-litematica.gui.title.area_editor_sub_region=Area Editor (sub-region)
-litematica.gui.title.area_selection_browser=Area Selection Browser
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
-litematica.gui.title.configs=Litematica Configs
 litematica.gui.title.confirm_file_deletion=Confirm file deletion
 litematica.gui.title.convert_schematic_format=Save schematic '%s' in a different schematic format
 litematica.gui.title.create_directory=Create a new directory
 litematica.gui.title.create_in_memory_schematic=Create an in-memory Schematic
 litematica.gui.title.create_schematic_project=Create a new schematic project
-litematica.gui.title.litematica_main_menu=Litematica %s
-litematica.gui.title.manage_schematic_placements=Manage Schematic Placements
 litematica.gui.title.material_list.area_analyzer=Area Analysis for selection '%s'
 litematica.gui.title.material_list.placement=Material List for placement '%s'
 litematica.gui.title.material_list.schematic=Material List for schematic '%s' (%s of %s regions)
@@ -520,7 +519,6 @@ litematica.gui.title.schematic_projects.confirm_place_to_world=Confirm Place to 
 litematica.gui.title.schematic_projects.save_new_version=Save new schematic version
 litematica.gui.title.schematic_projects_browser=Schematic Projects Browser
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
-litematica.gui.title.task_manager=Task Manager
 
 litematica.hud.misc.none_brackets=<none>
 
