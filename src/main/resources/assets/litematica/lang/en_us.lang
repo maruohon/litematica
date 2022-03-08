@@ -32,7 +32,6 @@ litematica.button.change_menu.task_manager=Task Manager
 litematica.button.main_menu.tool_mode=Tool Mode: %s
 litematica.button.placement_list.placement_enabled=Placement: %s
 litematica.button.schematic_browser.load_schematic=Load Schematic
-litematica.button.schematic_browser.material_list=Material List
 litematica.button.schematic_list.create_placement=Create Placement
 litematica.button.schematic_list.reload=Reload
 litematica.button.schematic_list.save_to_file=Save To File
@@ -43,6 +42,16 @@ litematica.button.schematic_manager.remove_preview=§cRemove Preview
 litematica.button.schematic_manager.rename_file=Rename File
 litematica.button.schematic_manager.rename_schematic=Rename Schematic
 litematica.button.schematic_manager.set_preview=Set Preview
+litematica.button.schematic_placement_settings.grid_settings=Grid/Repeat: %s
+litematica.button.schematic_placement_settings.ignore_entities=Ignore Entities: %s
+litematica.button.schematic_placement_settings.locked=Locked: %s
+litematica.button.schematic_placement_settings.mirror_value=Mirror: %s
+litematica.button.schematic_placement_settings.reset_sub_regions=<c=fa3>Reset All Sub-Regions
+litematica.button.schematic_placement_settings.rotation_value=Rotation: %s
+litematica.button.schematic_placement_settings.entry_name.enabled=<c=5f5>%s
+litematica.button.schematic_placement_settings.entry_name.disabled=<c=f55>%s
+litematica.button.schematic_placement_settings.toggle_all_off=All §cOFF§r
+litematica.button.schematic_placement_settings.toggle_all_on=All §aON§r
 litematica.button.schematic_vcs.close_project=Close Current Project
 litematica.button.schematic_vcs.create_project=New Project
 litematica.button.schematic_vcs.delete_area=§cDelete Area
@@ -61,10 +70,12 @@ litematica.button.placement_list.open_placement_browser=Saved Placements
 litematica.button.misc.configure=Configure
 litematica.button.misc.copy=Copy
 litematica.button.misc.duplicate=Duplicate
+litematica.button.misc.material_list=Material List
 litematica.button.misc.remove=Remove
 litematica.button.misc.remove.minus=§c-
 litematica.button.misc.rename=Rename
 litematica.button.misc.save=Save
+litematica.button.misc.schematic_verifier=Schematic Verifier
 litematica.button.misc.set=Set
 
 litematica.checkmark.area_editor.corner1=Corner 1
@@ -87,11 +98,18 @@ litematica.hover.button.schematic_list.save_to_file=Save this schematic to a fil
 litematica.hover.button.schematic_list.toggle_enabled=Toggles this placement on/off.\n\nDisabling a placement is the recommended way of "not seeing it" while you don't need it, as this will remove it entirely from the schematic world and thus decrease the amount of work the mod has to do to update things when the player moves around.
 litematica.hover.button.schematic_list.unload=Unload this schematic from memory.\n\n§6Note:§r Unloading a schematic will also remove all the placements created from it!
 litematica.hover.button.schematic_manager.convert_format=Convert the selected schematic to another schematic format
+litematica.hover.button.schematic_placement_settings.copy_paste_settings=§eCopy or Paste placement settings§r\n- Click to open a text field where you can copy\n   or paste the setting string to/from\n- Shift + Left click to copy to the clipboard\n- Ctrl + Shift + Right click to paste from the clipboard
+litematica.hover.button.schematic_placement_settings.enclosing_box.off=Enclosing box rendering: §cOFF
+litematica.hover.button.schematic_placement_settings.enclosing_box.on=Enclosing box rendering: §aON
+litematica.hover.button.schematic_placement_settings.grid_settings=Hold §eShift§r to just toggle the Grid Repeat §aON§r/§cOFF
+litematica.hover.button.schematic_placement_settings.lock=Locking a placement prevents (accidentally) moving or otherwise changing it
+litematica.hover.button.schematic_placement_settings.rename_placement=Rename the §fplacement§r.\nThis does not affect the schematic itself.
 litematica.hover.button.schematic_vcs.delete_area=Delete the last placed or saved area.\n§cBE CAREFUL§r with this, as the affected area might not be obvious!
 litematica.hover.button.schematic_vcs.move_origin=Move the project origin to the player's current position (actually the camera entity's position, in case you are using for example Tweakeroo's Free Camera feature).\n\nThis will also move the Area Selection and Placement so that they remain at the same relative position to the origin as they were originally.
 litematica.hover.button.schematic_vcs.place_to_world=§cWARNING:§r This will delete/overwrite the blocks in the world §6within the area that was previously placed from a VCS system schematic version, or saved as a version.§r\n\nBasically the last seen "effective area selection" within the VCS project system.
 litematica.hover.button.schematic_vcs.save_new_version=Saves a new Schematic Version to the current project using the current Area Selection
 litematica.hover.checkmark.area_editor.select_this_element=Select this element
+litematica.hover.checkmark.schematic_placement_settings.lock_coordinate=Lock this coordinate\nThis allows changing the other coordinates (with the tool) without (accidentally) affecting the locked ones
 
 litematica.hover.area_editor.multi_region.sub_region.dimensions=Dimensions: §b%s§r x §b%s§r x §b%s§r
 litematica.hover.area_editor.multi_region.sub_region.pos1=Corner 1: x: §9%s§r, y: §9%s§r, z: §9%s§r
@@ -99,14 +117,18 @@ litematica.hover.area_editor.multi_region.sub_region.pos2=Corner 2: x: §9%s§r,
 litematica.hover.area_selection_browser.origin.auto=Origin [§6Auto§r]: x: §b%s§r y: §b%s§r z: §b%s§r
 litematica.hover.area_selection_browser.origin.manual=Origin [§6Manual§r]: x: §b%s§r y: §b%s§r z: §b%s§r
 litematica.hover.area_selection_browser.region_count=Sub-Regions: §b%d
-litematica.hover.placement_list.enclosing_size=Enclosing size: §b%s§r x §b%s§r x §b%s§r
+litematica.hover.placement_list.enclosing_size=Enclosing size: <c=77f>%s§r x <c=77f>%s§r x <c=77f>%s§r
 litematica.hover.placement_list.icon.placement_locked=§6This placement has been locked and can't be modified without unlocking it first
 litematica.hover.placement_list.icon.placement_modified=§6This placement has been modified
 litematica.hover.placement_list.is_loaded=Loaded: %s
-litematica.hover.placement_list.origin=Origin: x: §b%s§7 y: §b%s§7 z: §b%s
+litematica.hover.placement_list.mirror=Mirror: §3%s
+litematica.hover.placement_list.origin=Origin: x: <c=77f>%s§r y: <c=77f>%s§r z: <c=77f>%s
+litematica.hover.placement_list.rotation=Rotation: §3%s
 litematica.hover.placement_list.saved_to_file.modified=Saved to file: §ayes§7 - §6modified§7 since saved
 litematica.hover.placement_list.saved_to_file.not_modified=Saved to file: %s
-litematica.hover.placement_list.sub_region_count=Sub-regions: §b%s
+litematica.hover.placement_list.sub_region_count=Sub-regions: §6%s
+litematica.hover.placement_list.sub_region_modified=§6This sub-region has been modified
+litematica.hover.placement_list.sub_region_size=Region size: <c=77f>%s§r x <c=77f>%s§r x <c=77f>%s
 litematica.hover.schematic_browser.create_placement=Automatically create a new placement of the loaded schematic, and select that newly created placement
 litematica.hover.schematic_list.in_memory_only=§dIN-MEMORY ONLY
 litematica.hover.schematic_list.modified_on=Modified @ §6%s§r
@@ -186,6 +208,9 @@ litematica.label.schematic_info.time_modified=<c=aaa>Modified: <c=77f>%s
 litematica.label.schematic_info.total_blocks=<c=aaa>Total blocks: §6%d
 litematica.label.schematic_info.total_blocks_and_volume=<c=aaa>Blocks/Volume: §6%s<c=aaa> / §6%s
 litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s <c=bbb>blocks
+litematica.label.schematic_placement_settings.placement_origin=Placement Origin:
+litematica.label.schematic_placement_settings.schematic_name=Schematic: §a%s§r\nFile: §3%s
+litematica.label.schematic_placement_settings.sub_regions=Sub-Regions [§6%s§r]:
 litematica.label.schematic_projects.current_version_date=Date: %s
 litematica.label.schematic_vcs.browser_root_dir_name=projects
 litematica.label.schematic_vcs.current_project=Current Project: §e%s
@@ -257,6 +282,8 @@ litematica.title.screen.schematic_manager.confirm_file_deletion=Confirm File Del
 litematica.title.screen.schematic_manager.confirm_preview_removal=Confirm Preview Image Removal
 litematica.title.screen.schematic_manager.rename_file=Rename File
 litematica.title.screen.schematic_manager.rename_schematic=Rename Schematic
+litematica.title.screen.schematic_placement_settings=Litematica %s - Schematic Placement Settings
+litematica.title.screen.schematic_placement_settings.copy_or_load_settings=Copy or Load Placement Settings
 litematica.title.screen.schematic_placements_list=Litematica %s - Schematic Placements List
 litematica.title.screen.schematic_vcs.confirm_delete_area=Confirm Area Deletion
 litematica.title.screen.schematic_vcs.confirm_delete_project=Confirm VCS Project Deletion
@@ -276,6 +303,7 @@ litematica.message.error.schematic_load.no_schematic_selected=No schematic file 
 litematica.message.error.schematic_manager.failed_to_save_schematic=Failed to save the schematic back to the file
 litematica.message.error.schematic_manager.schematic_type_has_no_name=The selected schematic type (§e%s§r) does not store a name
 litematica.message.error.schematic_manager.schematic_type_has_no_preview=The selected schematic type (§e%s§r) does not store a preview/thumbnail image
+litematica.message.error.schematic_placement.locked=The placement is locked and can't be modified
 litematica.message.error.schematic_preview_set_failed=Exception while trying to set the schematic preview image for schematic §e%s§r
 litematica.message.error.schematic_vcs.failed_to_load_project=Failed to load Schematic VCS Project §e%s§r
 litematica.message.error.schematic_vcs.project_already_exists=Schematic VCS Project §e%s§r already exists
@@ -283,6 +311,8 @@ litematica.message.info.schematic_loaded_to_memory=Schematic '%s' successfully l
 litematica.message.info.schematic_manager.preview_removed=Schematic preview image removed
 litematica.message.info.schematic_manager.set_preview=Use the §e%s§r hotkey [§e%s§r] to set the schematic preview image.\n\nYou can remove the pending preview task(s) via the Litematica Task Manager screen. If you start multiple preview tasks at once, they will get executed in order when you use the hotkey.
 litematica.message.info.schematic_manager.set_preview.success=Schematic preview image has been set for schematic §e%s§r
+litematica.message.info.settings_copied_to_clipboard=Settings copied to clip board
+litematica.message.info.settings_loaded_from_clipboard=Settings loaded from clipboard
 litematica.message.info.schematic_vcs.project_created=Schematic VCS Project §e%s§r created
 litematica.message.info.schematic_vcs.project_loaded=Schematic VCS Project §e%s§r loaded
 litematica.message.warn.area_selection_browser.in_simple_mode=Note: You are currently in the §eSimple§r Area Selection mode. These area selection save files are only used in the §e"Normal"/Multi-box§r selection mode.
@@ -368,8 +398,6 @@ litematica.gui.button.hover.material_list.write_hold_shift_for_csv=Hold shift to
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
 
-litematica.gui.button.hover.schematic_placement.copy_paste_settings=§6Copy or Paste placement settings\n- Click to open a text field where you can copy\n   or paste the setting string from/to\n- Shift + Left click to copy the settings directly to the clip board\n- Ctrl + Shift + Right click to directly paste the settings from the clip board
-
 litematica.gui.button.hover.use_text_or_icon_buttons=§7Whether to use normal text buttons or smaller icon-only buttons
 
 litematica.gui.button.material_list.clear_cache=Clear cache
@@ -385,21 +413,11 @@ litematica.gui.button.placement_sub.placement_configuration=Placement configurat
 litematica.gui.button.placement_sub.reset_sub_region_placement=Reset sub-region
 litematica.gui.button.placement_sub.slice_type=Slice: %s
 
-litematica.gui.button.schematic_placement.grid_settings=Grid/repeat: %s
-litematica.gui.button.schematic_placement.ignore_entities=Ignore entities: %s
 litematica.gui.button.schematic_placement.region_enabled=Region: %s
 litematica.gui.button.schematic_placement.reset_grid_size=Reset Size
-litematica.gui.button.schematic_placement.reset_sub_region_placements=Reset all sub-regions
-litematica.gui.button.schematic_placement.toggle_all_off=All §cOFF§r
-litematica.gui.button.schematic_placement.toggle_all_on=All §aON§r
-
-litematica.gui.button.schematic_placement.hover.enclosing_box=§7Enclosing box rendering: %s
-litematica.gui.button.schematic_placement.hover.grid_settings_shift_to_toggle=§7Hold shift to just toggle the grid repeat on/off
-litematica.gui.button.schematic_placement.hover.lock=§7Locking a placement prevents moving or\n§7otherwise changing it (accidentally)
 
 litematica.gui.button.schematic_placements.disable=Disable
 litematica.gui.button.schematic_placements.load=Load
-litematica.gui.button.schematic_placements.locked=Locked: %s
 litematica.gui.button.schematic_placements.rendering_enabled=Rendering: %s
 litematica.gui.button.schematic_placements.select=Select
 
@@ -417,15 +435,12 @@ litematica.gui.button.cancel=Cancel
 litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
-litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
 litematica.gui.button.ok=Ok
 litematica.gui.button.remove=Remove
 litematica.gui.button.remove_placement=Remove placement
-litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_new_schematic_version=Save Version
 litematica.gui.button.save_schematic=Save Schematic
-litematica.gui.button.schematic_verifier=Schematic Verifier
 litematica.gui.button.unlocked=Unlocked
 
 litematica.gui.hover.schematic_placement.button.load=§7Load this placement to the list of "active placements"
@@ -472,10 +487,6 @@ litematica.gui.label.placement_grid_settings.size_z=Size Z
 litematica.gui.label.placement_sub.region_name=Region name: %s
 litematica.gui.label.placement_sub.region_position=Region position
 
-litematica.gui.label.placement_sub.hover.region_size=§7Region size: §9%s x %s x %s
-
-litematica.gui.label.placement_settings.placement_origin=Placement origin
-
 litematica.gui.label.replace_behavior.all=All
 litematica.gui.label.replace_behavior.none=None
 litematica.gui.label.replace_behavior.with_non_air=With non-air
@@ -487,7 +498,6 @@ litematica.gui.label.schematic_save.upldate_placements_option.update_selected=Up
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:
 litematica.gui.label.schematic_placement.saved_to_file=Successfully saved the placement to file '%s'
-litematica.gui.label.schematic_placement.sub_regions=Sub-regions (%s):
 
 litematica.gui.label.schematic_placement.hover.enabled=§7Placement: %s
 litematica.gui.label.schematic_placement.hover.name=§7Name: §2%s
@@ -517,7 +527,6 @@ litematica.gui.label.task_name.save_schematic=Save Schematic
 litematica.gui.label.task_name.update_blocks=Update Blocks
 litematica.gui.label.task_name.verifier=Verifier
 
-litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
 litematica.gui.title.convert_schematic_format=Save schematic '%s' in a different schematic format
 litematica.gui.title.create_directory=Create a new directory
@@ -528,15 +537,11 @@ litematica.gui.title.create_schematic_from_selection=Save the currently selected
 litematica.gui.title.save_schematic_convert=Convert/Save schematic '%s'
 litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
 litematica.gui.title.schematic_manager=Schematic Manager
-litematica.gui.title.schematic_placement.copy_or_load_settings=Copy or load placement settings
 litematica.gui.title.schematic_placement_browser=Saved Schematic Placements
 litematica.gui.title.schematic_placement_grid_settings=Grid/Repeat settings for placement '%s'
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
 
 litematica.hud.misc.none_brackets=<none>
-
-litematica.hud.schematic_placement.hover_info.lock_coordinate=§7Lock this coordinate\n§7This allows changing the other coordinates\n§7without (accidentally) affecting the locked ones
-litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=§6This sub-region has been modified
 
 litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
 
@@ -604,11 +609,8 @@ litematica.message.material_list.material_cache_cleared=Material Cache cleared
 litematica.message.material_list_written_to_file=Material list written to file '%s'
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
-litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin §a%s, %s, %s§r => §a%s, %s, %s§r
 litematica.message.placement.moved_subregion_to=Moved sub-region to x: §a%s§r y: §a%s§r z: §a%s§r
-litematica.message.placement.settings_copied_to_clipboard=Settings copied to clip board
-litematica.message.placement.settings_loaded_from_clipboard=Settings loaded from clip board
 litematica.message.placement_restriction_fail=Action prevented by Placement Restriction mode
 litematica.message.removed_area_origin=Removed the explicit/manual area origin point
 litematica.message.removed_selection_box=Removed selection box %s

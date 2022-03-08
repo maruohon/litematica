@@ -86,7 +86,8 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.schematicPlacementFileBrowserButton.setPosition(x, y);
         x = this.schematicPlacementFileBrowserButton.getRight() + 2;
 
-        this.mainMenuButton.setPosition(x, y);
+        this.mainMenuButton.setRight(this.getRight() - 10);
+        this.mainMenuButton.setY(y);
     }
 
     protected void openScreen(BaseScreen screen)

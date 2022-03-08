@@ -50,7 +50,6 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
 
@@ -317,7 +316,7 @@ public class SchematicPlacementManager
 
             if (printMessages && isLoadFromFile == false)
             {
-                MessageDispatcher.success().translate("litematica.message.schematic_placement_created", placement.getName());
+                MessageDispatcher.success("litematica.message.schematic_placement_created", placement.getName());
 
                 if (Configs.InfoOverlays.WARN_DISABLED_RENDERING.getBooleanValue())
                 {
@@ -325,7 +324,7 @@ public class SchematicPlacementManager
 
                     if (mode != LayerMode.ALL)
                     {
-                        MessageDispatcher.warning().translate("litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
+                        MessageDispatcher.warning("litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
                     }
 
                     if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() == false)
@@ -362,7 +361,7 @@ public class SchematicPlacementManager
         }
         else if (printMessages)
         {
-            MessageDispatcher.error().translate("litematica.error.duplicate_schematic_placement");
+            MessageDispatcher.error("litematica.error.duplicate_schematic_placement");
         }
     }
 
@@ -484,7 +483,7 @@ public class SchematicPlacementManager
         }
         else
         {
-            MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
+            MessageDispatcher.error("litematica.message.error.no_placement_selected");
         }
     }
 
@@ -635,8 +634,8 @@ public class SchematicPlacementManager
             }
             else
             {
-                MessageDispatcher.error().translate("litematica.message.error.schematic_placement.load_failed",
-                                                    placement.getName(), placement.getSchematicFile());
+                MessageDispatcher.error("litematica.message.error.schematic_placement.load_failed",
+                                        placement.getName(), placement.getSchematicFile());
             }
         }
     }
@@ -652,7 +651,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return;
         }
 
@@ -675,7 +674,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return;
         }
 
@@ -696,7 +695,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return;
         }
 
@@ -743,7 +742,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return;
         }
 
@@ -761,7 +760,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return;
         }
 
@@ -779,7 +778,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return;
         }
 
@@ -797,7 +796,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return;
         }
 
@@ -812,16 +811,16 @@ public class SchematicPlacementManager
         }
     }
 
-    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, ResultingStringConsumer feedback)
+    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement)
     {
-        this.resetAllSubRegionsToSchematicValues(placement, feedback, true);
+        this.resetAllSubRegionsToSchematicValues(placement, true);
     }
 
-    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, ResultingStringConsumer feedback, boolean updatePlacementManager)
+    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, boolean updatePlacementManager)
     {
         if (placement.isLocked())
         {
-            feedback.consumeString("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return;
         }
 
@@ -847,7 +846,7 @@ public class SchematicPlacementManager
             return this.loadPlacementSettings(placement, el.getAsJsonObject());
         }
 
-        MessageDispatcher.error().translate("litematica.error.schematic_placements.settings_load.invalid_data");
+        MessageDispatcher.error("litematica.error.schematic_placements.settings_load.invalid_data");
 
         return false;
     }
@@ -856,7 +855,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+            this.printLockedErrorMessage();
             return false;
         }
 
@@ -1011,7 +1010,7 @@ public class SchematicPlacementManager
         {
             if (schematicPlacement.isLocked())
             {
-                MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+                this.printLockedErrorMessage();
                 return;
             }
 
@@ -1050,7 +1049,7 @@ public class SchematicPlacementManager
         {
             if (schematicPlacement.isLocked())
             {
-                MessageDispatcher.error().translate("litematica.message.placement.cant_modify_is_locked");
+                this.printLockedErrorMessage();
                 return;
             }
 
@@ -1100,7 +1099,7 @@ public class SchematicPlacementManager
         }
         else
         {
-            MessageDispatcher.error().translate("litematica.error.schematic_placements.load_fail", file.getName());
+            MessageDispatcher.error("litematica.error.schematic_placements.load_fail", file.getName());
         }
     }
 
@@ -1110,7 +1109,7 @@ public class SchematicPlacementManager
         {
             if (isActiveList == false && this.checkIsAlreadyLoaded(placement))
             {
-                MessageDispatcher.error().translate("litematica.error.schematic_placements.load_fail.already_loaded", placement.getName());
+                MessageDispatcher.error("litematica.error.schematic_placements.load_fail.already_loaded", placement.getName());
                 return;
             }
 
@@ -1136,7 +1135,7 @@ public class SchematicPlacementManager
 
             if (isActiveList == false)
             {
-                MessageDispatcher.success().translate("litematica.message.schematic_placement_loaded", placement.getName());
+                MessageDispatcher.success("litematica.message.schematic_placement_loaded", placement.getName());
             }
         }
     }
@@ -1257,6 +1256,11 @@ public class SchematicPlacementManager
         }
 
         OverlayRenderer.getInstance().updatePlacementCache();
+    }
+
+    protected void printLockedErrorMessage()
+    {
+        MessageDispatcher.error("litematica.message.error.schematic_placement.locked");
     }
 
     public static class PlacementPart

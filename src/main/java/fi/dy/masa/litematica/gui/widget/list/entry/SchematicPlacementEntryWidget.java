@@ -9,14 +9,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.gui.SchematicPlacementSettingsScreen;
 import fi.dy.masa.litematica.gui.SchematicPlacementsListScreen;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.icon.Icon;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.IconWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
@@ -91,13 +94,13 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         Icon icon = this.loadedPlacement != null && this.loadedPlacement.getSchematicFile() != null ? this.loadedPlacement.getSchematic().getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
         this.schematicTypeIcon = new IconWidget(icon);
         this.textOffset.setXOffset(icon.getWidth() + 6);
-        this.textSettings.setTextColor(placement.isEnabled() ? 0xFF60FF60 : 0xFFFF3030);
 
-        // boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
+        String key = placement.isEnabled() ? "litematica.button.schematic_placement_settings.entry_name.enabled" :
+                                             "litematica.button.schematic_placement_settings.entry_name.disabled";
+        this.setText(StyledTextLine.translate(key, placement.getName()));
 
-        this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0x70606060 : 0x70909090);
-        this.getBackgroundRenderer().getNormalSettings().setEnabled(true);
-        this.setText(StyledTextLine.of(placement.getName()));
+        this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0xA0101010 : 0xA0303030);
+        this.getBackgroundRenderer().getHoverSettings().setEnabledAndColor(true, 0xA0707070);
         this.addHoverInfo(placement);
     }
 
@@ -177,6 +180,20 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         }
 
         lines.add(StringUtils.translate("litematica.hover.schematic_list.schematic_file", fileName));
+
+        if (this.loadedPlacement != null)
+        {
+            lines.add(StringUtils.translate("litematica.hover.placement_list.sub_region_count",
+                                            this.loadedPlacement.getSubRegionCount()));
+        }
+
+        if (metadata != null)
+        {
+            Vec3i size = metadata.getEnclosingSize();
+            lines.add(StringUtils.translate("litematica.hover.placement_list.enclosing_size",
+                                            size.getX(), size.getY(), size.getZ()));
+        }
+
         lines.add(StringUtils.translate("litematica.hover.placement_list.is_loaded",
                                         MessageHelpers.getYesNoColored(placement.isLoaded(), false)));
 
@@ -191,18 +208,13 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
                                             MessageHelpers.getYesNoColored(saved, false)));
         }
 
+        lines.add(StringUtils.translate("litematica.hover.placement_list.rotation",
+                                        PositionUtils.getRotationNameShort(placement.getRotation())));
+        lines.add(StringUtils.translate("litematica.hover.placement_list.mirror",
+                                        PositionUtils.getMirrorName(placement.getMirror())));
+
         BlockPos o = placement.getOrigin();
         lines.add(StringUtils.translate("litematica.hover.placement_list.origin", o.getX(), o.getY(), o.getZ()));
-
-        if (metadata != null)
-        {
-            lines.add(StringUtils.translate("litematica.hover.placement_list.sub_region_count",
-                                            this.loadedPlacement.getSubRegionCount()));
-
-            Vec3i size = metadata.getEnclosingSize();
-            lines.add(StringUtils.translate("litematica.hover.placement_list.enclosing_size",
-                                            size.getX(), size.getY(), size.getZ()));
-        }
 
         this.getHoverInfoFactory().addStrings(lines);
     }
@@ -220,11 +232,12 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
     protected void openConfigurationMenu()
     {
-        /* TODO FIXME malilib refactor
-        GuiPlacementConfiguration gui = new GuiPlacementConfiguration((SchematicPlacement) this.widget.placement);
-        gui.setParent(this.widget.gui);
-        BaseScreen.openScreen(gui);
-        */
+        if (this.loadedPlacement != null)
+        {
+            SchematicPlacementSettingsScreen screen = new SchematicPlacementSettingsScreen(this.loadedPlacement);
+            screen.setParent(GuiUtils.getCurrentScreen());
+            BaseScreen.openScreen(screen);
+        }
     }
 
     protected void removePlacement()

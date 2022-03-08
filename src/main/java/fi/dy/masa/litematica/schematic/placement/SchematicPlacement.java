@@ -1,8 +1,10 @@
 package fi.dy.masa.litematica.schematic.placement;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -158,9 +160,9 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         return this.relativeSubRegionPlacements.get(areaName);
     }
 
-    public Collection<SubRegionPlacement> getAllSubRegionsPlacements()
+    public List<SubRegionPlacement> getAllSubRegionsPlacements()
     {
-        return this.relativeSubRegionPlacements.values();
+        return new ArrayList<>(this.relativeSubRegionPlacements.values());
     }
 
     public ImmutableMap<String, SubRegionPlacement> getEnabledRelativeSubRegionPlacements()
