@@ -52,6 +52,9 @@ litematica.button.schematic_placement_settings.entry_name.enabled=<c=5f5>%s
 litematica.button.schematic_placement_settings.entry_name.disabled=<c=f55>%s
 litematica.button.schematic_placement_settings.toggle_all_off=All §cOFF§r
 litematica.button.schematic_placement_settings.toggle_all_on=All §aON§r
+litematica.button.schematic_placement_sub_region_settings.placement_settings=Placement Settings
+litematica.button.schematic_placement_sub_region_settings.region_enabled=Region: %s
+litematica.button.schematic_placement_sub_region_settings.reset_region=Reset Sub-Region
 litematica.button.schematic_vcs.close_project=Close Current Project
 litematica.button.schematic_vcs.create_project=New Project
 litematica.button.schematic_vcs.delete_area=§cDelete Area
@@ -211,6 +214,9 @@ litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s <c=bbb>b
 litematica.label.schematic_placement_settings.placement_origin=Placement Origin:
 litematica.label.schematic_placement_settings.schematic_name=Schematic: §a%s§r\nFile: §3%s
 litematica.label.schematic_placement_settings.sub_regions=Sub-Regions [§6%s§r]:
+litematica.label.schematic_placement_sub_region_settings.placement_name=Placement: §a%s
+litematica.label.schematic_placement_sub_region_settings.region_name=Sub-Region Name: §a%s
+litematica.label.schematic_placement_sub_region_settings.region_position=Region Position
 litematica.label.schematic_projects.current_version_date=Date: %s
 litematica.label.schematic_vcs.browser_root_dir_name=projects
 litematica.label.schematic_vcs.current_project=Current Project: §e%s
@@ -284,6 +290,7 @@ litematica.title.screen.schematic_manager.rename_file=Rename File
 litematica.title.screen.schematic_manager.rename_schematic=Rename Schematic
 litematica.title.screen.schematic_placement_settings=Litematica %s - Schematic Placement Settings
 litematica.title.screen.schematic_placement_settings.copy_or_load_settings=Copy or Load Placement Settings
+litematica.title.screen.schematic_placement_sub_region_settings=Litematica %s - Placement Sub-Region Settings
 litematica.title.screen.schematic_placements_list=Litematica %s - Schematic Placements List
 litematica.title.screen.schematic_vcs.confirm_delete_area=Confirm Area Deletion
 litematica.title.screen.schematic_vcs.confirm_delete_project=Confirm VCS Project Deletion
@@ -409,11 +416,6 @@ litematica.gui.button.material_list.refresh_list=Refresh
 litematica.gui.button.material_list.toggle_info_hud=Info HUD: %s
 litematica.gui.button.material_list.write_to_file=Write to file
 
-litematica.gui.button.placement_sub.placement_configuration=Placement configuration
-litematica.gui.button.placement_sub.reset_sub_region_placement=Reset sub-region
-litematica.gui.button.placement_sub.slice_type=Slice: %s
-
-litematica.gui.button.schematic_placement.region_enabled=Region: %s
 litematica.gui.button.schematic_placement.reset_grid_size=Reset Size
 
 litematica.gui.button.schematic_placements.disable=Disable
@@ -484,9 +486,6 @@ litematica.gui.label.placement_grid_settings.size_x=Size X
 litematica.gui.label.placement_grid_settings.size_y=Size Y
 litematica.gui.label.placement_grid_settings.size_z=Size Z
 
-litematica.gui.label.placement_sub.region_name=Region name: %s
-litematica.gui.label.placement_sub.region_position=Region position
-
 litematica.gui.label.replace_behavior.all=All
 litematica.gui.label.replace_behavior.none=None
 litematica.gui.label.replace_behavior.with_non_air=With non-air
@@ -527,7 +526,6 @@ litematica.gui.label.task_name.save_schematic=Save Schematic
 litematica.gui.label.task_name.update_blocks=Update Blocks
 litematica.gui.label.task_name.verifier=Verifier
 
-litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
 litematica.gui.title.convert_schematic_format=Save schematic '%s' in a different schematic format
 litematica.gui.title.create_directory=Create a new directory
 litematica.gui.title.material_list.area_analyzer=Area Analysis for selection '%s'

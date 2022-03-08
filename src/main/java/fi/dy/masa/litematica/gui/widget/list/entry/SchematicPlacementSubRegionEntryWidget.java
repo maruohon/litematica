@@ -5,12 +5,15 @@ import java.util.List;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.SchematicPlacementSubRegionSettingsScreen;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.IconWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
@@ -96,9 +99,9 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
 
     protected void openConfigurationMenu()
     {
-        //SchematicPlacementSubRegionSettingsScreen screen = new SchematicPlacementSubRegionSettingsScreen(this.data);
-        //screen.setParent(GuiUtils.getCurrentScreen());
-        //BaseScreen.openScreen(screen);
+        SchematicPlacementSubRegionSettingsScreen screen = new SchematicPlacementSubRegionSettingsScreen(this.placement, this.data);
+        screen.setParent(GuiUtils.getCurrentScreen());
+        BaseScreen.openScreen(screen);
     }
 
     protected void toggleEnabled()

@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
@@ -38,6 +39,7 @@ import fi.dy.masa.malilib.render.text.StyledText;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.position.Coordinate;
 
 public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWidget<SubRegionPlacement>>
 {
@@ -131,9 +133,19 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.copyPasteSettingsButton.setRenderButtonBackgroundTexture(true);
         this.copyPasteSettingsButton.setActionListener(this::clickCopyPasteSettings);
         this.resetSubRegionsButton.setActionListener(this::resetSubRegions);
-        this.resetSubRegionsButton.setEnabledStatusSupplier(this.placement::isRegionPlacementModified);
+        this.resetSubRegionsButton.setEnabledStatusSupplier(() -> this.placement.isRegionPlacementModified() && this.isNotLocked());
+
+        BooleanSupplier enabledSupplier = this::isNotLocked;
+        this.mirrorButton.setEnabledStatusSupplier(enabledSupplier);
+        this.rotateButton.setEnabledStatusSupplier(enabledSupplier);
+        this.originEditWidget.setEnabledStatusSupplier(enabledSupplier);
+
         this.mirrorButton.setActionListener(this::mirror);
         this.rotateButton.setActionListener(this::rotate);
+
+        this.lockXCoordCheckbox.setBooleanStorage(() -> this.isCoordinateLocked(Coordinate.X), (val) -> this.setCoordinateLocked(val, Coordinate.X));
+        this.lockYCoordCheckbox.setBooleanStorage(() -> this.isCoordinateLocked(Coordinate.Y), (val) -> this.setCoordinateLocked(val, Coordinate.Y));
+        this.lockZCoordCheckbox.setBooleanStorage(() -> this.isCoordinateLocked(Coordinate.Z), (val) -> this.setCoordinateLocked(val, Coordinate.Z));
 
         this.setTitle("litematica.title.screen.schematic_placement_settings", Reference.MOD_VERSION);
     }
@@ -207,19 +219,34 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.originLabel.setPosition(x + 2, this.toggleEntitiesButton.getBottom() + 4);
         this.originEditWidget.setPosition(x + 2, this.originLabel.getBottom() + 1);
 
-        this.lockXCoordCheckbox.setPosition(this.originEditWidget.getRight() + 2, this.originEditWidget.getY() + 2);
-        this.lockYCoordCheckbox.setPosition(this.originEditWidget.getRight() + 2, this.originEditWidget.getY() + 20);
-        this.lockZCoordCheckbox.setPosition(this.originEditWidget.getRight() + 2, this.originEditWidget.getY() + 38);
-
         this.rotateButton.setPosition(x, this.originEditWidget.getBottom() + 1);
         this.mirrorButton.setPosition(x, this.rotateButton.getBottom() + 1);
         this.resetSubRegionsButton.setPosition(x, this.mirrorButton.getBottom() + 1);
+
+        x = this.originEditWidget.getRight() + 2;
+        y = this.originEditWidget.getY();
+        this.lockXCoordCheckbox.setPosition(x, y + 2);
+        this.lockYCoordCheckbox.setPosition(x, y + 20);
+        this.lockZCoordCheckbox.setPosition(x, y + 38);
 
         y = this.getBottom() - 20;
         this.openMaterialListButton.setPosition(this.x + 10, y);
         this.openVerifierButton.setPosition(this.openMaterialListButton.getRight() + 2, y);
         this.openPlacementListButton.setRight(this.getRight() - 10);
         this.openPlacementListButton.setY(y);
+    }
+
+    protected void updateWidgetStates()
+    {
+        this.mirrorButton.updateWidgetState();
+        this.nameTextField.updateWidgetState();
+        this.originEditWidget.updateWidgetState();
+        this.resetSubRegionsButton.updateWidgetState();
+        this.rotateButton.updateWidgetState();
+        this.toggleEnclosingBoxButton.updateWidgetState();
+        this.toggleEntitiesButton.updateWidgetState();
+        this.toggleLockedButton.updateWidgetState();
+        this.togglePlacementEnabledButton.updateWidgetState();
     }
 
     @Override
@@ -246,47 +273,19 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         //this.getListWidget().updateEntryWidgetStates();
     }
 
-    protected MultiIcon getEnclosingBoxButtonIcon()
+    protected boolean isNotLocked()
     {
-        return this.placement.shouldRenderEnclosingBox() ? LitematicaIcons.ENCLOSING_BOX_ENABLED :
-                                                           LitematicaIcons.ENCLOSING_BOX_DISABLED;
+        return this.placement.isLocked() == false;
     }
 
-    protected List<String> getEnclosingBoxButtonHoverText()
+    protected boolean isCoordinateLocked(Coordinate coordinate)
     {
-        String key;
-
-        if (this.placement.shouldRenderEnclosingBox())
-        {
-            key = "litematica.hover.button.schematic_placement_settings.enclosing_box.on";
-        }
-        else
-        {
-            key = "litematica.hover.button.schematic_placement_settings.enclosing_box.off";
-        }
-
-        return ImmutableList.of(StringUtils.translate(key));
+        return this.placement.isCoordinateLocked(coordinate);
     }
 
-    protected String getMirrorButtonLabel()
+    protected void setCoordinateLocked(boolean locked, Coordinate coordinate)
     {
-        String val = fi.dy.masa.litematica.util.PositionUtils.getMirrorName(this.placement.getMirror());
-        String key = "litematica.button.schematic_placement_settings.mirror_value";
-        return StringUtils.translate(key, val);
-    }
-
-    protected String getRotateButtonLabel()
-    {
-        String val = fi.dy.masa.litematica.util.PositionUtils.getRotationNameShort(this.placement.getRotation());
-        String key = "litematica.button.schematic_placement_settings.rotation_value";
-        return StringUtils.translate(key, val);
-    }
-
-    protected void updateLabels()
-    {
-        int regionCount = this.placement.getSubRegionCount();
-        String key = "litematica.label.schematic_placement_settings.sub_regions";
-        this.subRegionsLabel.setLabelStyledText(StyledText.translate(key, regionCount));
+        this.placement.setCoordinateLocked(coordinate, locked);
     }
 
     protected void setOrigin(BlockPos origin)
@@ -404,6 +403,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     {
         this.manager.resetAllSubRegionsToSchematicValues(this.placement);
         this.initScreen();
+        this.updateWidgetStates();
     }
 
     protected void toggleAllRegionsOff()
@@ -432,5 +432,48 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     protected void toggleIgnoreEntities()
     {
         this.manager.toggleIgnoreEntities(this.placement);
+    }
+
+    protected void updateLabels()
+    {
+        int regionCount = this.placement.getSubRegionCount();
+        String key = "litematica.label.schematic_placement_settings.sub_regions";
+        this.subRegionsLabel.setLabelStyledText(StyledText.translate(key, regionCount));
+    }
+
+    protected MultiIcon getEnclosingBoxButtonIcon()
+    {
+        return this.placement.shouldRenderEnclosingBox() ? LitematicaIcons.ENCLOSING_BOX_ENABLED :
+                       LitematicaIcons.ENCLOSING_BOX_DISABLED;
+    }
+
+    protected List<String> getEnclosingBoxButtonHoverText()
+    {
+        String key;
+
+        if (this.placement.shouldRenderEnclosingBox())
+        {
+            key = "litematica.hover.button.schematic_placement_settings.enclosing_box.on";
+        }
+        else
+        {
+            key = "litematica.hover.button.schematic_placement_settings.enclosing_box.off";
+        }
+
+        return ImmutableList.of(StringUtils.translate(key));
+    }
+
+    protected String getMirrorButtonLabel()
+    {
+        String val = fi.dy.masa.litematica.util.PositionUtils.getMirrorName(this.placement.getMirror());
+        String key = "litematica.button.schematic_placement_settings.mirror_value";
+        return StringUtils.translate(key, val);
+    }
+
+    protected String getRotateButtonLabel()
+    {
+        String val = fi.dy.masa.litematica.util.PositionUtils.getRotationNameShort(this.placement.getRotation());
+        String key = "litematica.button.schematic_placement_settings.rotation_value";
+        return StringUtils.translate(key, val);
     }
 }
