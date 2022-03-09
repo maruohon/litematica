@@ -14,7 +14,6 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
 
 public class GridPlacementManager
 {
@@ -111,13 +110,14 @@ public class GridPlacementManager
 
         if (settings.isEnabled() && PositionUtils.areAllCoordinatesAtLeast(size, 1))
         {
-            IntBoundingBox repeat = settings.getRepeatCounts();
+            Vec3i repeatNeg = settings.getRepeatNegative();
+            Vec3i repeatPos = settings.getRepeatPositive();
             int sizeX = size.getX();
             int sizeY = size.getY();
             int sizeZ = size.getZ();
             Box baseBox = basePlacement.getEclosingBox();
-            BlockPos repeatAreaMinCorner = baseBox.getPos1().add(-repeat.minX * sizeX, -repeat.minY * sizeY, -repeat.minZ * sizeZ);
-            BlockPos repeatAreaMaxCorner = baseBox.getPos2().add( repeat.maxX * sizeX,  repeat.maxY * sizeY,  repeat.maxZ * sizeZ);
+            BlockPos repeatAreaMinCorner = baseBox.getPos1().add(-repeatNeg.getX() * sizeX, -repeatNeg.getY() * sizeY, -repeatNeg.getZ() * sizeZ);
+            BlockPos repeatAreaMaxCorner = baseBox.getPos2().add( repeatPos.getX() * sizeX,  repeatPos.getY() * sizeY,  repeatPos.getZ() * sizeZ);
             Box repeatEnclosingBox = new Box(repeatAreaMinCorner, repeatAreaMaxCorner);
 
             // Get the box where the repeated placements intersect the target area
@@ -225,7 +225,6 @@ public class GridPlacementManager
     /**
      * Creates and adds all the grid placements within the loaded area
      * for the provided normal placement
-     * @param basePlacement
      * @return true if some placements were added
      */
     private boolean addGridPlacementsWithinLoadedAreaFor(SchematicPlacement basePlacement)
@@ -253,8 +252,6 @@ public class GridPlacementManager
 
     /**
      * Removes all repeated grid placements of the provided normal placement
-     * @param basePlacement
-     * @param updateOverlay
      * @return true if some placements were removed
      */
     private boolean removeAllGridPlacementsOf(SchematicPlacement basePlacement)
@@ -325,13 +322,7 @@ public class GridPlacementManager
 
         if (placements.isEmpty() == false)
         {
-            HashMap<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.get(basePlacement);
-
-            if (map == null)
-            {
-                map = new HashMap<>();
-                this.gridPlacementsPerPlacement.put(basePlacement, map);
-            }
+            HashMap<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.computeIfAbsent(basePlacement, k -> new HashMap<>());
 
             for (Map.Entry<Vec3i, SchematicPlacement> entry : placements.entrySet())
             {

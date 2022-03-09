@@ -270,7 +270,6 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     {
         boolean clearSelection = placement == null || placement.getName().equals(this.placement.getSelectedSubRegionName());
         this.placement.setSelectedSubRegionName(clearSelection ? null : placement.getName());
-        //this.getListWidget().updateEntryWidgetStates();
     }
 
     protected boolean isNotLocked()
@@ -359,9 +358,9 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         }
         else
         {
-            //GuiPlacementGridSettings screen = new GuiPlacementGridSettings(this.placement, this.parent);
-            //screen.setParent(this);
-            //BaseScreen.openPopupScreen(screen);
+            PlacementGridSettingsScreen screen = new PlacementGridSettingsScreen(this.placement);
+            screen.setParent(this);
+            BaseScreen.openPopupScreen(screen);
         }
     }
 

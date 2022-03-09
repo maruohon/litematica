@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.gui.AreaSelectionBrowserScreen;
 import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.gui.LoadedSchematicsListScreen;
 import fi.dy.masa.litematica.gui.MainMenuScreen;
+import fi.dy.masa.litematica.gui.PlacementGridSettingsScreen;
 import fi.dy.masa.litematica.gui.RenderLayerEditScreen;
 import fi.dy.masa.litematica.gui.SchematicBrowserScreen;
 import fi.dy.masa.litematica.gui.SchematicPlacementSettingsScreen;
@@ -107,8 +108,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             {
                 if (placement.isRepeatedPlacement() == false)
                 {
-                    // TODO FIXME malilib refactor
-                    //BaseScreen.openScreen(new GuiPlacementGridSettings(placement, null));
+                    BaseScreen.openScreen(new PlacementGridSettingsScreen(placement));
                 }
                 else
                 {

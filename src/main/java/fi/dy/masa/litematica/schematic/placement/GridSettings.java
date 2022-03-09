@@ -1,22 +1,21 @@
 package fi.dy.masa.litematica.schematic.placement;
 
+import java.util.Objects;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
 
 public class GridSettings
 {
-    private static final IntBoundingBox NO_REPEAT = new IntBoundingBox(0, 0, 0, 0, 0, 0);
-
-    private IntBoundingBox repeat = NO_REPEAT;
-    private Vec3i size = Vec3i.NULL_VECTOR;
-    private Vec3i defaultSize = Vec3i.NULL_VECTOR;
-    private boolean enabled;
-    private boolean initialized;
+    protected Vec3i size = Vec3i.NULL_VECTOR;
+    protected Vec3i defaultSize = Vec3i.NULL_VECTOR;
+    protected Vec3i repeatNegative = Vec3i.NULL_VECTOR;
+    protected Vec3i repeatPositive = Vec3i.NULL_VECTOR;
+    protected boolean enabled;
+    protected boolean initialized;
 
     public boolean isInitialized()
     {
@@ -30,7 +29,9 @@ public class GridSettings
 
     public boolean isAtDefaultValues()
     {
-        return (this.size.equals(Vec3i.NULL_VECTOR) || this.size.equals(this.defaultSize)) && this.repeat.equals(NO_REPEAT);
+        return (this.size.equals(Vec3i.NULL_VECTOR) || this.size.equals(this.defaultSize)) &&
+                this.repeatNegative.equals(Vec3i.NULL_VECTOR) &&
+                this.repeatPositive.equals(Vec3i.NULL_VECTOR);
     }
 
     public Vec3i getSize()
@@ -43,9 +44,14 @@ public class GridSettings
         return this.defaultSize;
     }
 
-    public IntBoundingBox getRepeatCounts()
+    public Vec3i getRepeatNegative()
     {
-        return this.repeat;
+        return this.repeatNegative;
+    }
+
+    public Vec3i getRepeatPositive()
+    {
+        return this.repeatPositive;
     }
 
     public boolean toggleEnabled()
@@ -81,9 +87,15 @@ public class GridSettings
         this.size = size;
     }
 
-    public void setRepeatCounts(IntBoundingBox repeat)
+    public void setRepeatCountNegative(Vec3i repeat)
     {
-        this.repeat = repeat;
+        this.repeatNegative = repeat;
+        this.initialized = true;
+    }
+
+    public void setRepeatCountPositive(Vec3i repeat)
+    {
+        this.repeatPositive = repeat;
         this.initialized = true;
     }
 
@@ -110,7 +122,8 @@ public class GridSettings
     {
         GridSettings copy = new GridSettings();
 
-        copy.repeat = this.repeat;
+        copy.repeatNegative = this.repeatNegative;
+        copy.repeatPositive = this.repeatPositive;
         copy.size = this.size;
         copy.enabled = this.enabled;
 
@@ -119,7 +132,8 @@ public class GridSettings
 
     public void copyFrom(GridSettings other)
     {
-        this.repeat = other.repeat;
+        this.repeatNegative = other.repeatNegative;
+        this.repeatPositive = other.repeatPositive;
         this.size = other.size;
         this.defaultSize = other.defaultSize;
         this.enabled = other.enabled;
@@ -129,32 +143,13 @@ public class GridSettings
     public void fromJson(JsonObject obj)
     {
         this.enabled = JsonUtils.getBoolean(obj, "enabled");
-
-        if (JsonUtils.hasArray(obj, "repeat"))
-        {
-            IntBoundingBox repeat = IntBoundingBox.fromJson(obj.get("repeat").getAsJsonArray());
-
-            if (repeat != null)
-            {
-                this.repeat = repeat;
-            }
-        }
-        else
-        {
-            this.repeat = NO_REPEAT;
-        }
-
         BlockPos pos = JsonUtils.blockPosFromJson(obj, "size");
+        BlockPos repNeg = JsonUtils.blockPosFromJson(obj, "repeatNegative");
+        BlockPos repPos = JsonUtils.blockPosFromJson(obj, "repeatPositive");
 
-        if (pos != null)
-        {
-            this.size = pos;
-        }
-        else
-        {
-            this.size = this.defaultSize;
-        }
-
+        this.repeatNegative = repNeg != null ? repNeg : Vec3i.NULL_VECTOR;
+        this.repeatPositive = repPos != null ? repPos : Vec3i.NULL_VECTOR;
+        this.size = pos != null ? pos : this.defaultSize;
         this.initialized = this.isAtDefaultValues() == false;
     }
 
@@ -163,67 +158,34 @@ public class GridSettings
         JsonObject obj = new JsonObject();
 
         obj.add("enabled", new JsonPrimitive(this.enabled));
-        obj.add("repeat", this.repeat.toJson());
         obj.add("size", JsonUtils.blockPosToJson(this.size));
+        obj.add("repeatNegative", JsonUtils.blockPosToJson(this.repeatNegative));
+        obj.add("repeatPositive", JsonUtils.blockPosToJson(this.repeatPositive));
 
         return obj;
     }
 
     @Override
-    public int hashCode()
+    public boolean equals(Object o)
     {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (enabled ? 1231 : 1237);
-        result = prime * result + ((repeat == null) ? 0 : repeat.hashCode());
-        result = prime * result + ((size == null) ? 0 : size.hashCode());
-        return result;
+        if (this == o) { return true; }
+        if (o == null || this.getClass() != o.getClass()) { return false; }
+
+        GridSettings that = (GridSettings) o;
+
+        if (this.enabled != that.enabled) { return false; }
+        if (!Objects.equals(this.size, that.size)) { return false; }
+        if (!Objects.equals(this.repeatNegative, that.repeatNegative)) { return false; }
+        return Objects.equals(this.repeatPositive, that.repeatPositive);
     }
 
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        if (this == obj)
-        {
-            return true;
-        }
-
-        if (obj == null || this.getClass() != obj.getClass())
-        {
-            return false;
-        }
-
-        GridSettings other = (GridSettings) obj;
-
-        if (this.enabled != other.enabled)
-        {
-            return false;
-        }
-
-        if (this.repeat == null)
-        {
-            if (other.repeat != null)
-            {
-                return false;
-            }
-        }
-        else if (! this.repeat.equals(other.repeat))
-        {
-            return false;
-        }
-
-        if (this.size == null)
-        {
-            if (other.size != null)
-            {
-                return false;
-            }
-        }
-        else if (! this.size.equals(other.size))
-        {
-            return false;
-        }
-
-        return true;
+        int result = this.size != null ? this.size.hashCode() : 0;
+        result = 31 * result + (this.repeatNegative != null ? this.repeatNegative.hashCode() : 0);
+        result = 31 * result + (this.repeatPositive != null ? this.repeatPositive.hashCode() : 0);
+        result = 31 * result + (this.enabled ? 1 : 0);
+        return result;
     }
 }

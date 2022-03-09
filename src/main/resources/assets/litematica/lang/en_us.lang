@@ -30,6 +30,7 @@ litematica.button.change_menu.schematic_placements=Schematic Placements
 litematica.button.change_menu.schematic_vcs=Schematic VCS
 litematica.button.change_menu.task_manager=Task Manager
 litematica.button.main_menu.tool_mode=Tool Mode: %s
+litematica.button.placement_grid_settings.reset_size=Reset Size
 litematica.button.placement_list.placement_enabled=Placement: %s
 litematica.button.schematic_browser.load_schematic=Load Schematic
 litematica.button.schematic_list.create_placement=Create Placement
@@ -196,6 +197,8 @@ litematica.label.area_selection_browser.selections=selections
 litematica.label.misc.null.brackets=<null>
 litematica.label.misc.origin.auto=Auto
 litematica.label.misc.origin.manual=Manual
+litematica.label.placement_grid_settings.grid_size=Grid Size
+litematica.label.placement_grid_settings.repeat_count=Repeat Count
 litematica.label.schematic_browser.schematics=schematics
 litematica.label.schematic_info.description=<c=aaa>Description:
 litematica.label.schematic_info.dimensions_value=§b%s<c=aaa> x §b%s<c=aaa> x §b%s
@@ -281,6 +284,7 @@ litematica.title.screen.create_area_selection=Create a new Area Selection
 litematica.title.screen.material_list.select_schematic_regions=Select the sub-regions to use for the Material List for '%s'
 litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
 litematica.title.screen.main_menu=Litematica %s
+litematica.title.screen.placement_grid_settings=Grid/Repeat Settings for Placement §e%s
 litematica.title.screen.save_in_memory_schematic=Create an In-Memory-Only Schematic
 litematica.title.screen.schematic_browser=Litematica %s - Schematic Browser
 litematica.title.screen.schematic_manager=Litematica %s - Schematic Manager
@@ -416,8 +420,6 @@ litematica.gui.button.material_list.refresh_list=Refresh
 litematica.gui.button.material_list.toggle_info_hud=Info HUD: %s
 litematica.gui.button.material_list.write_to_file=Write to file
 
-litematica.gui.button.schematic_placement.reset_grid_size=Reset Size
-
 litematica.gui.button.schematic_placements.disable=Disable
 litematica.gui.button.schematic_placements.load=Load
 litematica.gui.button.schematic_placements.rendering_enabled=Rendering: %s
@@ -474,8 +476,6 @@ litematica.gui.label.material_list.total=Total: %s items
 litematica.gui.label.misc.icons=Icons
 litematica.gui.label.misc.text=Text
 
-litematica.gui.label.placement_grid.grid_size=Grid size
-litematica.gui.label.placement_grid.repeat_count=Repeat count
 litematica.gui.label.placement_grid_settings.max_x=Positive X
 litematica.gui.label.placement_grid_settings.max_y=Positive Y
 litematica.gui.label.placement_grid_settings.max_z=Positive Z
@@ -536,7 +536,6 @@ litematica.gui.title.save_schematic_convert=Convert/Save schematic '%s'
 litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
 litematica.gui.title.schematic_manager=Schematic Manager
 litematica.gui.title.schematic_placement_browser=Saved Schematic Placements
-litematica.gui.title.schematic_placement_grid_settings=Grid/Repeat settings for placement '%s'
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
 
 litematica.hud.misc.none_brackets=<none>
