@@ -9,7 +9,6 @@ import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.widget.list.entry.SchematicEntryWidget;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -23,7 +22,7 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
 
     public LoadedSchematicsListScreen()
     {
-        super(12, 30, 20, 68);
+        super(10, 30, 20, 56);
 
         this.iconsTextToggleButton               = GenericButton.create(this::getIconVsTextButtonLabel);
         this.loadSchematicsScreenButton          = GenericButton.create("litematica.button.change_menu.load_schematics", LitematicaIcons.SCHEMATIC_BROWSER);
@@ -37,8 +36,8 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
             this.initScreen();
         });
 
-        this.loadSchematicsScreenButton.setActionListener(() -> this.openScreen(new SchematicBrowserScreen()));
-        this.schematicPlacementsListScreenButton.setActionListener(() -> this.openScreen(new SchematicPlacementsListScreen()));
+        this.loadSchematicsScreenButton.setActionListener(() -> openScreenWithParent(new SchematicBrowserScreen()));
+        this.schematicPlacementsListScreenButton.setActionListener(() -> openScreenWithParent(new SchematicPlacementsListScreen()));
 
         this.setTitle("litematica.title.screen.loaded_schematics", Reference.MOD_VERSION);
     }
@@ -62,9 +61,9 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
         this.iconsTextToggleButton.setRight(this.getRight() - 22);
         this.iconsTextToggleButton.setY(this.y + 8);
 
-        int y = this.getBottom() - 26;
-        this.loadSchematicsScreenButton.setPosition(this.x + 12, y);
-        this.schematicPlacementsListScreenButton.setPosition(this.loadSchematicsScreenButton.getRight() + 4, y);
+        int y = this.getBottom() - 24;
+        this.loadSchematicsScreenButton.setPosition(this.x + 10, y);
+        this.schematicPlacementsListScreenButton.setPosition(this.loadSchematicsScreenButton.getRight() + 2, y);
         this.mainMenuScreenButton.setRight(this.getRight() - 10);
         this.mainMenuScreenButton.setY(y);
     }
@@ -78,12 +77,6 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
         listWidget.setEntryFilter(SchematicEntryWidget::schematicSearchFilter);
         listWidget.setEntryWidgetFactory(SchematicEntryWidget::new);
         return listWidget;
-    }
-
-    protected void openScreen(BaseScreen screen)
-    {
-        screen.setParent(this);
-        BaseScreen.openScreen(screen);
     }
 
     protected String getIconVsTextButtonLabel()

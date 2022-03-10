@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class SchematicVcsProjectInfoWidget extends ContainerWidget
 {
@@ -88,7 +89,8 @@ public class SchematicVcsProjectInfoWidget extends ContainerWidget
         StyledTextLine.translate(lines, "litematica.label.schematic_vcs.info_widget.project", project.getName());
 
         int versionId = project.getCurrentVersionId();
-        String currentVersion = (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A");
+        String currentVersion = (versionId >= 0 ? String.valueOf(versionId + 1) :
+                                StringUtils.translate("litematica.label.misc.not_available"));
         StyledTextLine.translate(lines, "litematica.label.schematic_vcs.info_widget.current_version",
                                  currentVersion, project.getVersionCount());
 

@@ -89,7 +89,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
 
         this.projectInfoWidget.setHeight(this.getListHeight());
         this.projectInfoWidget.setRight(this.getRight() - 10);
-        this.projectInfoWidget.setY(this.projectNameLabel.getBottom() + 1);
+        this.projectInfoWidget.setY(this.getListY());
 
         int y = this.getBottom() - 44;
         this.createProjectButton.setPosition(this.x + 10, y);

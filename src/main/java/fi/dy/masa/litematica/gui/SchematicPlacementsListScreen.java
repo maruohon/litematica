@@ -13,7 +13,6 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -23,24 +22,26 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     protected final HashMap<SchematicPlacementUnloaded, Boolean> modifiedCache = new HashMap<>();
     protected final SchematicPlacementManager manager;
     protected final GenericButton iconsTextToggleButton;
+    protected final GenericButton loadSchematicsScreenButton;
     protected final GenericButton loadedSchematicsListScreenButton;
     protected final GenericButton mainMenuButton;
     protected final GenericButton schematicPlacementFileBrowserButton;
 
     public SchematicPlacementsListScreen()
     {
-        super(12, 30, 20, 64);
+        super(10, 30, 20, 56);
 
         this.manager = DataManager.getSchematicPlacementManager();
 
         this.iconsTextToggleButton               = GenericButton.create(this::getIconVsTextButtonLabel);
+        this.loadSchematicsScreenButton          = GenericButton.create("litematica.button.change_menu.load_schematics", LitematicaIcons.SCHEMATIC_BROWSER);
         this.loadedSchematicsListScreenButton    = GenericButton.create("litematica.button.change_menu.loaded_schematics", LitematicaIcons.LOADED_SCHEMATICS);
         this.mainMenuButton                      = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.schematicPlacementFileBrowserButton = GenericButton.create("litematica.button.placement_list.open_placement_browser");
 
-        this.loadedSchematicsListScreenButton.setActionListener(() -> this.openScreen(new LoadedSchematicsListScreen()));
-        // TODO FIXME malilib refactor
-        //this.schematicPlacementFileBrowserButton.setActionListener(() -> this.openScreen(new GuiSchematicPlacementFileBrowser()));
+        this.loadSchematicsScreenButton.setActionListener(() -> openScreenWithParent(new SchematicBrowserScreen()));
+        this.loadedSchematicsListScreenButton.setActionListener(() -> openScreenWithParent(new LoadedSchematicsListScreen()));
+        this.schematicPlacementFileBrowserButton.setActionListener(() -> openScreenWithParent(new SavedSchematicPlacementsBrowserScreen()));
 
         this.iconsTextToggleButton.translateAndAddHoverString("litematica.hover.button.icon_vs_text_buttons");
         this.iconsTextToggleButton.setIsRightAligned(true);
@@ -64,6 +65,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     {
         super.reAddActiveWidgets();
 
+        this.addWidget(this.loadSchematicsScreenButton);
         this.addWidget(this.loadedSchematicsListScreenButton);
         this.addWidget(this.schematicPlacementFileBrowserButton);
         this.addWidget(this.iconsTextToggleButton);
@@ -78,22 +80,13 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.iconsTextToggleButton.setRight(this.getRight() - 22);
         this.iconsTextToggleButton.setY(this.y + 8);
 
-        int x = this.x + 12;
-        int y = this.getBottom() - 26;
-        this.loadedSchematicsListScreenButton.setPosition(x, y);
-        x = this.loadedSchematicsListScreenButton.getRight() + 2;
-
-        this.schematicPlacementFileBrowserButton.setPosition(x, y);
-        x = this.schematicPlacementFileBrowserButton.getRight() + 2;
+        int y = this.getBottom() - 24;
+        this.loadSchematicsScreenButton.setPosition(this.x + 10, y);
+        this.loadedSchematicsListScreenButton.setPosition(this.loadSchematicsScreenButton.getRight() + 2, y);
+        this.schematicPlacementFileBrowserButton.setPosition(this.loadedSchematicsListScreenButton.getRight() + 2, y);
 
         this.mainMenuButton.setRight(this.getRight() - 10);
         this.mainMenuButton.setY(y);
-    }
-
-    protected void openScreen(BaseScreen screen)
-    {
-        screen.setParent(this);
-        BaseScreen.openScreen(screen);
     }
 
     public void onSelectionChange(@Nullable SchematicPlacementUnloaded entry)

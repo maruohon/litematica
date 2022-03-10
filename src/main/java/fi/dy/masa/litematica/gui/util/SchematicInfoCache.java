@@ -11,7 +11,6 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.SchematicType;
-import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class SchematicInfoCache
@@ -23,16 +22,6 @@ public class SchematicInfoCache
     public SchematicInfo getSchematicInfo(File file)
     {
         return this.cachedData.get(file);
-    }
-
-    public void cacheSchematicInfo(DirectoryEntry entry)
-    {
-        File file = new File(entry.getDirectory(), entry.getName());
-
-        if (this.cachedData.containsKey(file) == false)
-        {
-            this.cacheSchematicInfo(file);
-        }
     }
 
     public void clearCache()
@@ -48,8 +37,13 @@ public class SchematicInfoCache
         this.cachedData.clear();
     }
 
-    protected void cacheSchematicInfo(File file)
+    public void cacheSchematicInfo(File file)
     {
+        if (this.cachedData.containsKey(file))
+        {
+            return;
+        }
+
         NBTTagCompound tag = NbtUtils.readNbtFromFile(file);
         SchematicInfo data = null;
 

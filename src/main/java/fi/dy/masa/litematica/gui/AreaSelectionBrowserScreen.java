@@ -162,7 +162,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         }
     }
 
-    public boolean selectionFromPlacementByName(String name)
+    protected boolean selectionFromPlacementByName(String name)
     {
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
         File dir = this.getListWidget().getCurrentDirectory();
@@ -186,7 +186,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         this.getListWidget().updateEntryWidgetStates();
     }
 
-    public void onSelectionChange(BaseFileBrowserWidget.DirectoryEntry entry)
+    protected void onSelectionChange(BaseFileBrowserWidget.DirectoryEntry entry)
     {
         if (entry.getType() == BaseFileBrowserWidget.DirectoryEntryType.FILE &&
             FileType.fromFileName(entry.getFullPath()) == FileType.JSON)

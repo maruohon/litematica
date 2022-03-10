@@ -22,7 +22,6 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 
@@ -66,8 +65,6 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
             this.isSelected = this.selectionId.equals(this.selectionManager.getCurrentNormalSelectionId());
             this.addHoverTooltip();
         }
-
-        this.setText(StyledTextLine.of(this.getDisplayName()));
     }
 
     @Override

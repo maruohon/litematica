@@ -72,7 +72,7 @@ public class SchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWidget
 
         this.schematicInfoWidget.setHeight(this.getListHeight());
         this.schematicInfoWidget.setRight(this.getRight() - 10);
-        this.schematicInfoWidget.setY(this.y + 24);
+        this.schematicInfoWidget.setY(this.getListY());
 
         this.loadButton.setX(this.x + 10);
         this.loadButton.setBottom(this.getBottom() - 6);

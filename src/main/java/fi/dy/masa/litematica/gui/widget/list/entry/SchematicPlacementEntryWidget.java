@@ -261,12 +261,14 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         {
             MessageDispatcher.error("litematica.message.error.placement_list.save_failed");
         }
+
+        this.listWidget.reCreateListEntryWidgets();
     }
 
     protected void toggleEnabled()
     {
         DataManager.getSchematicPlacementManager().toggleEnabled(this.getData());
-        this.listWidget.refreshEntries();
+        this.listWidget.reCreateListEntryWidgets();
     }
 
     public static boolean placementSearchFilter(SchematicPlacementUnloaded entry, List<String> searchTerms)

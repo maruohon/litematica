@@ -194,6 +194,7 @@ litematica.label.area_selection.mode.multi_region=Multi-Region
 litematica.label.area_selection.mode.simple=Simple
 litematica.label.area_selection_browser.current_selection=Current Selection: §a%s
 litematica.label.area_selection_browser.selections=selections
+litematica.label.misc.not_available=<N/A>
 litematica.label.misc.null.brackets=<null>
 litematica.label.misc.origin.auto=Auto
 litematica.label.misc.origin.manual=Manual
