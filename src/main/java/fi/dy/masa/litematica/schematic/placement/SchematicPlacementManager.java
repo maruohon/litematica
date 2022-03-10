@@ -1135,7 +1135,7 @@ public class SchematicPlacementManager
 
             if (isActiveList == false)
             {
-                MessageDispatcher.success("litematica.message.schematic_placement_loaded", placement.getName());
+                MessageDispatcher.generic("litematica.message.schematic_placement_loaded", placement.getName());
             }
         }
     }

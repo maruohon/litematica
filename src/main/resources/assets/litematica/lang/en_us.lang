@@ -74,6 +74,7 @@ litematica.button.placement_list.open_placement_browser=Saved Placements
 litematica.button.misc.configure=Configure
 litematica.button.misc.copy=Copy
 litematica.button.misc.duplicate=Duplicate
+litematica.button.misc.load=Load
 litematica.button.misc.material_list=Material List
 litematica.button.misc.remove=Remove
 litematica.button.misc.remove.minus=§c-
@@ -200,6 +201,14 @@ litematica.label.misc.origin.auto=Auto
 litematica.label.misc.origin.manual=Manual
 litematica.label.placement_grid_settings.grid_size=Grid Size
 litematica.label.placement_grid_settings.repeat_count=Repeat Count
+litematica.label.saved_placement.info_widget.last_saved=<c=aaa>Last Saved:\n  <c=77f>%s
+litematica.label.saved_placement.info_widget.modified=<c=aaa>Modified: %s
+litematica.label.saved_placement.info_widget.mirror=<c=aaa>Mirror: §3%s
+litematica.label.saved_placement.info_widget.origin=<c=aaa>Project Origin:\n  x: §6%s\n  <c=aaa>y: §6%s\n  <c=aaa>z: §6%s
+litematica.label.saved_placement.info_widget.placement_state=<c=aaa>Placement: %s
+litematica.label.saved_placement.info_widget.region_count=<c=aaa>Regions: §6%s
+litematica.label.saved_placement.info_widget.rotation=<c=aaa>Rotation: §3%s
+litematica.label.saved_placement.names=Placement: §a%s§r\nSchematic: §3%s§r\nSchematic path: §3%s§r\nPlacement file: §3%s
 litematica.label.schematic_browser.schematics=schematics
 litematica.label.schematic_info.description=<c=aaa>Description:
 litematica.label.schematic_info.dimensions_value=§b%s<c=aaa> x §b%s<c=aaa> x §b%s
@@ -215,6 +224,7 @@ litematica.label.schematic_info.time_modified=<c=aaa>Modified: <c=77f>%s
 litematica.label.schematic_info.total_blocks=<c=aaa>Total blocks: §6%d
 litematica.label.schematic_info.total_blocks_and_volume=<c=aaa>Blocks/Volume: §6%s<c=aaa> / §6%s
 litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s <c=bbb>blocks
+litematica.label.schematic_placement_browser.placements=placements
 litematica.label.schematic_placement_settings.placement_origin=Placement Origin:
 litematica.label.schematic_placement_settings.schematic_name=Schematic: §a%s§r\nFile: §3%s
 litematica.label.schematic_placement_settings.sub_regions=Sub-Regions [§6%s§r]:
@@ -287,6 +297,7 @@ litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
 litematica.title.screen.main_menu=Litematica %s
 litematica.title.screen.placement_grid_settings=Grid/Repeat Settings for Placement §e%s
 litematica.title.screen.save_in_memory_schematic=Create an In-Memory-Only Schematic
+litematica.title.screen.saved_placements=Litematica %s - Saved Schematic Placements
 litematica.title.screen.schematic_browser=Litematica %s - Schematic Browser
 litematica.title.screen.schematic_manager=Litematica %s - Schematic Manager
 litematica.title.screen.schematic_manager.confirm_file_deletion=Confirm File Deletion
@@ -364,8 +375,8 @@ litematica.error.schematic_load.unsupported_schematic_version=Unsupported or fut
 litematica.error.schematic_load.unsupported_type=Unknown or unsupported file type for '%s'
 
 litematica.error.schematic_placements.coordinate_locked=Can't move because of an active coordinate lock
-litematica.error.schematic_placements.load_fail=Failed to load the placement from file '%s'
-litematica.error.schematic_placements.load_fail.already_loaded=Failed to load the placement '%s' from file, that placement seems to already be loaded
+litematica.error.schematic_placements.load_fail=Failed to load the placement from file '§e%s§r'
+litematica.error.schematic_placements.load_fail.already_loaded=Failed to load the placement '§e%s§r' from file, that placement seems to already be loaded
 litematica.error.schematic_placements.settings_load.invalid_data=Failed to load placement settings, invalid (non-JSON?) data
 litematica.error.schematic_placements.settings_load.missing_data=Failed to load placement settings, missing some of the required data!
 
@@ -497,7 +508,7 @@ litematica.gui.label.schematic_save.upldate_placements_option.update_selected=Up
 
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:
-litematica.gui.label.schematic_placement.saved_to_file=Successfully saved the placement to file '%s'
+litematica.gui.label.schematic_placement.saved_to_file=Successfully saved the placement to file '§e%s§r'
 
 litematica.gui.label.schematic_placement.hover.enabled=§7Placement: %s
 litematica.gui.label.schematic_placement.hover.name=§7Name: §2%s
@@ -618,7 +629,7 @@ litematica.message.schematic_exported_as=Schematic exported as '%s'
 litematica.message.schematic_pasted=Schematic pasted in world
 litematica.message.schematic_pasted_using_setblock=Schematic pasted using %s setblock commands
 litematica.message.schematic_placement_created=Placement created for '%s'
-litematica.message.schematic_placement_loaded=Placement '%s' loaded from file
+litematica.message.schematic_placement_loaded=Placement '§e%s§r' loaded from file
 litematica.message.schematic_placements_pasted=All Schematic Placements successfully pasted in the world
 litematica.message.schematic_preview_cancelled=Preview task cancelled
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'

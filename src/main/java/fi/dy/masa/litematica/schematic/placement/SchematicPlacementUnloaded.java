@@ -23,7 +23,6 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 
 public class SchematicPlacementUnloaded
@@ -37,7 +36,7 @@ public class SchematicPlacementUnloaded
     @Nullable protected String placementSaveFile;
     protected BlockPos origin = BlockPos.ORIGIN;
     protected String name = "?";
-    protected Color4f boundingBoxColor = new Color4f(0xFF, 0xFF, 0xFF);
+    protected Color4f boundingBoxColor = Color4f.WHITE;
     protected Rotation rotation = Rotation.NONE;
     protected Mirror mirror = Mirror.NONE;
     protected BlockInfoListType verifierType = BlockInfoListType.ALL;
@@ -49,6 +48,7 @@ public class SchematicPlacementUnloaded
     protected boolean shouldBeSaved = true;
     protected boolean invalidated;
     protected int coordinateLockMask;
+    protected long lastSaveTime;
     @Nullable protected Box enclosingBox;
     @Nullable protected String selectedSubRegionName;
     @Nullable protected JsonObject materialListData;
@@ -85,6 +85,11 @@ public class SchematicPlacementUnloaded
         return this.placementSaveFile != null;
     }
 
+    public long getLastSaveTime()
+    {
+        return this.lastSaveTime;
+    }
+
     public boolean isLocked()
     {
         return this.locked;
@@ -118,6 +123,13 @@ public class SchematicPlacementUnloaded
     public boolean ignoreEntities()
     {
         return this.ignoreEntities;
+    }
+
+    public int getRegionCount()
+    {
+        // FIXME this map should probably go away such that it would only contain actually
+        // modified regions, maybe store the region count in a field?
+        return this.relativeSubRegionPlacements.size();
     }
 
     public String getName()
@@ -463,6 +475,7 @@ public class SchematicPlacementUnloaded
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
             schematicPlacement.renderEnclosingBox = JsonUtils.getBoolean(obj, "render_enclosing_box");
             schematicPlacement.coordinateLockMask = JsonUtils.getInteger(obj, "locked_coords");
+            schematicPlacement.lastSaveTime = JsonUtils.getLong(obj, "last_save_time");
 
             if (JsonUtils.hasInteger(obj, "bb_color"))
             {
@@ -584,9 +597,11 @@ public class SchematicPlacementUnloaded
                 objOther.remove("enabled");
                 objOther.remove("material_list");
                 objOther.remove("storage_file");
+                objOther.remove("last_save_time");
                 objThis.remove("enabled");
                 objThis.remove("material_list");
                 objThis.remove("storage_file");
+                objThis.remove("last_save_time");
 
                 return objOther.equals(objThis) == false;
             }
@@ -599,6 +614,8 @@ public class SchematicPlacementUnloaded
 
     protected boolean saveToFile(File file, JsonObject obj)
     {
+        obj.add("last_save_time", new JsonPrimitive(System.currentTimeMillis()));
+
         boolean success = JsonUtils.writeJsonToFile(obj, file);
 
         if (success)
@@ -608,7 +625,7 @@ public class SchematicPlacementUnloaded
                 this.placementSaveFile = file.getName();
             }
 
-            MessageDispatcher.success().translate("litematica.gui.label.schematic_placement.saved_to_file", file.getName());
+            MessageDispatcher.generic("litematica.gui.label.schematic_placement.saved_to_file", file.getName());
         }
 
         return success;
@@ -616,8 +633,8 @@ public class SchematicPlacementUnloaded
 
     public static File getSaveDirectory()
     {
-        String worldAndDimPath = getWorldAndDimPath();
-        File dir = new File(DataManager.getDataBaseDirectory("placements"), worldAndDimPath);
+        String worldName = StringUtils.getWorldOrServerNameOrDefault("__fallback");
+        File dir = new File(DataManager.getDataBaseDirectory("placements"), worldName);
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
@@ -625,26 +642,6 @@ public class SchematicPlacementUnloaded
         }
 
         return dir;
-    }
-
-    public static String getWorldAndDimPath()
-    {
-        String worldName = StringUtils.getWorldOrServerName();
-        net.minecraft.world.World world = net.minecraft.client.Minecraft.getMinecraft().world;
-        String path;
-
-        if (worldName == null || world == null)
-        {
-            path = "__fallback";
-        }
-        else
-        {
-            String sep = File.separator;
-            String dimStr = "dim_" + WorldUtils.getDimensionAsString(world);
-            path = worldName + sep + dimStr;
-        }
-
-        return path;
     }
 
     @Nullable
