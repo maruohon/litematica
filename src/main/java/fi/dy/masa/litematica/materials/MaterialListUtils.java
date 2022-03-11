@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.MaterialListScreen;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
@@ -169,8 +170,7 @@ public class MaterialListUtils
         {
             MaterialListSchematic materialList = new MaterialListSchematic(schematic, true);
             DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-            // TODO FIXME malilib refactor
-            //BaseScreen.openScreen(new GuiMaterialList(materialList));
+            BaseScreen.openScreen(new MaterialListScreen(materialList));
         }
     }
 
@@ -178,7 +178,6 @@ public class MaterialListUtils
     {
         MaterialListSchematic materialList = new MaterialListSchematic(schematic, regions, true);
         DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-        // TODO FIXME malilib refactor
-        //BaseScreen.openScreen(new GuiMaterialList(materialList));
+        BaseScreen.openScreen(new MaterialListScreen(materialList));
     }
 }

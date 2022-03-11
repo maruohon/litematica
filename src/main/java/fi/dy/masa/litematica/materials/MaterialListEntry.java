@@ -34,7 +34,7 @@ public class MaterialListEntry
      * Returns the total number of required items of this type in the counted area.
      * @return
      */
-    public long getCountTotal()
+    public long getTotalCount()
     {
         return this.countTotal;
     }
@@ -44,7 +44,7 @@ public class MaterialListEntry
      * in the counted area for this item type.
      * @return
      */
-    public long getCountMissing()
+    public long getMissingCount()
     {
         return this.countMissing;
     }
@@ -54,7 +54,7 @@ public class MaterialListEntry
         return this.countMismatched;
     }
 
-    public long getCountAvailable()
+    public long getAvailableCount()
     {
         return this.countAvailable;
     }

@@ -13,6 +13,7 @@ import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.datadump.DataDump;
 
 public abstract class MaterialListBase implements IMaterialList
 {
@@ -41,10 +42,9 @@ public abstract class MaterialListBase implements IMaterialList
     }
 
     /**
-     * Whether or not this material list is made based on a schematic placement,
+     * @return Whether this material list is made based on a schematic placement,
      * and thus should be cleared on dimension changes and when the currently
      * selected placement is changed by any means.
-     * @return
      */
     public boolean isForPlacement()
     {
@@ -56,26 +56,26 @@ public abstract class MaterialListBase implements IMaterialList
         return this.hudRenderer;
     }
 
-    public ImmutableList<MaterialListEntry> getMaterialsAll()
+    public ImmutableList<MaterialListEntry> getAllMaterials()
     {
         return this.materialListAll;
     }
 
-    public List<MaterialListEntry> getMaterialsFiltered(boolean refresh)
+    public List<MaterialListEntry> getFilteredMaterials(boolean refresh)
     {
         if (this.hideAvailable)
         {
-            return this.getMaterialsMissingOnly(refresh);
+            return this.getMissingMaterials(refresh);
         }
 
         return this.materialListPreFiltered;
     }
 
-    public List<MaterialListEntry> getMaterialsMissingOnly(boolean refresh)
+    public List<MaterialListEntry> getMissingMaterials(boolean refresh)
     {
         if (refresh)
         {
-            this.recreateFilteredList();
+            this.reCreateFilteredList();
         }
 
         return this.materialListFiltered;
@@ -86,7 +86,7 @@ public abstract class MaterialListBase implements IMaterialList
         this.completionListener = listener;
     }
 
-    public void recreateFilteredList()
+    public void reCreateFilteredList()
     {
         this.materialListFiltered.clear();
 
@@ -95,7 +95,7 @@ public abstract class MaterialListBase implements IMaterialList
             MaterialListEntry entry = this.materialListPreFiltered.get(i);
             long countMissing = this.getMultipliedMissingCount(entry);
 
-            if (entry.getCountAvailable() < countMissing)
+            if (entry.getAvailableCount() < countMissing)
             {
                 this.materialListFiltered.add(entry);
             }
@@ -112,11 +112,11 @@ public abstract class MaterialListBase implements IMaterialList
     public long getMultipliedMissingCount(MaterialListEntry entry)
     {
         long multiplier = this.getMultiplier();
-        long missing = entry.getCountMissing();
+        long missing = entry.getMissingCount();
 
         if (multiplier > 1L)
         {
-            long total = entry.getCountTotal();
+            long total = entry.getTotalCount();
             return (multiplier - 1L) * total + missing;
         }
 
@@ -127,14 +127,14 @@ public abstract class MaterialListBase implements IMaterialList
     {
         this.ignored.add(entry);
         this.materialListPreFiltered.remove(entry);
-        this.recreateFilteredList();
+        this.reCreateFilteredList();
     }
 
     public void clearIgnored()
     {
         this.ignored.clear();
         this.refreshPreFilteredList();
-        this.recreateFilteredList();
+        this.reCreateFilteredList();
     }
 
     /**
@@ -223,8 +223,8 @@ public abstract class MaterialListBase implements IMaterialList
 
         for (MaterialListEntry entry : this.materialListAll)
         {
-            this.countTotal += entry.getCountTotal();
-            this.countMissing += entry.getCountMissing();
+            this.countTotal += entry.getTotalCount();
+            this.countMissing += entry.getMissingCount();
             this.countMismatched += entry.getCountMismatched();
         }
     }
@@ -247,6 +247,39 @@ public abstract class MaterialListBase implements IMaterialList
     public void setMaterialListType(BlockInfoListType type)
     {
         this.materialListType = type;
+    }
+
+    public DataDump getMaterialListDump(DataDump.Format format)
+    {
+        DataDump dump = new DataDump(4, format);
+        long multiplier = this.getMultiplier();
+
+        ArrayList<MaterialListEntry> list = new ArrayList<>(this.getFilteredMaterials(false));
+        list.sort(new MaterialListSorter(this));
+
+        for (MaterialListEntry entry : list)
+        {
+            long total = entry.getTotalCount() * multiplier;
+            long missing = multiplier > 1L ? total : entry.getMissingCount();
+            long available = entry.getAvailableCount();
+
+            dump.addData(entry.getStack().getDisplayName(),
+                         String.valueOf(total),
+                         String.valueOf(missing),
+                         String.valueOf(available));
+        }
+
+        String titleTotal = multiplier > 1L ? String.format("Total (x%d)", multiplier) : "Total";
+
+        dump.addTitle("Item", titleTotal, "Missing", "Available");
+        dump.addHeader(this.getTitle());
+        dump.setColumnProperties(1, DataDump.Alignment.RIGHT, true); // total
+        dump.setColumnProperties(2, DataDump.Alignment.RIGHT, true); // missing
+        dump.setColumnProperties(3, DataDump.Alignment.RIGHT, true); // available
+        dump.setSort(false);
+        dump.setUseColumnSeparator(true);
+
+        return dump;
     }
 
     public JsonObject toJson()

@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.gui.AreaSelectionBrowserScreen;
 import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.gui.LoadedSchematicsListScreen;
 import fi.dy.masa.litematica.gui.MainMenuScreen;
+import fi.dy.masa.litematica.gui.MaterialListScreen;
 import fi.dy.masa.litematica.gui.PlacementGridSettingsScreen;
 import fi.dy.masa.litematica.gui.RenderLayerEditScreen;
 import fi.dy.masa.litematica.gui.SchematicBrowserScreen;
@@ -63,7 +64,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageDispatcher.error().translate("litematica.message.error.no_area_selected");
+                MessageDispatcher.error("litematica.message.error.no_area_selected");
             }
         }
         else if (key == Hotkeys.OPEN_LOAD_SCHEMATICS_SCREEN.getKeyBind())
@@ -90,14 +91,13 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 }
                 else
                 {
-                    MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
+                    MessageDispatcher.error("litematica.message.error.no_placement_selected");
                 }
             }
 
             if (materialList != null)
             {
-                // TODO FIXME malilib refactor
-                //BaseScreen.openScreen(new GuiMaterialList(materialList));
+                BaseScreen.openScreen(new MaterialListScreen(materialList));
             }
         }
         else if (key == Hotkeys.OPEN_PLACEMENT_GRID_SETTINGS.getKeyBind())
@@ -112,7 +112,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 }
                 else
                 {
-                    MessageDispatcher.error().translate("litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
+                    MessageDispatcher.error("litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
                 }
             }
         }
@@ -135,7 +135,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
+                MessageDispatcher.error("litematica.message.error.no_placement_selected");
             }
         }
         else if (key == Hotkeys.OPEN_PLACEMENTS_LIST_SCREEN.getKeyBind())
@@ -157,7 +157,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
+                MessageDispatcher.error("litematica.message.error.no_placement_selected");
             }
         }
         else if (key == Hotkeys.OPEN_AREA_SELECTION_BROWSER.getKeyBind())
@@ -168,7 +168,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageDispatcher.warning().translate("litematica.hover.button.main_menu.area_browser_in_vcs_mode");
+                MessageDispatcher.warning("litematica.hover.button.main_menu.area_browser_in_vcs_mode");
             }
         }
 

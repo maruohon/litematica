@@ -73,8 +73,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         if (currentTime - this.lastUpdateTime > refreshInterval && this.mc.player != null)
         {
-            MaterialListUtils.updateAvailableCounts(this.materialList.getMaterialsAll(), this.mc.player);
-            List<MaterialListEntry> list = this.materialList.getMaterialsMissingOnly(true);
+            MaterialListUtils.updateAvailableCounts(this.materialList.getAllMaterials(), this.mc.player);
+            List<MaterialListEntry> list = this.materialList.getMissingMaterials(true);
             list.sort(this.sorter);
             this.lastUpdateTime = currentTime;
         }
@@ -85,7 +85,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     {
         this.refreshList(2000L);
 
-        List<MaterialListEntry> list = this.materialList.getMaterialsMissingOnly(false);
+        List<MaterialListEntry> list = this.materialList.getMissingMaterials(false);
 
         if (list.size() == 0)
         {
@@ -119,7 +119,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             MaterialListEntry entry = list.get(i);
             maxTextLength = Math.max(maxTextLength, font.getStringWidth(entry.getStack().getDisplayName()));
             long multiplier = this.materialList.getMultiplier();
-            long count = multiplier == 1L ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
+            long count = multiplier == 1L ? entry.getMissingCount() - entry.getAvailableCount() : entry.getTotalCount();
             count *= multiplier;
             String strCount = this.getFormattedCountString(count, entry.getStack().getMaxStackSize());
             maxCountLength = Math.max(maxCountLength, font.getStringWidth(strCount));
@@ -177,7 +177,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             MaterialListEntry entry = list.get(i);
             String text = entry.getStack().getDisplayName();
             long multiplier = this.materialList.getMultiplier();
-            long count = multiplier == 1L ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
+            long count = multiplier == 1L ? entry.getMissingCount() - entry.getAvailableCount() : entry.getTotalCount();
             count *= multiplier;
             String strCount = this.getFormattedCountString(count, entry.getStack().getMaxStackSize());
             int cntLen = font.getStringWidth(strCount);
@@ -257,7 +257,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         if (materialList != null)
         {
             materialList.getHudRenderer().refreshList(2000L);
-            List<MaterialListEntry> list = materialList.getMaterialsMissingOnly(false);
+            List<MaterialListEntry> list = materialList.getMissingMaterials(false);
 
             if (list.isEmpty() == false)
             {
@@ -301,7 +301,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                 // The item in the slot is on the material list's missing items list
                 if (entry != null)
                 {
-                    long available = entry.getCountAvailable();
+                    long available = entry.getAvailableCount();
                     Color4f color;
 
                     if (available == 0L)

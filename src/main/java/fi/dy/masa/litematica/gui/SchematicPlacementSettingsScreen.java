@@ -17,6 +17,7 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.widget.list.entry.SchematicPlacementSubRegionEntryWidget;
+import fi.dy.masa.litematica.materials.MaterialListPlacement;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
@@ -382,6 +383,9 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected void openMaterialList()
     {
+        MaterialListPlacement materialList = new MaterialListPlacement(this.placement, true);
+        DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
+        BaseScreen.openScreen(new MaterialListScreen(materialList));
     }
 
     protected void openPlacementList()

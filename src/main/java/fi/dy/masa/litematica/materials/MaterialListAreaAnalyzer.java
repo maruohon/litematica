@@ -26,7 +26,7 @@ public class MaterialListAreaAnalyzer extends MaterialListBase
     @Override
     public String getTitle()
     {
-        return StringUtils.translate("litematica.gui.title.material_list.area_analyzer", this.getName());
+        return StringUtils.translate("litematica.title.screen.material_list.area_analyzer", this.getName());
     }
 
     @Override
@@ -34,6 +34,6 @@ public class MaterialListAreaAnalyzer extends MaterialListBase
     {
         TaskCountBlocksArea task = new TaskCountBlocksArea(this.selection, this);
         TaskScheduler.getInstanceClient().scheduleTask(task, 20);
-        MessageDispatcher.generic().translate("litematica.message.scheduled_task_added");
+        MessageDispatcher.generic(1000).translate("litematica.message.scheduled_task_added");
     }
 }

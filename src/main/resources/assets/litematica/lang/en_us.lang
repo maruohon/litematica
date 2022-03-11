@@ -30,6 +30,14 @@ litematica.button.change_menu.schematic_placements=Schematic Placements
 litematica.button.change_menu.schematic_vcs=Schematic VCS
 litematica.button.change_menu.task_manager=Task Manager
 litematica.button.main_menu.tool_mode=Tool Mode: %s
+litematica.button.material_list.clear_cache=Clear Cache
+litematica.button.material_list.clear_ignored=Clear Ignored
+litematica.button.material_list.export_to_file=Export to File
+litematica.button.material_list.hide_available=Hide Available: %s
+litematica.button.material_list.ignore=Ignore
+litematica.button.material_list.refresh=Refresh
+litematica.button.material_list.scope=Range: %s
+litematica.button.material_list.toggle_hud=Info HUD: %s
 litematica.button.placement_grid_settings.reset_size=Reset Size
 litematica.button.placement_list.placement_enabled=Placement: %s
 litematica.button.schematic_browser.load_schematic=Load Schematic
@@ -92,6 +100,8 @@ litematica.hover.button.area_editor.manual_origin=Enabling a manual origin allow
 litematica.hover.button.area_selection_browser.unselect=Unselects the current Area Selection (if any)
 litematica.hover.button.icon_vs_text_buttons=Whether to use normal text buttons or smaller icon-only buttons
 litematica.hover.button.main_menu.area_browser_in_vcs_mode=There is currently a Schematic VCS Project open.\nThe Schematic VCS Project overrides the normal Area Selection functionality, and the selections are stored in the project data.
+litematica.hover.button.material_list.clear_cache=Clears the Material List Cache. Normally this should not be needed, but this allows you to clear the cache if sometimes you start to get weird mismatched items to what you would expect. This can be used instead of deleting the §ematerial_cache.nbt§r file manually, in case the cache somehow has some incorrect data.
+litematica.hover.button.material_list.export_shift_for_csv=Hold §e<i>Shift</i>§r to write to a CSV file instead of the normal ASCII-art table text file
 litematica.hover.button.placement_list.configure=Edit the properties of this placement, such as the position, rotation or mirror values or sub-regions properties etc.
 litematica.hover.button.placement_list.duplicate=Creates a new identical copy of this placement
 litematica.hover.button.placement_list.remove=Removes this placement.\n\nRemoving a placement won't unload the schematic itself from memory. To unload the schematic too, unload it on the §eLoaded Schematics List§r screen. Unloading a schematic via there automatically removes all placements of it.\n\n§6Note:§r If you may need the placement again later on, you can save it first using the §eSave§r button. You can then load it back later on via the §eSaved Placements§r menu if you need it again.
@@ -122,6 +132,8 @@ litematica.hover.area_editor.multi_region.sub_region.pos2=Corner 2: x: §9%s§r,
 litematica.hover.area_selection_browser.origin.auto=Origin [§6Auto§r]: x: §b%s§r y: §b%s§r z: §b%s§r
 litematica.hover.area_selection_browser.origin.manual=Origin [§6Manual§r]: x: §b%s§r y: §b%s§r z: §b%s§r
 litematica.hover.area_selection_browser.region_count=Sub-Regions: §b%d
+litematica.hover.material_list.info_widget=- The Material List hotkey will open the last viewed Material List, if there is one stored\n- To switch to a different Material List, open one via the button on the Placement Settings Screen or the button on the Schematic Browser screen\n- The stored/last viewed Material List is also forgotten if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet, then the selected Placement (if there is one) is used to generate one for
+litematica.hover.material_list.multiplier=Material List multiplier. The total item counts from the generated material list will be multiplied by this number.
 litematica.hover.placement_list.enclosing_size=Enclosing size: <c=77f>%s§r x <c=77f>%s§r x <c=77f>%s§r
 litematica.hover.placement_list.icon.placement_locked=§6This placement has been locked and can't be modified without unlocking it first
 litematica.hover.placement_list.icon.placement_modified=§6This placement has been modified
@@ -195,6 +207,17 @@ litematica.label.area_selection.mode.multi_region=Multi-Region
 litematica.label.area_selection.mode.simple=Simple
 litematica.label.area_selection_browser.current_selection=Current Selection: §a%s
 litematica.label.area_selection_browser.selections=selections
+litematica.label.material_list.column.available=Available
+litematica.label.material_list.column.item=Item
+litematica.label.material_list.column.missing=Missing
+litematica.label.material_list.column.total=Total
+litematica.label.material_list.hover_info.row_names=<c=aaa><b>Item\nTotal\nMissing
+litematica.label.material_list.progress.finished=Total: §a%s§r items - §a100%§r done
+litematica.label.material_list.progress.incomplete=Total: §b%s§r items Finished: §a%s%%§r Missing: §b%s%%§r Incorrect: §c%s%%
+litematica.label.material_list.item_counts.total=§6%d§r
+litematica.label.material_list.item_counts.total_boxes=§6%d§r = §6%.2f§r SB
+litematica.label.material_list.item_counts.total_stacks_boxes=§6%d§r = §6%d§r x §6%d§r = §6%.2f§r SB
+litematica.label.material_list.item_counts.total_stacks_lose_boxes=§6%d§r = §6%d§r x §6%d§r + §6%d§r = §6%.2f§r SB
 litematica.label.misc.not_available=<N/A>
 litematica.label.misc.null.brackets=<null>
 litematica.label.misc.origin.auto=Auto
@@ -292,6 +315,9 @@ litematica.title.screen.area_selection_browser.rename_selection=Rename Area Sele
 litematica.title.screen.area_selection_browser.selection_from_placement=Area Selection from Placement
 litematica.title.screen.configs=Litematica %s - Configs
 litematica.title.screen.create_area_selection=Create a new Area Selection
+litematica.title.screen.material_list.area_analyzer=Area Analysis for selection §e%s
+litematica.title.screen.material_list.placement=Material List for placement §e%s
+litematica.title.screen.material_list.schematic=Material List for schematic §e%s§r (§6%s§r of §6%s§r regions)
 litematica.title.screen.material_list.select_schematic_regions=Select the sub-regions to use for the Material List for '%s'
 litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
 litematica.title.screen.main_menu=Litematica %s
@@ -330,6 +356,8 @@ litematica.message.error.schematic_placement.locked=The placement is locked and 
 litematica.message.error.schematic_preview_set_failed=Exception while trying to set the schematic preview image for schematic §e%s§r
 litematica.message.error.schematic_vcs.failed_to_load_project=Failed to load Schematic VCS Project §e%s§r
 litematica.message.error.schematic_vcs.project_already_exists=Schematic VCS Project §e%s§r already exists
+litematica.message.info.material_cache_cleared=Material List Cache cleared
+litematica.message.info.material_list.written_to_file=Material List written to file §e%s§r
 litematica.message.info.schematic_loaded_to_memory=Schematic '%s' successfully loaded to memory
 litematica.message.info.schematic_manager.preview_removed=Schematic preview image removed
 litematica.message.info.schematic_manager.set_preview=Use the §e%s§r hotkey [§e%s§r] to set the schematic preview image.\n\nYou can remove the pending preview task(s) via the Litematica Task Manager screen. If you start multiple preview tasks at once, they will get executed in order when you use the hotkey.
@@ -416,21 +444,10 @@ litematica.gui.button.hover.area_editor.corner_mode.corners=§fCorners Mode:\n§
 litematica.gui.button.hover.area_editor.corner_mode.expand=§fExpand Mode:\n§7Right click to reset/collapse the selection box to the clicked position.\n§7Left click to expand the selection around all the clicked positions.\n§7Middle click to select a corner, and then you can Alt + scroll\n§7to nudge it around in the looking direction.
 litematica.gui.button.hover.area_editor.shift_for_in_memory=§7Hold Shift to create an in-memory-only schematic
 
-litematica.gui.button.hover.material_list.clear_cache=Clears the Material Cache\nNormally this should not be needed\nThis can be used instead of deleting the 'material_cache.nbt'\nfile in case the cache has some wrong data, like items\nstored for blocks that shouldn't have them, like piston heads
-litematica.gui.button.hover.material_list.write_hold_shift_for_csv=Hold shift to write to a CSV file,\ninstead of the normal ASCII-art table text file
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
 
 litematica.gui.button.hover.use_text_or_icon_buttons=§7Whether to use normal text buttons or smaller icon-only buttons
-
-litematica.gui.button.material_list.clear_cache=Clear cache
-litematica.gui.button.material_list.clear_ignored=Clear ignored
-litematica.gui.button.material_list.hide_available=Hide available: %s
-litematica.gui.button.material_list.ignore=Ignore
-litematica.gui.button.material_list.list_type=Show: %s
-litematica.gui.button.material_list.refresh_list=Refresh
-litematica.gui.button.material_list.toggle_info_hud=Info HUD: %s
-litematica.gui.button.material_list.write_to_file=Write to file
 
 litematica.gui.button.schematic_placements.disable=Disable
 litematica.gui.button.schematic_placements.load=Load
@@ -477,13 +494,7 @@ litematica.gui.label.material_list.title.item=Item
 litematica.gui.label.material_list.title.missing=Missing
 litematica.gui.label.material_list.title.total=Total
 
-litematica.gui.label.material_list.multiplier=Multiplier:
 litematica.gui.label.material_list.name=Name
-litematica.gui.label.material_list.progress=Progress: %s
-litematica.gui.label.material_list.progress.done=Done %s
-litematica.gui.label.material_list.progress.mismatch=Mismatched %s
-litematica.gui.label.material_list.progress.missing=Missing %s
-litematica.gui.label.material_list.total=Total: %s items
 
 litematica.gui.label.misc.icons=Icons
 litematica.gui.label.misc.text=Text
@@ -540,9 +551,6 @@ litematica.gui.label.task_name.verifier=Verifier
 
 litematica.gui.title.convert_schematic_format=Save schematic '%s' in a different schematic format
 litematica.gui.title.create_directory=Create a new directory
-litematica.gui.title.material_list.area_analyzer=Area Analysis for selection '%s'
-litematica.gui.title.material_list.placement=Material List for placement '%s'
-litematica.gui.title.material_list.schematic=Material List for schematic '%s' (%s of %s regions)
 litematica.gui.title.create_schematic_from_selection=Save the currently selected area as a Schematic
 litematica.gui.title.save_schematic_convert=Convert/Save schematic '%s'
 litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
@@ -551,8 +559,6 @@ litematica.gui.title.schematic_placement_browser=Saved Schematic Placements
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
 
 litematica.hud.misc.none_brackets=<none>
-
-litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
 
 litematica.label.alignment.center=Center
 litematica.label.alignment.top_center=Top Center
@@ -614,8 +620,6 @@ litematica.message.easy_place_fail=Action prevented by the Easy Place mode
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.grid_paste.warning.select_base_placement_for_grid_paste=Note: Grid pasting only happens when you select the "original"/base placement and then use the Grid paste feature. If you select one of the repeated placements, then only that specific placement will be pasted.
 litematica.message.in_memory_schematic_created=Created an in-memory schematic as '%s'
-litematica.message.material_list.material_cache_cleared=Material Cache cleared
-litematica.message.material_list_written_to_file=Material list written to file '%s'
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
 litematica.message.placement.moved_placement_origin=Moved placement origin §a%s, %s, %s§r => §a%s, %s, %s§r

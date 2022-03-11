@@ -44,7 +44,7 @@ public class MaterialListPlacement extends MaterialListBase
     @Override
     public String getTitle()
     {
-        return StringUtils.translate("litematica.gui.title.material_list.placement", this.getName());
+        return StringUtils.translate("litematica.title.screen.material_list.placement", this.getName());
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MaterialListPlacement extends MaterialListBase
     {
         TaskCountBlocksPlacement task = new TaskCountBlocksPlacement(this.placement, this);
         TaskScheduler.getInstanceClient().scheduleTask(task, 20);
-        MessageDispatcher.generic().translate("litematica.message.scheduled_task_added");
+        MessageDispatcher.generic(1000).translate("litematica.message.scheduled_task_added");
     }
 
     public static MaterialListPlacement createFromJson(JsonObject obj, SchematicPlacement schematicPlacement)

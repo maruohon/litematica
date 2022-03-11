@@ -21,15 +21,15 @@ public class MaterialListSorter implements Comparator<MaterialListEntry>
 
         if (sortCriteria == SortCriteria.COUNT_TOTAL)
         {
-            return entry1.getCountTotal() == entry2.getCountTotal() ? nameCompare : ((entry1.getCountTotal() > entry2.getCountTotal()) != reverse ? -1 : 1);
+            return entry1.getTotalCount() == entry2.getTotalCount() ? nameCompare : ((entry1.getTotalCount() > entry2.getTotalCount()) != reverse ? -1 : 1);
         }
         else if (sortCriteria == SortCriteria.COUNT_MISSING)
         {
-            return entry1.getCountMissing() == entry2.getCountMissing() ? nameCompare : ((entry1.getCountMissing() > entry2.getCountMissing()) != reverse ? -1 : 1);
+            return entry1.getMissingCount() == entry2.getMissingCount() ? nameCompare : ((entry1.getMissingCount() > entry2.getMissingCount()) != reverse ? -1 : 1);
         }
         else if (sortCriteria == SortCriteria.COUNT_AVAILABLE)
         {
-            return entry1.getCountAvailable() == entry2.getCountAvailable() ? nameCompare : ((entry1.getCountAvailable() > entry2.getCountAvailable()) != reverse ? -1 : 1);
+            return entry1.getAvailableCount() == entry2.getAvailableCount() ? nameCompare : ((entry1.getAvailableCount() > entry2.getAvailableCount()) != reverse ? -1 : 1);
         }
 
         return reverse == false ? nameCompare * -1 : nameCompare;

@@ -45,6 +45,7 @@ public class MaterialListSchematic extends MaterialListBase
     @Override
     public String getTitle()
     {
-        return StringUtils.translate("litematica.gui.title.material_list.schematic", this.getName(), this.regions.size(), this.schematic.getRegionNames().size());
+        return StringUtils.translate("litematica.title.screen.material_list.schematic",
+                                     this.getName(), this.regions.size(), this.schematic.getRegionNames().size());
     }
 }
