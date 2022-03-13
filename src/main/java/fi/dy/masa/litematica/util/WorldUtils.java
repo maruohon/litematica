@@ -628,13 +628,12 @@ public class WorldUtils
         {
             protocolValue += propertyIncrement;
         }
-        else if (block instanceof SlabBlock && state.get(SlabBlock.TYPE) != SlabType.DOUBLE)
+        else if (state.contains(Properties.SLAB_TYPE) && state.get(Properties.SLAB_TYPE) == SlabType.TOP)
         {
-            //x += 10; // Doesn't actually exist (yet?)
-
-            // Do it via vanilla
-            y = getBlockSlabY(pos, state);
+            protocolValue += propertyIncrement;
         }
+
+        y = applySlabOrStairHitVecY(y, pos, state);
 
         if (protocolValue != 0 || hasData)
         {
@@ -644,13 +643,27 @@ public class WorldUtils
         return new Vec3d(x, y, z);
     }
 
-    private static double getBlockSlabY(BlockPos pos, BlockState state)
+    private static double applySlabOrStairHitVecY(double origY, BlockPos pos, BlockState state)
     {
-        double y = pos.getY();
+        double y = origY;
 
-        if (state.get(SlabBlock.TYPE) == SlabType.TOP)
+        if (state.contains(Properties.SLAB_TYPE))
         {
-            y += 0.9;
+            y = pos.getY();
+
+            if (state.get(Properties.SLAB_TYPE) == SlabType.TOP)
+            {
+                y += 0.99;
+            }
+        }
+        else if (state.contains(Properties.BLOCK_HALF))
+        {
+            y = pos.getY();
+
+            if (state.get(Properties.BLOCK_HALF) == BlockHalf.TOP)
+            {
+                y += 0.99;
+            }
         }
 
         return y;
@@ -658,18 +671,8 @@ public class WorldUtils
 
     private static Vec3d applyBlockSlabProtocol(BlockPos pos, BlockState state, Vec3d hitVecIn)
     {
-        double x = hitVecIn.x;
-        double y = hitVecIn.y;
-        double z = hitVecIn.z;
-        Block block = state.getBlock();
-
-        if (block instanceof SlabBlock && state.get(SlabBlock.TYPE) != SlabType.DOUBLE)
-        {
-            // Do it via vanilla
-            y = getBlockSlabY(pos, state);
-        }
-
-        return new Vec3d(x, y, z);
+        double newY = applySlabOrStairHitVecY(hitVecIn.y, pos, state);
+        return newY != hitVecIn.y ? new Vec3d(hitVecIn.x, newY, hitVecIn.z) : hitVecIn;
     }
 
     public static <T extends Comparable<T>> Vec3d applyPlacementProtocolV3(BlockPos pos, BlockState state, Vec3d hitVecIn)
@@ -765,6 +768,10 @@ public class WorldUtils
             {
                 return Direction.NORTH;
             }
+        }
+        else if (stateSchematic.contains(Properties.BLOCK_HALF))
+        {
+            side = stateSchematic.get(Properties.BLOCK_HALF) == BlockHalf.TOP ? Direction.DOWN : Direction.UP;
         }
 
         return side;
