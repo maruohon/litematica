@@ -3,10 +3,12 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import java.util.Collection;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.materials.IMaterialList;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.BlockInfoListType;
 
 public class TaskCountBlocksPlacement extends TaskCountBlocksBase
 {
@@ -18,7 +20,17 @@ public class TaskCountBlocksPlacement extends TaskCountBlocksBase
 
         this.schematicPlacement = schematicPlacement;
         Collection<Box> boxes = schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values();
-        this.addPerChunkBoxes(boxes);
+
+        // Filter/clamp the boxes to intersect with the render layer
+        if (materialList.getMaterialListType() == BlockInfoListType.RENDER_LAYERS)
+        {
+            this.addPerChunkBoxes(boxes, DataManager.getRenderLayerRange());
+        }
+        else
+        {
+            this.addPerChunkBoxes(boxes);
+        }
+
     }
 
     @Override

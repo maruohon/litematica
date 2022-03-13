@@ -14,6 +14,8 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerMode;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 
@@ -100,10 +102,23 @@ public abstract class TaskProcessChunkBase extends TaskBase
 
     protected void addPerChunkBoxes(Collection<Box> allBoxes)
     {
+        this.addPerChunkBoxes(allBoxes, new LayerRange(null));
+    }
+
+    protected void addPerChunkBoxes(Collection<Box> allBoxes, LayerRange range)
+    {
         this.boxesInChunks.clear();
         this.pendingChunks.clear();
 
-        PositionUtils.getPerChunkBoxes(allBoxes, this.boxesInChunks::put);
+        if (range.getLayerMode() == LayerMode.ALL)
+        {
+            PositionUtils.getPerChunkBoxes(allBoxes, this.boxesInChunks::put);
+        }
+        else
+        {
+            PositionUtils.getLayerRangeClampedPerChunkBoxes(allBoxes, range, this.boxesInChunks::put);
+        }
+
         this.pendingChunks.addAll(this.boxesInChunks.keySet());
 
         this.sortChunkList();
