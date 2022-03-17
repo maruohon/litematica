@@ -139,7 +139,7 @@ public class OverlayRenderer
                 {
                     if (currentSelection.isOriginSelected())
                     {
-                        Color4f colorTmp = Color4f.fromColor(this.colorAreaOrigin, 0.4f);
+                        Color4f colorTmp = this.colorAreaOrigin.withAlpha(0.4F);
                         RenderUtils.renderAreaSides(origin, origin, colorTmp, renderViewEntity, partialTicks);
                     }
 
@@ -178,7 +178,7 @@ public class OverlayRenderer
                     {
                         if (schematicPlacement.shouldRenderEnclosingBox())
                         {
-                            Box box = schematicPlacement.getEclosingBox();
+                            Box box = schematicPlacement.getEnclosingBox();
                             RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
 
                             if (Configs.Visuals.PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
@@ -293,12 +293,12 @@ public class OverlayRenderer
 
                 if (box.getSelectedCorner() == Corner.CORNER_1)
                 {
-                    Color4f color = Color4f.fromColor(this.colorPos1, 0.4f);
+                    Color4f color = this.colorPos1.withAlpha(0.4F);
                     RenderUtils.renderAreaSides(pos1, pos1, color, renderViewEntity, partialTicks);
                 }
                 else if (box.getSelectedCorner() == Corner.CORNER_2)
                 {
-                    Color4f color = Color4f.fromColor(this.colorPos2, 0.4f);
+                    Color4f color = this.colorPos2.withAlpha(0.4F);
                     RenderUtils.renderAreaSides(pos2, pos2, color, renderViewEntity, partialTicks);
                 }
 
@@ -407,7 +407,7 @@ public class OverlayRenderer
             GlStateManager.disableCull();
 
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_ALPHA.getDoubleValue();
+            float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HIGHLIGHT_ALPHA.getDoubleValue();
 
             for (MismatchRenderPos entry : posList)
             {
@@ -562,7 +562,7 @@ public class OverlayRenderer
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
             BlockInfo info = new BlockInfo(stateClient, "litematica.title.hud.block_info_overlay.state_client");
-            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
+            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
             info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
             RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldClient, pos);
@@ -574,7 +574,7 @@ public class OverlayRenderer
             if (te instanceof IInventory)
             {
                 BlockInfo info = new BlockInfo(stateClient, "litematica.title.hud.block_info_overlay.state_client");
-                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
+                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
                 info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
                 RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
@@ -582,7 +582,7 @@ public class OverlayRenderer
             else
             {
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.title.hud.block_info_overlay.state_schematic");
-                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
+                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
                 info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
                 RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldSchematic, pos);
@@ -590,7 +590,7 @@ public class OverlayRenderer
         }
     }
 
-    protected void getOverlayPosition(int width, int height, int offY, Minecraft mc)
+    protected void getOverlayPosition(int width, int height, int offY)
     {
         BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
 

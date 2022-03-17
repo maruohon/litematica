@@ -77,7 +77,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
 
     public ISchematic getSchematic()
     {
-        return schematic;
+        return this.schematic;
     }
 
     public int getSubRegionCount()
@@ -110,7 +110,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         return this.verifier;
     }
 
-    public Box getEclosingBox()
+    public Box getEnclosingBox()
     {
         if (this.enclosingBox == null)
         {

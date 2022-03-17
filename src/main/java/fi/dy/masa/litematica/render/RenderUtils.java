@@ -70,8 +70,12 @@ public class RenderUtils
         return length;
     }
 
-    public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth,
-            Color4f color, Entity renderViewEntity, float partialTicks)
+    public static void renderBlockOutline(BlockPos pos,
+                                          float expand,
+                                          float lineWidth,
+                                          Color4f color,
+                                          Entity renderViewEntity,
+                                          float partialTicks)
     {
         GlStateManager.glLineWidth(lineWidth);
 
@@ -122,8 +126,14 @@ public class RenderUtils
         buffer.pos(x2, y2, z2).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
-    public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
-            Color4f color1, Color4f color2, Color4f color3, Entity renderViewEntity, float partialTicks)
+    public static void renderBlockOutlineOverlapping(BlockPos pos,
+                                                     float expand,
+                                                     float lineWidth,
+                                                     Color4f color1,
+                                                     Color4f color2,
+                                                     Color4f color3,
+                                                     Entity renderViewEntity,
+                                                     float partialTicks)
     {
         final double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         final double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
@@ -198,7 +208,9 @@ public class RenderUtils
         drawBoundingBoxEdges(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, colorX, colorY, colorZ);
     }
 
-    private static void drawBoundingBoxEdges(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f colorX, Color4f colorY, Color4f colorZ)
+    private static void drawBoundingBoxEdges(double minX, double minY, double minZ,
+                                             double maxX, double maxY, double maxZ,
+                                             Color4f colorX, Color4f colorY, Color4f colorZ)
     {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -276,8 +288,13 @@ public class RenderUtils
     /**
      * Assumes a BufferBuilder in GL_QUADS mode has been initialized
      */
-    public static void renderAreaSidesBatched(BlockPos pos1, BlockPos pos2, Color4f color, double expand,
-            Entity renderViewEntity, float partialTicks, BufferBuilder buffer)
+    public static void renderAreaSidesBatched(BlockPos pos1,
+                                              BlockPos pos2,
+                                              Color4f color,
+                                              double expand,
+                                              Entity renderViewEntity,
+                                              float partialTicks,
+                                              BufferBuilder buffer)
     {
         double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;

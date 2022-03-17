@@ -82,7 +82,7 @@ public abstract class TaskProcessChunkBase extends TaskBase
         // Single player, saving from the integrated server world
         else
         {
-            this.mc.addScheduledTask(TaskProcessChunkBase.this::onStop);
+            this.mc.addScheduledTask(this::onStop);
         }
     }
 

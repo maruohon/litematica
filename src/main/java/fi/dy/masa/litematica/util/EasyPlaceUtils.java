@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.util;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -168,7 +168,7 @@ public class EasyPlaceUtils
         {
             double reach = Math.max(6, mc.playerController.getBlockReachDistance());
             Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-            RayTraceResult trace = RayTraceUtils.traceToPositions(Arrays.asList(overriddenPos), entity, reach);
+            RayTraceResult trace = RayTraceUtils.traceToPositions(Collections.singletonList(overriddenPos), entity, reach);
             BlockPos pos = overriddenPos;
             Vec3d hitPos;
             EnumFacing side;

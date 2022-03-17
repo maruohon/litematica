@@ -369,9 +369,9 @@ public class SchematicPlacementManager
     {
         SchematicPlacementUnloaded placement = this.getSelectedSchematicPlacement();
 
-        if (placement != null)
+        if (placement != null && this.removeSchematicPlacement(placement))
         {
-            this.removeSchematicPlacement(placement);
+            MessageDispatcher.generic("litematica.message.info.selected_placement_removed", placement.getName());
             return true;
         }
 

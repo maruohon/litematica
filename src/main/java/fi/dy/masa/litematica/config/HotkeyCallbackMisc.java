@@ -246,8 +246,10 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.REMOVE_SELECTED_PLACEMENT.getKeyBind())
         {
-            DataManager.getSchematicPlacementManager().removeSelectedSchematicPlacement();
-            return ActionResult.SUCCESS;
+            if (DataManager.getSchematicPlacementManager().removeSelectedSchematicPlacement())
+            {
+                return ActionResult.SUCCESS;
+            }
         }
         else if (key == Hotkeys.REFRESH_SCHEMATIC_RENDERER.getKeyBind())
         {

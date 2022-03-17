@@ -362,6 +362,7 @@ litematica.message.info.schematic_loaded_to_memory=Schematic '%s' successfully l
 litematica.message.info.schematic_manager.preview_removed=Schematic preview image removed
 litematica.message.info.schematic_manager.set_preview=Use the §e%s§r hotkey [§e%s§r] to set the schematic preview image.\n\nYou can remove the pending preview task(s) via the Litematica Task Manager screen. If you start multiple preview tasks at once, they will get executed in order when you use the hotkey.
 litematica.message.info.schematic_manager.set_preview.success=Schematic preview image has been set for schematic §e%s§r
+litematica.message.info.selected_placement_removed=Selected Schematic Placement §e%s§r removed
 litematica.message.info.settings_copied_to_clipboard=Settings copied to clip board
 litematica.message.info.settings_loaded_from_clipboard=Settings loaded from clipboard
 litematica.message.info.schematic_vcs.project_created=Schematic VCS Project §e%s§r created

@@ -215,8 +215,8 @@ public class Configs
         public static final IntegerConfig TOOL_HUD_OFFSET_X                         = new IntegerConfig("toolHudOffsetX", 1, 0, 8192);
         public static final IntegerConfig TOOL_HUD_OFFSET_Y                         = new IntegerConfig("toolHudOffsetY", 1, 0, 8192);
         public static final DoubleConfig  TOOL_HUD_SCALE                            = new DoubleConfig( "toolHudScale", 1.0, 0.1, 4.0);
-        public static final DoubleConfig  VERIFIER_ERROR_HILIGHT_ALPHA              = new DoubleConfig( "verifierErrorHighlightAlpha", 0.2, 0.0, 1.0);
-        public static final IntegerConfig VERIFIER_ERROR_HILIGHT_MAX_POSITIONS      = new IntegerConfig("verifierErrorHighlightMaxPositions", 1000, 1, 1000000);
+        public static final DoubleConfig  VERIFIER_ERROR_HIGHLIGHT_ALPHA            = new DoubleConfig("verifierErrorHighlightAlpha", 0.2, 0.0, 1.0);
+        public static final IntegerConfig VERIFIER_ERROR_HIGHLIGHT_MAX_POSITIONS    = new IntegerConfig("verifierErrorHighlightMaxPositions", 1000, 1, 1000000);
         public static final BooleanConfig WARN_DISABLED_RENDERING                   = new BooleanConfig("warnDisabledRendering", true);
 
         public static final OptionListConfig<HudAlignment> BLOCK_INFO_LINES_ALIGNMENT           = new OptionListConfig<>("blockInfoLinesAlignment", HudAlignment.TOP_RIGHT, HudAlignment.VALUES);
@@ -256,8 +256,8 @@ public class Configs
                 TOOL_HUD_OFFSET_X,
                 TOOL_HUD_OFFSET_Y,
                 TOOL_HUD_SCALE,
-                VERIFIER_ERROR_HILIGHT_ALPHA,
-                VERIFIER_ERROR_HILIGHT_MAX_POSITIONS
+                VERIFIER_ERROR_HIGHLIGHT_ALPHA,
+                VERIFIER_ERROR_HIGHLIGHT_MAX_POSITIONS
         );
 
         public static final ImmutableList<HotkeyedBooleanConfig> HOTKEYS = ImmutableList.of(

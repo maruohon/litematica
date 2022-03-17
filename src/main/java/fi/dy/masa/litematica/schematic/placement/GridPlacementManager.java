@@ -115,7 +115,7 @@ public class GridPlacementManager
             int sizeX = size.getX();
             int sizeY = size.getY();
             int sizeZ = size.getZ();
-            Box baseBox = basePlacement.getEclosingBox();
+            Box baseBox = basePlacement.getEnclosingBox();
             BlockPos repeatAreaMinCorner = baseBox.getPos1().add(-repeatNeg.getX() * sizeX, -repeatNeg.getY() * sizeY, -repeatNeg.getZ() * sizeZ);
             BlockPos repeatAreaMaxCorner = baseBox.getPos2().add( repeatPos.getX() * sizeX,  repeatPos.getY() * sizeY,  repeatPos.getZ() * sizeZ);
             Box repeatEnclosingBox = new Box(repeatAreaMinCorner, repeatAreaMaxCorner);

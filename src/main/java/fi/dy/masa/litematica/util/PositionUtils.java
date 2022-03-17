@@ -756,7 +756,7 @@ public class PositionUtils
                 }
                 else
                 {
-                    box = placement.getEclosingBox();
+                    box = placement.getEnclosingBox();
                 }
 
                 if (box != null)
