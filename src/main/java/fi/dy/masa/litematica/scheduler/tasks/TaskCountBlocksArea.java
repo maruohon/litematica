@@ -14,7 +14,7 @@ public class TaskCountBlocksArea extends TaskCountBlocksMaterialList
         super(materialList, "litematica.gui.label.task_name.area_analyzer");
 
         this.selection = selection;
-        this.addBoxesPerChunks(selection.getAllSubRegionBoxes());
+        this.addPerChunkBoxes(selection.getAllSubRegionBoxes());
         this.updateInfoHudLinesMissingChunks(this.requiredChunks);
     }
 

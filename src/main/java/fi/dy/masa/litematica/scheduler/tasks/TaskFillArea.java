@@ -71,7 +71,7 @@ public class TaskFillArea extends TaskProcessChunkBase
 
         this.blockString = strName;
 
-        this.addBoxesPerChunks(boxes);
+        this.addPerChunkBoxes(boxes);
         this.updateInfoHudLinesMissingChunks(this.requiredChunks);
     }
 

@@ -16,7 +16,7 @@ public class TaskUpdateBlocks extends TaskProcessChunkBase
     {
         super("litematica.gui.label.task_name.update_blocks");
 
-        this.addBoxesPerChunks(boxes);
+        this.addPerChunkBoxes(boxes);
         this.updateInfoHudLinesMissingChunks(this.requiredChunks);
     }
 

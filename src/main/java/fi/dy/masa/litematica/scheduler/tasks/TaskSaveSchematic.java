@@ -46,7 +46,7 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
         this.takeEntities = takeEntities;
         this.overrideFile = overrideFile;
 
-        this.addBoxesPerChunks(area.getAllSubRegionBoxes());
+        this.addPerChunkBoxes(area.getAllSubRegionBoxes());
         this.updateInfoHudLinesMissingChunks(this.requiredChunks);
     }
 

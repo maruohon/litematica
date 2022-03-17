@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
@@ -469,6 +470,98 @@ public class PositionUtils
         }
 
         return null;
+    }
+
+    public static void getPerChunkBoxes(Collection<? extends Box> boxes, BiConsumer<ChunkPos, IntBoundingBox> consumer)
+    {
+        for (Box box : boxes)
+        {
+            final int boxMinX = Math.min(box.getPos1().getX(), box.getPos2().getX());
+            final int boxMinY = Math.min(box.getPos1().getY(), box.getPos2().getY());
+            final int boxMinZ = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
+            final int boxMaxX = Math.max(box.getPos1().getX(), box.getPos2().getX());
+            final int boxMaxY = Math.max(box.getPos1().getY(), box.getPos2().getY());
+            final int boxMaxZ = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+            final int boxMinChunkX = boxMinX >> 4;
+            final int boxMinChunkZ = boxMinZ >> 4;
+            final int boxMaxChunkX = boxMaxX >> 4;
+            final int boxMaxChunkZ = boxMaxZ >> 4;
+
+            for (int cz = boxMinChunkZ; cz <= boxMaxChunkZ; ++cz)
+            {
+                for (int cx = boxMinChunkX; cx <= boxMaxChunkX; ++cx)
+                {
+                    final int chunkMinX = cx << 4;
+                    final int chunkMinZ = cz << 4;
+                    final int chunkMaxX = chunkMinX + 15;
+                    final int chunkMaxZ = chunkMinZ + 15;
+                    final int minX = Math.max(chunkMinX, boxMinX);
+                    final int minZ = Math.max(chunkMinZ, boxMinZ);
+                    final int maxX = Math.min(chunkMaxX, boxMaxX);
+                    final int maxZ = Math.min(chunkMaxZ, boxMaxZ);
+
+                    consumer.accept(new ChunkPos(cx, cz), new IntBoundingBox(minX, boxMinY, minZ, maxX, boxMaxY, maxZ));
+                }
+            }
+        }
+    }
+
+    public static void getLayerRangeClampedPerChunkBoxes(Collection<? extends Box> boxes,
+                                                         LayerRange range,
+                                                         BiConsumer<ChunkPos, IntBoundingBox> consumer)
+    {
+        for (Box box : boxes)
+        {
+            final int rangeMin = range.getMinLayerBoundary();
+            final int rangeMax = range.getMaxLayerBoundary();
+            int boxMinX = Math.min(box.getPos1().getX(), box.getPos2().getX());
+            int boxMinY = Math.min(box.getPos1().getY(), box.getPos2().getY());
+            int boxMinZ = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
+            int boxMaxX = Math.max(box.getPos1().getX(), box.getPos2().getX());
+            int boxMaxY = Math.max(box.getPos1().getY(), box.getPos2().getY());
+            int boxMaxZ = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+
+            switch (range.getAxis())
+            {
+                case X:
+                    if (rangeMax < boxMinX || rangeMin > boxMaxX) { continue; }
+                    boxMinX = Math.max(boxMinX, rangeMin);
+                    boxMaxX = Math.min(boxMaxX, rangeMax);
+                    break;
+                case Y:
+                    if (rangeMax < boxMinY || rangeMin > boxMaxY) { continue; }
+                    boxMinY = Math.max(boxMinY, rangeMin);
+                    boxMaxY = Math.min(boxMaxY, rangeMax);
+                    break;
+                case Z:
+                    if (rangeMax < boxMinZ || rangeMin > boxMaxZ) { continue; }
+                    boxMinZ = Math.max(boxMinZ, rangeMin);
+                    boxMaxZ = Math.min(boxMaxZ, rangeMax);
+                    break;
+            }
+
+            final int boxMinChunkX = boxMinX >> 4;
+            final int boxMinChunkZ = boxMinZ >> 4;
+            final int boxMaxChunkX = boxMaxX >> 4;
+            final int boxMaxChunkZ = boxMaxZ >> 4;
+
+            for (int cz = boxMinChunkZ; cz <= boxMaxChunkZ; ++cz)
+            {
+                for (int cx = boxMinChunkX; cx <= boxMaxChunkX; ++cx)
+                {
+                    final int chunkMinX = cx << 4;
+                    final int chunkMinZ = cz << 4;
+                    final int chunkMaxX = chunkMinX + 15;
+                    final int chunkMaxZ = chunkMinZ + 15;
+                    final int minX = Math.max(chunkMinX, boxMinX);
+                    final int minZ = Math.max(chunkMinZ, boxMinZ);
+                    final int maxX = Math.min(chunkMaxX, boxMaxX);
+                    final int maxZ = Math.min(chunkMaxZ, boxMaxZ);
+
+                    consumer.accept(new ChunkPos(cx, cz), new IntBoundingBox(minX, boxMinY, minZ, maxX, boxMaxY, maxZ));
+                }
+            }
+        }
     }
 
     /**

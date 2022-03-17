@@ -10,11 +10,13 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.selection.SelectionBox;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.config.value.LayerMode;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public abstract class TaskProcessChunkBase extends TaskBase
 {
@@ -95,17 +97,26 @@ public abstract class TaskProcessChunkBase extends TaskBase
 
     protected abstract boolean processChunk(ChunkPos pos);
 
-    protected void addBoxesPerChunks(Collection<SelectionBox> allBoxes)
+    protected void addPerChunkBoxes(Collection<? extends Box> allBoxes)
     {
         this.boxesInChunks.clear();
         this.requiredChunks.clear();
+        PositionUtils.getPerChunkBoxes(allBoxes, this.boxesInChunks::put);
+        this.requiredChunks.addAll(this.boxesInChunks.keySet());
+    }
 
-        this.requiredChunks.addAll(PositionUtils.getTouchedChunksForBoxes(allBoxes));
-
-        for (ChunkPos pos : this.requiredChunks)
+    protected void addPerChunkBoxes(Collection<? extends Box> allBoxes, LayerRange range)
+    {
+        if (range.getLayerMode() == LayerMode.ALL)
         {
-            this.boxesInChunks.putAll(pos, PositionUtils.getBoxesWithinChunk(pos.x, pos.z, allBoxes));
+            this.addPerChunkBoxes(allBoxes);
+            return;
         }
+
+        this.boxesInChunks.clear();
+        this.requiredChunks.clear();
+        PositionUtils.getLayerRangeClampedPerChunkBoxes(allBoxes, range, this.boxesInChunks::put);
+        this.requiredChunks.addAll(this.boxesInChunks.keySet());
     }
 
     protected List<IntBoundingBox> getBoxesInChunk(ChunkPos pos)
