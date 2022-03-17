@@ -66,7 +66,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
         this.exportButton       = GenericButton.create(18, "litematica.button.material_list.export_to_file", this::exportToFile);
         this.mainMenuButton     = GenericButton.create(18, "litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.refreshButton      = GenericButton.create(18, "litematica.button.material_list.refresh", this::refreshList);
-        this.scopeButton        = GenericButton.create(18, this::getScopeButtonDisplayName);
+        this.scopeButton        = GenericButton.create(18, this::getScopeButtonDisplayName, this::toggleScope);
 
         this.hiveAvailableButton = OnOffButton.onOff(18, "litematica.button.material_list.hide_available",
                                                      this.materialList::getHideAvailable, this::toggleHideAvailable);
@@ -75,7 +75,6 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
 
         this.multiplierEditor = new IntegerEditWidget(80, 18, 1, 1, 1000000, this::setMultiplier);
 
-        this.scopeButton.setActionListener(this::toggleScope);
         this.clearCacheButton.translateAndAddHoverString("litematica.hover.button.material_list.clear_cache");
         this.exportButton.translateAndAddHoverString("litematica.hover.button.material_list.export_shift_for_csv");
         this.multiplierEditor.getTextField().translateAndAddHoverString("litematica.hover.material_list.multiplier");
@@ -145,10 +144,12 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
         DataListWidget<MaterialListEntry> listWidget = new DataListWidget<>(supplier, true);
 
         listWidget.setListEntryWidgetFixedHeight(20);
+        listWidget.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0x80101010);
         listWidget.addDefaultSearchBar();
-        listWidget.setHeaderWidgetFactory(this::createFileListHeaderWidget);
+        listWidget.setHeaderWidgetFactory(this::createListHeaderWidget);
         listWidget.setEntryFilterStringFunction((e) -> Collections.singletonList(e.getStack().getDisplayName()));
-        listWidget.setEntryWidgetFactory((d, cd) -> new MaterialListEntryWidget(d, cd, this.materialList));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new MaterialListEntryWidget(d, cd, this.materialList));
+        listWidget.setWidgetInitializer(new MaterialListEntryWidget.WidgetInitializer());
 
         listWidget.setColumnSupplier(() -> MaterialListEntryWidget.COLUMNS);
         listWidget.setDefaultSortColumn(MaterialListEntryWidget.TOTAL_COUNT_COLUMN);
@@ -159,7 +160,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
         return listWidget;
     }
 
-    protected DataListHeaderWidget<MaterialListEntry> createFileListHeaderWidget(DataListWidget<MaterialListEntry> listWidget)
+    protected DataListHeaderWidget<MaterialListEntry> createListHeaderWidget(DataListWidget<MaterialListEntry> listWidget)
     {
         ColumnizedDataListHeaderWidget<MaterialListEntry> widget =
                 new ColumnizedDataListHeaderWidget<>(this.getListWidget().getWidth() - 10, 16,

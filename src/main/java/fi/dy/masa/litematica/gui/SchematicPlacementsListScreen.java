@@ -33,7 +33,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
 
         this.manager = DataManager.getSchematicPlacementManager();
 
-        this.iconsTextToggleButton               = GenericButton.create(this::getIconVsTextButtonLabel);
+        this.iconsTextToggleButton               = GenericButton.create(18, this::getIconVsTextButtonLabel, this::toggleIconsVsText);
         this.loadSchematicsScreenButton          = GenericButton.create("litematica.button.change_menu.load_schematics", LitematicaIcons.SCHEMATIC_BROWSER);
         this.loadedSchematicsListScreenButton    = GenericButton.create("litematica.button.change_menu.loaded_schematics", LitematicaIcons.LOADED_SCHEMATICS);
         this.mainMenuButton                      = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
@@ -45,10 +45,6 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
 
         this.iconsTextToggleButton.translateAndAddHoverString("litematica.hover.button.icon_vs_text_buttons");
         this.iconsTextToggleButton.setIsRightAligned(true);
-        this.iconsTextToggleButton.setActionListener(() -> {
-            Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue();
-            this.initScreen();
-        });
 
         this.setTitle("litematica.title.screen.schematic_placements_list", Reference.MOD_VERSION);
     }
@@ -78,7 +74,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         super.updateWidgetPositions();
 
         this.iconsTextToggleButton.setRight(this.getRight() - 22);
-        this.iconsTextToggleButton.setY(this.y + 8);
+        this.iconsTextToggleButton.setBottom(this.getListY() - 12);
 
         int y = this.getBottom() - 24;
         this.loadSchematicsScreenButton.setPosition(this.x + 10, y);
@@ -109,9 +105,15 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
                 .setSelectionListener(this::onSelectionChange);
         listWidget.setEntryFilter(SchematicPlacementEntryWidget::placementSearchFilter);
         listWidget.addDefaultSearchBar();
-        listWidget.setEntryWidgetFactory((d, cd) -> new SchematicPlacementEntryWidget(d, cd, this));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new SchematicPlacementEntryWidget(d, cd, this));
 
         return listWidget;
+    }
+
+    protected void toggleIconsVsText()
+    {
+        Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue();
+        this.initScreen();
     }
 
     public boolean getCachedWasModifiedSinceSaved(SchematicPlacementUnloaded placement)

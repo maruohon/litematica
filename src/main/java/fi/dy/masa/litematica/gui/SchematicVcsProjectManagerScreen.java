@@ -113,7 +113,7 @@ public class SchematicVcsProjectManagerScreen extends BaseListScreen<DataListWid
         listWidget.getEntrySelectionHandler().setAllowSelection(true);
         listWidget.setAllowKeyboardNavigation(true);
         listWidget.setEntryFilterStringFunction((v) -> ImmutableList.of(v.getName(), String.valueOf(v.getVersion())));
-        listWidget.setEntryWidgetFactory(SchematicVcsVersionEntryWidget::new);
+        listWidget.setDataListEntryWidgetFactory(SchematicVcsVersionEntryWidget::new);
         listWidget.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
 
         return listWidget;

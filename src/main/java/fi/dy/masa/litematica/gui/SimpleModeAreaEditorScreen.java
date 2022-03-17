@@ -6,7 +6,6 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
-import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
@@ -34,29 +33,21 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
     {
         super(selection);
 
+        this.areaNameLabel = new LabelWidget("litematica.label.area_editor.area_selection_name");
         this.areaNameTextField = new BaseTextFieldWidget(200, 16, selection.getName());
 
-        this.areaNameLabel = new LabelWidget("litematica.label.area_editor.area_selection_name");
-
-        this.selectionModeButton    = GenericButton.create(18, SimpleModeAreaEditorScreen::getSelectionModeButtonLabel);
-        this.cornersModeButton      = GenericButton.create(18, SimpleModeAreaEditorScreen::getCornersModeButtonLabel);
+        this.selectionModeButton    = GenericButton.create(18, SimpleModeAreaEditorScreen::getSelectionModeButtonLabel, SimpleModeAreaEditorScreen::cycleSelectionMode);
+        this.cornersModeButton      = GenericButton.create(18, SimpleModeAreaEditorScreen::getCornersModeButtonLabel, this::cycleCornersMode);
         this.manualOriginButton     = OnOffButton.onOff(18, "litematica.button.area_editor.manual_origin",
                                                         this.selection::hasManualOrigin, this::toggleManualOrigin);
 
         this.setAreaNameButton      = GenericButton.create(18, "litematica.button.misc.set", this::renameAreaSelection);
-
         this.areaAnalyzerButton     = GenericButton.create(18, "litematica.button.area_editor.area_analyzer", this::openAreaAnalyzer);
         this.saveSchematicButton    = GenericButton.create(18, "litematica.button.area_editor.save_schematic", this::openSaveSchematicScreen);
         this.mainMenuButton         = GenericButton.create(18, "litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
 
-        this.selectionModeButton.setActionListener(SimpleModeAreaEditorScreen::cycleSelectionMode);
-        this.cornersModeButton.setActionListener(this::cycleCornersMode);
-
-        String hover = "litematica.hover.checkmark.area_editor.select_this_element";
-        this.originCheckbox = new CheckBoxWidget(DefaultIcons.CHECKMARK_OFF, DefaultIcons.CHECKMARK_ON,
-                                                 "litematica.checkmark.area_editor.origin", hover);
         this.manualOriginButton.translateAndAddHoverString("litematica.hover.button.area_editor.manual_origin");
-
+        this.originCheckbox = new CheckBoxWidget("litematica.checkmark.area_editor.origin", "litematica.hover.checkmark.area_editor.select_this_element");
         this.originCheckbox.setBooleanStorage(selection::isOriginSelected, selection::setOriginSelected);
         this.originCheckbox.setListener(this::onOriginCheckboxClick);
 

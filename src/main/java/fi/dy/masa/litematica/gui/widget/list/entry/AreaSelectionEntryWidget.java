@@ -47,7 +47,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
     {
         super(entry, constructData, fileBrowserWidget, iconProvider);
 
-        File file = this.entry.getFullPath();
+        File file = this.data.getFullPath();
         this.selectionId = file.getAbsolutePath();
         this.selection = selectionManager.getOrLoadSelection(this.selectionId);
         this.fileType = FileType.fromFileName(file);
@@ -137,7 +137,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         {
             if (this.selection != null)
             {
-                String prefix = this.entry.getDisplayNamePrefix();
+                String prefix = this.data.getDisplayNamePrefix();
                 String selectionName = this.selection.getName();
                 String name = prefix != null ? prefix + selectionName : selectionName;
                 int count = this.selection.getAllSubRegionBoxes().size();
@@ -214,7 +214,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
     protected boolean renameSelectionUsingName(String name, boolean copy)
     {
-        File dir = this.entry.getDirectory();
+        File dir = this.data.getDirectory();
         return this.selectionManager.renameSelection(dir, this.selectionId, name, copy, MessageOutput.MESSAGE_OVERLAY);
     }
 

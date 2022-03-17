@@ -103,7 +103,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
         listWidget.getEntrySelectionHandler().setAllowSelection(true);
         listWidget.setRootDirectoryDisplayName(StringUtils.translate("litematica.label.area_selection_browser.selections"));
-        listWidget.setEntryWidgetFactory((d, cd) -> new AreaSelectionEntryWidget(d, cd, listWidget, null, this.selectionManager));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new AreaSelectionEntryWidget(d, cd, listWidget, null, this.selectionManager));
 
         return listWidget;
     }

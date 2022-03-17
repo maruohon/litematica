@@ -36,8 +36,8 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
     protected final GenericButton openPlacementSettingsButton;
     protected final GenericButton resetSubRegionButton;
     protected final GenericButton rotateButton;
-    protected final OnOffButton toggleEntitiesButton;
-    protected final OnOffButton toggleRegionEnabledButton;
+    protected final GenericButton toggleEntitiesButton;
+    protected final GenericButton toggleRegionEnabledButton;
     protected final CheckBoxWidget lockXCoordCheckbox;
     protected final CheckBoxWidget lockYCoordCheckbox;
     protected final CheckBoxWidget lockZCoordCheckbox;
@@ -54,19 +54,14 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         String fileName = file != null ? file.getName() : "-";
 
         this.originLabel = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.region_position");
-        String key = "litematica.label.schematic_placement_sub_region_settings.placement_name";
-        this.placementNameLabel = new LabelWidget(StringUtils.translate(key, placement.getName()));
- 
-        key = "litematica.label.schematic_placement_sub_region_settings.region_name";
-        this.regionNameLabel = new LabelWidget(StringUtils.translate(key, subRegion.getName()));
+        this.placementNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.placement_name", placement.getName()));
+        this.regionNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.region_name", subRegion.getName()));
+        this.schematicNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_settings.schematic_name", schematic.getMetadata().getName(), fileName));
 
-        key = "litematica.label.schematic_placement_settings.schematic_name";
-        this.schematicNameLabel = new LabelWidget(StringUtils.translate(key, schematic.getMetadata().getName(), fileName));
-
-        this.mirrorButton                = GenericButton.create(18, this::getMirrorButtonLabel);
+        this.mirrorButton                = GenericButton.create(18, this::getMirrorButtonLabel, this::mirror);
         this.openPlacementSettingsButton = GenericButton.create(18, "litematica.button.schematic_placement_sub_region_settings.placement_settings", this::openPlacementSettings);
-        this.resetSubRegionButton        = GenericButton.create(18, "litematica.button.schematic_placement_sub_region_settings.reset_region");
-        this.rotateButton                = GenericButton.create(18, this::getRotateButtonLabel);
+        this.resetSubRegionButton        = GenericButton.create(18, "litematica.button.schematic_placement_sub_region_settings.reset_region", this::resetSubRegion);
+        this.rotateButton                = GenericButton.create(18, this::getRotateButtonLabel, this::rotate);
 
         this.toggleEntitiesButton      = OnOffButton.onOff(18, "litematica.button.schematic_placement_settings.ignore_entities",
                                                            this.subRegion::ignoreEntities, this::toggleIgnoreEntities);
@@ -77,27 +72,18 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         pos = fi.dy.masa.litematica.util.PositionUtils.getTransformedBlockPos(pos, placement.getMirror(), placement.getRotation()).add(placement.getOrigin());
         this.originEditWidget = new BlockPosEditWidget(90, 72, 2, true, pos, this::setOrigin);
 
-        this.lockXCoordCheckbox = new CheckBoxWidget();
-        this.lockYCoordCheckbox = new CheckBoxWidget();
-        this.lockZCoordCheckbox = new CheckBoxWidget();
-
+        this.lockXCoordCheckbox = new CheckBoxWidget(() -> this.isCoordinateLocked(Coordinate.X), (val) -> this.setCoordinateLocked(val, Coordinate.X));
+        this.lockYCoordCheckbox = new CheckBoxWidget(() -> this.isCoordinateLocked(Coordinate.Y), (val) -> this.setCoordinateLocked(val, Coordinate.Y));
+        this.lockZCoordCheckbox = new CheckBoxWidget(() -> this.isCoordinateLocked(Coordinate.Z), (val) -> this.setCoordinateLocked(val, Coordinate.Z));
         this.lockXCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockYCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockZCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
-
-        this.resetSubRegionButton.setActionListener(this::resetSubRegion);
-        this.resetSubRegionButton.setEnabledStatusSupplier(() -> this.subRegion.isRegionPlacementModifiedFromDefault() && this.isNotLocked());
-        this.mirrorButton.setActionListener(this::mirror);
-        this.rotateButton.setActionListener(this::rotate);
-
-        this.lockXCoordCheckbox.setBooleanStorage(() -> this.isCoordinateLocked(Coordinate.X), (val) -> this.setCoordinateLocked(val, Coordinate.X));
-        this.lockYCoordCheckbox.setBooleanStorage(() -> this.isCoordinateLocked(Coordinate.Y), (val) -> this.setCoordinateLocked(val, Coordinate.Y));
-        this.lockZCoordCheckbox.setBooleanStorage(() -> this.isCoordinateLocked(Coordinate.Z), (val) -> this.setCoordinateLocked(val, Coordinate.Z));
 
         BooleanSupplier enabledSupplier = this::isNotLocked;
         this.mirrorButton.setEnabledStatusSupplier(enabledSupplier);
         this.rotateButton.setEnabledStatusSupplier(enabledSupplier);
         this.originEditWidget.setEnabledStatusSupplier(enabledSupplier);
+        this.resetSubRegionButton.setEnabledStatusSupplier(() -> this.subRegion.isRegionPlacementModifiedFromDefault() && this.isNotLocked());
 
         this.setTitle("litematica.title.screen.schematic_placement_sub_region_settings", Reference.MOD_VERSION);
     }

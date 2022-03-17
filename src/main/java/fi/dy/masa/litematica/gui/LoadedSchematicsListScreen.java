@@ -75,7 +75,7 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
         DataListWidget<ISchematic> listWidget = new DataListWidget<>(supplier, true);
         listWidget.addDefaultSearchBar();
         listWidget.setEntryFilter(SchematicEntryWidget::schematicSearchFilter);
-        listWidget.setEntryWidgetFactory(SchematicEntryWidget::new);
+        listWidget.setDataListEntryWidgetFactory(SchematicEntryWidget::new);
         return listWidget;
     }
 

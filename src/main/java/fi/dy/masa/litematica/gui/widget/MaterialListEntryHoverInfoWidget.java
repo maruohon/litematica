@@ -1,11 +1,12 @@
 package fi.dy.masa.litematica.gui.widget;
 
+import java.text.DecimalFormat;
 import net.minecraft.item.ItemStack;
-import fi.dy.masa.litematica.gui.widget.list.entry.MaterialListEntryWidget;
 import fi.dy.masa.malilib.gui.widget.ContainerWidget;
 import fi.dy.masa.malilib.gui.widget.ItemStackWidget;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListEntryHoverInfoWidget extends ContainerWidget
 {
@@ -32,8 +33,8 @@ public class MaterialListEntryHoverInfoWidget extends ContainerWidget
         this.itemNameLabel.setPosition(this.itemWidget.getRight() + 4, 8);
 
         int maxStackSize = stack.getMaxStackSize();
-        String strTotal = MaterialListEntryWidget.getFormattedCountString(totalCount, maxStackSize);
-        String strMissing = MaterialListEntryWidget.getFormattedCountString(missingCount, maxStackSize);
+        String strTotal = getFormattedCountString(totalCount, maxStackSize);
+        String strMissing = getFormattedCountString(missingCount, maxStackSize);
         this.itemCountsLabel = new LabelWidget();
         this.itemCountsLabel.setLabelStyledTextLines(StyledTextLine.of(strTotal),
                                                      StyledTextLine.of(strMissing));
@@ -59,5 +60,41 @@ public class MaterialListEntryHoverInfoWidget extends ContainerWidget
         this.addWidget(this.headerLabel);
         this.addWidget(this.itemNameLabel);
         this.addWidget(this.itemCountsLabel);
+    }
+
+    public static String getFormattedCountString(long itemCount, int maxStackSize)
+    {
+        long stacks = itemCount / maxStackSize;
+        long remainder = itemCount % maxStackSize;
+        double boxCount = (double) itemCount / (27.0 * maxStackSize);
+
+        if (itemCount > maxStackSize)
+        {
+            DecimalFormat format = new DecimalFormat("#.##");
+            String boxCountStr = format.format(boxCount);
+
+            if (maxStackSize > 1)
+            {
+                if (remainder > 0L)
+                {
+                    return StringUtils.translate("litematica.label.material_list.item_counts.total_stacks_lose_boxes",
+                                                 itemCount, stacks, maxStackSize, remainder, boxCountStr);
+                }
+                else
+                {
+                    return StringUtils.translate("litematica.label.material_list.item_counts.total_stacks_boxes",
+                                                 itemCount, stacks, maxStackSize, boxCountStr);
+                }
+            }
+            else
+            {
+                return StringUtils.translate("litematica.label.material_list.item_counts.total_boxes",
+                                             itemCount, boxCountStr);
+            }
+        }
+        else
+        {
+            return StringUtils.translate("litematica.label.material_list.item_counts.total", itemCount);
+        }
     }
 }

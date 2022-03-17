@@ -48,7 +48,7 @@ public class SchematicManagerScreen extends BaseListScreen<BaseFileBrowserWidget
 
         this.convertSchematicButton = GenericButton.create("litematica.button.schematic_manager.convert_format", this::convertSchematic);
         this.deleteFileButton       = GenericButton.create("litematica.button.schematic_manager.delete", this::deleteFile);
-        this.mainMenuScreenButton   = GenericButton.create("litematica.button.change_menu.main_menu");
+        this.mainMenuScreenButton   = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.removePreviewButton    = GenericButton.create("litematica.button.schematic_manager.remove_preview", this::removePreview);
         this.renameFileButton       = GenericButton.create("litematica.button.schematic_manager.rename_file", this::renameFile);
         this.renameSchematicButton  = GenericButton.create("litematica.button.schematic_manager.rename_schematic", this::renameSchematic);
@@ -56,7 +56,6 @@ public class SchematicManagerScreen extends BaseListScreen<BaseFileBrowserWidget
         this.schematicInfoWidget = new SchematicInfoWidget(170, 290);
 
         this.convertSchematicButton.translateAndAddHoverString("litematica.hover.button.schematic_manager.convert_format");
-        this.mainMenuScreenButton.setActionListener(MainMenuScreen::openMainMenuScreen);
 
         this.setTitle("litematica.title.screen.schematic_manager", Reference.MOD_VERSION);
     }

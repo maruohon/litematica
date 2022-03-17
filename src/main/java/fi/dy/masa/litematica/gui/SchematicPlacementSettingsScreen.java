@@ -92,14 +92,14 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.schematicNameLabel = new LabelWidget();
         this.schematicNameLabel.setLabelStyledText(name);
 
-        this.copyPasteSettingsButton   = GenericButton.create(18, "malilib.button.export_slash_import");
-        this.mirrorButton              = GenericButton.create(18, this::getMirrorButtonLabel);
+        this.copyPasteSettingsButton   = GenericButton.create(18, "malilib.button.export_slash_import", this::clickCopyPasteSettings);
+        this.mirrorButton              = GenericButton.create(18, this::getMirrorButtonLabel, this::mirror);
         this.openMaterialListButton    = GenericButton.create(18, "litematica.button.misc.material_list", this::openMaterialList);
         this.openPlacementListButton   = GenericButton.create(18, "litematica.button.change_menu.schematic_placements", this::openPlacementList);
         this.openVerifierButton        = GenericButton.create(18, "litematica.button.misc.schematic_verifier", this::openVerifier);
         this.renameButton              = GenericButton.create(16, "litematica.button.misc.rename", this::renamePlacement);
-        this.resetSubRegionsButton     = GenericButton.create(18, "litematica.button.schematic_placement_settings.reset_sub_regions");
-        this.rotateButton              = GenericButton.create(18, this::getRotateButtonLabel);
+        this.resetSubRegionsButton     = GenericButton.create(18, "litematica.button.schematic_placement_settings.reset_sub_regions", this::resetSubRegions);
+        this.rotateButton              = GenericButton.create(18, this::getRotateButtonLabel, this::rotate);
         this.toggleAllRegionsOffButton = GenericButton.create(18, "litematica.button.schematic_placement_settings.toggle_all_off", this::toggleAllRegionsOff);
         this.toggleAllRegionsOnButton  = GenericButton.create(18, "litematica.button.schematic_placement_settings.toggle_all_on", this::toggleAllRegionsOn);
         this.toggleEnclosingBoxButton  = GenericButton.create(this::getEnclosingBoxButtonIcon, this::toggleEnclosingBoxRendering);
@@ -125,24 +125,19 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.lockYCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockZCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
 
+        this.copyPasteSettingsButton.setRenderButtonBackgroundTexture(true);
         this.copyPasteSettingsButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.copy_paste_settings");
         this.gridSettingsButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.grid_settings");
         this.renameButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.rename_placement");
         this.toggleLockedButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.lock");
-        this.toggleEnclosingBoxButton.getHoverInfoFactory().setStringListProvider("_default", this::getEnclosingBoxButtonHoverText);
 
-        this.copyPasteSettingsButton.setRenderButtonBackgroundTexture(true);
-        this.copyPasteSettingsButton.setActionListener(this::clickCopyPasteSettings);
-        this.resetSubRegionsButton.setActionListener(this::resetSubRegions);
+        this.toggleEnclosingBoxButton.getHoverInfoFactory().setStringListProvider("_default", this::getEnclosingBoxButtonHoverText);
         this.resetSubRegionsButton.setEnabledStatusSupplier(() -> this.placement.isRegionPlacementModified() && this.isNotLocked());
 
         BooleanSupplier enabledSupplier = this::isNotLocked;
         this.mirrorButton.setEnabledStatusSupplier(enabledSupplier);
         this.rotateButton.setEnabledStatusSupplier(enabledSupplier);
         this.originEditWidget.setEnabledStatusSupplier(enabledSupplier);
-
-        this.mirrorButton.setActionListener(this::mirror);
-        this.rotateButton.setActionListener(this::rotate);
 
         this.lockXCoordCheckbox.setBooleanStorage(() -> this.isCoordinateLocked(Coordinate.X), (val) -> this.setCoordinateLocked(val, Coordinate.X));
         this.lockYCoordCheckbox.setBooleanStorage(() -> this.isCoordinateLocked(Coordinate.Y), (val) -> this.setCoordinateLocked(val, Coordinate.Y));
@@ -262,7 +257,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
                 .setSelectionListener(this::onSelectionChange);
         listWidget.addDefaultSearchBar();
         listWidget.setEntryFilterStringFunction((p) -> Collections.singletonList(p.getName()));
-        listWidget.setEntryWidgetFactory((d, cd) -> new SchematicPlacementSubRegionEntryWidget(d, cd, this.placement));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new SchematicPlacementSubRegionEntryWidget(d, cd, this.placement));
 
         return listWidget;
     }
@@ -411,13 +406,13 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected void toggleAllRegionsOff()
     {
-        this.manager.setSubRegionsEnabled(this.placement, false, this.getListWidget().getFilteredEntries());
+        this.manager.setSubRegionsEnabled(this.placement, false, this.getListWidget().getFilteredDataList());
         this.initScreen();
     }
 
     protected void toggleAllRegionsOn()
     {
-        this.manager.setSubRegionsEnabled(this.placement, true, this.getListWidget().getFilteredEntries());
+        this.manager.setSubRegionsEnabled(this.placement, true, this.getListWidget().getFilteredDataList());
         this.initScreen();
     }
 

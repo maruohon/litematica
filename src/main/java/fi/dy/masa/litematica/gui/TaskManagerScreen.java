@@ -50,7 +50,7 @@ public class TaskManagerScreen extends BaseListScreen<DataListWidget<ITask>>
     protected DataListWidget<ITask> createListWidget()
     {
         DataListWidget<ITask> listWidget = new DataListWidget<>(this::getAllTasks, true);
-        listWidget.setEntryWidgetFactory(TaskEntryWidget::new);
+        listWidget.setDataListEntryWidgetFactory(TaskEntryWidget::new);
         return listWidget;
     }
 }

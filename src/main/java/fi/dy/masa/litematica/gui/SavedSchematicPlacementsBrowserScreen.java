@@ -91,7 +91,7 @@ public class SavedSchematicPlacementsBrowserScreen extends BaseListScreen<BaseFi
         listWidget.getEntrySelectionHandler().setAllowSelection(true);
         listWidget.setRootDirectoryDisplayName(StringUtils.translate("litematica.label.schematic_placement_browser.placements"));
         listWidget.setEntryFilter(SchematicPlacementBrowserEntryWidget::placementSearchFilter);
-        listWidget.setEntryWidgetFactory((d, cd) -> new SchematicPlacementBrowserEntryWidget(d, cd, listWidget, iconProvider));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new SchematicPlacementBrowserEntryWidget(d, cd, listWidget, iconProvider));
 
         return listWidget;
     }

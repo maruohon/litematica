@@ -51,8 +51,8 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
 
         this.areaNameLabel = new LabelWidget("litematica.label.area_editor.area_selection_name");
 
-        this.selectionModeButton    = GenericButton.create(18, SimpleModeAreaEditorScreen::getSelectionModeButtonLabel);
-        this.cornersModeButton      = GenericButton.create(18, SimpleModeAreaEditorScreen::getCornersModeButtonLabel);
+        this.selectionModeButton    = GenericButton.create(18, SimpleModeAreaEditorScreen::getSelectionModeButtonLabel, SimpleModeAreaEditorScreen::cycleSelectionMode);
+        this.cornersModeButton      = GenericButton.create(18, SimpleModeAreaEditorScreen::getCornersModeButtonLabel, this::cycleCornersMode);
         this.createSubRegionButton  = GenericButton.create(18, "litematica.button.area_editor.create_sub_region", this::createSubRegion);
         this.manualOriginButton     = OnOffButton.onOff(18, "litematica.button.area_editor.manual_origin",
                                                         this.selection::hasManualOrigin, this::toggleManualOrigin);
@@ -64,8 +64,6 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
         this.mainMenuButton         = GenericButton.create(18, "litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.areaSelectionBrowserButton = GenericButton.create(18, "litematica.button.change_menu.area_selection_browser", LitematicaIcons.AREA_SELECTION);
 
-        this.selectionModeButton.setActionListener(SimpleModeAreaEditorScreen::cycleSelectionMode);
-        this.cornersModeButton.setActionListener(this::cycleCornersMode);
         this.areaSelectionBrowserButton.setActionListener(() -> openScreenWithParent(new AreaSelectionBrowserScreen()));
 
         String hover = "litematica.hover.checkmark.area_editor.select_this_element";
@@ -156,7 +154,7 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
         listWidget.addDefaultSearchBar();
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
         listWidget.getEntrySelectionHandler().setAllowSelection(true);
-        listWidget.setEntryWidgetFactory((d, cd) -> new AreaSubRegionEntryWidget(d, cd, this.selection));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new AreaSubRegionEntryWidget(d, cd, this.selection));
         return listWidget;
     }
 
