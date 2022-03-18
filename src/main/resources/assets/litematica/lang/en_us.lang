@@ -80,12 +80,14 @@ litematica.button.schematic_vcs.place_to_world=Place to World
 litematica.button.schematic_vcs.save_version=Save New Version
 litematica.button.schematic_verifier.clear_selection=Clear Selection
 litematica.button.schematic_verifier.ignore=Ignore
+litematica.button.schematic_verifier.pause=Pause Verifier
 litematica.button.schematic_verifier.range=Range: %s
 litematica.button.schematic_verifier.reset_ignored=Reset Ignored
 litematica.button.schematic_verifier.reset_verifier=Reset Data
 litematica.button.schematic_verifier.resume=Resume Verifier
 litematica.button.schematic_verifier.start=Start Verifier
 litematica.button.schematic_verifier.stop=Stop Verifier
+litematica.button.schematic_verifier.toggle_auto_refresh=Auto Refresh: %s
 litematica.button.schematic_verifier.toggle_info_hud=Info HUD: %s
 
 litematica.button.misc.configure=Configure
@@ -280,6 +282,9 @@ litematica.label.schematic_verifier.modified_block_state_property.direction=<c=F
 litematica.label.schematic_verifier.modified_block_state_property.enum=<c=FFFFF000>%s</c> = §3%s
 litematica.label.schematic_verifier.modified_block_state_property.generic=<c=FFFFF000>%s</c> = %s
 litematica.label.schematic_verifier.modified_block_state_property.integer=<c=FFFFF000>%s</c> = §b%s
+litematica.label.schematic_verifier.status.status=Status: %s - Checked Chunks: <c=7af>%s§r / <c=7af>%s§r
+litematica.label.schematic_verifier.status.counts_1=Total Blocks: §e%s§r - Done: §e%s%%§r - Correct: §a%s§r
+litematica.label.schematic_verifier.status.counts_2=Wrong Block: §c%s§r - Wrong State: §6%s§r - Missing: §b%s§r - Extra: §d%s§r
 litematica.label.task.set_schematic_preview=Set Preview image for schematic §e%s
 litematica.label.tool_hud.none_brackets=§c<none>§r
 litematica.label.widget.schematic_vcs.version_entry=Ver. §6%d§r - %s

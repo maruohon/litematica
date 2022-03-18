@@ -1,17 +1,17 @@
 package fi.dy.masa.litematica.world;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
-import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.malilib.listener.LayerRangeChangeListener;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
+import fi.dy.masa.litematica.render.LitematicaRenderer;
 
 public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
 {
@@ -109,8 +109,8 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
 
         if (world != null)
         {
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
             long key = ChunkPos.asLong(chunkPos.getX(), chunkPos.getZ());
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
@@ -122,21 +122,21 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
         }
     }
 
-    public static void markSchematicChunksForRenderUpdate(ChunkPos chunkPos)
+    public static void markSchematicChunksForRenderUpdate(int chunkX, int chunkZ)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
 
         if (world != null)
         {
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
-            long key = ChunkPos.asLong(chunkPos.x, chunkPos.z);
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            long key = ChunkPos.asLong(chunkX, chunkZ);
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
             {
                 RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-                rg.markBlockRangeForRenderUpdate((chunkPos.x << 4) - 1,   0, (chunkPos.z << 4) - 1,
-                                                 (chunkPos.x << 4) + 1, 255, (chunkPos.z << 4) + 1);
+                rg.markBlockRangeForRenderUpdate((chunkX << 4) - 1,   0, (chunkZ << 4) - 1,
+                                                 (chunkX << 4) + 1, 255, (chunkZ << 4) + 1);
             }
         }
     }
@@ -147,8 +147,8 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
 
         if (world != null)
         {
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
             long key = ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))

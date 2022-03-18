@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierUtils;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 
 @Mixin(net.minecraft.client.renderer.RenderGlobal.class)
@@ -34,7 +34,7 @@ public abstract class MixinRenderGlobal
     {
         if (oldState != newState)
         {
-            SchematicVerifierUtils.onBlockChanged(pos);
+            SchematicVerifierManager.INSTANCE.onBlockChanged(pos);
 
             if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
                 Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue())

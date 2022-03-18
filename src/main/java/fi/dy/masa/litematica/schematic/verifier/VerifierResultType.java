@@ -2,11 +2,10 @@ package fi.dy.masa.litematica.schematic.verifier;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.litematica.config.Configs;
 
 public enum VerifierResultType
 {
@@ -22,8 +21,6 @@ public enum VerifierResultType
             VerifierResultType.WRONG_STATE,
             VerifierResultType.MISSING,
             VerifierResultType.EXTRA);
-
-    private static final IBlockState AIR = Blocks.AIR.getDefaultState();
 
     private final String translationKey;
     private final ColorConfig colorConfig;
@@ -61,9 +58,9 @@ public enum VerifierResultType
 
         if (foundState != expectedState)
         {
-            if (expectedState != AIR)
+            if (expectedState != SchematicVerifier.AIR)
             {
-                if (foundState == AIR)
+                if (foundState == SchematicVerifier.AIR)
                 {
                     type = VerifierResultType.MISSING;
                 }
@@ -77,7 +74,7 @@ public enum VerifierResultType
                 }
             }
             else if (Configs.Visuals.IGNORE_EXISTING_FLUIDS.getBooleanValue() == false ||
-                             foundState.getMaterial().isLiquid() == false)
+                     foundState.getMaterial().isLiquid() == false)
             {
                 type = VerifierResultType.EXTRA;
             }

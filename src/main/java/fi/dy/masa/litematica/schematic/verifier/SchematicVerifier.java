@@ -38,9 +38,11 @@ import fi.dy.masa.litematica.util.PositionUtils;
 
 public class SchematicVerifier implements IInfoHudRenderer
 {
+    public static final IBlockState AIR = Blocks.AIR.getDefaultState();
+
     protected final ArrayList<SchematicPlacement> placements = new ArrayList<>();
     protected final ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks = ArrayListMultimap.create();
-    protected final HashSet<ChunkPos> completedChunks = new HashSet<>();
+    protected final LongOpenHashSet completedChunks = new LongOpenHashSet();
 
     protected final Long2ObjectOpenHashMap<Object2ObjectOpenHashMap<BlockStatePair, IntArrayList>> resultsPerChunk = new Long2ObjectOpenHashMap<>();
     protected final Object2IntOpenHashMap<BlockStatePair> countsPerPair = new Object2IntOpenHashMap<>();
@@ -61,9 +63,11 @@ public class SchematicVerifier implements IInfoHudRenderer
     protected String name = "?";
     @Nullable protected SchematicVerifierTask task;
     @Nullable protected TaskCompletionListener completionListener;
+    @Nullable protected EventListener statusChangeListener;
     @Nullable BlockPos lastSortPosition;
+    protected boolean autoRefresh = true;
+    protected boolean countsDirty;
     protected boolean infoHudEnabled;
-    protected boolean finished;
     protected boolean selectedClosestPositionsDirty;
     protected boolean selectedPairsDirty;
     protected boolean selectedPositionsDirty;
@@ -91,6 +95,33 @@ public class SchematicVerifier implements IInfoHudRenderer
         this.verifierType = type;
     }
 
+    public void setStatusChangeListener(@Nullable EventListener statusChangeListener)
+    {
+        this.statusChangeListener = statusChangeListener;
+    }
+
+    public Set<ChunkPos> getTouchedChunks()
+    {
+        return this.boxesInChunks.keySet();
+    }
+
+    public boolean hasPlacement(SchematicPlacement placement)
+    {
+        return this.placements.contains(placement);
+    }
+
+    public boolean removePlacement(SchematicPlacement placement)
+    {
+        // TODO how should this be handled exactly?
+
+        if (this.placements.remove(placement))
+        {
+            this.stop();
+        }
+
+        return this.placements.isEmpty();
+    }
+
     public String getName()
     {
         return this.name;
@@ -101,9 +132,19 @@ public class SchematicVerifier implements IInfoHudRenderer
         this.name = name;
     }
 
+    public boolean getAutoRefresh()
+    {
+        return this.autoRefresh;
+    }
+
     public void toggleInfoHudEnabled()
     {
         this.infoHudEnabled = ! this.infoHudEnabled;
+    }
+
+    public void toggleAutoRefreshEnabled()
+    {
+        this.autoRefresh = ! this.autoRefresh;
     }
 
     public RunStatus getStatus()
@@ -111,9 +152,9 @@ public class SchematicVerifier implements IInfoHudRenderer
         return this.status;
     }
 
-    public boolean isFinished()
+    public boolean hasData()
     {
-        return this.finished;
+        return this.resultsPerChunk.isEmpty() == false;
     }
 
     public boolean isCategoryVisible(VerifierResultType type)
@@ -140,6 +181,7 @@ public class SchematicVerifier implements IInfoHudRenderer
 
     public int getTotalPositionCountFor(VerifierResultType type)
     {
+        this.updateCountsIfDirty();
         return this.countsPerType.getInt(type);
     }
 
@@ -161,6 +203,10 @@ public class SchematicVerifier implements IInfoHudRenderer
             this.status = RunStatus.RUNNING;
             TaskScheduler.getInstanceClient().scheduleTask(this.task, 5);
         }
+        else
+        {
+            this.pause();
+        }
     }
 
     public void pause()
@@ -181,6 +227,17 @@ public class SchematicVerifier implements IInfoHudRenderer
         }
     }
 
+    protected void onTaskFinished()
+    {
+        this.status = RunStatus.FINISHED;
+        this.task = null;
+
+        if (this.completionListener != null)
+        {
+            this.completionListener.onTaskCompleted();
+        }
+    }
+
     public void reset()
     {
         this.stopTask();
@@ -192,8 +249,13 @@ public class SchematicVerifier implements IInfoHudRenderer
         if (this.task != null)
         {
             this.task.stop();
-            this.task = null;
+            this.removeTask();
         }
+    }
+
+    protected void removeTask()
+    {
+        this.task = null;
     }
 
     public void resetIgnored()
@@ -264,6 +326,8 @@ public class SchematicVerifier implements IInfoHudRenderer
         int correctBlocks = 0;
         int totalBlocks = 0;
 
+        this.updateCountsIfDirty();
+
         for (BlockStatePair pair : this.countsPerPair.keySet())
         {
             if (pair.expectedState != AIR)
@@ -281,10 +345,39 @@ public class SchematicVerifier implements IInfoHudRenderer
         return new VerifierStatus(this.status, processedChunks, totalChunks, totalBlocks, correctBlocks);
     }
 
+    public void reCheckChunks(LongOpenHashSet reCheckChunks)
+    {
+        if (this.autoRefresh && this.status != RunStatus.STOPPED)
+        {
+            ArrayListMultimap<ChunkPos, IntBoundingBox> boxes = ArrayListMultimap.create();
+
+            for (long posLong : reCheckChunks)
+            {
+                if (this.completedChunks.contains(posLong))
+                {
+                    ChunkPos pos = fi.dy.masa.malilib.util.PositionUtils.chunkPosFromLong(posLong);
+                    boxes.putAll(pos, this.boxesInChunks.get(pos));
+                }
+            }
+
+            if (this.task == null)
+            {
+                this.task = new SchematicVerifierTask(this);
+                this.task.setCompletionListener(this::removeTask);
+                TaskScheduler.getInstanceClient().scheduleTask(this.task, 5);
+            }
+
+            this.task.replaceBoxes(boxes);
+        }
+    }
+
     public void addBlockResultsFromWorld(ChunkPos chunkPos, Object2ObjectOpenHashMap<BlockStatePair, IntArrayList> results)
     {
         long chunkPosLong = ChunkPos.asLong(chunkPos.x, chunkPos.z);
 
+        this.resultsPerChunk.put(chunkPosLong, results);
+
+        /*
         Object2ObjectOpenHashMap<BlockStatePair, IntArrayList> old = this.resultsPerChunk.get(chunkPosLong);
 
         if (old != null)
@@ -297,7 +390,6 @@ public class SchematicVerifier implements IInfoHudRenderer
             });
         }
 
-        this.resultsPerChunk.put(chunkPosLong, results);
 
         // Add the new counts
         results.forEach((pair, list) -> {
@@ -305,27 +397,22 @@ public class SchematicVerifier implements IInfoHudRenderer
             this.countsPerPair.addTo(pair, size);
             this.countsPerType.addTo(pair.type, size);
         });
+        */
 
-        this.completedChunks.add(chunkPos);
+        this.completedChunks.add(chunkPosLong);
+        this.countsDirty = true;
+        this.selectedPairsDirty = true;
         this.selectedPositionsDirty = true;
-    }
 
-    /*
-    public List<BlockStatePairCount> getAllUniqueBlockPairs()
-    {
-        ArrayList<BlockStatePairCount> list = new ArrayList<>();
-
-        for (BlockStatePair pair : this.countsPerPair.keySet())
+        if (this.statusChangeListener != null)
         {
-            list.add(BlockStatePairCount.of(pair, this.countsPerPair.getInt(pair)));
+            this.statusChangeListener.onEvent();
         }
-
-        return list;
     }
-    */
 
     public List<BlockStatePairCount> getNonIgnoredBlockPairs()
     {
+        this.updateCountsIfDirty();
         ArrayList<BlockStatePairCount> list = new ArrayList<>();
 
         for (BlockStatePair pair : this.countsPerPair.keySet())
@@ -363,18 +450,6 @@ public class SchematicVerifier implements IInfoHudRenderer
         this.closestSelectedPositions.clear();
 
         this.status = RunStatus.STOPPED;
-        this.finished = false;
-    }
-
-    protected void onTaskFinished()
-    {
-        this.finished = true;
-        this.status = RunStatus.STOPPED;
-
-        if (this.completionListener != null)
-        {
-            this.completionListener.onTaskCompleted();
-        }
     }
 
     protected void updateRequiredBoxes()
@@ -396,6 +471,8 @@ public class SchematicVerifier implements IInfoHudRenderer
                 PositionUtils.getPerChunkBoxes(boxes, this.boxesInChunks::put);
             }
         }
+
+        SchematicVerifierManager.INSTANCE.updateTouchedChunks();
     }
 
     protected void updateSelectedPairsIfDirty()
@@ -414,8 +491,35 @@ public class SchematicVerifier implements IInfoHudRenderer
         }
     }
 
+    protected void updateCountsIfDirty()
+    {
+        if (this.countsDirty)
+        {
+            this.updateCounts();
+        }
+    }
+
+    protected void updateCounts()
+    {
+        this.countsPerPair.clear();
+        this.countsPerType.clear();
+
+        for (Object2ObjectOpenHashMap<BlockStatePair, IntArrayList> map : this.resultsPerChunk.values())
+        {
+            for (BlockStatePair pair : map.keySet())
+            {
+                int size = map.get(pair).size();
+                this.countsPerPair.addTo(pair, size);
+                this.countsPerType.addTo(pair.type, size);
+            }
+        }
+
+        this.countsDirty = false;
+    }
+
     protected void updateSelectedPairs()
     {
+        this.updateCountsIfDirty();
         this.calculatedSelectedPairs.clear();
 
         for (BlockStatePair pair : this.countsPerPair.keySet())

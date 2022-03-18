@@ -1,21 +1,21 @@
 package fi.dy.masa.litematica.task;
 
 import com.google.common.collect.ArrayListMultimap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.malilib.util.PositionUtils;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.scheduler.tasks.TaskProcessChunkBase;
 import fi.dy.masa.litematica.schematic.verifier.BlockStatePair;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.schematic.verifier.VerifierResultType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.util.PositionUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class SchematicVerifierTask extends TaskProcessChunkBase
 {
@@ -36,6 +36,17 @@ public class SchematicVerifierTask extends TaskProcessChunkBase
     {
         this.requiredChunks.clear();
         this.boxesInChunks.clear();
+        this.boxesInChunks.putAll(boxesInChunks);
+        this.requiredChunks.addAll(this.boxesInChunks.keySet());
+    }
+
+    public void replaceBoxes(ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks)
+    {
+        for (ChunkPos pos : boxesInChunks.keySet())
+        {
+            this.boxesInChunks.removeAll(pos);
+        }
+
         this.boxesInChunks.putAll(boxesInChunks);
         this.requiredChunks.addAll(this.boxesInChunks.keySet());
     }

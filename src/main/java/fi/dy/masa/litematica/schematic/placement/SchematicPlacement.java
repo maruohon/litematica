@@ -14,6 +14,8 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.malilib.util.position.Coordinate;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListPlacement;
@@ -21,12 +23,10 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierUtils;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.position.Coordinate;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
 
 public class SchematicPlacement extends SchematicPlacementUnloaded
 {
@@ -63,8 +63,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     public void invalidate()
     {
         super.invalidate();
-
-        SchematicVerifierUtils.onPlacementRemoved(this);
+        SchematicVerifierManager.INSTANCE.onPlacementRemoved(this);
     }
 
     public boolean isRepeatedPlacement()
