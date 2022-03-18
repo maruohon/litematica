@@ -595,6 +595,17 @@ public class PositionUtils
     /**
      * Creates an AABB for the given position
      */
+    public static AxisAlignedBB createAABBForPosition(long posLong)
+    {
+        int x = fi.dy.masa.malilib.util.PositionUtils.unpackX(posLong);
+        int y = fi.dy.masa.malilib.util.PositionUtils.unpackY(posLong);
+        int z = fi.dy.masa.malilib.util.PositionUtils.unpackZ(posLong);
+        return createAABBForPosition(x, y, z);
+    }
+
+    /**
+     * Creates an AABB for the given position
+     */
     public static AxisAlignedBB createAABBForPosition(int x, int y, int z)
     {
         return createAABB(x, y, z, x + 1, y + 1, z + 1);

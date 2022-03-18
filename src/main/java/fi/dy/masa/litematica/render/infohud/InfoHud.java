@@ -3,10 +3,12 @@ package fi.dy.masa.litematica.render.infohud;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.malilib.config.value.HorizontalAlignment;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.render.TextRenderUtils;
+import fi.dy.masa.malilib.gui.util.ScreenContext;
+import fi.dy.masa.malilib.render.text.StringListRenderer;
+import fi.dy.masa.litematica.config.Configs;
 
 public class InfoHud
 {
@@ -15,6 +17,7 @@ public class InfoHud
     protected final Minecraft mc;
     protected final List<String> lineList = new ArrayList<>();
     protected final List<IInfoHudRenderer> renderers = new ArrayList<>();
+    protected final StringListRenderer stringListRenderer = new StringListRenderer();
     protected boolean enabled = true;
 
     public static InfoHud getInstance()
@@ -29,7 +32,7 @@ public class InfoHud
 
     public boolean isEnabled()
     {
-        return enabled;
+        return this.enabled;
     }
 
     protected double getScaleFactor()
@@ -65,9 +68,12 @@ public class InfoHud
             this.lineList.clear();
 
             final int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
-            int xOffset = this.getOffsetX();
-            int yOffset = this.getOffsetY();
+            int x = this.getOffsetX();
+            int y = this.getOffsetY();
             boolean isGui = GuiUtils.getCurrentScreen() != null;
+
+            // TODO FIXME all of this junk needs to be rewritten and cleaned up...
+
             double scale = Math.max(0.05, this.getScaleFactor());
 
             this.getLinesForPhase(RenderPhase.PRE, maxLines, isGui);
@@ -76,9 +82,42 @@ public class InfoHud
 
             if (this.lineList.isEmpty() == false)
             {
-                int ySize = TextRenderUtils.renderText(xOffset, yOffset, 0, scale,
-                                                       0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
-                yOffset += (int) Math.ceil(ySize * scale);
+                this.stringListRenderer.clearText();
+                this.stringListRenderer.getNormalTextSettings().setTextColor(0xFFFFFFFF);
+                this.stringListRenderer.getNormalTextSettings().setBackgroundEnabled(true);
+                this.stringListRenderer.getNormalTextSettings().setBackgroundColor(0x80000000);
+                this.stringListRenderer.getPadding().setAll(2, 2, 2, 2);
+                this.stringListRenderer.setLineHeight(12);
+                //this.stringListRenderer.setLineHeight(11);
+                this.stringListRenderer.setText(this.lineList);
+
+                //int ySize = TextRenderUtils.renderText(xOffset, yOffset, 0, scale,
+                //                                       0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                //yOffset += (int) Math.ceil(ySize * scale);
+                HudAlignment align = this.getHudAlignment();
+
+                if (align == HudAlignment.BOTTOM_RIGHT || align == HudAlignment.TOP_RIGHT)
+                {
+                    this.stringListRenderer.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+                    x = GuiUtils.getScaledWindowWidth() - this.stringListRenderer.getTotalRenderWidth() - this.getOffsetX();
+                }
+                else if (align == HudAlignment.CENTER)
+                {
+                    this.stringListRenderer.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                }
+                else
+                {
+                    this.stringListRenderer.setHorizontalAlignment(HorizontalAlignment.LEFT);
+                }
+
+                if (align == HudAlignment.BOTTOM_RIGHT || align == HudAlignment.BOTTOM_LEFT)
+                {
+                    y = GuiUtils.getScaledWindowHeight() - this.stringListRenderer.getTotalRenderHeight() - this.getOffsetY() + 2;
+                }
+
+                ScreenContext ctx = new ScreenContext(0, 0, 0, false);
+                this.stringListRenderer.renderAt(x, y, 0, false, ctx);
+                y += this.stringListRenderer.getTotalRenderHeight();
             }
 
             if (this.renderers.isEmpty() == false)
@@ -88,7 +127,7 @@ public class InfoHud
                     if (renderer.getShouldRenderCustom() && (isGui == false || renderer.shouldRenderInGuis()))
                     {
                         // FIXME: This is technically wrong, the yOffset should be separate per hud alignment
-                        yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment());
+                        y += renderer.render(x, y, this.getHudAlignment());
                     }
                 }
             }

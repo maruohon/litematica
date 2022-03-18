@@ -14,9 +14,12 @@ import fi.dy.masa.litematica.gui.SchematicBrowserScreen;
 import fi.dy.masa.litematica.gui.SchematicPlacementSettingsScreen;
 import fi.dy.masa.litematica.gui.SchematicPlacementSubRegionSettingsScreen;
 import fi.dy.masa.litematica.gui.SchematicPlacementsListScreen;
+import fi.dy.masa.litematica.gui.SchematicVerifierScreen;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
@@ -148,16 +151,15 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_SCHEMATIC_VERIFIER_SCREEN.getKeyBind())
         {
-            SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+            SchematicVerifier verifier = SchematicVerifierManager.INSTANCE.getSelectedVerifierOrCreateForPlacement();
 
-            if (schematicPlacement != null)
+            if (verifier != null)
             {
-                // TODO FIXME malilib refactor
-                //BaseScreen.openScreen(new GuiSchematicVerifier(schematicPlacement));
+                BaseScreen.openScreen(new SchematicVerifierScreen(verifier));
             }
             else
             {
-                MessageDispatcher.error("litematica.message.error.no_placement_selected");
+                MessageDispatcher.error("litematica.message.error.schematic_verifier.no_placement_selected");
             }
         }
         else if (key == Hotkeys.OPEN_AREA_SELECTION_BROWSER.getKeyBind())

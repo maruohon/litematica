@@ -17,8 +17,6 @@ import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -39,7 +37,6 @@ public class SchematicPlacementUnloaded
     protected Color4f boundingBoxColor = Color4f.WHITE;
     protected Rotation rotation = Rotation.NONE;
     protected Mirror mirror = Mirror.NONE;
-    protected BlockInfoListType verifierType = BlockInfoListType.ALL;
     protected boolean ignoreEntities;
     protected boolean enabled;
     protected boolean renderEnclosingBox;
@@ -428,7 +425,6 @@ public class SchematicPlacementUnloaded
             obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
             obj.add("bb_color", new JsonPrimitive(this.boundingBoxColor.intValue));
-            obj.add("verifier_type", new JsonPrimitive(this.verifierType.getName()));
 
             if (this.selectedSubRegionName != null)
             {
@@ -489,11 +485,6 @@ public class SchematicPlacementUnloaded
             if (JsonUtils.hasObject(obj, "material_list"))
             {
                 schematicPlacement.materialListData = JsonUtils.getNestedObject(obj, "material_list", false);
-            }
-
-            if (JsonUtils.hasString(obj, "verifier_type"))
-            {
-                schematicPlacement.verifierType = BaseOptionListConfigValue.findValueByName(JsonUtils.getString(obj, "verifier_type"), BlockInfoListType.VALUES);
             }
 
             if (JsonUtils.hasString(obj, "selected_region"))

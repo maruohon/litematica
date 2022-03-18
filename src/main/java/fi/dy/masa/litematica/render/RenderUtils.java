@@ -19,10 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.util.BlockInfoAlignment;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.config.value.HorizontalAlignment;
 import fi.dy.masa.malilib.config.value.VerticalAlignment;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
@@ -32,6 +28,10 @@ import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.inventory.InventoryView;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.PositionUtils;
 
 public class RenderUtils
 {
@@ -83,34 +83,43 @@ public class RenderUtils
         RenderGlobal.drawSelectionBoundingBox(aabb, color.r, color.g, color.b, color.a);
     }
 
-    public static void drawBlockBoundingBoxOutlinesBatchedLines(BlockPos pos, Color4f color, double expand, BufferBuilder buffer,
-            Entity renderViewEntity, float partialTicks)
+    public static void drawBlockBoundingBoxOutlinesBatchedLines(long posLong,
+                                                                Color4f color,
+                                                                double expand,
+                                                                BufferBuilder buffer,
+                                                                Entity renderViewEntity,
+                                                                float partialTicks)
     {
         double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
         double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
-        double minX = pos.getX() - dx - expand;
-        double minY = pos.getY() - dy - expand;
-        double minZ = pos.getZ() - dz - expand;
-        double maxX = pos.getX() - dx + expand + 1;
-        double maxY = pos.getY() - dy + expand + 1;
-        double maxZ = pos.getZ() - dz + expand + 1;
+        double minX = fi.dy.masa.malilib.util.PositionUtils.unpackX(posLong) - dx - expand;
+        double minY = fi.dy.masa.malilib.util.PositionUtils.unpackY(posLong) - dy - expand;
+        double minZ = fi.dy.masa.malilib.util.PositionUtils.unpackZ(posLong) - dz - expand;
+        double maxX = fi.dy.masa.malilib.util.PositionUtils.unpackX(posLong) - dx + expand + 1;
+        double maxY = fi.dy.masa.malilib.util.PositionUtils.unpackY(posLong) - dy + expand + 1;
+        double maxZ = fi.dy.masa.malilib.util.PositionUtils.unpackZ(posLong) - dz + expand + 1;
 
         ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 
-    public static void drawConnectingLineBatchedLines(BlockPos pos1, BlockPos pos2, boolean center, Color4f color, BufferBuilder buffer,
-            Entity renderViewEntity, float partialTicks)
+    public static void drawConnectingLineBatchedLines(long pos1,
+                                                      long pos2,
+                                                      boolean center,
+                                                      Color4f color,
+                                                      BufferBuilder buffer,
+                                                      Entity renderViewEntity,
+                                                      float partialTicks)
     {
         double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
         double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
-        double x1 = pos1.getX() - dx;
-        double y1 = pos1.getY() - dy;
-        double z1 = pos1.getZ() - dz;
-        double x2 = pos2.getX() - dx;
-        double y2 = pos2.getY() - dy;
-        double z2 = pos2.getZ() - dz;
+        double x1 = fi.dy.masa.malilib.util.PositionUtils.unpackX(pos1) - dx;
+        double y1 = fi.dy.masa.malilib.util.PositionUtils.unpackY(pos1) - dy;
+        double z1 = fi.dy.masa.malilib.util.PositionUtils.unpackZ(pos1) - dz;
+        double x2 = fi.dy.masa.malilib.util.PositionUtils.unpackX(pos2) - dx;
+        double y2 = fi.dy.masa.malilib.util.PositionUtils.unpackY(pos2) - dy;
+        double z2 = fi.dy.masa.malilib.util.PositionUtils.unpackZ(pos2) - dz;
 
         if (center)
         {
@@ -305,6 +314,36 @@ public class RenderUtils
         double maxX = Math.max(pos1.getX(), pos2.getX()) + 1 - dx + expand;
         double maxY = Math.max(pos1.getY(), pos2.getY()) + 1 - dy + expand;
         double maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1 - dz + expand;
+
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
+    }
+
+    /**
+     * Assumes a BufferBuilder in GL_QUADS mode has been initialized
+     */
+    public static void renderAreaSidesBatched(long pos1,
+                                              long pos2,
+                                              Color4f color,
+                                              double expand,
+                                              Entity renderViewEntity,
+                                              float partialTicks,
+                                              BufferBuilder buffer)
+    {
+        double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
+        double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
+        double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+        int x1 = fi.dy.masa.malilib.util.PositionUtils.unpackX(pos1);
+        int y1 = fi.dy.masa.malilib.util.PositionUtils.unpackY(pos1);
+        int z1 = fi.dy.masa.malilib.util.PositionUtils.unpackZ(pos1);
+        int x2 = fi.dy.masa.malilib.util.PositionUtils.unpackX(pos2);
+        int y2 = fi.dy.masa.malilib.util.PositionUtils.unpackY(pos2);
+        int z2 = fi.dy.masa.malilib.util.PositionUtils.unpackZ(pos2);
+        double minX = Math.min(x1, x2) - dx - expand;
+        double minY = Math.min(y1, y2) - dy - expand;
+        double minZ = Math.min(z1, z2) - dz - expand;
+        double maxX = Math.max(x1, x2) + 1 - dx + expand;
+        double maxY = Math.max(y1, y2) + 1 - dy + expand;
+        double maxZ = Math.max(z1, z2) + 1 - dz + expand;
 
         ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
@@ -573,8 +612,8 @@ public class RenderUtils
 
     public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, Minecraft mc)
     {
-        int heightSch = renderInventoryOverlay(align, HorizontalAlignment.LEFT, offY, worldSchematic, pos);
-        int heightCli = renderInventoryOverlay(align, HorizontalAlignment.RIGHT, offY, worldClient, pos);
+        int heightSch = renderInventoryOverlay(align, HorizontalAlignment.RIGHT, offY, worldSchematic, pos);
+        int heightCli = renderInventoryOverlay(align, HorizontalAlignment.LEFT, offY, worldClient, pos);
 
         return Math.max(heightSch, heightCli);
     }
@@ -588,11 +627,11 @@ public class RenderUtils
         {
             InventoryRenderDefinition renderer = pair.getRight();
             InventoryView inv = pair.getLeft();
-            int gap = 4;
+            int gap = side == HorizontalAlignment.LEFT ? 4 : -4;
             int height = renderer.getRenderHeight(inv);
-            final int xCenter = GuiUtils.getScaledWindowWidth() / 2 + side.getXStartOffsetForEdgeAlignment(renderer.getRenderWidth(inv) + gap);
+            final int xCenter = GuiUtils.getScaledWindowWidth() / 2 + gap;
             final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
-            int y = (align.getVerticalAlign() == VerticalAlignment.CENTER ? yCenter - height : 8) + offY;
+            int y = (align.getVerticalAlign() == VerticalAlignment.CENTER ? yCenter - height : 2) + offY;
 
             InventoryRenderUtils.renderInventoryPreview(inv, renderer, xCenter, y, 300, 0xFFFFFFFF, side, VerticalAlignment.TOP);
 

@@ -21,9 +21,9 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierUtils;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
-import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
@@ -64,10 +64,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     {
         super.invalidate();
 
-        if (this.hasVerifier())
-        {
-            this.getSchematicVerifier().reset();
-        }
+        SchematicVerifierUtils.onPlacementRemoved(this);
     }
 
     public boolean isRepeatedPlacement()
@@ -83,31 +80,6 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     public int getSubRegionCount()
     {
         return this.subRegionCount;
-    }
-
-    public BlockInfoListType getSchematicVerifierType()
-    {
-        return this.verifierType;
-    }
-
-    public void setSchematicVerifierType(BlockInfoListType type)
-    {
-        this.verifierType = type;
-    }
-
-    public boolean hasVerifier()
-    {
-        return this.verifier != null;
-    }
-
-    public SchematicVerifier getSchematicVerifier()
-    {
-        if (this.verifier == null)
-        {
-            this.verifier = new SchematicVerifier();
-        }
-
-        return this.verifier;
     }
 
     public Box getEnclosingBox()

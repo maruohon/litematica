@@ -39,6 +39,9 @@ litematica.button.material_list.refresh=Refresh
 litematica.button.material_list.scope=Range: %s
 litematica.button.material_list.toggle_hud=Info HUD: %s
 litematica.button.placement_grid_settings.reset_size=Reset Size
+litematica.button.placement_list.icon_vs_text.icons=Buttons: Icons
+litematica.button.placement_list.icon_vs_text.text=Buttons: Text
+litematica.button.placement_list.open_placement_browser=Saved Placements
 litematica.button.placement_list.placement_enabled=Placement: %s
 litematica.button.schematic_browser.load_schematic=Load Schematic
 litematica.button.schematic_list.create_placement=Create Placement
@@ -75,9 +78,15 @@ litematica.button.schematic_vcs.open_manager=Open Manager
 litematica.button.schematic_vcs.open_project_browser=Open Projects Browser
 litematica.button.schematic_vcs.place_to_world=Place to World
 litematica.button.schematic_vcs.save_version=Save New Version
-litematica.button.placement_list.icon_vs_text.icons=Buttons: Icons
-litematica.button.placement_list.icon_vs_text.text=Buttons: Text
-litematica.button.placement_list.open_placement_browser=Saved Placements
+litematica.button.schematic_verifier.clear_selection=Clear Selection
+litematica.button.schematic_verifier.ignore=Ignore
+litematica.button.schematic_verifier.range=Range: %s
+litematica.button.schematic_verifier.reset_ignored=Reset Ignored
+litematica.button.schematic_verifier.reset_verifier=Reset Data
+litematica.button.schematic_verifier.resume=Resume Verifier
+litematica.button.schematic_verifier.start=Start Verifier
+litematica.button.schematic_verifier.stop=Stop Verifier
+litematica.button.schematic_verifier.toggle_info_hud=Info HUD: %s
 
 litematica.button.misc.configure=Configure
 litematica.button.misc.copy=Copy
@@ -153,6 +162,10 @@ litematica.hover.schematic_list.schematic_file=Schematic file: §3%s
 litematica.hover.schematic_list.schematic_name=Schematic name: §a%s
 litematica.hover.schematic_list.schematic_type=Type: §b%s
 
+litematica.hud.area_selection.mode.corners=Corners
+litematica.hud.area_selection.mode.expand=Expand
+litematica.hud.schematic_verifier.position=%s%s : %s %s %s
+litematica.hud.schematic_verifier.title=<b>Schematic Verifier Highlights</b>
 litematica.hud.status_info.easy_place_enabled=Easy Place: §aON§r
 litematica.hud.status_info.render_layer_mode=Layer Mode: §6%s§r - §a%s§r = §b%s
 litematica.hud.status_info.render_layer_mode_all=Render Layer Mode: §6%s
@@ -186,12 +199,8 @@ litematica.hud.tool_hud.schematic_projects.origin=Project origin: §a%s
 litematica.hud.tool_hud.schematic_projects.project_name=Project: §a%s
 litematica.hud.tool_hud.tool_mode=Mode: [§b%s§r/§b%s§r]: §a%s§r
 litematica.hud.tool_hud.used_block=Block: §a%s
-
 litematica.hud.value.on.colored=§aON§r
 litematica.hud.value.off.colored=§cOFF§r
-
-litematica.hud.area_selection.mode.corners=Corners
-litematica.hud.area_selection.mode.expand=Expand
 
 litematica.info.area_browser.from_placement=Create a new Area Selection from the currently selected Schematic Placement. This will basically re-create the same Area Selection that was originally used to save the schematic.
 litematica.info.schematic_manager.confirm_file_deletion=Are you sure you want to delete the file §e'%s'§r?
@@ -262,28 +271,29 @@ litematica.label.schematic_vcs.info_widget.origin=<c=aaa>Project Origin:\n  x: �
 litematica.label.schematic_vcs.info_widget.project=<c=aaa>Project:\n  <c=7f7>%s
 litematica.label.schematic_vcs.info_widget.version_name=<c=aaa>Version Name:\n  <c=7f7>%s
 litematica.label.schematic_vcs.info_widget.version_time=<c=aaa>Version Saved:\n  <c=77f>%s
+litematica.label.schematic_verifier.column.count=§lCount
+litematica.label.schematic_verifier.column.expected=§lExpected
+litematica.label.schematic_verifier.column.found=§lFound
+litematica.label.schematic_verifier.modified_block_state_property.boolean.false=<c=FFFFF000>%s</c> = §c%s
+litematica.label.schematic_verifier.modified_block_state_property.boolean.true=<c=FFFFF000>%s</c> = §a%s
+litematica.label.schematic_verifier.modified_block_state_property.direction=<c=FFFFF000>%s</c> = §6%s
+litematica.label.schematic_verifier.modified_block_state_property.enum=<c=FFFFF000>%s</c> = §3%s
+litematica.label.schematic_verifier.modified_block_state_property.generic=<c=FFFFF000>%s</c> = %s
+litematica.label.schematic_verifier.modified_block_state_property.integer=<c=FFFFF000>%s</c> = §b%s
 litematica.label.task.set_schematic_preview=Set Preview image for schematic §e%s
 litematica.label.tool_hud.none_brackets=§c<none>§r
 litematica.label.widget.schematic_vcs.version_entry=Ver. §6%d§r - %s
 
-litematica.name.schematic_verifier.all=All (non-ignored)
-litematica.name.schematic_verifier.all.pos_line=§fx: %s y: %s z: %s§r
-litematica.name.schematic_verifier.all.title=§f§lAll (non-ignored)§r
 litematica.name.schematic_verifier.correct_state=Correct State
-litematica.name.schematic_verifier.correct_state.pos_line=<c=1f1>x: %s y: %s z: %s§r
-litematica.name.schematic_verifier.correct_state.title=<c=1f1><b>Correct State§r
+litematica.name.schematic_verifier.correct_state.widget=<b>Correct State</b> [%s pairs, %s positions]
 litematica.name.schematic_verifier.extra=Extra Blocks
-litematica.name.schematic_verifier.extra.pos_line=§dx: %s y: %s z: %s§r
-litematica.name.schematic_verifier.extra.title=§d§lExtra Blocks§r
+litematica.name.schematic_verifier.extra.widget=<b>Extra Blocks</b> [%s pairs, %s positions]
 litematica.name.schematic_verifier.missing=Missing Blocks
-litematica.name.schematic_verifier.missing.pos_line=<c=off>x: %s y: %s z: %s§r
-litematica.name.schematic_verifier.missing.title=<c=0ff><b>Missing Blocks§r
+litematica.name.schematic_verifier.missing.widget=<b>Missing Blocks</b> [%s pairs, %s positions]
 litematica.name.schematic_verifier.wrong_blocks=Wrong Blocks
-litematica.name.schematic_verifier.wrong_blocks.pos_line=<c=f00>x: %s y: %s z: %s§r
-litematica.name.schematic_verifier.wrong_blocks.title=<c=f00><b>Wrong Blocks§r
+litematica.name.schematic_verifier.wrong_blocks.widget=<b>Wrong Blocks</b> [%s pairs, %s positions]
 litematica.name.schematic_verifier.wrong_state=Wrong States
-litematica.name.schematic_verifier.wrong_state.pos_line=<c=ffaf00>x: %s y: %s z: %s§r
-litematica.name.schematic_verifier.wrong_state.title=<c=ffaf00><b>Wrong States§r
+litematica.name.schematic_verifier.wrong_state.widget=<b>Wrong States</b> [%s pairs, %s positions]
 litematica.name.tool_mode.area_selection=Area Selection
 litematica.name.tool_mode.delete=Delete
 litematica.name.tool_mode.fill=Fill
@@ -301,6 +311,7 @@ litematica.title.hud.block_info_overlay.state_schematic=§f§lSchematic World Bl
 litematica.title.hud.material_list=§lMaterial List
 litematica.title.hud.missing_chunks=§f§l%s, un-seen chunks (%s)
 litematica.title.hud.missing_chunks.schematic_paste=§f§lPaste, un-seen chunks (%s)
+litematica.title.hud.schematic_verifier=Schematic Verifier
 litematica.title.hud.schematic_verifier.errors=<b>Schematic Verifier Errors</b>
 
 litematica.title.screen.area_editor.create_sub_region=Create a new Sub-Region
@@ -341,10 +352,12 @@ litematica.title.screen.schematic_vcs.create_new_project=Create a New Schematic 
 litematica.title.screen.schematic_vcs.project_browser=Litematica %s - Schematic VCS Project Browser
 litematica.title.screen.schematic_vcs.project_manager=Litematica %s - Schematic VCS Project Manager
 litematica.title.screen.schematic_vcs.save_new_version=Save New Schematic VCS Version
+litematica.title.screen.schematic_verifier=Schematic Verifier for §e%s
 litematica.title.screen.task_manager=Litematica %s - Task Manager
 
 litematica.message.error.area_selection_browser.failed_to_load=Failed to load the Area Selection
 litematica.message.error.area_selection_browser.no_placement_selected=No Schematic Placement selected!
+litematica.message.error.no_placement_selected=§cNo Schematic Placement currently selected.§r\nTo select a placement, either:\n1) click on one on the Schematic Placements screen so that it gets the white outline to indicate it's the selected placement\n2) Use the §eTool Select Elements§r hotkey (by default middle click) while holding the "tool item" and looking at a placement in the world\nThe selected placement's name also appears on the tool HUD, and it has a light cyan outline color in-world.
 litematica.message.error.placement_list.remove_failed_locked=The placement is locked!\nHold §6Shift§r to force remove it
 litematica.message.error.placement_list.save_failed=Failed to save the placement to file
 litematica.message.error.schematic_load.invalid_schematic_file=Invalid or broken schematic file!
@@ -356,6 +369,7 @@ litematica.message.error.schematic_placement.locked=The placement is locked and 
 litematica.message.error.schematic_preview_set_failed=Exception while trying to set the schematic preview image for schematic §e%s§r
 litematica.message.error.schematic_vcs.failed_to_load_project=Failed to load Schematic VCS Project §e%s§r
 litematica.message.error.schematic_vcs.project_already_exists=Schematic VCS Project §e%s§r already exists
+litematica.message.error.schematic_verifier.no_placement_selected=No selected Verifier, and no Schematic Placement selected to create a verifier for
 litematica.message.info.material_cache_cleared=Material List Cache cleared
 litematica.message.info.material_list.written_to_file=Material List written to file §e%s§r
 litematica.message.info.schematic_loaded_to_memory=Schematic '%s' successfully loaded to memory
@@ -378,7 +392,7 @@ litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated 
 litematica.error.duplicate_schematic_placement=Error: Tried to add a placement that already exists
 litematica.error.generic.creative_mode_only=This action is only available in Creative mode
 litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
-litematica.error.generic.schematic_world_not_loaded=Schematic world was not loaded
+litematica.error.generic.schematic_world_not_loaded=Schematic World is not loaded
 
 litematica.error.area_editor.create_sub_region.exists=A sub-region by the name '%s' already exists
 litematica.error.area_editor.no_selection=No active Area Selections
@@ -455,15 +469,6 @@ litematica.gui.button.schematic_placements.load=Load
 litematica.gui.button.schematic_placements.rendering_enabled=Rendering: %s
 litematica.gui.button.schematic_placements.select=Select
 
-litematica.gui.button.schematic_verifier.ignore=Ignore
-litematica.gui.button.schematic_verifier.range_type=Range: %s
-litematica.gui.button.schematic_verifier.reset_ignored=Reset ignored
-litematica.gui.button.schematic_verifier.reset_verifier=Reset data
-litematica.gui.button.schematic_verifier.resume=Resume verification
-litematica.gui.button.schematic_verifier.start=Start verification
-litematica.gui.button.schematic_verifier.stop=Stop verification
-litematica.gui.button.schematic_verifier.toggle_info_hud=Info HUD: %s
-
 litematica.gui.button.buttons_val=Buttons: %s
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.create_directory=Create New Directory
@@ -539,7 +544,6 @@ litematica.gui.label.schematic_verifier.found=Found
 litematica.gui.label.schematic_verifier.status.done_errors=Wrong: §cBlock: %s§r, §6State: %s§r, §bMissing: %s§r, §dExtra: %s§r
 litematica.gui.label.schematic_verifier.status.done_correct_total=§aCorrect: %s§r, Total: %s
 litematica.gui.label.schematic_verifier.status.verifying=Unseen Chunks: %s / %s
-litematica.gui.label.schematic_verifier.verifier=Schematic Verifier
 
 litematica.gui.label.task_name.area_analyzer=Area Analyzer
 litematica.gui.label.task_name.delete=Delete task
@@ -557,7 +561,6 @@ litematica.gui.title.save_schematic_convert=Convert/Save schematic '%s'
 litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
 litematica.gui.title.schematic_manager=Schematic Manager
 litematica.gui.title.schematic_placement_browser=Saved Schematic Placements
-litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
 
 litematica.hud.misc.none_brackets=<none>
 
@@ -571,7 +574,6 @@ litematica.message.error.area_deletion_aborted=Area Deletion interrupted or abor
 litematica.message.error.empty_area_selection=Empty Area Selection (no boxes)
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.error.no_area_selected=§cNo area selected§r
-litematica.message.error.no_placement_selected=§cNo placement selected§r
 litematica.message.error.only_works_in_single_player=§cThis operation only works in single player§r
 litematica.message.error.move.pending_tasks=§cCan not start a move operation while there are pending tasks§r
 litematica.message.error.placement_grid_settings.open_gui_selected_is_grid=The selected placement is a repeated/grid placement.\nRepeated placements can't be repeated again.\nSelect a normal placement to configure the grid settings for it.
@@ -817,11 +819,11 @@ litematica.config.name.errormarkersides=Error Marker Sides
 litematica.config.name.ignoreexistingfluids=Ignore Existing Fluids
 litematica.config.name.mainrenderingtoggle=Main Rendering Toggle
 litematica.config.name.overlayreducedinnersides=Overlay Reduced Inner Sides
-litematica.config.name.placementboundingboxrendering=Placement Bounding Boxes
-litematica.config.name.placementboxsides=Render Placement Box Sides
-litematica.config.name.placementboxsidealpha=Placement Box Side Alpha
+litematica.config.name.placementboundingboxrendering=Placement Bounding Box
+litematica.config.name.placementboxsides=Placement Bounding Box Sides
+litematica.config.name.placementboxsidealpha=Placement Bounding Box Side Alpha
 litematica.config.name.placementenclosingbox=Placement Enclosing Box
-litematica.config.name.placementenclosingboxsides=Render Placement Enclosing Box Sides
+litematica.config.name.placementenclosingboxsides=Placement Enclosing Box Sides
 litematica.config.name.rendercollidingblockatcursor=Render Colliding Block at Cursor
 litematica.config.name.rendercollidingschematicblocks=Render Colliding Schematic Blocks
 litematica.config.name.schematicblocksrendering=Schematic Blocks Rendering

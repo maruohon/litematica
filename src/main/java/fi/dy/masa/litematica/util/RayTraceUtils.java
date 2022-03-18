@@ -20,15 +20,17 @@ import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
+import fi.dy.masa.litematica.schematic.verifier.BlockPairTypePosition;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceCalculationData;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class RayTraceUtils
 {
@@ -275,10 +277,6 @@ public class RayTraceUtils
 
     /**
      * Ray traces to the closest position on the given list
-     * @param posList
-     * @param entity
-     * @param range
-     * @return
      */
     @Nullable
     public static RayTraceResult traceToPositions(List<BlockPos> posList, Entity entity, double range)
@@ -316,6 +314,44 @@ public class RayTraceUtils
         }
 
         return trace;
+    }
+
+    /**
+     * Ray traces to the closest position on the given list
+     */
+    @Nullable
+    public static BlockPairTypePosition traceToVerifierResultPositions(List<BlockPairTypePosition> posList, Entity entity, double range)
+    {
+        if (posList.isEmpty())
+        {
+            return null;
+        }
+
+        Vec3d eyesPos = entity.getPositionEyes(1f);
+        Vec3d rangedLookRot = entity.getLook(1f).scale(range);
+        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
+
+        BlockPairTypePosition closestPos = null;
+        double closest = -1D;
+
+        for (BlockPairTypePosition pos : posList)
+        {
+            AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos.posLong);
+            RayTraceResult hit = bb.calculateIntercept(eyesPos, lookEndPos);
+
+            if (hit != null)
+            {
+                double dist = hit.hitVec.distanceTo(eyesPos);
+
+                if (closest < 0 || dist < closest)
+                {
+                    closestPos = pos;
+                    closest = dist;
+                }
+            }
+        }
+
+        return closestPos;
     }
 
     @Nullable
@@ -389,21 +425,21 @@ public class RayTraceUtils
             if (distClosest < 0 || dist < distClosest)
             {
                 trace = traceClient;
-                distClosest = dist;
                 type = HitType.VANILLA;
             }
         }
 
         if (includeVerifier)
         {
-            List<SchematicVerifier> activeVerifiers = SchematicVerifier.getActiveVerifiers();
+            List<SchematicVerifier> activeVerifiers = SchematicVerifierManager.INSTANCE.getActiveVerifiers();
 
             if (activeVerifiers.isEmpty() == false)
             {
                 for (SchematicVerifier verifier : activeVerifiers)
                 {
-                    List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-                    RayTraceResult traceMismatch = traceToPositions(posList, entity, range);
+                    // TODO FIXME verifier rewrite
+                    List<BlockPairTypePosition> posList = null;//verifier.getClosestSelectedPositions(new BlockPos(eyesPos));
+                    RayTraceResult traceMismatch = null;//traceToPositions(posList, entity, range);
 
                     // Mismatch overlay has priority over other hits
                     if (traceMismatch != null)

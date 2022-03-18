@@ -27,7 +27,6 @@ import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.projects.SchematicProjectsManager;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -181,7 +180,6 @@ public class DataManager implements DirectoryCache
     public static void clear()
     {
         TaskScheduler.getInstanceClient().clearTasks();
-        SchematicVerifier.clearActiveVerifiers();
         InfoHud.getInstance().reset(); // remove the line providers and clear the data
 
         getInstance().clearData(true);

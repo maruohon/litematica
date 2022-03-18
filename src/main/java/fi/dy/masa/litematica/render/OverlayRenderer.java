@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
+import org.lwjgl.opengl.GL11;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -22,16 +22,29 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.config.value.HorizontalAlignment;
+import fi.dy.masa.malilib.config.value.HudAlignment;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.gui.util.ScreenContext;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.widget.SchematicVerifierBlockInfoWidget;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
+import fi.dy.masa.litematica.schematic.verifier.BlockPairTypePosition;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchRenderPos;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
+import fi.dy.masa.litematica.schematic.verifier.VerifierResultType;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
@@ -42,15 +55,6 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.config.value.HorizontalAlignment;
-import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
 
 public class OverlayRenderer
 {
@@ -326,27 +330,28 @@ public class OverlayRenderer
 
     public void renderSchematicVerifierMismatches(float partialTicks)
     {
-        List<SchematicVerifier> activeVerifiers = SchematicVerifier.getActiveVerifiers();
+        List<SchematicVerifier> activeVerifiers = SchematicVerifierManager.INSTANCE.getActiveVerifiers();
 
         if (activeVerifiers.isEmpty() == false)
         {
+            BlockPos cameraPos = EntityUtils.getCameraEntityBlockPos();
+
             for (SchematicVerifier verifier : activeVerifiers)
             {
-                List<MismatchRenderPos> list = verifier.getSelectedMismatchPositionsForRender();
+                List<BlockPairTypePosition> list = verifier.getClosestSelectedPositions(cameraPos);
 
                 if (list.isEmpty() == false)
                 {
-                    List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
+                    List<BlockPairTypePosition> posList = verifier.getClosestSelectedPositions(cameraPos);
                     Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-                    RayTraceResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
-                    BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
-                    this.renderSchematicMismatches(list, posLook, partialTicks);
+                    BlockPairTypePosition lookPos = RayTraceUtils.traceToVerifierResultPositions(posList, entity, 128);
+                    this.renderSchematicMismatches(list, lookPos, partialTicks);
                 }
             }
         }
     }
 
-    private void renderSchematicMismatches(List<MismatchRenderPos> posList, @Nullable BlockPos lookPos, float partialTicks)
+    private void renderSchematicMismatches(List<BlockPairTypePosition> posList, @Nullable BlockPairTypePosition lookPos, float partialTicks)
     {
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
@@ -360,17 +365,19 @@ public class OverlayRenderer
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-        MismatchRenderPos lookedEntry = null;
-        MismatchRenderPos prevEntry = null;
+
+        BlockPairTypePosition lookedEntry = null;
+        BlockPairTypePosition prevEntry = null;
+        long lookPosLong = lookPos != null ? lookPos.posLong : -1;
         boolean connections = Configs.Visuals.ERROR_MARKER_CONNECTIONS.getBooleanValue();
 
-        for (MismatchRenderPos entry : posList)
+        for (BlockPairTypePosition entry : posList)
         {
-            Color4f color = entry.type.getColor();
+            Color4f color = entry.type.getOverlayColor();
 
-            if (entry.pos.equals(lookPos) == false)
+            if (entry.posLong != lookPosLong)
             {
-                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.pos, color, 0.002, buffer, entity, partialTicks);
+                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.posLong, color, 0.002, buffer, entity, partialTicks);
             }
             else
             {
@@ -379,7 +386,7 @@ public class OverlayRenderer
 
             if (connections && prevEntry != null)
             {
-                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, entry.pos, false, color, buffer, entity, partialTicks);
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.posLong, entry.posLong, false, color, buffer, entity, partialTicks);
             }
 
             prevEntry = entry;
@@ -389,14 +396,14 @@ public class OverlayRenderer
         {
             if (connections && prevEntry != null)
             {
-                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, lookedEntry.pos, false, lookedEntry.type.getColor(), buffer, entity, partialTicks);
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.posLong, lookedEntry.posLong, false, lookedEntry.type.getOverlayColor(), buffer, entity, partialTicks);
             }
 
             tessellator.draw();
             buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
             GlStateManager.glLineWidth(6f);
-            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, entity, partialTicks);
+            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPosLong, lookedEntry.type.getOverlayColor(), 0.002, buffer, entity, partialTicks);
         }
 
         tessellator.draw();
@@ -409,11 +416,11 @@ public class OverlayRenderer
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
             float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HIGHLIGHT_ALPHA.getDoubleValue();
 
-            for (MismatchRenderPos entry : posList)
+            for (BlockPairTypePosition entry : posList)
             {
-                Color4f color = entry.type.getColor();
+                Color4f color = entry.type.getOverlayColor();
                 color = new Color4f(color.r, color.g, color.b, alpha);
-                RenderUtils.renderAreaSidesBatched(entry.pos, entry.pos, color, 0.002, entity, partialTicks, buffer);
+                RenderUtils.renderAreaSidesBatched(entry.posLong, entry.posLong, color, 0.002, entity, partialTicks, buffer);
             }
 
             tessellator.draw();
@@ -492,36 +499,33 @@ public class OverlayRenderer
 
     private boolean renderVerifierOverlay(Minecraft mc)
     {
-        List<SchematicVerifier> activeVerifiers = SchematicVerifier.getActiveVerifiers();
+        List<SchematicVerifier> activeVerifiers = SchematicVerifierManager.INSTANCE.getActiveVerifiers();
 
         if (activeVerifiers.isEmpty() == false)
         {
+            BlockPos cameraPos = EntityUtils.getCameraEntityBlockPos();
+
             for (SchematicVerifier verifier : activeVerifiers)
             {
-                List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
                 Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, entity, 32);
+                List<BlockPairTypePosition> posList = verifier.getClosestSelectedPositions(cameraPos);
+                BlockPairTypePosition lookPos = RayTraceUtils.traceToVerifierResultPositions(posList, entity, 32);
 
-                if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
+                if (lookPos != null)
                 {
-                    BlockPos pos = trace.getBlockPos();
-                    BlockMismatch mismatch = verifier.getMismatchForPosition(pos);
+                    int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
+                    SchematicVerifierBlockInfoWidget widget = new SchematicVerifierBlockInfoWidget(
+                            lookPos.type, lookPos.pair.expectedState, lookPos.pair.foundState);
+                    this.getOverlayPosition(widget.getWidth(), widget.getHeight(), offY);
+                    widget.renderAt(this.blockInfoX, this.blockInfoY, 0, new ScreenContext(0, 0, 0, false));
 
-                    /* TODO FIXME malilib refactor
-                    if (mismatch != null)
-                    {
-                        int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
-                        BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                        this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
-                        info.render(this.blockInfoX, this.blockInfoY, 0, mc);
+                    World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+                    World worldClient = WorldUtils.getBestWorld(mc);
+                    BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
+                    RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic,
+                                                        worldClient, lookPos.getBlockPos(), mc);
 
-                        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-                        World worldClient = WorldUtils.getBestWorld(mc);
-                        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
-                        RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
-                        return true;
-                    }
-                    */
+                    return true;
                 }
             }
         }
@@ -551,13 +555,11 @@ public class OverlayRenderer
         // Not just a missing block
         if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
         {
-            /* TODO FIXME malilib refactor
-            BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
-            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
-            info.render(this.blockInfoX, this.blockInfoY, 0, mc);
-
+            SchematicVerifierBlockInfoWidget widget = new SchematicVerifierBlockInfoWidget(
+                    VerifierResultType.from(stateSchematic, stateClient), stateSchematic, stateClient);
+            this.getOverlayPosition(widget.getWidth(), widget.getHeight(), offY);
+            widget.renderAt(this.blockInfoX, this.blockInfoY, 0, new ScreenContext(0, 0, 0, false));
             RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
-            */
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
@@ -598,13 +600,13 @@ public class OverlayRenderer
         {
             this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
             this.blockInfoY = GuiUtils.getScaledWindowHeight() / 2 + offY;
-            this.blockInfoInvOffY = 4;
+            this.blockInfoInvOffY = 2;
         }
         else if (align == BlockInfoAlignment.TOP_CENTER)
         {
             this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
             this.blockInfoY = offY;
-            this.blockInfoInvOffY = height + offY + 4;
+            this.blockInfoInvOffY = height + offY;
         }
     }
 

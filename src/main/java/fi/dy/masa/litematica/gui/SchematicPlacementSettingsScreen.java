@@ -22,6 +22,8 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
@@ -390,6 +392,8 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected void openVerifier()
     {
+        SchematicVerifier verifier = SchematicVerifierManager.INSTANCE.getOrCreateVerifierForPlacement(this.placement);
+        BaseScreen.openScreen(new SchematicVerifierScreen(verifier));
     }
 
     protected void renamePlacement()
