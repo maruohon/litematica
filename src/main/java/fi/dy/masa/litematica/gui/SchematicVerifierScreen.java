@@ -71,7 +71,6 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
 
         this.resetIgnoredButton.setEnabledStatusSupplier(this.verifier::hasIgnoredPairs);
         this.resetVerifierButton.setEnabledStatusSupplier(this.verifier::hasData);
-        this.startButton.setEnabledStatusSupplier(() -> this.verifier.getStatus() != RunStatus.RUNNING);
         this.stopButton.setEnabledStatusSupplier(() -> this.verifier.getStatus() == RunStatus.RUNNING || this.verifier.getStatus() == RunStatus.PAUSED);
 
         this.statusLabel.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
@@ -219,6 +218,7 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
     protected void startVerifier()
     {
         this.verifier.start(this::onVerifierFinished);
+        this.updateWidgetPositions();
     }
 
     protected void stopVerifier()

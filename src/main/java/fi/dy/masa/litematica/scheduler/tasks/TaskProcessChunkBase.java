@@ -9,14 +9,14 @@ import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.config.value.LayerMode;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.PositionUtils;
 
 public abstract class TaskProcessChunkBase extends TaskBase
 {
@@ -86,6 +86,8 @@ public abstract class TaskProcessChunkBase extends TaskBase
         {
             this.mc.addScheduledTask(this::onStop);
         }
+
+        InfoHud.getInstance().removeInfoHudRenderer(this, false);
     }
 
     protected void onStop()

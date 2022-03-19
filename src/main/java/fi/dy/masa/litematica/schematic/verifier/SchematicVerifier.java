@@ -213,8 +213,8 @@ public class SchematicVerifier implements IInfoHudRenderer
     {
         if (this.status == RunStatus.RUNNING)
         {
-            this.status = RunStatus.PAUSED;
             this.stopTask();
+            this.status = RunStatus.PAUSED;
         }
     }
 
@@ -222,8 +222,8 @@ public class SchematicVerifier implements IInfoHudRenderer
     {
         if (this.status != RunStatus.STOPPED)
         {
-            this.status = RunStatus.STOPPED;
             this.stopTask();
+            this.status = RunStatus.STOPPED;
         }
     }
 
