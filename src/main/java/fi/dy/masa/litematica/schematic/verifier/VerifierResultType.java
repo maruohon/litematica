@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.schematic.verifier;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
-import fi.dy.masa.malilib.config.option.ColorConfig;
+import fi.dy.masa.malilib.config.option.DualColorConfig;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.litematica.config.Configs;
@@ -23,9 +23,9 @@ public enum VerifierResultType
             VerifierResultType.EXTRA);
 
     private final String translationKey;
-    private final ColorConfig colorConfig;
+    private final DualColorConfig colorConfig;
 
-    VerifierResultType(String translationKey, ColorConfig colorConfig)
+    VerifierResultType(String translationKey, DualColorConfig colorConfig)
     {
         this.translationKey = translationKey;
         this.colorConfig = colorConfig;
@@ -33,13 +33,12 @@ public enum VerifierResultType
 
     public Color4f getOverlayColor()
     {
-        return this.colorConfig.getColor();
+        return this.colorConfig.getFirstColor();
     }
 
-    // TODO add a separate config
     public int getTextColor()
     {
-        return this.colorConfig.getColor().intValue | 0xFF000000;
+        return this.colorConfig.getSecondColorInt();
     }
 
     public String getDisplayName()

@@ -1,6 +1,9 @@
 package fi.dy.masa.litematica;
 
 import net.minecraft.client.Minecraft;
+import fi.dy.masa.malilib.config.BaseModConfig;
+import fi.dy.masa.malilib.event.InitializationHandler;
+import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.HotkeyCallbacks;
 import fi.dy.masa.litematica.data.DataManager;
@@ -12,9 +15,6 @@ import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.input.HotkeyProvider;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.ClientTickHandler;
-import fi.dy.masa.malilib.config.BaseModConfig;
-import fi.dy.masa.malilib.event.InitializationHandler;
-import fi.dy.masa.malilib.registry.Registry;
 
 public class InitHandler implements InitializationHandler
 {
@@ -36,6 +36,7 @@ public class InitHandler implements InitializationHandler
 
         Registry.CLIENT_WORLD_CHANGE_EVENT_DISPATCHER.registerClientWorldChangeHandler(new ClientWorldChangeHandler());
 
+        Configs.init();
         FileMigrationUtils.tryMigrateOldPerWorldData();
         FileMigrationUtils.tryMigrateOldAreaSelections();
 

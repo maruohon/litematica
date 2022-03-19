@@ -3,9 +3,6 @@ package fi.dy.masa.litematica.config;
 import java.io.File;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.selection.CornerSelectionMode;
-import fi.dy.masa.litematica.util.BlockInfoAlignment;
-import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.malilib.config.category.BaseConfigOptionCategory;
 import fi.dy.masa.malilib.config.category.ConfigOptionCategory;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
@@ -13,6 +10,7 @@ import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.ConfigOption;
 import fi.dy.masa.malilib.config.option.DirectoryConfig;
 import fi.dy.masa.malilib.config.option.DoubleConfig;
+import fi.dy.masa.malilib.config.option.DualColorConfig;
 import fi.dy.masa.malilib.config.option.HotkeyedBooleanConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
@@ -21,6 +19,9 @@ import fi.dy.masa.malilib.config.value.FileBrowserColumns;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.litematica.selection.CornerSelectionMode;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
 
 public class Configs
 {
@@ -281,11 +282,11 @@ public class Configs
         public static final ColorConfig SCHEMATIC_OVERLAY_MISSING           = new ColorConfig("schematicOverlayMissing",                "#2C33B3E6");
         public static final ColorConfig SCHEMATIC_OVERLAY_WRONG_BLOCK       = new ColorConfig("schematicOverlayWrongBlock",             "#4CFF3333");
         public static final ColorConfig SCHEMATIC_OVERLAY_WRONG_STATE       = new ColorConfig("schematicOverlayWrongState",             "#4CFF9010");
-        public static final ColorConfig VERIFIER_CORRECT                    = new ColorConfig("verifierCorrect",                        "#4C11FF11");
-        public static final ColorConfig VERIFIER_EXTRA                      = new ColorConfig("verifierExtra",                          "#4CFF00CF");
-        public static final ColorConfig VERIFIER_MISSING                    = new ColorConfig("verifierMissing",                        "#4C00FFFF");
-        public static final ColorConfig VERIFIER_WRONG_BLOCK                = new ColorConfig("verifierWrongBlock",                     "#4CFF0000");
-        public static final ColorConfig VERIFIER_WRONG_STATE                = new ColorConfig("verifierWrongState",                     "#4CFFAF00");
+        public static final DualColorConfig VERIFIER_CORRECT                = new DualColorConfig("verifierCorrect",                    "#4C11FF11", "#FF55FF55");
+        public static final DualColorConfig VERIFIER_EXTRA                  = new DualColorConfig("verifierExtra",                      "#4CFF00CF", "#FFFF55FF");
+        public static final DualColorConfig VERIFIER_MISSING                = new DualColorConfig("verifierMissing",                    "#4C00FFFF", "#FF55FFFF");
+        public static final DualColorConfig VERIFIER_WRONG_BLOCK            = new DualColorConfig("verifierWrongBlock",                 "#4CFF0000", "#FFFF5555");
+        public static final DualColorConfig VERIFIER_WRONG_STATE            = new DualColorConfig("verifierWrongState",                 "#4CFFAF00", "#FFFFAA00");
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 AREA_SELECTION_BOX_SIDE,
@@ -329,4 +330,19 @@ public class Configs
             BaseConfigOptionCategory.normal("Colors",       Colors.OPTIONS),
             BaseConfigOptionCategory.normal("Hotkeys",      Hotkeys.HOTKEY_LIST)
     );
+
+    public static void init()
+    {
+        setVerifierColorTooltips(Colors.VERIFIER_CORRECT);
+        setVerifierColorTooltips(Colors.VERIFIER_EXTRA);
+        setVerifierColorTooltips(Colors.VERIFIER_MISSING);
+        setVerifierColorTooltips(Colors.VERIFIER_WRONG_BLOCK);
+        setVerifierColorTooltips(Colors.VERIFIER_WRONG_STATE);
+    }
+
+    private static void setVerifierColorTooltips(DualColorConfig config)
+    {
+        config.setFirstColorHoverInfoKey("litematica.hover.schematic_verifier.color_config.overlay_color");
+        config.setSecondColorHoverInfoKey("litematica.hover.schematic_verifier.color_config.text_color");
+    }
 }

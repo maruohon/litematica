@@ -163,6 +163,8 @@ litematica.hover.schematic_list.modified_on=Modified @ §6%s§r
 litematica.hover.schematic_list.schematic_file=Schematic file: §3%s
 litematica.hover.schematic_list.schematic_name=Schematic name: §a%s
 litematica.hover.schematic_list.schematic_type=Type: §b%s
+litematica.hover.schematic_verifier.color_config.overlay_color=Schematic Verifier Overlay color
+litematica.hover.schematic_verifier.color_config.text_color=Schematic Verifier Screen/HUD Text color
 
 litematica.hud.area_selection.mode.corners=Corners
 litematica.hud.area_selection.mode.expand=Expand
