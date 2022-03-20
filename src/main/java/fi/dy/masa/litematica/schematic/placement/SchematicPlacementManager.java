@@ -25,6 +25,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.config.value.LayerMode;
+import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -44,14 +52,6 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.config.value.LayerMode;
-import fi.dy.masa.malilib.input.Hotkey;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class SchematicPlacementManager
 {
@@ -281,6 +281,26 @@ public class SchematicPlacementManager
         else
         {
             this.lightlyLoadedPlacements.add(placement.copyAsUnloaded());
+        }
+    }
+
+    public void updateDependentPlacements(ISchematic schematic, File newSchematicFile, boolean selectedOnly)
+    {
+        if (selectedOnly)
+        {
+            SchematicPlacement placement = this.getSelectedSchematicPlacement();
+
+            if (placement != null && placement.getSchematic() == schematic)
+            {
+                placement.setSchematicFile(newSchematicFile);
+            }
+        }
+        else
+        {
+            for (SchematicPlacement placement : this.getAllPlacementsOfSchematic(schematic))
+            {
+                placement.setSchematicFile(newSchematicFile);
+            }
         }
     }
 

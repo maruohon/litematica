@@ -3,21 +3,6 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.gui.util.SchematicBrowserIconProvider;
-import fi.dy.masa.litematica.gui.util.SchematicInfoCache.SchematicInfo;
-import fi.dy.masa.litematica.gui.widget.SchematicInfoWidget;
-import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.litematica.scheduler.tasks.SetSchematicPreviewTask;
-import fi.dy.masa.litematica.schematic.ISchematic;
-import fi.dy.masa.litematica.schematic.SchematicMetadata;
-import fi.dy.masa.litematica.schematic.SchematicType;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.ConfirmActionScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
@@ -27,33 +12,38 @@ import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.gui.util.SchematicInfoCache.SchematicInfo;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.SetSchematicPreviewTask;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.SchematicMetadata;
+import fi.dy.masa.litematica.schematic.SchematicType;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 
-public class SchematicManagerScreen extends BaseListScreen<BaseFileBrowserWidget>
+public class SchematicManagerScreen extends BaseSchematicBrowserScreen
 {
-    protected final SchematicBrowserIconProvider cachingIconProvider;
     protected final GenericButton convertSchematicButton;
     protected final GenericButton deleteFileButton;
-    protected final GenericButton mainMenuScreenButton;
     protected final GenericButton removePreviewButton;
     protected final GenericButton renameFileButton;
     protected final GenericButton renameSchematicButton;
     protected final GenericButton setPreviewButton;
-    protected final SchematicInfoWidget schematicInfoWidget;
 
     public SchematicManagerScreen()
     {
-        super(10, 24, 20 + 170 + 2, 70);
-
-        this.cachingIconProvider = new SchematicBrowserIconProvider();
+        super(10, 24, 20 + 170 + 2, 70, "schematic_manager");
 
         this.convertSchematicButton = GenericButton.create("litematica.button.schematic_manager.convert_format", this::convertSchematic);
         this.deleteFileButton       = GenericButton.create("litematica.button.schematic_manager.delete", this::deleteFile);
-        this.mainMenuScreenButton   = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.removePreviewButton    = GenericButton.create("litematica.button.schematic_manager.remove_preview", this::removePreview);
         this.renameFileButton       = GenericButton.create("litematica.button.schematic_manager.rename_file", this::renameFile);
         this.renameSchematicButton  = GenericButton.create("litematica.button.schematic_manager.rename_schematic", this::renameSchematic);
         this.setPreviewButton       = GenericButton.create("litematica.button.schematic_manager.set_preview", this::setPreview);
-        this.schematicInfoWidget = new SchematicInfoWidget(170, 290);
 
         this.convertSchematicButton.translateAndAddHoverString("litematica.hover.button.schematic_manager.convert_format");
 
@@ -64,9 +54,6 @@ public class SchematicManagerScreen extends BaseListScreen<BaseFileBrowserWidget
     protected void reAddActiveWidgets()
     {
         super.reAddActiveWidgets();
-
-        this.addWidget(this.mainMenuScreenButton);
-        this.addWidget(this.schematicInfoWidget);
 
         DirectoryEntry entry = this.getListWidget().getLastSelectedEntry();
 
@@ -92,10 +79,6 @@ public class SchematicManagerScreen extends BaseListScreen<BaseFileBrowserWidget
     {
         super.updateWidgetPositions();
 
-        this.schematicInfoWidget.setHeight(this.getListHeight());
-        this.schematicInfoWidget.setRight(this.getRight() - 10);
-        this.schematicInfoWidget.setY(this.y + 24);
-
         int y = this.getBottom() - 44;
         this.renameSchematicButton.setPosition(this.x + 10, y);
         this.convertSchematicButton.setPosition(this.renameSchematicButton.getRight() + 2, y);
@@ -105,36 +88,20 @@ public class SchematicManagerScreen extends BaseListScreen<BaseFileBrowserWidget
         this.renameFileButton.setPosition(this.x + 10, y);
         this.deleteFileButton.setPosition(this.renameFileButton.getRight() + 2, y);
         this.removePreviewButton.setPosition(this.deleteFileButton.getRight() + 2, y);
-
-        this.mainMenuScreenButton.setRight(this.getRight() - 10);
-        this.mainMenuScreenButton.setY(y);
-    }
-
-    @Override
-    protected void onScreenClosed()
-    {
-        super.onScreenClosed();
-        this.schematicInfoWidget.clearCache();
     }
 
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        File dir = DataManager.getSchematicsBaseDirectory();
-        BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE,
-                                                                     "schematic_manager", this.cachingIconProvider);
-
-        listWidget.setParentScreen(this.getParent());
-        listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
-        SchematicBrowserScreen.setCommonSchematicBrowserSettings(listWidget);
+        BaseFileBrowserWidget listWidget = super.createListWidget();
         listWidget.setAllowFileOperations(true);
-
         return listWidget;
     }
 
+    @Override
     public void onSelectionChange(@Nullable DirectoryEntry entry)
     {
-        this.schematicInfoWidget.onSelectionChange(entry);
+        super.onSelectionChange(entry);
         this.reAddActiveWidgets();
     }
 
@@ -144,12 +111,9 @@ public class SchematicManagerScreen extends BaseListScreen<BaseFileBrowserWidget
 
         if (info != null)
         {
-            // TODO FIXME malilib refactor
-            /*
-            SchematicConvertScreen screen = new SchematicConvertScreen(info.schematic, entry.getName());
+            SaveConvertSchematicScreen screen = new SaveConvertSchematicScreen(info.schematic, false);
             screen.setParent(this);
             BaseScreen.openScreen(screen);
-            */
         }
     }
 

@@ -6,16 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
-import fi.dy.masa.litematica.schematic.ISchematic;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.malilib.gui.icon.MultiIcon;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.IconWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
@@ -25,6 +19,14 @@ import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.gui.SaveConvertSchematicScreen;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 
 public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
 {
@@ -181,21 +183,10 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
 
     protected void saveToFile()
     {
-        // TODO should this ove to a static method in the save screen?
         ISchematic schematic = this.getData();
-        String name = schematic.getFile() != null ? schematic.getFile().getName() : schematic.getMetadata().getName();
-
-        if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue() && schematic.getFile() == null)
-        {
-            name = FileNameUtils.generateSimpleSafeFileName(name);
-        }
-
-        /* TODO FIXME malilib refactor
-        GuiSchematicSaveConvert gui = new GuiSchematicSaveConvert(schematic, name);
-        gui.setUpdatePlacementsOption(true);
-        gui.setParent(GuiUtils.getCurrentScreen());
-        BaseScreen.openScreen(gui);
-        */
+        SaveConvertSchematicScreen screen = new SaveConvertSchematicScreen(schematic, true);
+        screen.setParent(GuiUtils.getCurrentScreen());
+        BaseScreen.openScreen(screen);
     }
 
     protected void unloadSchematic()

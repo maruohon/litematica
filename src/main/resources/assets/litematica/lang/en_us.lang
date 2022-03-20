@@ -43,6 +43,7 @@ litematica.button.placement_list.icon_vs_text.icons=Buttons: Icons
 litematica.button.placement_list.icon_vs_text.text=Buttons: Text
 litematica.button.placement_list.open_placement_browser=Saved Placements
 litematica.button.placement_list.placement_enabled=Placement: %s
+litematica.button.save_schematic.save_schematic=Save Schematic
 litematica.button.schematic_browser.load_schematic=Load Schematic
 litematica.button.schematic_list.create_placement=Create Placement
 litematica.button.schematic_list.reload=Reload
@@ -117,6 +118,8 @@ litematica.hover.button.placement_list.configure=Edit the properties of this pla
 litematica.hover.button.placement_list.duplicate=Creates a new identical copy of this placement
 litematica.hover.button.placement_list.remove=Removes this placement.\n\nRemoving a placement won't unload the schematic itself from memory. To unload the schematic too, unload it on the §eLoaded Schematics List§r screen. Unloading a schematic via there automatically removes all placements of it.\n\n§6Note:§r If you may need the placement again later on, you can save it first using the §eSave§r button. You can then load it back later on via the §eSaved Placements§r menu if you need it again.
 litematica.hover.button.placement_list.save=Save this placement to a separate file on disk.\n\nThis allows you to remove it from this list, but still load it back later on via the §eSaved Placements§r menu if you need it again.
+litematica.hover.button.save_schematic.hold_shift_to_overwrite=Hold §eShift§r to overwrite an existing file
+litematica.hover.button.save_schematic.revert_name=Revert to the original suggested name
 litematica.hover.button.schematic_browser.create_material_list=Hold shift to select which sub-regions are used for the Material List. By default all regions will be included.
 litematica.hover.button.schematic_list.create_placement=Create a new placement of this schematic.\n\nHold §6Shift§r to create the placement as disabled to begin with.
 litematica.hover.button.schematic_list.reload_schematic=Reload the schematic from file.\n\nThis can be useful if you make a mistake in the Schematic Edit mode, or just want to revert the changes made to the in-memory copy of the schematic. Or if the schematic file was changed externally and you want to load the updated version.
@@ -157,6 +160,7 @@ litematica.hover.placement_list.saved_to_file.not_modified=Saved to file: %s
 litematica.hover.placement_list.sub_region_count=Sub-regions: §6%s
 litematica.hover.placement_list.sub_region_modified=§6This sub-region has been modified
 litematica.hover.placement_list.sub_region_size=Region size: <c=77f>%s§r x <c=77f>%s§r x <c=77f>%s
+litematica.hover.save_schematic.update_dependent_placements=Select whether to update any of the placements created of this schematic, so that when the placement is next loaded from file, it would use the newly saved schematic file.\n\nThis can be useful especially when using the Edit Schematic feature to for example change block types in the schematic, and you would want that edited schematic to be used for your placements from now on.
 litematica.hover.schematic_browser.create_placement=Automatically create a new placement of the loaded schematic, and select that newly created placement
 litematica.hover.schematic_list.in_memory_only=§dIN-MEMORY ONLY
 litematica.hover.schematic_list.modified_on=Modified @ §6%s§r
@@ -291,6 +295,9 @@ litematica.label.task.set_schematic_preview=Set Preview image for schematic §e%
 litematica.label.tool_hud.none_brackets=§c<none>§r
 litematica.label.widget.schematic_vcs.version_entry=Ver. §6%d§r - %s
 
+litematica.name.save_schematic.update_placements.all=All - Update all dependent placements
+litematica.name.save_schematic.update_placements.none=None - Don't update any placements
+litematica.name.save_schematic.update_placements.selected=Selected - Update currently selected placement
 litematica.name.schematic_verifier.correct_state=Correct State
 litematica.name.schematic_verifier.correct_state.widget=<b>Correct State</b> [%s pairs, %s positions]
 litematica.name.schematic_verifier.extra=Extra Blocks
@@ -342,6 +349,7 @@ litematica.title.screen.main_menu=Litematica %s
 litematica.title.screen.placement_grid_settings=Grid/Repeat Settings for Placement §e%s
 litematica.title.screen.save_in_memory_schematic=Create an In-Memory-Only Schematic
 litematica.title.screen.saved_placements=Litematica %s - Saved Schematic Placements
+litematica.title.screen.save_or_convert_schematic=Save or Convert Schematic §e%s§r
 litematica.title.screen.schematic_browser=Litematica %s - Schematic Browser
 litematica.title.screen.schematic_manager=Litematica %s - Schematic Manager
 litematica.title.screen.schematic_manager.confirm_file_deletion=Confirm File Deletion
@@ -364,9 +372,15 @@ litematica.title.screen.task_manager=Litematica %s - Task Manager
 
 litematica.message.error.area_selection_browser.failed_to_load=Failed to load the Area Selection
 litematica.message.error.area_selection_browser.no_placement_selected=No Schematic Placement selected!
+litematica.message.error.file_exists.hold_shift_to_override=The file already exists!\n§7Hold §eShift§7 to override the existing file.
 litematica.message.error.no_placement_selected=§cNo Schematic Placement currently selected.§r\nTo select a placement, either:\n1) click on one on the Schematic Placements screen so that it gets the white outline to indicate it's the selected placement\n2) Use the §eTool Select Elements§r hotkey (by default middle click) while holding the "tool item" and looking at a placement in the world\nThe selected placement's name also appears on the tool HUD, and it has a light cyan outline color in-world.
 litematica.message.error.placement_list.remove_failed_locked=The placement is locked!\nHold §6Shift§r to force remove it
 litematica.message.error.placement_list.save_failed=Failed to save the placement to file
+litematica.message.error.save_schematic.failed_to_convert=Failed to convert the schematic to the new format!
+litematica.message.error.save_schematic.failed_to_save=Failed to save the converted schematic as §e'%s'§r
+litematica.message.error.save_schematic.invalid_directory=Invalid directory §e'%s'§r
+litematica.message.error.save_schematic.no_file_name=Empty file name!
+litematica.message.error.save_schematic.no_type_selected=No schematic type selected!\n§7Select the schematic type/format using the dropdown widget.
 litematica.message.error.schematic_load.invalid_schematic_file=Invalid or broken schematic file!
 litematica.message.error.schematic_load.no_schematic_selected=No schematic file selected!
 litematica.message.error.schematic_manager.failed_to_save_schematic=Failed to save the schematic back to the file
@@ -413,9 +427,6 @@ litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_s
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
 litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the Structure to a Litematica Schematic
 
-litematica.error.schematic_convert.failed_to_convert=Failed to convert the schematic:
-litematica.error.schematic_convert.failed_to_save=Failed to save the converted schematic as '%s'
-litematica.error.schematic_convert.no_output_type_selected=Select the output type using the dropdown widget
 litematica.error.schematic.create.no_selections=No valid selection regions!
 
 litematica.error.schematic_load.cant_read_file=Can't read the schematic file '%s' (doesn't exist or permission issue)
@@ -447,8 +458,6 @@ litematica.error.schematic_rename.read_failed=Failed to read the schematic from 
 
 litematica.error.schematic_save.directory_doesnt_exist=No such directory: '%s'
 litematica.error.schematic_save.file_already_exists=File '%s' already exists
-litematica.error.schematic_save.invalid_directory=Invalid directory '%s'
-litematica.error.schematic_save.invalid_schematic_name=Invalid schematic name '%s'
 litematica.error.schematic_save.schematic_creation_failed=Failed to create the schematic!
 
 litematica.error.schematic_write_to_file_failed.directory_creation_failed=Failed to create schematic directory '%s'
@@ -491,8 +500,6 @@ litematica.gui.button.unlocked=Unlocked
 
 litematica.gui.hover.schematic_placement.button.load=§7Load this placement to the list of "active placements"
 
-litematica.gui.hover.schematic_save.update_dependent_placements=§7Select whether or not to update all or just the currently\n§7selected placement of this schematic to point to the new file\n§7instead, so that when the placements are next reloaded from file, they\n§7will load the currently being saved version of the schematic\n§7instead of the original. This can be useful especially when\n§7using the Schematic Rebuild/Edit mode on a schematic.
-
 litematica.gui.label.area_editor.corner_1=Corner 1
 litematica.gui.label.area_editor.corner_2=Corner 2
 litematica.gui.label.area_editor.origin=Origin
@@ -526,10 +533,6 @@ litematica.gui.label.replace_behavior.all=All
 litematica.gui.label.replace_behavior.none=None
 litematica.gui.label.replace_behavior.with_non_air=With non-air
 
-litematica.gui.label.schematic_save.upldate_placements_option.dont_update=Don't update any placements
-litematica.gui.label.schematic_save.upldate_placements_option.update_all=Update all dependent placements
-litematica.gui.label.schematic_save.upldate_placements_option.update_selected=Update currently selected placement
-
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:
 litematica.gui.label.schematic_placement.saved_to_file=Successfully saved the placement to file '§e%s§r'
@@ -543,7 +546,6 @@ litematica.gui.label.schematic_projects.currently_open_project=Currently open pr
 litematica.gui.label.schematic_projects.version_name=Version name:
 
 litematica.gui.label.schematic_save.checkbox.ignore_entities=Ignore entities
-litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite=Hold shift to overwrite an existing file
 
 litematica.gui.label.schematic_verifier.count=Count
 litematica.gui.label.schematic_verifier.expected=Expected
@@ -618,6 +620,8 @@ litematica.message.error.schematic_save_no_area_selected=§cSchematic saving fai
 litematica.message.error.schematic_write.schematica.palette.invalid_id=SchematicaSchematic: Block id %s for block '%s' is out of range, max = %s
 litematica.message.error.update_blocks_aborted=Aborted updating the blocks in the area
 
+litematica.message.success.save_schematic.success=Successfully converted the schematic to the new format and saved it as §e'%s'§r
+
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.area_clear_fail=§cFailed to clear the area(s)§r
 litematica.message.area_cleared=Area cleared
@@ -638,7 +642,6 @@ litematica.message.placement_restriction_fail=Action prevented by Placement Rest
 litematica.message.removed_area_origin=Removed the explicit/manual area origin point
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.scheduled_task_added=Scheduled task added...
-litematica.message.schematic_convert.success=Successfully converted the schematic and saved it as '%s'
 litematica.message.schematic_exported_as=Schematic exported as '%s'
 litematica.message.schematic_pasted=Schematic pasted in world
 litematica.message.schematic_pasted_using_setblock=Schematic pasted using %s setblock commands
