@@ -222,5 +222,7 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
 
     protected void openSaveSchematicScreen()
     {
+        SaveSchematicFromAreaScreen screen = new SaveSchematicFromAreaScreen(this.selection);
+        BaseScreen.openScreen(screen);
     }
 }

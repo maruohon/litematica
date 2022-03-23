@@ -106,6 +106,7 @@ litematica.button.misc.set=Set
 litematica.checkmark.area_editor.corner1=Corner 1
 litematica.checkmark.area_editor.corner2=Corner 2
 litematica.checkmark.area_editor.origin=Origin
+litematica.checkmark.save_schematic.ignore_entities=Ignore Entities
 litematica.checkmark.schematic_browser.create_placement=Create Placement
 
 litematica.hover.button.area_editor.manual_origin=Enabling a manual origin allows you to define the origin point of the area selection in a custom location/offset in relation to the sub-regions.\n\nThe automatic origin point would be at the minimum coordinate of all the sub-regions. In other words if you were to create an enclosing box around all the sub-regions, the automatic origin is the minimum coordinate corner of that box.\n\nDefining a manual origin is mostly useful if you want to be able to automatically load the schematic (or rather create the placement) in the correct/specific location while standing at a certain location.\n\nBasically when you create a placement, the origin point is by default at the player's location. And the origin point of a placement is the same as the origin point of an area selection. (Not in absolute coordinates when creating a selection, but rather the relative positions of all the sub-regions.)
@@ -173,7 +174,8 @@ litematica.hover.schematic_verifier.color_config.text_color=Schematic Verifier S
 litematica.hud.area_selection.mode.corners=Corners
 litematica.hud.area_selection.mode.expand=Expand
 litematica.hud.schematic_verifier.position=%s%s : %s %s %s
-litematica.hud.schematic_verifier.title=<b>Schematic Verifier Highlights</b>
+litematica.hud.task_name.save_schematic=Save Schematic
+litematica.hud.task_name.schematic_verifier=<b>Schematic Verifier Highlights</b>
 litematica.hud.status_info.easy_place_enabled=Easy Place: §aON§r
 litematica.hud.status_info.render_layer_mode=Layer Mode: §6%s§r - §a%s§r = §b%s
 litematica.hud.status_info.render_layer_mode_all=Render Layer Mode: §6%s
@@ -348,6 +350,7 @@ litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
 litematica.title.screen.main_menu=Litematica %s
 litematica.title.screen.placement_grid_settings=Grid/Repeat Settings for Placement §e%s
 litematica.title.screen.save_in_memory_schematic=Create an In-Memory-Only Schematic
+litematica.title.screen.save_schematic_from_area=Save Schematic from selection §e%s§r
 litematica.title.screen.saved_placements=Litematica %s - Saved Schematic Placements
 litematica.title.screen.save_or_convert_schematic=Save or Convert Schematic §e%s§r
 litematica.title.screen.schematic_browser=Litematica %s - Schematic Browser
@@ -372,12 +375,13 @@ litematica.title.screen.task_manager=Litematica %s - Task Manager
 
 litematica.message.error.area_selection_browser.failed_to_load=Failed to load the Area Selection
 litematica.message.error.area_selection_browser.no_placement_selected=No Schematic Placement selected!
-litematica.message.error.file_exists.hold_shift_to_override=The file already exists!\n§7Hold §eShift§7 to override the existing file.
+litematica.message.error.file_exists.hold_shift_to_override=The file already exists!\n§7Hold §eShift§7 to overwrite the existing file.
 litematica.message.error.no_placement_selected=§cNo Schematic Placement currently selected.§r\nTo select a placement, either:\n1) click on one on the Schematic Placements screen so that it gets the white outline to indicate it's the selected placement\n2) Use the §eTool Select Elements§r hotkey (by default middle click) while holding the "tool item" and looking at a placement in the world\nThe selected placement's name also appears on the tool HUD, and it has a light cyan outline color in-world.
 litematica.message.error.placement_list.remove_failed_locked=The placement is locked!\nHold §6Shift§r to force remove it
 litematica.message.error.placement_list.save_failed=Failed to save the placement to file
 litematica.message.error.save_schematic.failed_to_convert=Failed to convert the schematic to the new format!
-litematica.message.error.save_schematic.failed_to_save=Failed to save the converted schematic as §e'%s'§r
+litematica.message.error.save_schematic.failed_to_save_converted=Failed to save the schematic to file §e'%s'§r
+litematica.message.error.save_schematic.failed_to_save_from_area=Failed to save the schematic to file §e'%s'§r.\n§7The schematic has been added to the Loaded Schematics list as an "in-memory-only" schematic, so you can try to save it from there to another file.
 litematica.message.error.save_schematic.invalid_directory=Invalid directory §e'%s'§r
 litematica.message.error.save_schematic.no_file_name=Empty file name!
 litematica.message.error.save_schematic.no_type_selected=No schematic type selected!\n§7Select the schematic type/format using the dropdown widget.
@@ -545,8 +549,6 @@ litematica.gui.label.schematic_placement.hover.placement_file=§7Placement file:
 litematica.gui.label.schematic_projects.currently_open_project=Currently open project: %s
 litematica.gui.label.schematic_projects.version_name=Version name:
 
-litematica.gui.label.schematic_save.checkbox.ignore_entities=Ignore entities
-
 litematica.gui.label.schematic_verifier.count=Count
 litematica.gui.label.schematic_verifier.expected=Expected
 litematica.gui.label.schematic_verifier.found=Found
@@ -559,7 +561,6 @@ litematica.gui.label.task_name.delete=Delete task
 litematica.gui.label.task_name.fill=Fill task
 litematica.gui.label.task_name.material_list=Material List
 litematica.gui.label.task_name.paste=Paste Schematic
-litematica.gui.label.task_name.save_schematic=Save Schematic
 litematica.gui.label.task_name.update_blocks=Update Blocks
 litematica.gui.label.task_name.verifier=Verifier
 
@@ -612,7 +613,6 @@ litematica.message.error.schematic_read.schematica.schematic.invalid_metadata_ar
 litematica.message.error.schematic_read.sponge.palette.invalid_id=Invalid ID '%s' in the Sponge format schematic block palette
 litematica.message.error.schematic_read.sponge.palette.unknown_block=Unknown block '%s' in the Sponge format schematic block palette
 litematica.message.error.schematic_read.sponge.failed_to_read_blocks=Failed to read the blocks for a Sponge format schematic
-litematica.message.error.schematic_save_failed=Failed to save schematic to file '%s'
 litematica.message.error.schematic_save_interrupted=Schematic saving interrupted or stopped
 litematica.message.error.schematic_save.missing_container=One of the data containers not found for sub-region '%s'
 litematica.message.error.schematic_save.missing_entity_list=Entity list not found for sub-region '%s'
@@ -620,7 +620,8 @@ litematica.message.error.schematic_save_no_area_selected=§cSchematic saving fai
 litematica.message.error.schematic_write.schematica.palette.invalid_id=SchematicaSchematic: Block id %s for block '%s' is out of range, max = %s
 litematica.message.error.update_blocks_aborted=Aborted updating the blocks in the area
 
-litematica.message.success.save_schematic.success=Successfully converted the schematic to the new format and saved it as §e'%s'§r
+litematica.message.success.save_schematic_convert=Successfully saved the schematic as §e'%s'§r (and possibly converted it to the new format)
+litematica.message.success.save_schematic_new=Successfully saved the schematic as §e'%s'§r
 
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.area_clear_fail=§cFailed to clear the area(s)§r
@@ -652,7 +653,6 @@ litematica.message.schematic_preview_cancelled=Preview task cancelled
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
 litematica.message.schematic_rebuild.accepted_replacement=Schematic Edit: Accepted the replacement block
 litematica.message.schematic_rendering_refreshed=Schematic rendering refreshed
-litematica.message.schematic_saved_as=Schematic saved as '%s'
 litematica.message.schematic_save_task_created=Schematic saving task created
 litematica.message.set_area_origin=Set the area origin point to %s
 litematica.message.set_currently_held_item_as_tool=§aSet the currently held item as the tool item

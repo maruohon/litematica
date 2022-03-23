@@ -2,14 +2,6 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.widget.SchematicVcsProjectInfoWidget;
-import fi.dy.masa.litematica.gui.widget.list.entry.SchematicVcsVersionEntryWidget;
-import fi.dy.masa.litematica.schematic.projects.SchematicProject;
-import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
-import fi.dy.masa.litematica.schematic.util.SchematicUtils;
-import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.ConfirmActionScreen;
@@ -19,6 +11,14 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.widget.SchematicVcsProjectInfoWidget;
+import fi.dy.masa.litematica.gui.widget.list.entry.SchematicVcsVersionEntryWidget;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
+import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
+import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
+import fi.dy.masa.litematica.selection.SelectionManager;
 
 public class SchematicVcsProjectManagerScreen extends BaseListScreen<DataListWidget<SchematicVersion>>
 {
@@ -164,7 +164,7 @@ public class SchematicVcsProjectManagerScreen extends BaseListScreen<DataListWid
 
     protected void saveNewVersion()
     {
-        SchematicUtils.saveSchematic(false);
+        SchematicCreationUtils.saveSchematic(false);
     }
 
     protected void deleteArea()

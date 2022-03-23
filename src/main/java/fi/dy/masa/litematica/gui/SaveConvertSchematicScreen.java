@@ -1,13 +1,10 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang3.StringUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.RadioButtonWidget;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicType;
@@ -114,7 +111,7 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
         }
         else
         {
-            MessageDispatcher.error("litematica.message.error.save_schematic.failed_to_save", file.getName());
+            MessageDispatcher.error("litematica.message.error.save_schematic.failed_to_save_converted", file.getName());
         }
     }
 
@@ -124,7 +121,7 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
         this.schematicInfoWidget.clearCache();
         this.getListWidget().clearSelection();
         this.getListWidget().refreshEntries();
-        MessageDispatcher.success("litematica.message.success.save_schematic.success", newSchematicFile.getName());
+        MessageDispatcher.success("litematica.message.success.save_schematic_convert", newSchematicFile.getName());
 
         UpdatePlacementsOption option = this.updatePlacementsWidget.getSelection();
 
@@ -133,49 +130,6 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
             boolean selectedOnly = option == UpdatePlacementsOption.SELECTED;
             this.updateDependentPlacements(newSchematicFile, selectedOnly);
         }
-    }
-
-    @Nullable
-    protected File getSchematicFileIfCanSave(boolean isHoldingShift)
-    {
-        String name = this.fileNameTextField.getText();
-        File dir = this.getListWidget().getCurrentDirectory();
-
-        if (dir.isDirectory() == false)
-        {
-            MessageDispatcher.error("litematica.message.error.save_schematic.invalid_directory", dir.getAbsolutePath());
-            return null;
-        }
-
-        if (StringUtils.isBlank(name))
-        {
-            MessageDispatcher.error("litematica.message.error.save_schematic.no_file_name");
-            return null;
-        }
-
-        if (FileNameUtils.doesFileNameContainIllegalCharacters(name))
-        {
-            MessageDispatcher.error("malilib.message.error.illegal_characters_in_file_name", name);
-            return null;
-        }
-
-        SchematicType<?> outputType = this.schematicTypeDropdown.getSelectedEntry();
-
-        if (outputType == null)
-        {
-            MessageDispatcher.error("litematica.message.error.save_schematic.no_type_selected");
-            return null;
-        }
-
-        File file = new File(dir, name + outputType.getFileNameExtension());
-
-        if (isHoldingShift == false && file.exists())
-        {
-            MessageDispatcher.error("litematica.message.error.file_exists.hold_shift_to_override", file.getName());
-            return null;
-        }
-
-        return file;
     }
 
     protected void updateDependentPlacements(File newSchematicFile, boolean selectedOnly)

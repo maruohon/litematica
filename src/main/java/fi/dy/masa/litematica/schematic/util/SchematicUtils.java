@@ -9,85 +9,16 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.schematic.projects.SchematicProject;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.input.ActionResult;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class SchematicUtils
 {
-    public static ActionResult saveSchematic(boolean inMemoryOnly)
-    {
-        SelectionManager sm = DataManager.getSelectionManager();
-        AreaSelection area = sm.getCurrentSelection();
-
-        if (area != null)
-        {
-            if (DataManager.getSchematicProjectsManager().hasProjectOpen())
-            {
-                String title = "litematica.title.screen.schematic_vcs.save_new_version";
-                SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-                TextInputScreen gui = new TextInputScreen(title, project.getCurrentVersionName(),
-                                                          DataManager.getSchematicProjectsManager()::commitNewVersion,
-                                                          GuiUtils.getCurrentScreen());
-                BaseScreen.openPopupScreen(gui);
-            }
-            else if (inMemoryOnly)
-            {
-                String title = "litematica.title.screen.save_in_memory_schematic";
-                TextInputScreen gui = new TextInputScreen(title, area.getName(),
-                                                          (str) -> saveInMemorySchematic(str, area),
-                                                          GuiUtils.getCurrentScreen());
-                BaseScreen.openPopupScreen(gui);
-            }
-            /* TODO FIXME malilib refactor
-            else
-            {
-                GuiSchematicSave gui = new GuiSchematicSave();
-                gui.setParent(GuiUtils.getCurrentScreen());
-                BaseScreen.openScreen(gui);
-            }
-            */
-
-            return ActionResult.SUCCESS;
-        }
-
-        return ActionResult.FAIL;
-    }
-
-    public static boolean saveInMemorySchematic(String name, AreaSelection area)
-    {
-        boolean takeEntities = true; // TODO
-        String author = GameUtils.getClientPlayer().getName();
-        LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(area, author);
-
-        if (schematic != null)
-        {
-            schematic.getMetadata().setName(name);
-            TaskSaveSchematic task = new TaskSaveSchematic(schematic, area, takeEntities);
-            TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
-
-            return true;
-        }
-
-        return false;
-    }
-
     @Nullable
     public static BlockPos getSchematicContainerPositionFromWorldPosition(BlockPos worldPos, ISchematic schematic, String regionName,
             SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, ILitematicaBlockStateContainer container)

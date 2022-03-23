@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.icon.MultiIcon;
@@ -11,6 +12,7 @@ import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
@@ -102,23 +104,68 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
 
     protected abstract void saveSchematic();
 
+    @Nullable
+    protected File getSchematicFileIfCanSave(boolean isHoldingShift)
+    {
+        String name = this.fileNameTextField.getText();
+        File dir = this.getListWidget().getCurrentDirectory();
+
+        if (dir.isDirectory() == false)
+        {
+            MessageDispatcher.error("litematica.message.error.save_schematic.invalid_directory", dir.getAbsolutePath());
+            return null;
+        }
+
+        if (StringUtils.isBlank(name))
+        {
+            MessageDispatcher.error("litematica.message.error.save_schematic.no_file_name");
+            return null;
+        }
+
+        if (FileNameUtils.doesFileNameContainIllegalCharacters(name))
+        {
+            MessageDispatcher.error("malilib.message.error.illegal_characters_in_file_name", name);
+            return null;
+        }
+
+        SchematicType<?> outputType = this.schematicTypeDropdown.getSelectedEntry();
+
+        if (outputType == null)
+        {
+            MessageDispatcher.error("litematica.message.error.save_schematic.no_type_selected");
+            return null;
+        }
+
+        File file = new File(dir, name + outputType.getFileNameExtension());
+
+        if (isHoldingShift == false && file.exists())
+        {
+            MessageDispatcher.error("litematica.message.error.file_exists.hold_shift_to_override", file.getName());
+            return null;
+        }
+
+        return file;
+    }
+
     public static String getDefaultFileNameForSchematic(ISchematic schematic)
     {
         File file = schematic.getFile();
-        String name;
 
         if (file != null)
         {
-            name = FileNameUtils.getFileNameWithoutExtension(file.getName());
+            return FileNameUtils.getFileNameWithoutExtension(file.getName());
         }
         else
         {
-            name = schematic.getMetadata().getName();
+            return getFileNameFromDisplayName(schematic.getMetadata().getName());
+        }
+    }
 
-            if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue())
-            {
-                name = FileNameUtils.generateSimpleSafeFileName(name);
-            }
+    public static String getFileNameFromDisplayName(String name)
+    {
+        if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue())
+        {
+            name = FileNameUtils.generateSimpleSafeFileName(name);
         }
 
         return name;

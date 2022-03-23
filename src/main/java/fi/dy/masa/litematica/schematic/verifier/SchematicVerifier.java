@@ -594,7 +594,7 @@ public class SchematicVerifier implements IInfoHudRenderer
         int endIndex = Math.min(max - 1, this.closestSelectedPositions.size());
 
         this.infoHudLines.clear();
-        this.infoHudLines.add(StringUtils.translate("litematica.hud.schematic_verifier.title"));
+        this.infoHudLines.add(StringUtils.translate("litematica.hud.task_name.schematic_verifier"));
 
         for (int i = 0; i < endIndex; ++i)
         {

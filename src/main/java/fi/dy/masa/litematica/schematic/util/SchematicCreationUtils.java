@@ -22,7 +22,21 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.TextInputScreen;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.input.ActionResult;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.gui.SaveSchematicFromAreaScreen;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
@@ -30,15 +44,13 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.task.CreateSchematicTask;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
 
 public class SchematicCreationUtils
 {
@@ -63,11 +75,81 @@ public class SchematicCreationUtils
         return schematic;
     }
 
+    public static ActionResult saveSchematic(boolean inMemoryOnly)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+
+        if (area != null)
+        {
+            if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+            {
+                String title = "litematica.title.screen.schematic_vcs.save_new_version";
+                SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
+                TextInputScreen gui = new TextInputScreen(title, project.getCurrentVersionName(),
+                                                          DataManager.getSchematicProjectsManager()::commitNewVersion,
+                                                          GuiUtils.getCurrentScreen());
+                BaseScreen.openPopupScreen(gui);
+            }
+            else if (inMemoryOnly)
+            {
+                String title = "litematica.title.screen.save_in_memory_schematic";
+                TextInputScreen gui = new TextInputScreen(title, area.getName(),
+                                                          (str) -> saveInMemorySchematic(str, area),
+                                                          GuiUtils.getCurrentScreen());
+                BaseScreen.openPopupScreen(gui);
+            }
+            else
+            {
+                SaveSchematicFromAreaScreen screen = new SaveSchematicFromAreaScreen(area);
+                screen.setParent(GuiUtils.getCurrentScreen());
+                BaseScreen.openScreen(screen);
+            }
+
+            return ActionResult.SUCCESS;
+        }
+
+        return ActionResult.FAIL;
+    }
+
+    public static boolean saveInMemorySchematic(String name, AreaSelection area)
+    {
+        boolean ignoreEntities = false; // TODO
+        LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(area);
+
+        if (schematic != null)
+        {
+            CreateSchematicTask task = new CreateSchematicTask(schematic, area, ignoreEntities,
+                                                               () -> onInMemorySchematicCreated(schematic, name));
+            TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static void onInMemorySchematicCreated(ISchematic schematic, String name)
+    {
+        setSchematicMetadataOnCreation(schematic, name);
+        SchematicHolder.getInstance().addSchematic(schematic, true);
+        MessageDispatcher.success("litematica.message.in_memory_schematic_created", name);
+    }
+
+    public static void setSchematicMetadataOnCreation(ISchematic schematic, String schematicName)
+    {
+        long time = System.currentTimeMillis();
+        schematic.getMetadata().setAuthor(GameUtils.getClientPlayer().getName());
+        schematic.getMetadata().setName(schematicName);
+        schematic.getMetadata().setTimeCreated(time);
+        schematic.getMetadata().setTimeModified(time);
+    }
+
     /**
      * Creates an empty schematic with all the maps and lists and containers already created.
      * This is intended to be used for the chunk-wise schematic creation.
      */
-    public static LitematicaSchematic createEmptySchematic(AreaSelection area, String author)
+    public static LitematicaSchematic createEmptySchematic(AreaSelection area)
     {
         List<SelectionBox> boxes = PositionUtils.getValidBoxes(area);
 
@@ -81,9 +163,6 @@ public class SchematicCreationUtils
         SchematicMetadata metadata = schematic.getMetadata();
 
         schematic.setSubRegions(boxes, area.getEffectiveOrigin());
-
-        metadata.setAuthor(author);
-        metadata.setName(area.getName());
         metadata.setRegionCount(boxes.size());
         metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
         metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
@@ -92,7 +171,11 @@ public class SchematicCreationUtils
     }
 
     @Nullable
-    public static LitematicaSchematic createFromWorld(World world, AreaSelection area, boolean ignoreEntities, String author, ResultingStringConsumer feedback)
+    public static LitematicaSchematic createFromWorld(World world,
+                                                      AreaSelection area,
+                                                      boolean ignoreEntities,
+                                                      String author,
+                                                      ResultingStringConsumer feedback)
     {
         List<SelectionBox> boxes = PositionUtils.getValidBoxes(area);
 
@@ -112,7 +195,7 @@ public class SchematicCreationUtils
 
         if (ignoreEntities == false)
         {
-            takeEntitiesFromWorld(schematic, world, boxes, origin);
+            takeEntitiesFromWorld(schematic, world, boxes);
         }
 
         SchematicMetadata metadata = schematic.getMetadata();
@@ -128,7 +211,7 @@ public class SchematicCreationUtils
         return schematic;
     }
 
-    private static void takeEntitiesFromWorld(LitematicaSchematic schematic, World world, List<SelectionBox> boxes, BlockPos origin)
+    private static void takeEntitiesFromWorld(LitematicaSchematic schematic, World world, List<SelectionBox> boxes)
     {
         for (SelectionBox box : boxes)
         {
@@ -163,8 +246,11 @@ public class SchematicCreationUtils
         }
     }
 
-    public static void takeEntitiesFromWorldWithinChunk(LitematicaSchematic schematic, World world, int chunkX, int chunkZ,
-            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, SelectionBox> boxes, Set<UUID> existingEntities, BlockPos origin)
+    public static void takeEntitiesFromWorldWithinChunk(ISchematic schematic,
+                                                        World world,
+                                                        ImmutableMap<String, IntBoundingBox> volumes,
+                                                        ImmutableMap<String, SelectionBox> boxes,
+                                                        Set<UUID> existingEntities)
     {
         for (Map.Entry<String, IntBoundingBox> entry : volumes.entrySet())
         {
@@ -309,11 +395,13 @@ public class SchematicCreationUtils
         schematic.setTotalBlocksReadFromWorld(totalBlocks);
     }
 
-    public static void takeBlocksFromWorldWithinChunk(LitematicaSchematic schematic, World world, int chunkX, int chunkZ,
-            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, SelectionBox> boxes)
+    public static void takeBlocksFromWorldWithinChunk(ISchematic schematic,
+                                                      World world,
+                                                      ImmutableMap<String, IntBoundingBox> volumes,
+                                                      ImmutableMap<String, SelectionBox> boxes)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
-        long totalBlocks = schematic.getTotalBlocksReadFromWorld();
+        long totalBlocks = schematic.getMetadata().getTotalBlocks();
 
         for (Map.Entry<String, IntBoundingBox> volumeEntry : volumes.entrySet())
         {
@@ -391,7 +479,7 @@ public class SchematicCreationUtils
                 IntBoundingBox structureBB = IntBoundingBox.createProper(
                         offsetX + startX  , offsetY + startY  , offsetZ + startZ  ,
                         offsetX + endX + 1, offsetY + endY + 1, offsetZ + endZ + 1);
-                List<NextTickListEntry> pendingTicks = ((WorldServer) world).getPendingBlockUpdates(structureBB.toVanillaBox(), false);
+                List<NextTickListEntry> pendingTicks = world.getPendingBlockUpdates(structureBB.toVanillaBox(), false);
 
                 if (pendingTicks != null)
                 {
@@ -421,6 +509,6 @@ public class SchematicCreationUtils
             }
         }
 
-        schematic.setTotalBlocksReadFromWorld(totalBlocks);
+        schematic.getMetadata().setTotalBlocks(totalBlocks);
     }
 }

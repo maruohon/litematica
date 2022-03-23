@@ -9,6 +9,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -19,8 +23,8 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskFillArea;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicDirect;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkBase;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
-import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.scheduler.tasks.TaskUpdateBlocks;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
@@ -28,15 +32,12 @@ import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.task.CreateSchematicTask;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class ToolUtils
 {
@@ -255,8 +256,8 @@ public class ToolUtils
         // server -> client chunk/block syncing, otherwise a subsequent move
         // might wipe the area before the new blocks have arrived on the
         // client and thus the new move schematic would just be air.
-        if ((currentTime - areaMovedTime) < 400 ||
-            scheduler.hasTask(TaskSaveSchematic.class) ||
+        if ((currentTime - areaMovedTime) < 1000 ||
+            scheduler.hasTask(CreateSchematicTask.class) ||
             scheduler.hasTask(TaskDeleteArea.class) ||
             scheduler.hasTask(TaskPasteSchematicPerChunkBase.class) ||
             scheduler.hasTask(TaskPasteSchematicDirect.class))
@@ -266,54 +267,15 @@ public class ToolUtils
         }
 
         SelectionManager sm = DataManager.getSelectionManager();
-        AreaSelection area = sm.getCurrentSelection();
+        AreaSelection selection = sm.getCurrentSelection();
 
-        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        if (selection != null && selection.getAllSubRegionBoxes().size() > 0)
         {
-            final LayerRange range = DataManager.getRenderLayerRange().copy();
-            LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(area, "");
-            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
-            taskSave.disableCompletionMessage();
+            LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(selection);
+            CreateSchematicTask taskSave = new CreateSchematicTask(schematic, selection, false,
+                                                () -> onAreaSavedForMove(schematic, selection, scheduler, pos));
             areaMovedTime = System.currentTimeMillis();
-
-            taskSave.setCompletionListener(() ->
-            {
-                SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, "-", true);
-                DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, false);
-
-                TaskDeleteArea taskDelete = new TaskDeleteArea(area.getAllSubRegionBoxes(), true);
-                taskDelete.disableCompletionMessage();
-                areaMovedTime = System.currentTimeMillis();
-
-                taskDelete.setCompletionListener(() ->
-                {
-                    TaskBase taskPaste;
-
-                    if (mc.isSingleplayer())
-                    {
-                        taskPaste = new TaskPasteSchematicDirect(placement, range);
-                    }
-                    else
-                    {
-                        taskPaste = new TaskPasteSchematicPerChunkCommand(ImmutableList.of(placement), range, false);
-                    }
-
-                    taskPaste.disableCompletionMessage();
-                    areaMovedTime = System.currentTimeMillis();
-
-                    taskPaste.setCompletionListener(() ->
-                    {
-                        SchematicHolder.getInstance().removeSchematic(schematic);
-                        area.moveEntireSelectionTo(pos, false);
-                        areaMovedTime = System.currentTimeMillis();
-                    });
-
-                    scheduler.scheduleTask(taskPaste, 1);
-                });
-
-                scheduler.scheduleTask(taskDelete, 1);
-            });
-
+            taskSave.disableCompletionMessage();
             scheduler.scheduleTask(taskSave, 1);
         }
         else
@@ -322,48 +284,67 @@ public class ToolUtils
         }
     }
 
-    public static boolean cloneSelectionArea(final Minecraft mc)
+    private static void onAreaSavedForMove(ISchematic schematic,
+                                           AreaSelection selection,
+                                           TaskScheduler scheduler,
+                                           BlockPos pos)
     {
-        final SelectionManager sm = DataManager.getSelectionManager();
-        final AreaSelection area = sm.getCurrentSelection();
+        SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, "-", true);
+        DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, false);
 
-        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        areaMovedTime = System.currentTimeMillis();
+
+        TaskDeleteArea taskDelete = new TaskDeleteArea(selection.getAllSubRegionBoxes(), true);
+        taskDelete.disableCompletionMessage();
+        taskDelete.setCompletionListener(() -> onAreaDeletedBeforeMove(schematic, placement, selection, scheduler, pos));
+        scheduler.scheduleTask(taskDelete, 1);
+    }
+
+    private static void onAreaDeletedBeforeMove(ISchematic schematic,
+                                                SchematicPlacement placement,
+                                                AreaSelection selection,
+                                                TaskScheduler scheduler,
+                                                BlockPos pos)
+    {
+        LayerRange range = DataManager.getRenderLayerRange().copy();
+        TaskBase taskPaste;
+
+        if (GameUtils.isSinglePlayer())
         {
-            final LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(area, mc.player.getName());
-            final TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
+            taskPaste = new TaskPasteSchematicDirect(placement, range);
+        }
+        else
+        {
+            taskPaste = new TaskPasteSchematicPerChunkCommand(ImmutableList.of(placement), range, false);
+        }
+
+        areaMovedTime = System.currentTimeMillis();
+
+        taskPaste.disableCompletionMessage();
+        taskPaste.setCompletionListener(() -> onMovedAreaPasted(schematic, selection, pos));
+        scheduler.scheduleTask(taskPaste, 1);
+    }
+
+    private static void onMovedAreaPasted(ISchematic schematic,
+                                          AreaSelection selection,
+                                          BlockPos pos)
+    {
+        SchematicHolder.getInstance().removeSchematic(schematic);
+        selection.moveEntireSelectionTo(pos, false);
+        areaMovedTime = System.currentTimeMillis();
+    }
+
+    public static boolean cloneSelectionArea()
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection selection = sm.getCurrentSelection();
+
+        if (selection != null && selection.getAllSubRegionBoxes().size() > 0)
+        {
+            LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(selection);
+            CreateSchematicTask taskSave = new CreateSchematicTask(schematic, selection, false,
+                                                                         () -> placeClonedSchematic(schematic, selection));
             taskSave.disableCompletionMessage();
-
-            taskSave.setCompletionListener(() ->
-            {
-                SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-                String name = schematic.getMetadata().getName();
-                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-                BlockPos origin;
-
-                if (Configs.Generic.CLONE_AT_ORIGINAL_POS.getBooleanValue())
-                {
-                    origin = area.getEffectiveOrigin();
-                }
-                else
-                {
-                    origin = RayTraceUtils.getTargetedPosition(mc.world, entity, 6, false);
-
-                    if (origin == null)
-                    {
-                        origin = new BlockPos(entity);
-                    }
-                }
-
-                SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, false);
-
-                manager.addSchematicPlacement(placement, false);
-                manager.setSelectedSchematicPlacement(placement);
-
-                if (mc.player.capabilities.isCreativeMode)
-                {
-                    DataManager.setToolMode(ToolMode.PASTE_SCHEMATIC);
-                }
-            });
 
             TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(taskSave, 10);
 
@@ -375,5 +356,40 @@ public class ToolUtils
         }
 
         return false;
+    }
+
+    private static void placeClonedSchematic(ISchematic schematic, AreaSelection selection)
+    {
+        String name = selection.getName();
+        BlockPos origin;
+
+        if (Configs.Generic.CLONE_AT_ORIGINAL_POS.getBooleanValue())
+        {
+            origin = selection.getEffectiveOrigin();
+        }
+        else
+        {
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            origin = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, 6, false);
+
+            if (origin == null)
+            {
+                origin = new BlockPos(entity);
+            }
+        }
+
+        SchematicCreationUtils.setSchematicMetadataOnCreation(schematic, name);
+        SchematicHolder.getInstance().addSchematic(schematic, true);
+
+        SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, false);
+        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+
+        manager.addSchematicPlacement(placement, false);
+        manager.setSelectedSchematicPlacement(placement);
+
+        if (GameUtils.isCreativeMode())
+        {
+            DataManager.setToolMode(ToolMode.PASTE_SCHEMATIC);
+        }
     }
 }

@@ -3,15 +3,22 @@ package fi.dy.masa.litematica.config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.config.value.LayerMode;
+import fi.dy.masa.malilib.input.ActionResult;
+import fi.dy.masa.malilib.input.KeyAction;
+import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.callback.HotkeyCallback;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.SetSchematicPreviewTask;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.schematic.util.SchematicEditUtils;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
-import fi.dy.masa.litematica.schematic.util.SchematicUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -22,13 +29,6 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.config.value.LayerMode;
-import fi.dy.masa.malilib.input.ActionResult;
-import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.input.KeyBind;
-import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.ListUtils;
 
 public class HotkeyCallbackMisc implements HotkeyCallback
 {
@@ -61,7 +61,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         {
             if (DataManager.getSelectionManager().getCurrentSelection() != null)
             {
-                ToolUtils.cloneSelectionArea(this.mc);
+                ToolUtils.cloneSelectionArea();
                 return ActionResult.SUCCESS;
             }
         }
@@ -281,11 +281,11 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.CREATE_SCHEMATIC_IN_MEMORY.getKeyBind())
         {
-            return SchematicUtils.saveSchematic(true);
+            return SchematicCreationUtils.saveSchematic(true);
         }
         else if (key == Hotkeys.SAVE_SCHEMATIC_TO_FILE.getKeyBind())
         {
-            return SchematicUtils.saveSchematic(false);
+            return SchematicCreationUtils.saveSchematic(false);
         }
         else if (key == Hotkeys.SCHEMATIC_EDIT_ACCEPT_REPLACEMENT.getKeyBind())
         {

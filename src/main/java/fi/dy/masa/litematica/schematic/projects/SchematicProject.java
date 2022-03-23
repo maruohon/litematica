@@ -4,17 +4,21 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.apache.commons.io.FileUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.entity.player.EntityPlayer;
+import org.apache.commons.io.FileUtils;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
@@ -23,12 +27,8 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
+import fi.dy.masa.litematica.task.CreateSchematicTask;
 import fi.dy.masa.litematica.util.ToolUtils;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
 
 public class SchematicProject
 {
@@ -314,16 +314,14 @@ public class SchematicProject
     {
         if (this.checkCanSaveOrPrintError())
         {
-            String author = GameUtils.getClientPlayer().getName();
             String fileName = this.getNextFileName();
             AreaSelection selection = this.getSelection();
             BlockPos areaOffset = selection.getEffectiveOrigin().subtract(this.origin);
 
-            LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(selection, author);
-            schematic.getMetadata().setName(name);
+            LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(selection);
+            CreateSchematicTask task = new CreateSchematicTask(schematic, selection.copy(), false,
+                () -> this.writeSchematicToFileAndAddVersion(schematic, fileName, name, areaOffset));
 
-            TaskSaveSchematic task = new TaskSaveSchematic(this.directory, fileName, schematic, selection.copy(), true, false);
-            task.setCompletionListener(new SaveCompletionListener(name, fileName, areaOffset));
             TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 2);
 
             this.saveInProgress = true;
@@ -334,6 +332,24 @@ public class SchematicProject
         }
 
         return false;
+    }
+
+    protected void writeSchematicToFileAndAddVersion(ISchematic schematic, String fileName, String name, Vec3i areaOffset)
+    {
+        SchematicCreationUtils.setSchematicMetadataOnCreation(schematic, name);
+
+        if (schematic.writeToFile(this.directory, fileName, false))
+        {
+            int versionNumber = this.versions.size() + 1;
+            SchematicVersion version = new SchematicVersion(this, name, fileName, areaOffset,
+                                                            versionNumber, System.currentTimeMillis());
+            this.versions.add(version);
+            this.switchVersion(this.versions.size() - 1, true);
+            this.cacheCurrentAreaFromPlacement();
+            this.saveInProgress = false;
+
+            MessageDispatcher.success("litematica.message.schematic_projects.version_saved", version, name);
+        }
     }
 
     private String getNextFileName()
@@ -510,44 +526,5 @@ public class SchematicProject
         }
 
         return true;
-    }
-
-    private class SaveCompletionListener implements TaskCompletionListener
-    {
-        private final String name;
-        private final String fileName;
-        private final BlockPos areaOffset;
-        private final int version;
-
-        private SaveCompletionListener(String name, String fileName, BlockPos areaOffset)
-        {
-            this.name = name;
-            this.fileName = fileName;
-            this.areaOffset = areaOffset;
-            this.version = SchematicProject.this.versions.size() + 1;
-        }
-
-        @Override
-        public void onTaskCompleted()
-        {
-            GameUtils.scheduleToClientThread(this::saveVersion);
-        }
-
-        private void saveVersion()
-        {
-            SchematicVersion version = new SchematicVersion(SchematicProject.this, this.name, this.fileName,
-                                                            this.areaOffset, this.version, System.currentTimeMillis());
-            SchematicProject.this.versions.add(version);
-            SchematicProject.this.switchVersion(SchematicProject.this.versions.size() - 1, true);
-            SchematicProject.this.cacheCurrentAreaFromPlacement();
-            SchematicProject.this.saveInProgress = false;
-
-            if (GuiUtils.getCurrentScreen() instanceof TaskCompletionListener)
-            {
-                ((TaskCompletionListener) GuiUtils.getCurrentScreen()).onTaskCompleted();
-            }
-
-            MessageDispatcher.success().translate("litematica.message.schematic_projects.version_saved", this.version, this.name);
-        }
     }
 }

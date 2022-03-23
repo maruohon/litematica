@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
@@ -200,5 +201,7 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
 
     protected void openSaveSchematicScreen()
     {
+        SaveSchematicFromAreaScreen screen = new SaveSchematicFromAreaScreen(this.selection);
+        BaseScreen.openScreen(screen);
     }
 }

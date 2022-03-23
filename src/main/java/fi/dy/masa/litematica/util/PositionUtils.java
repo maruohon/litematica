@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
@@ -25,6 +25,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.position.Coordinate;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
@@ -36,11 +41,6 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.position.Coordinate;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class PositionUtils
 {
@@ -476,12 +476,14 @@ public class PositionUtils
     {
         for (Box box : boxes)
         {
-            final int boxMinX = Math.min(box.getPos1().getX(), box.getPos2().getX());
-            final int boxMinY = Math.min(box.getPos1().getY(), box.getPos2().getY());
-            final int boxMinZ = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
-            final int boxMaxX = Math.max(box.getPos1().getX(), box.getPos2().getX());
-            final int boxMaxY = Math.max(box.getPos1().getY(), box.getPos2().getY());
-            final int boxMaxZ = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+            BlockPos pos1 = box.getPos1();
+            BlockPos pos2 = box.getPos2();
+            final int boxMinX = Math.min(pos1.getX(), pos2.getX());
+            final int boxMinY = Math.min(pos1.getY(), pos2.getY());
+            final int boxMinZ = Math.min(pos1.getZ(), pos2.getZ());
+            final int boxMaxX = Math.max(pos1.getX(), pos2.getX());
+            final int boxMaxY = Math.max(pos1.getY(), pos2.getY());
+            final int boxMaxZ = Math.max(pos1.getZ(), pos2.getZ());
             final int boxMinChunkX = boxMinX >> 4;
             final int boxMinChunkZ = boxMinZ >> 4;
             final int boxMaxChunkX = boxMaxX >> 4;
@@ -493,12 +495,10 @@ public class PositionUtils
                 {
                     final int chunkMinX = cx << 4;
                     final int chunkMinZ = cz << 4;
-                    final int chunkMaxX = chunkMinX + 15;
-                    final int chunkMaxZ = chunkMinZ + 15;
-                    final int minX = Math.max(chunkMinX, boxMinX);
-                    final int minZ = Math.max(chunkMinZ, boxMinZ);
-                    final int maxX = Math.min(chunkMaxX, boxMaxX);
-                    final int maxZ = Math.min(chunkMaxZ, boxMaxZ);
+                    final int minX = Math.max(chunkMinX     , boxMinX);
+                    final int minZ = Math.max(chunkMinZ     , boxMinZ);
+                    final int maxX = Math.min(chunkMinX + 15, boxMaxX);
+                    final int maxZ = Math.min(chunkMinZ + 15, boxMaxZ);
 
                     consumer.accept(new ChunkPos(cx, cz), new IntBoundingBox(minX, boxMinY, minZ, maxX, boxMaxY, maxZ));
                 }

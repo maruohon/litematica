@@ -9,9 +9,9 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.litematica.Litematica;
 
 public interface ISchematic
 {
@@ -88,7 +88,7 @@ public interface ISchematic
         if (dir.exists() == false && dir.mkdirs() == false)
         {
             String key = "litematica.error.schematic_write_to_file_failed.directory_creation_failed";
-            MessageDispatcher.error().translate(key, dir.getAbsolutePath());
+            MessageDispatcher.error(key, dir.getAbsolutePath());
             return false;
         }
 
@@ -114,8 +114,8 @@ public interface ISchematic
         {
             if (override == false && file.exists())
             {
-                MessageDispatcher.error().translate("litematica.error.schematic_write_to_file_failed.exists",
-                                                    file.getAbsolutePath());
+                MessageDispatcher.error("litematica.error.schematic_write_to_file_failed.exists",
+                                        file.getAbsolutePath());
                 return false;
             }
 
@@ -127,8 +127,8 @@ public interface ISchematic
         }
         catch (Exception e)
         {
-            MessageDispatcher.error().translate("litematica.error.schematic_write_to_file_failed.exception",
-                                                file.getAbsolutePath());
+            MessageDispatcher.error("litematica.error.schematic_write_to_file_failed.exception",
+                                    file.getAbsolutePath());
             Litematica.logger.warn("Failed to write schematic to file '{}'", file.getAbsolutePath(), e);
         }
 
@@ -151,7 +151,7 @@ public interface ISchematic
 
         if (file == null)
         {
-            MessageDispatcher.error().translate("litematica.error.schematic_read_from_file_failed.no_file");
+            MessageDispatcher.error("litematica.error.schematic_read_from_file_failed.no_file");
             return false;
         }
 
@@ -159,8 +159,8 @@ public interface ISchematic
 
         if (tag == null)
         {
-            MessageDispatcher.error().translate("litematica.error.schematic_read_from_file_failed.cant_read",
-                                                file.getAbsolutePath());
+            MessageDispatcher.error("litematica.error.schematic_read_from_file_failed.cant_read",
+                                    file.getAbsolutePath());
             return false;
         }
 
