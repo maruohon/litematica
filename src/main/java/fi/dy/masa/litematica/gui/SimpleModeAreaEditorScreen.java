@@ -1,11 +1,5 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
@@ -14,6 +8,12 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
 
 public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
 {
@@ -47,8 +47,9 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
         this.mainMenuButton         = GenericButton.create(18, "litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
 
         this.manualOriginButton.translateAndAddHoverString("litematica.hover.button.area_editor.manual_origin");
-        this.originCheckbox = new CheckBoxWidget("litematica.checkmark.area_editor.origin", "litematica.hover.checkmark.area_editor.select_this_element");
-        this.originCheckbox.setBooleanStorage(selection::isOriginSelected, selection::setOriginSelected);
+        this.originCheckbox = new CheckBoxWidget("litematica.checkmark.area_editor.origin",
+                                                 "litematica.hover.checkmark.area_editor.select_this_element",
+                                                 selection::isOriginSelected, selection::setOriginSelected);
         this.originCheckbox.setListener(this::onOriginCheckboxClick);
 
         Box box = selection.getSelectedSubRegionBox();

@@ -13,17 +13,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
-import fi.dy.masa.litematica.gui.widget.list.entry.SchematicPlacementSubRegionEntryWidget;
-import fi.dy.masa.litematica.materials.MaterialListPlacement;
-import fi.dy.masa.litematica.schematic.ISchematic;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
@@ -43,6 +32,17 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.gui.widget.list.entry.SchematicPlacementSubRegionEntryWidget;
+import fi.dy.masa.litematica.materials.MaterialListPlacement;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 
 public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWidget<SubRegionPlacement>>
 {
@@ -116,16 +116,12 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
                                                               this.placement::isEnabled, this::toggleEnabled);
         this.originEditWidget = new BlockPosEditWidget(90, 72, 2, true, placement.getOrigin(), this::setOrigin);
 
-        this.lockXCoordCheckbox = new CheckBoxWidget();
-        this.lockYCoordCheckbox = new CheckBoxWidget();
-        this.lockZCoordCheckbox = new CheckBoxWidget();
+        this.lockXCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
+        this.lockYCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
+        this.lockZCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
 
         Icon icon = placement.getSchematicFile() != null ? placement.getSchematic().getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
         this.schematicTypeIcon = new IconWidget(icon);
-
-        this.lockXCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
-        this.lockYCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
-        this.lockZCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
 
         this.copyPasteSettingsButton.setRenderButtonBackgroundTexture(true);
         this.copyPasteSettingsButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.copy_paste_settings");

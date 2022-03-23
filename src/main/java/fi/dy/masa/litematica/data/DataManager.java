@@ -17,6 +17,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import fi.dy.masa.malilib.gui.config.ConfigTab;
+import fi.dy.masa.malilib.gui.tab.ScreenTab;
+import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
@@ -32,16 +41,6 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.gui.config.ConfigTab;
-import fi.dy.masa.malilib.gui.tab.ScreenTab;
-import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class DataManager implements DirectoryCache
 {
@@ -151,7 +150,7 @@ public class DataManager implements DirectoryCache
 
     public static void cycleToolMode(boolean forward)
     {
-        operationMode = operationMode.cycle(GameUtils.getClientPlayer(), forward);
+        operationMode = operationMode.cycle(forward);
     }
 
     public static LayerRange getRenderLayerRange()

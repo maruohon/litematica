@@ -4,6 +4,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.input.MouseInputHandler;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -16,9 +19,6 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.input.MouseInputHandler;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 
 public class InputHandler implements MouseInputHandler
 {
@@ -101,7 +101,7 @@ public class InputHandler implements MouseInputHandler
 
         if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeyBind().isKeyBindHeld())
         {
-            DataManager.setToolMode(DataManager.getToolMode().cycle(player, amount < 0));
+            DataManager.setToolMode(DataManager.getToolMode().cycle(amount < 0));
             return true;
         }
 

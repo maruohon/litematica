@@ -80,7 +80,7 @@ public class ToolUtils
 
     public static void fillSelectionVolumes(Minecraft mc, IBlockState state, @Nullable IBlockState stateToReplace)
     {
-        if (mc.player != null && mc.player.capabilities.isCreativeMode)
+        if (mc.player != null && GameUtils.isCreativeMode())
         {
             final AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
 
@@ -142,7 +142,7 @@ public class ToolUtils
     {
         EntityPlayer player = GameUtils.getClientPlayer();
 
-        if (player != null && player.capabilities.isCreativeMode)
+        if (player != null && GameUtils.isCreativeMode())
         {
             if (area == null)
             {
@@ -200,9 +200,7 @@ public class ToolUtils
 
     public static void updateSelectionVolumes(@Nullable final AreaSelection area)
     {
-        EntityPlayer player = GameUtils.getClientPlayer();
-
-        if (player != null && player.capabilities.isCreativeMode && GameUtils.isSinglePlayer())
+        if (GameUtils.getClientPlayer() != null && GameUtils.isCreativeMode() && GameUtils.isSinglePlayer())
         {
             if (area == null)
             {
@@ -244,7 +242,7 @@ public class ToolUtils
 
     public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos, Minecraft mc)
     {
-        if (mc.player == null || mc.player.capabilities.isCreativeMode == false)
+        if (mc.player == null || GameUtils.isCreativeMode() == false)
         {
             MessageDispatcher.error("litematica.error.generic.creative_mode_only");
             return;

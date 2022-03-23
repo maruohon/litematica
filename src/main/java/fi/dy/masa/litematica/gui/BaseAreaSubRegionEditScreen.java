@@ -1,15 +1,14 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.PositionUtils;
 
 public abstract class BaseAreaSubRegionEditScreen extends BaseScreen
 {
@@ -31,13 +30,8 @@ public abstract class BaseAreaSubRegionEditScreen extends BaseScreen
         this.setSubRegionNameButton = GenericButton.create(18, "litematica.button.misc.set", this::renameSubRegion);
 
         String hover = "litematica.hover.checkmark.area_editor.select_this_element";
-        this.corner1Checkbox = new CheckBoxWidget(DefaultIcons.CHECKMARK_OFF, DefaultIcons.CHECKMARK_ON,
-                                                  "litematica.checkmark.area_editor.corner1", hover);
-        this.corner2Checkbox = new CheckBoxWidget(DefaultIcons.CHECKMARK_OFF, DefaultIcons.CHECKMARK_ON,
-                                                  "litematica.checkmark.area_editor.corner2", hover);
-
-        this.corner1Checkbox.setBooleanStorage(this::isCorner1Selected, this::setCorner1Selected);
-        this.corner2Checkbox.setBooleanStorage(this::isCorner2Selected, this::setCorner2Selected);
+        this.corner1Checkbox = new CheckBoxWidget("litematica.checkmark.area_editor.corner1", hover, this::isCorner1Selected, this::setCorner1Selected);
+        this.corner2Checkbox = new CheckBoxWidget("litematica.checkmark.area_editor.corner2", hover, this::isCorner2Selected, this::setCorner2Selected);
 
         Box box = selection.getSelectedSubRegionBox();
         this.corner1EditWidget = new BlockPosEditWidget(90, 80, 2, true, box.getPos1(), box::setPos1);

@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,6 +24,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -42,10 +45,6 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class SchematicPlacingUtils
 {
@@ -99,9 +98,7 @@ public class SchematicPlacingUtils
                                                boolean changedBlocksOnly,
                                                boolean printMessage)
     {
-        EntityPlayer player = GameUtils.getClientPlayer();
-
-        if (player != null && player.capabilities.isCreativeMode)
+        if (GameUtils.isCreativeMode())
         {
             if (placements.isEmpty() == false)
             {

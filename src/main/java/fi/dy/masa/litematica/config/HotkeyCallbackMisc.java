@@ -404,12 +404,12 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.TOOL_MODE_CYCLE_BACKWARD.getKeyBind())
         {
-            DataManager.setToolMode(DataManager.getToolMode().cycle(this.mc.player, false));
+            DataManager.setToolMode(DataManager.getToolMode().cycle(false));
             return ActionResult.SUCCESS;
         }
         else if (key == Hotkeys.TOOL_MODE_CYCLE_FORWARD.getKeyBind())
         {
-            DataManager.setToolMode(DataManager.getToolMode().cycle(this.mc.player, true));
+            DataManager.setToolMode(DataManager.getToolMode().cycle(true));
             return ActionResult.SUCCESS;
         }
         else if (key == Hotkeys.UNLOAD_CURRENT_SCHEMATIC.getKeyBind())

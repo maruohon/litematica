@@ -235,9 +235,7 @@ public class SchematicProject
     {
         if (this.currentPlacement != null)
         {
-            EntityPlayer player = GameUtils.getClientPlayer();
-
-            if (player == null || player.capabilities.isCreativeMode == false)
+            if (GameUtils.getClientPlayer() == null || GameUtils.isCreativeMode() == false)
             {
                 MessageDispatcher.error().translate("litematica.error.generic.creative_mode_only");
                 return;

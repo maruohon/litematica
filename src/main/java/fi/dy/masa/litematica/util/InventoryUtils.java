@@ -17,11 +17,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.registry.Registry;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.registry.Registry;
 
 public class InventoryUtils
 {
@@ -82,7 +83,7 @@ public class InventoryUtils
 
         EntityPlayer player = mc.player;
         InventoryPlayer inventory = player.inventory;
-        boolean isCreativeMode = player.capabilities.isCreativeMode;
+        boolean isCreativeMode = GameUtils.isCreativeMode();
         int slotWithItem = fi.dy.masa.malilib.util.inventory.InventoryUtils.findSlotWithItemToPickBlock(player.openContainer, stack, ignoreNbt);
 
         // No item or no place to put it
@@ -196,18 +197,17 @@ public class InventoryUtils
     public static EnumHand doPickBlockForPosition(BlockPos pos, Minecraft mc)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        EntityPlayer player = mc.player;
         IBlockState state = world.getBlockState(pos);
         ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
 
         if (stack.isEmpty() == false)
         {
-            EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
+            EnumHand hand = EntityUtils.getUsedHandForItem(GameUtils.getClientPlayer(), stack, ignoreNbt);
 
             if (hand == null)
             {
-                if (mc.player.capabilities.isCreativeMode)
+                if (GameUtils.isCreativeMode())
                 {
                     TileEntity te = world.getTileEntity(pos);
 

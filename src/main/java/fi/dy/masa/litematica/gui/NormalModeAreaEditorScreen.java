@@ -4,17 +4,9 @@ import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
-import fi.dy.masa.litematica.gui.widget.list.entry.AreaSubRegionEntryWidget;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
@@ -24,6 +16,13 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.gui.widget.list.entry.AreaSubRegionEntryWidget;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionManager;
 
 public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<String>>
 {
@@ -67,12 +66,9 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
         this.areaSelectionBrowserButton.setActionListener(() -> openScreenWithParent(new AreaSelectionBrowserScreen()));
 
         String hover = "litematica.hover.checkmark.area_editor.select_this_element";
-        this.originCheckbox = new CheckBoxWidget(DefaultIcons.CHECKMARK_OFF, DefaultIcons.CHECKMARK_ON,
-                                                 "litematica.checkmark.area_editor.origin", hover);
-        this.manualOriginButton.translateAndAddHoverString("litematica.hover.button.area_editor.manual_origin");
-
-        this.originCheckbox.setBooleanStorage(selection::isOriginSelected, selection::setOriginSelected);
+        this.originCheckbox = new CheckBoxWidget("litematica.checkmark.area_editor.origin", hover, selection::isOriginSelected, selection::setOriginSelected);
         this.originCheckbox.setListener(this::onOriginCheckboxClick);
+        this.manualOriginButton.translateAndAddHoverString("litematica.hover.button.area_editor.manual_origin");
 
         Box box = selection.getSelectedSubRegionBox();
         BlockPos pos = box != null ? box.getPos1() : BlockPos.ORIGIN;
