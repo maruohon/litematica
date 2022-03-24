@@ -486,7 +486,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected BlockPos placeNbtPickedBlock(BlockPos pos, BlockState state, BlockEntity be,
                                            World schematicWorld, ClientWorld clientWorld)
     {
-        BlockPos placementPos = this.findEmptyNearbyPosition(clientWorld, this.mc.player.getBlockPos(), 5);
+        BlockPos placementPos = this.findEmptyNearbyPosition(clientWorld, this.mc.player.getBlockPos(), 4);
 
         if (placementPos != null && preparePickedStack(pos, state, be, schematicWorld, this.mc))
         {
@@ -868,8 +868,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         BlockPos.Mutable sidePos = new BlockPos.Mutable();
         long currentTime = System.nanoTime();
         long timeout = 2000000000L;
+        int radiusY = Math.min(radius, 2);
 
-        for (int y = centerPos.getY() - radius; y <= centerPos.getY() + radius; ++y)
+        for (int y = centerPos.getY() - radiusY; y <= centerPos.getY() + radiusY; ++y)
         {
             for (int z = centerPos.getZ() - radius; z <= centerPos.getZ() + radius; ++z)
             {
