@@ -1,31 +1,32 @@
 {
-    "required": true,
-    "package": "fi.dy.masa.litematica.mixin",
-    "refmap": "mixins.litematica.refmap.json",
-    "minVersion": "0.6",
-    "client": [
-        "IMixinBlockRendererDispatcher",
-        "IMixinCompiledChunk",
-        "IMixinDataFixer",
-        "IMixinItemBlockSpecial",
-        "IMixinNBTBase",
-        "IMixinViewFrustum",
-        "IMixinWorldClient",
-        "MixinBlock",
-        "MixinBlockRail",
-        "MixinChunk",
-        "MixinChunkProviderClient",
-        "MixinEntityRenderer",
-        "MixinGuiContainer",
-        "MixinGuiEditSign",
-        "MixinIntegratedServer",
-        "MixinMinecraft",
-        "MixinNetHandlerPlayClient",
-        "MixinPlayerControllerMP",
-        "MixinRenderGlobal",
-        "MixinWorld"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+	"required": true,
+	"package": "fi.dy.masa.litematica.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"refmap": "mixins.litematica.refmap.json",
+	"minVersion": "0.7",
+	"client": [
+		"IMixinBlockRendererDispatcher",
+		"IMixinCompiledChunk",
+		"IMixinDataFixer",
+		"IMixinItemBlockSpecial",
+		"IMixinNBTBase",
+		"IMixinViewFrustum",
+		"IMixinWorldClient",
+		"MixinBlock",
+		"MixinBlockRail",
+		"MixinChunk",
+		"MixinChunkProviderClient",
+		"MixinEntityRenderer",
+		"MixinGuiContainer",
+		"MixinGuiEditSign",
+		"MixinIntegratedServer",
+		"MixinMinecraft",
+		"MixinNetHandlerPlayClient",
+		"MixinPlayerControllerMP",
+		"MixinRenderGlobal",
+		"MixinWorld"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }
