@@ -1,12 +1,12 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.util.BlockRenderLayer;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public class VboRenderListSchematic extends ChunkRenderContainerSchematic
 {

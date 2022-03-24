@@ -1,6 +1,9 @@
 package fi.dy.masa.litematica.event;
 
 import net.minecraft.client.Minecraft;
+import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
+import fi.dy.masa.malilib.event.PostWorldRenderer;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -11,9 +14,6 @@ import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.SetSchematicPreviewTask;
 import fi.dy.masa.litematica.tool.ToolMode;
-import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
-import fi.dy.masa.malilib.event.PostWorldRenderer;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
 
 public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 {

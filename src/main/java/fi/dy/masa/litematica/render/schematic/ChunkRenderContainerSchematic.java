@@ -2,8 +2,8 @@ package fi.dy.masa.litematica.render.schematic;
 
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import net.minecraft.client.renderer.ChunkRenderContainer;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public abstract class ChunkRenderContainerSchematic extends ChunkRenderContainer
 {

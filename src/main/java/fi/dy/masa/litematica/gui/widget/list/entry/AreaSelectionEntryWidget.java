@@ -5,11 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.litematica.gui.NormalModeAreaEditorScreen;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.selection.SelectionMode;
-import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
@@ -24,6 +19,11 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
+import fi.dy.masa.litematica.gui.NormalModeAreaEditorScreen;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
+import fi.dy.masa.litematica.util.FileType;
 
 public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 {

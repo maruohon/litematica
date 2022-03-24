@@ -11,10 +11,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
-import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.RenderUtils;
@@ -23,6 +19,10 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.ItemType;
 import fi.dy.masa.malilib.util.inventory.InventoryScreenUtils;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
+import fi.dy.masa.litematica.render.infohud.RenderPhase;
 
 public class MaterialListHudRenderer implements IInfoHudRenderer
 {

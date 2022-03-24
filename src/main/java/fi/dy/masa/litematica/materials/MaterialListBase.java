@@ -9,11 +9,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.MathHelper;
-import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.datadump.DataDump;
+import fi.dy.masa.litematica.util.BlockInfoListType;
 
 public abstract class MaterialListBase implements IMaterialList
 {

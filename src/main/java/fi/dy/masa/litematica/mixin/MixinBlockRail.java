@@ -4,13 +4,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import fi.dy.masa.litematica.config.Configs;
 import net.minecraft.block.BlockRail;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.BlockRailDetector;
 import net.minecraft.block.BlockRailPowered;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.Rotation;
+import fi.dy.masa.litematica.config.Configs;
 
 @Mixin({BlockRail.class, BlockRailDetector.class, BlockRailPowered.class})
 public abstract class MixinBlockRail extends BlockRailBase

@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.world;
 
-import fi.dy.masa.litematica.mixin.IMixinWorldClient;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
@@ -15,6 +14,7 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.IChunkProvider;
+import fi.dy.masa.litematica.mixin.IMixinWorldClient;
 
 public class WorldSchematic extends WorldClient
 {

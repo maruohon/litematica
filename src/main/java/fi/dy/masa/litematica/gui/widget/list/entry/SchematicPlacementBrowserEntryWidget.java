@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
@@ -17,6 +15,8 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.util.FileType;
 
 public class SchematicPlacementBrowserEntryWidget extends DirectoryEntryWidget
 {

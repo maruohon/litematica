@@ -1,14 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
-import fi.dy.masa.litematica.gui.widget.list.entry.AreaSelectionEntryWidget;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.selection.SelectionMode;
-import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
@@ -19,6 +11,14 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.gui.widget.list.entry.AreaSelectionEntryWidget;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
+import fi.dy.masa.litematica.util.FileType;
 
 public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {

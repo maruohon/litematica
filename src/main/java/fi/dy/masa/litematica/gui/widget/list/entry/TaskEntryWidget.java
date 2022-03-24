@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.gui.widget.list.entry;
 
-import fi.dy.masa.litematica.scheduler.ITask;
-import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
+import fi.dy.masa.litematica.scheduler.ITask;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
 
 public class TaskEntryWidget extends BaseDataListEntryWidget<ITask>
 {

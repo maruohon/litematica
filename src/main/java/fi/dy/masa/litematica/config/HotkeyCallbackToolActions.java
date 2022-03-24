@@ -3,6 +3,10 @@ package fi.dy.masa.litematica.config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.input.ActionResult;
+import fi.dy.masa.malilib.input.KeyAction;
+import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.callback.HotkeyCallback;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -11,10 +15,6 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.ToolUtils;
-import fi.dy.masa.malilib.input.ActionResult;
-import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.input.KeyBind;
-import fi.dy.masa.malilib.input.KeyAction;
 
 public class HotkeyCallbackToolActions implements HotkeyCallback
 {

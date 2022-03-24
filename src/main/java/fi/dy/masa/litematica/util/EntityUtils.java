@@ -18,13 +18,13 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.inventory.InventoryUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.inventory.InventoryUtils;
 
 public class EntityUtils
 {

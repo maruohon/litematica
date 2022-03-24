@@ -6,10 +6,10 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ScreenShotHelper;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.schematic.ISchematic;
 
 /**
  * This task doesn't actually do/run anything on its own.

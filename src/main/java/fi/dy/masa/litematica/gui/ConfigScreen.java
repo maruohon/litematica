@@ -6,19 +6,19 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiScreen;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
+import fi.dy.masa.malilib.gui.config.BaseConfigTab;
+import fi.dy.masa.malilib.gui.config.ConfigTab;
+import fi.dy.masa.malilib.gui.tab.BaseScreenTab;
+import fi.dy.masa.malilib.gui.tab.ScreenTab;
+import fi.dy.masa.malilib.util.data.ModInfo;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.config.option.ConfigInfo;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.tab.BaseScreenTab;
-import fi.dy.masa.malilib.gui.tab.ScreenTab;
-import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
-import fi.dy.masa.malilib.gui.config.BaseConfigTab;
-import fi.dy.masa.malilib.gui.config.ConfigTab;
-import fi.dy.masa.malilib.util.data.ModInfo;
 
 public class ConfigScreen
 {

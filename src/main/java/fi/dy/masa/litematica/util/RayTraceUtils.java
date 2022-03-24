@@ -15,6 +15,9 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceCalculationData;
+import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -28,9 +31,6 @@ import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceCalculationData;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class RayTraceUtils
 {

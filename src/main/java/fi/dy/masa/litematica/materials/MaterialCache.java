@@ -32,12 +32,12 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.FileUtils;
 
 public class MaterialCache
 {

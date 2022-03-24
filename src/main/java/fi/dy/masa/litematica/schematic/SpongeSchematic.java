@@ -12,12 +12,12 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 
 public class SpongeSchematic extends SingleRegionSchematic
 {

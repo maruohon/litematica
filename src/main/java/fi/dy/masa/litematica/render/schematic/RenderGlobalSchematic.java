@@ -8,8 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Lists;
+import org.lwjgl.opengl.GL11;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -47,15 +47,15 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.util.IGenericEventListener;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class RenderGlobalSchematic extends RenderGlobal implements IGenericEventListener
 {

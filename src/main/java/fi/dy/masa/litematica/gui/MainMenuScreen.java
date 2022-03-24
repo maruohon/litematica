@@ -2,16 +2,16 @@ package fi.dy.masa.litematica.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
-import fi.dy.masa.litematica.schematic.projects.SchematicProject;
-import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.InteractableWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
+import fi.dy.masa.litematica.selection.SelectionMode;
 
 public class MainMenuScreen extends BaseScreen
 {

@@ -4,14 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.SchematicPlacementSubRegionSettingsScreen;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
-import fi.dy.masa.litematica.schematic.ISchematicRegion;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.IconWidget;
@@ -21,6 +13,14 @@ import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.SchematicPlacementSubRegionSettingsScreen;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.util.PositionUtils;
 
 public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWidget<SubRegionPlacement>
 {

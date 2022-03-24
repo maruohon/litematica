@@ -4,12 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.AreaSubRegionEditScreen;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.SelectionBox;
-import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
@@ -19,6 +13,12 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.AreaSubRegionEditScreen;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.SelectionBox;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.PositionUtils;
 
 public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
 {

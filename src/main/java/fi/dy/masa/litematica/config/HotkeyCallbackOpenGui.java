@@ -1,6 +1,13 @@
 package fi.dy.masa.litematica.config;
 
 import net.minecraft.client.Minecraft;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
+import fi.dy.masa.malilib.input.ActionResult;
+import fi.dy.masa.malilib.input.KeyAction;
+import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.callback.HotkeyCallback;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.AreaSelectionBrowserScreen;
@@ -21,13 +28,6 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
-import fi.dy.masa.malilib.input.ActionResult;
-import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.input.KeyBind;
-import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 
 public class HotkeyCallbackOpenGui implements HotkeyCallback
 {

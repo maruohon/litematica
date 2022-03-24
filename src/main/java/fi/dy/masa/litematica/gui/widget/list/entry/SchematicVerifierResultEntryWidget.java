@@ -4,13 +4,6 @@ import java.util.Comparator;
 import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.gui.widget.SchematicVerifierBlockInfoWidget;
-import fi.dy.masa.litematica.materials.MaterialCache;
-import fi.dy.masa.litematica.schematic.verifier.BlockStatePair;
-import fi.dy.masa.litematica.schematic.verifier.BlockStatePairCount;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
-import fi.dy.masa.litematica.schematic.verifier.VerifierResultType;
 import fi.dy.masa.malilib.config.value.SortDirection;
 import fi.dy.masa.malilib.gui.util.ElementOffset;
 import fi.dy.masa.malilib.gui.util.ScreenContext;
@@ -26,6 +19,13 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.gui.widget.list.header.DataColumn;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.gui.widget.SchematicVerifierBlockInfoWidget;
+import fi.dy.masa.litematica.materials.MaterialCache;
+import fi.dy.masa.litematica.schematic.verifier.BlockStatePair;
+import fi.dy.masa.litematica.schematic.verifier.BlockStatePairCount;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.VerifierResultType;
 
 public class SchematicVerifierResultEntryWidget extends BaseDataListEntryWidget<BlockStatePairCount>
 {

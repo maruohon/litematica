@@ -3,11 +3,6 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import java.util.Collections;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.widget.SchematicVcsProjectInfoWidget;
-import fi.dy.masa.litematica.schematic.projects.SchematicProject;
-import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.ConfirmActionScreen;
@@ -21,6 +16,11 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.render.text.StyledText;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.widget.SchematicVcsProjectInfoWidget;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
+import fi.dy.masa.litematica.util.FileType;
 
 public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {

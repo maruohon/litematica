@@ -7,11 +7,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.SchematicType;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class SchematicInfoCache
 {

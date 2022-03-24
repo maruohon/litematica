@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -12,10 +16,6 @@ import fi.dy.masa.litematica.gui.widget.list.entry.SchematicPlacementEntryWidget
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.util.StringUtils;
 
 public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget<SchematicPlacementUnloaded>>
 {

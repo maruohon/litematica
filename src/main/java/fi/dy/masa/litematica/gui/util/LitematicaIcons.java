@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui.util;
 
 import net.minecraft.util.ResourceLocation;
-import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.malilib.gui.icon.BaseMultiIcon;
+import fi.dy.masa.litematica.Reference;
 
 public class LitematicaIcons extends BaseMultiIcon
 {

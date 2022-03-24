@@ -1,12 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
-import fi.dy.masa.litematica.gui.widget.SavedSchematicPlacementInfoWidget;
-import fi.dy.masa.litematica.gui.widget.list.entry.SchematicPlacementBrowserEntryWidget;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
@@ -16,6 +10,12 @@ import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.render.text.StyledText;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.gui.widget.SavedSchematicPlacementInfoWidget;
+import fi.dy.masa.litematica.gui.widget.list.entry.SchematicPlacementBrowserEntryWidget;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 
 public class SavedSchematicPlacementsBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {

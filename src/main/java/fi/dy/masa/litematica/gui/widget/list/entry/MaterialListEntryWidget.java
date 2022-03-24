@@ -3,9 +3,6 @@ package fi.dy.masa.litematica.gui.widget.list.entry;
 import java.util.Comparator;
 import java.util.Optional;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.gui.widget.MaterialListEntryHoverInfoWidget;
-import fi.dy.masa.litematica.materials.MaterialListBase;
-import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.malilib.config.value.SortDirection;
 import fi.dy.masa.malilib.gui.util.ElementOffset;
 import fi.dy.masa.malilib.gui.util.ScreenContext;
@@ -20,6 +17,9 @@ import fi.dy.masa.malilib.gui.widget.list.header.DataColumn;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.render.text.TextStyle;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.gui.widget.MaterialListEntryHoverInfoWidget;
+import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.litematica.materials.MaterialListEntry;
 
 public class MaterialListEntryWidget extends BaseDataListEntryWidget<MaterialListEntry>
 {

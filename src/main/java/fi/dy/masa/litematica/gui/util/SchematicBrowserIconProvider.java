@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.icon.MultiIcon;
+import fi.dy.masa.litematica.schematic.SchematicType;
 
 public class SchematicBrowserIconProvider implements FileBrowserIconProvider
 {

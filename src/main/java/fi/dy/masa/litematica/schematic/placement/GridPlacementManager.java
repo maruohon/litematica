@@ -10,10 +10,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.GameUtils;
 
 public class GridPlacementManager
 {

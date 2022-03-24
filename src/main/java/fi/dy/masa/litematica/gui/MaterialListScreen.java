@@ -5,17 +5,6 @@ import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
-import fi.dy.masa.litematica.gui.widget.list.entry.MaterialListEntryWidget;
-import fi.dy.masa.litematica.materials.MaterialCache;
-import fi.dy.masa.litematica.materials.MaterialListAreaAnalyzer;
-import fi.dy.masa.litematica.materials.MaterialListBase;
-import fi.dy.masa.litematica.materials.MaterialListEntry;
-import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
-import fi.dy.masa.litematica.materials.MaterialListUtils;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
@@ -32,6 +21,17 @@ import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.datadump.DataDump;
 import fi.dy.masa.malilib.util.datadump.DataDump.Format;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.util.LitematicaIcons;
+import fi.dy.masa.litematica.gui.widget.list.entry.MaterialListEntryWidget;
+import fi.dy.masa.litematica.materials.MaterialCache;
+import fi.dy.masa.litematica.materials.MaterialListAreaAnalyzer;
+import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.litematica.materials.MaterialListEntry;
+import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
+import fi.dy.masa.litematica.materials.MaterialListUtils;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.util.BlockInfoListType;
 
 public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialListEntry>>
 {

@@ -1,12 +1,12 @@
 package fi.dy.masa.litematica.world;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.render.LitematicaRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import fi.dy.masa.litematica.render.LitematicaRenderer;
 
 public class SchematicWorldHandler
 {

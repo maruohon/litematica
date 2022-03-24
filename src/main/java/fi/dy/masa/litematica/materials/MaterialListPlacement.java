@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.materials;
 
 import com.google.gson.JsonObject;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListPlacement extends MaterialListBase
 {

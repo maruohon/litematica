@@ -14,12 +14,12 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.mixin.IMixinDataFixer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
-import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public abstract class SchematicBase implements ISchematic
 {

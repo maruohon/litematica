@@ -12,10 +12,10 @@ import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
+import fi.dy.masa.malilib.render.shader.ShaderProgram;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
-import fi.dy.masa.malilib.render.shader.ShaderProgram;
 
 public class LitematicaRenderer
 {

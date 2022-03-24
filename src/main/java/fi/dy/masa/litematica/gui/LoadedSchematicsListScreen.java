@@ -2,16 +2,16 @@ package fi.dy.masa.litematica.gui;
 
 import java.util.List;
 import java.util.function.Supplier;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.gui.widget.list.entry.SchematicEntryWidget;
 import fi.dy.masa.litematica.schematic.ISchematic;
-import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.util.StringUtils;
 
 public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<ISchematic>>
 {
