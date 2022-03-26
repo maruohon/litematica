@@ -251,7 +251,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         }
 
         String blockName = rl.toString();
-        String cmdName = Configs.Generic.COMMAND_NAME_SETBLOCK.getStringValue();
+        String cmdName = Configs.Generic.COMMAND_NAME_SETBLOCK.getValue();
         String strCommand = String.format("/%s %d %d %d %s %d", cmdName, x, y, z, blockName, block.getMetaFromState(state));
 
         player.sendChatMessage(strCommand);

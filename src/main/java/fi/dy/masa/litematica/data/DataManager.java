@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import fi.dy.masa.malilib.config.option.OptionalDirectoryConfig.BooleanAndFile;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
@@ -40,6 +41,7 @@ import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
+import fi.dy.masa.litematica.util.DefaultDirectories;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 
 public class DataManager implements DirectoryCache
@@ -374,17 +376,18 @@ public class DataManager implements DirectoryCache
 
     public static File getSchematicsBaseDirectory()
     {
-        boolean custom = Configs.Generic.USE_CUSTOM_SCHEMATIC_DIRECTORY.getBooleanValue();
+        BooleanAndFile value = Configs.Generic.CUSTOM_SCHEMATIC_DIRECTORY.getValue();
+        boolean useCustom = value.booleanValue;
         File dir = null;
 
-        if (custom)
+        if (useCustom)
         {
-            dir = Configs.Generic.CUSTOM_SCHEMATIC_DIRECTORY.getValue();
+            dir = value.fileValue;
         }
 
-        if (custom == false || dir == null)
+        if (useCustom == false || dir == null)
         {
-            dir = FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics"));
+            dir = DefaultDirectories.getDefaultSchematicDirectory();
         }
 
         if (dir.exists() == false && dir.mkdirs() == false)
@@ -529,7 +532,7 @@ public class DataManager implements DirectoryCache
         // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
 
-        Configs.Generic.TOOL_ITEM.setValueFromString(Item.REGISTRY.getNameForObject(Items.STICK).toString());
+        Configs.Generic.TOOL_ITEM.setValue(Item.REGISTRY.getNameForObject(Items.STICK).toString());
     }
 
     public static void setHeldItemAsTool()
@@ -558,7 +561,7 @@ public class DataManager implements DirectoryCache
                 }
             }
 
-            Configs.Generic.TOOL_ITEM.setValueFromString(cfgStr);
+            Configs.Generic.TOOL_ITEM.setValue(cfgStr);
             MessageDispatcher.generic().customHotbar().translate("litematica.message.set_currently_held_item_as_tool");
         }
     }

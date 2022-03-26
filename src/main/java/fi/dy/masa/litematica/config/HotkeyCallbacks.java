@@ -62,7 +62,7 @@ public class HotkeyCallbacks
         Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SELECTION_GROW_HOTKEY.getKeyBind().setCallback(hotkeyCallbackMisc);
-        Hotkeys.SELECTION_MODE_CYCLE.getKeyBind().setCallback(hotkeyCallbackMisc);
+        Hotkeys.SUB_MODE_CYCLE.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SELECTION_SHRINK.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SET_AREA_ORIGIN.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SET_HELD_ITEM_AS_TOOL.getKeyBind().setCallback(hotkeyCallbackMisc);

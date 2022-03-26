@@ -178,19 +178,16 @@ public class OverlayRenderer
                     Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoundingBoxColor();
                     RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
 
-                    if (Configs.Visuals.PLACEMENT_ENCLOSING_BOX.getBooleanValue())
+                    if (schematicPlacement.shouldRenderEnclosingBox())
                     {
-                        if (schematicPlacement.shouldRenderEnclosingBox())
-                        {
-                            Box box = schematicPlacement.getEnclosingBox();
-                            RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
+                        Box box = schematicPlacement.getEnclosingBox();
+                        RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
 
-                            if (Configs.Visuals.PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
-                            {
-                                float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
-                                color = new Color4f(color.r, color.g, color.b, alpha);
-                                RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, renderViewEntity, partialTicks);
-                            }
+                        if (Configs.Visuals.PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
+                        {
+                            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
+                            color = new Color4f(color.r, color.g, color.b, alpha);
+                            RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, renderViewEntity, partialTicks);
                         }
                     }
                 }
@@ -369,7 +366,7 @@ public class OverlayRenderer
         BlockPairTypePosition lookedEntry = null;
         BlockPairTypePosition prevEntry = null;
         long lookPosLong = lookPos != null ? lookPos.posLong : -1;
-        boolean connections = Configs.Visuals.ERROR_MARKER_CONNECTIONS.getBooleanValue();
+        boolean connections = Configs.Visuals.VERIFIER_HIGHLIGHT_CONNECTIONS.getBooleanValue();
 
         for (BlockPairTypePosition entry : posList)
         {
@@ -408,7 +405,7 @@ public class OverlayRenderer
 
         tessellator.draw();
 
-        if (Configs.Visuals.ERROR_MARKER_SIDES.getBooleanValue())
+        if (Configs.Visuals.VERIFIER_HIGHLIGHT_SIDES.getBooleanValue())
         {
             GlStateManager.enableBlend();
             GlStateManager.disableCull();

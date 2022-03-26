@@ -316,7 +316,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
                 return ActionResult.SUCCESS;
             }
         }
-        else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeyBind())
+        else if (key == Hotkeys.SUB_MODE_CYCLE.getKeyBind())
         {
             if (mode == ToolMode.DELETE)
             {

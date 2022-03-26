@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.config;
 
-import java.io.File;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.category.BaseConfigOptionCategory;
@@ -8,19 +7,19 @@ import fi.dy.masa.malilib.config.category.ConfigOptionCategory;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.ConfigOption;
-import fi.dy.masa.malilib.config.option.DirectoryConfig;
 import fi.dy.masa.malilib.config.option.DoubleConfig;
 import fi.dy.masa.malilib.config.option.DualColorConfig;
 import fi.dy.masa.malilib.config.option.HotkeyedBooleanConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
+import fi.dy.masa.malilib.config.option.OptionalDirectoryConfig;
 import fi.dy.masa.malilib.config.option.StringConfig;
 import fi.dy.masa.malilib.config.value.FileBrowserColumns;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.DefaultDirectories;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 
 public class Configs
@@ -37,15 +36,15 @@ public class Configs
         public static final BooleanConfig AREAS_PER_WORLD                           = new BooleanConfig("areaSelectionsPerWorld", true);
         public static final BooleanConfig BETTER_RENDER_ORDER                       = new BooleanConfig("betterRenderOrder", true);
         public static final BooleanConfig CHANGE_SELECTED_CORNER                    = new BooleanConfig("changeSelectedCornerOnMove", true);
-        public static final BooleanConfig CLONE_AT_ORIGINAL_POS                     = new BooleanConfig("cloneAtOriginalPosition", false);
+        public static final BooleanConfig CLONE_AT_ORIGINAL_POS                     = new BooleanConfig("cloneAtOriginalPosition", true);
         public static final StringConfig  COMMAND_NAME_SETBLOCK                     = new StringConfig("commandNameSetblock", "setblock");
-        public static final DirectoryConfig CUSTOM_SCHEMATIC_DIRECTORY              = new DirectoryConfig("customSchematicDirectory", FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics")));
+        public static final OptionalDirectoryConfig CUSTOM_SCHEMATIC_DIRECTORY      = new OptionalDirectoryConfig("customSchematicDirectory", false, DefaultDirectories.getDefaultSchematicDirectory());
         public static final BooleanConfig DEBUG_MESSAGES                            = new BooleanConfig("debugMessages", false);
         public static final BooleanConfig EASY_PLACE_CLICK_ADJACENT                 = new BooleanConfig("easyPlaceClickAdjacent", false);
         public static final BooleanConfig EASY_PLACE_HOLD_ENABLED                   = new BooleanConfig("easyPlaceHold", false);
         public static final BooleanConfig EXECUTE_REQUIRE_TOOL                      = new BooleanConfig("executeRequireHoldingTool", true);
         public static final BooleanConfig FIX_RAIL_ROTATION                         = new BooleanConfig("fixRailRotation", true);
-        public static final BooleanConfig GENERATE_LOWERCASE_NAMES                  = new BooleanConfig("generateLowercaseNames", true);
+        public static final BooleanConfig GENERATE_LOWERCASE_NAMES                  = new BooleanConfig("generateLowerCaseNames", false);
         public static final BooleanConfig LOAD_ENTIRE_SCHEMATICS                    = new BooleanConfig("loadEntireSchematics", false);
         public static final BooleanConfig MATERIAL_LIST_IGNORE_BLOCK_STATE          = new BooleanConfig("materialListIgnoreBlockState", false);
         public static final BooleanConfig MATERIALS_FROM_CONTAINER                  = new BooleanConfig("materialListFromContainer", true);
@@ -57,7 +56,6 @@ public class Configs
         public static final BooleanConfig RENDER_MATERIALS_IN_GUI                   = new BooleanConfig("renderMaterialListInGuis", true);
         public static final BooleanConfig RENDER_THREAD_NO_TIMEOUT                  = new BooleanConfig("renderThreadNoTimeout", true);
         public static final StringConfig  TOOL_ITEM                                 = new StringConfig( "toolItem", "minecraft:stick");
-        public static final BooleanConfig USE_CUSTOM_SCHEMATIC_DIRECTORY            = new BooleanConfig("useCustomSchematicDirectory", false);
 
         public static final OptionListConfig<ReplaceBehavior> PASTE_REPLACE_BEHAVIOR        = new OptionListConfig<>("pasteReplaceBehavior", ReplaceBehavior.NONE, ReplaceBehavior.VALUES);
         public static final OptionListConfig<FileBrowserColumns> SCHEMATIC_BROWSER_COLUMNS  = new OptionListConfig<>("schematicBrowserColumns", FileBrowserColumns.MTIME, FileBrowserColumns.VALUES);
@@ -69,12 +67,11 @@ public class Configs
                 CHANGE_SELECTED_CORNER,
                 CLONE_AT_ORIGINAL_POS,
                 COMMAND_NAME_SETBLOCK,
-                USE_CUSTOM_SCHEMATIC_DIRECTORY,
                 CUSTOM_SCHEMATIC_DIRECTORY,
                 DEBUG_MESSAGES,
                 EASY_PLACE_CLICK_ADJACENT,
-                EASY_PLACE_MODE,
                 EASY_PLACE_HOLD_ENABLED,
+                EASY_PLACE_MODE,
                 EXECUTE_REQUIRE_TOOL,
                 FIX_RAIL_ROTATION,
                 GENERATE_LOWERCASE_NAMES,
@@ -111,30 +108,27 @@ public class Configs
 
     public static class Visuals
     {
+        public static final HotkeyedBooleanConfig AREA_SELECTION_BOX_SIDES              = new HotkeyedBooleanConfig("areaSelectionBoxSides", true, "");
         public static final HotkeyedBooleanConfig AREA_SELECTION_RENDERING              = new HotkeyedBooleanConfig("areaSelectionRendering", true, "");
         public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE                 = new HotkeyedBooleanConfig("mainRenderingToggle", true, "M,R");
+        public static final HotkeyedBooleanConfig PLACEMENT_BOX_RENDERING               = new HotkeyedBooleanConfig("placementBoundingBoxRendering", true, "");
+        public static final HotkeyedBooleanConfig PLACEMENT_BOX_SIDES                   = new HotkeyedBooleanConfig("placementBoxSides", false, "");
+        public static final HotkeyedBooleanConfig RENDER_COLLIDING_BLOCK_AT_CURSOR      = new HotkeyedBooleanConfig("renderCollidingBlockAtCursor", false, "");
         public static final HotkeyedBooleanConfig RENDER_COLLIDING_SCHEMATIC_BLOCKS     = new HotkeyedBooleanConfig("renderCollidingSchematicBlocks", false, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_BLOCKS_RENDERING            = new HotkeyedBooleanConfig("schematicBlocksRendering", true, "M,B");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY                     = new HotkeyedBooleanConfig("schematicOverlayRendering", true, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_RENDERING                   = new HotkeyedBooleanConfig("schematicRendering", true, "M,G");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_RENDER_THROUGH      = new HotkeyedBooleanConfig("schematicOverlayRenderThrough", false, "");
-        public static final HotkeyedBooleanConfig TRANSLUCENT_SCHEMATIC_RENDERING       = new HotkeyedBooleanConfig("translucentSchematicRendering", false, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_EXTRA          = new HotkeyedBooleanConfig("schematicOverlayTypeExtra", true, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_MISSING        = new HotkeyedBooleanConfig("schematicOverlayTypeMissing", true, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK    = new HotkeyedBooleanConfig("schematicOverlayTypeWrongBlock", true, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_STATE    = new HotkeyedBooleanConfig("schematicOverlayTypeWrongState", true, "");
+        public static final HotkeyedBooleanConfig TRANSLUCENT_SCHEMATIC_RENDERING       = new HotkeyedBooleanConfig("translucentSchematicRendering", false, "");
 
-        public static final BooleanConfig AREA_SELECTION_BOX_SIDES                  = new BooleanConfig("areaSelectionBoxSides", true);
-        public static final BooleanConfig ERROR_MARKER_CONNECTIONS                  = new BooleanConfig("errorMarkerConnections", false);
-        public static final BooleanConfig ERROR_MARKER_SIDES                        = new BooleanConfig("errorMarkerSides", true);
         public static final BooleanConfig IGNORE_EXISTING_FLUIDS                    = new BooleanConfig("ignoreExistingFluids", true);
         public static final BooleanConfig OVERLAY_REDUCED_INNER_SIDES               = new BooleanConfig("overlayReducedInnerSides", false);
-        public static final BooleanConfig PLACEMENT_BOX_RENDERING                   = new BooleanConfig("placementBoundingBoxRendering", true);
-        public static final BooleanConfig PLACEMENT_BOX_SIDES                       = new BooleanConfig("placementBoxSides", false);
         public static final DoubleConfig  PLACEMENT_BOX_SIDE_ALPHA                  = new DoubleConfig( "placementBoxSideAlpha", 0.2, 0.0, 1.0);
-        public static final BooleanConfig PLACEMENT_ENCLOSING_BOX                   = new BooleanConfig("placementEnclosingBox", true);
         public static final BooleanConfig PLACEMENT_ENCLOSING_BOX_SIDES             = new BooleanConfig("placementEnclosingBoxSides", false);
-        public static final BooleanConfig RENDER_COLLIDING_BLOCK_AT_CURSOR          = new BooleanConfig("renderCollidingBlockAtCursor", false);
         public static final BooleanConfig SCHEMATIC_OVERLAY_MODEL_OUTLINE           = new BooleanConfig("schematicOverlayModelOutline", true);
         public static final BooleanConfig SCHEMATIC_OVERLAY_MODEL_SIDES             = new BooleanConfig("schematicOverlayModelSides", true);
         public static final BooleanConfig SCHEMATIC_OVERLAY_OUTLINES                = new BooleanConfig("schematicOverlayOutlines", true);
@@ -144,51 +138,62 @@ public class Configs
         public static final BooleanConfig SCHEMATIC_VERIFIER_BLOCK_MODELS           = new BooleanConfig("schematicVerifierUseBlockModels", false);
         public static final BooleanConfig TRANSLUCENT_INNER_SIDES                   = new BooleanConfig("translucentBlockInnerSides", false);
         public static final DoubleConfig  TRANSLUCENT_SCHEMATIC_ALPHA               = new DoubleConfig( "translucentSchematicAlpha", 0.5, 0.0, 1.0);
+        public static final BooleanConfig VERIFIER_HIGHLIGHT_CONNECTIONS            = new BooleanConfig("verifierHighlightConnections", false);
+        public static final BooleanConfig VERIFIER_HIGHLIGHT_SIDES                  = new BooleanConfig("verifierHighlightSides", true);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 AREA_SELECTION_BOX_SIDES,
                 AREA_SELECTION_RENDERING,
-                ERROR_MARKER_CONNECTIONS,
-                ERROR_MARKER_SIDES,
-                IGNORE_EXISTING_FLUIDS,
                 MAIN_RENDERING_TOGGLE,
-                OVERLAY_REDUCED_INNER_SIDES,
                 PLACEMENT_BOX_RENDERING,
                 PLACEMENT_BOX_SIDES,
-                PLACEMENT_BOX_SIDE_ALPHA,
-                PLACEMENT_ENCLOSING_BOX,
-                PLACEMENT_ENCLOSING_BOX_SIDES,
                 RENDER_COLLIDING_BLOCK_AT_CURSOR,
                 RENDER_COLLIDING_SCHEMATIC_BLOCKS,
                 SCHEMATIC_BLOCKS_RENDERING,
                 SCHEMATIC_OVERLAY,
-                SCHEMATIC_OVERLAY_OUTLINES,
-                SCHEMATIC_OVERLAY_MODEL_OUTLINE,
-                SCHEMATIC_OVERLAY_MODEL_SIDES,
-                SCHEMATIC_OVERLAY_OUTLINE_WIDTH,
-                SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH,
+                SCHEMATIC_RENDERING,
                 SCHEMATIC_OVERLAY_RENDER_THROUGH,
-                SCHEMATIC_OVERLAY_SIDES,
                 SCHEMATIC_OVERLAY_TYPE_EXTRA,
                 SCHEMATIC_OVERLAY_TYPE_MISSING,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_STATE,
-                SCHEMATIC_RENDERING,
+                TRANSLUCENT_SCHEMATIC_RENDERING,
+
+                IGNORE_EXISTING_FLUIDS,
+                OVERLAY_REDUCED_INNER_SIDES,
+                PLACEMENT_ENCLOSING_BOX_SIDES,
+                SCHEMATIC_OVERLAY_MODEL_OUTLINE,
+                SCHEMATIC_OVERLAY_MODEL_SIDES,
+                SCHEMATIC_OVERLAY_OUTLINES,
+                SCHEMATIC_OVERLAY_SIDES,
                 SCHEMATIC_VERIFIER_BLOCK_MODELS,
                 TRANSLUCENT_INNER_SIDES,
-                TRANSLUCENT_SCHEMATIC_ALPHA,
-                TRANSLUCENT_SCHEMATIC_RENDERING
+                VERIFIER_HIGHLIGHT_CONNECTIONS,
+                VERIFIER_HIGHLIGHT_SIDES,
+
+                PLACEMENT_BOX_SIDE_ALPHA,
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH,
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH,
+                TRANSLUCENT_SCHEMATIC_ALPHA
         );
 
         public static final ImmutableList<HotkeyedBooleanConfig> HOTKEYS = ImmutableList.of(
+                AREA_SELECTION_BOX_SIDES,
                 AREA_SELECTION_RENDERING,
                 MAIN_RENDERING_TOGGLE,
+                PLACEMENT_BOX_RENDERING,
+                PLACEMENT_BOX_SIDES,
+                RENDER_COLLIDING_BLOCK_AT_CURSOR,
+                RENDER_COLLIDING_SCHEMATIC_BLOCKS,
                 SCHEMATIC_BLOCKS_RENDERING,
                 SCHEMATIC_OVERLAY,
                 SCHEMATIC_RENDERING,
+                SCHEMATIC_OVERLAY_RENDER_THROUGH,
                 TRANSLUCENT_SCHEMATIC_RENDERING,
-                RENDER_COLLIDING_SCHEMATIC_BLOCKS,
-                SCHEMATIC_OVERLAY_RENDER_THROUGH
+                SCHEMATIC_OVERLAY_TYPE_EXTRA,
+                SCHEMATIC_OVERLAY_TYPE_MISSING,
+                SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK,
+                SCHEMATIC_OVERLAY_TYPE_WRONG_STATE
         );
     }
 
