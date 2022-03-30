@@ -1,7 +1,9 @@
 package fi.dy.masa.litematica;
 
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.malilib.config.BaseModConfig;
+import fi.dy.masa.malilib.config.JsonModConfig;
+import fi.dy.masa.malilib.config.JsonModConfig.ConfigDataUpdater;
+import fi.dy.masa.malilib.config.util.ConfigUpdateUtils.KeyBindSettingsResetter;
 import fi.dy.masa.malilib.event.InitializationHandler;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.litematica.config.Configs;
@@ -12,7 +14,7 @@ import fi.dy.masa.litematica.event.ClientWorldChangeHandler;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.gui.ConfigScreen;
-import fi.dy.masa.litematica.input.HotkeyProvider;
+import fi.dy.masa.litematica.input.LitematicaHotkeyProvider;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.ClientTickHandler;
 
@@ -21,11 +23,14 @@ public class InitHandler implements InitializationHandler
     @Override
     public void registerModHandlers()
     {
-        Registry.CONFIG_MANAGER.registerConfigHandler(BaseModConfig.createDefaultModConfig(Reference.MOD_INFO, 1, Configs.CATEGORIES));
+        // Reset all KeyBindSettings when updating to the first post-malilib-refactor version
+        ConfigDataUpdater updater = new KeyBindSettingsResetter(LitematicaHotkeyProvider.INSTANCE::getAllHotkeys, 1);
+        Registry.CONFIG_MANAGER.registerConfigHandler(JsonModConfig.createJsonModConfig(Reference.MOD_INFO, Configs.CURRENT_VERSION, Configs.CATEGORIES, updater));
+
         Registry.CONFIG_SCREEN.registerConfigScreenFactory(Reference.MOD_INFO, ConfigScreen::create);
         Registry.CONFIG_TAB.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
-        Registry.HOTKEY_MANAGER.registerHotkeyProvider(new HotkeyProvider());
+        Registry.HOTKEY_MANAGER.registerHotkeyProvider(new LitematicaHotkeyProvider());
         Registry.INPUT_DISPATCHER.registerMouseInputHandler(InputHandler.getInstance());
 
         RenderHandler renderer = new RenderHandler();

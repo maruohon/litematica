@@ -4,13 +4,15 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.input.HotkeyCategory;
+import fi.dy.masa.malilib.input.HotkeyProvider;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 
-public class HotkeyProvider implements fi.dy.masa.malilib.input.HotkeyProvider
+public class LitematicaHotkeyProvider implements HotkeyProvider
 {
     public static final ImmutableList<Hotkey> ALL_HOTKEYS = buildFullHotkeyList();
+    public static final LitematicaHotkeyProvider INSTANCE = new LitematicaHotkeyProvider();
 
     @Override
     public List<? extends Hotkey> getAllHotkeys()

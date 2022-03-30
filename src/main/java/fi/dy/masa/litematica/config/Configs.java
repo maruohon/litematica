@@ -17,6 +17,7 @@ import fi.dy.masa.malilib.config.option.StringConfig;
 import fi.dy.masa.malilib.config.value.FileBrowserColumns;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.DefaultDirectories;
@@ -24,6 +25,8 @@ import fi.dy.masa.litematica.util.ReplaceBehavior;
 
 public class Configs
 {
+    public static final int CURRENT_VERSION = 1;
+
     public static class Generic
     {
         public static final HotkeyedBooleanConfig EASY_PLACE_MODE                   = new HotkeyedBooleanConfig("easyPlaceMode", false, "");
@@ -328,12 +331,12 @@ public class Configs
     }
 
     public static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
-            BaseConfigOptionCategory.normal("Generic",      Generic.OPTIONS),
-            BaseConfigOptionCategory.normal("InfoOverlays", InfoOverlays.OPTIONS),
-            BaseConfigOptionCategory.normal("Internal",     Internal.OPTIONS),
-            BaseConfigOptionCategory.normal("Visuals",      Visuals.OPTIONS),
-            BaseConfigOptionCategory.normal("Colors",       Colors.OPTIONS),
-            BaseConfigOptionCategory.normal("Hotkeys",      Hotkeys.HOTKEY_LIST)
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Generic",      Generic.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "InfoOverlays", InfoOverlays.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Internal",     Internal.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Visuals",      Visuals.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Colors",       Colors.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Hotkeys",      Hotkeys.HOTKEY_LIST)
     );
 
     public static void init()
