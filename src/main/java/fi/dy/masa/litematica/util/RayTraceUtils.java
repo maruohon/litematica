@@ -24,8 +24,6 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.verifier.BlockPairTypePosition;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -382,21 +380,20 @@ public class RayTraceUtils
     }
 
     @Nullable
-    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range, boolean respectRenderRange)
+    public static RayTraceWrapper getGenericTrace(World worldClient,
+                                                  Entity entity,
+                                                  double range,
+                                                  boolean respectRenderRange)
     {
-        return getGenericTrace(worldClient, entity, range, respectRenderRange, false);
+        return getGenericTrace(worldClient, entity, range, respectRenderRange, RayTraceFluidHandling.ANY);
     }
 
     @Nullable
-    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity,
-            double range, boolean respectRenderRange, boolean includeVerifier)
-    {
-        return getGenericTrace(worldClient, entity, RayTraceFluidHandling.ANY, range, respectRenderRange, includeVerifier);
-    }
-
-    @Nullable
-    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity,
-            RayTraceFluidHandling fluidHandling, double range, boolean respectRenderRange, boolean includeVerifier)
+    public static RayTraceWrapper getGenericTrace(World worldClient,
+                                                  Entity entity,
+                                                  double range,
+                                                  boolean respectRenderRange,
+                                                  RayTraceFluidHandling fluidHandling)
     {
         RayTraceResult traceClient = fi.dy.masa.malilib.util.RayTraceUtils
                 .getRayTraceFromEntity(worldClient, entity, fluidHandling, false, range);
@@ -426,29 +423,6 @@ public class RayTraceUtils
             {
                 trace = traceClient;
                 type = HitType.VANILLA;
-            }
-        }
-
-        if (includeVerifier)
-        {
-            List<SchematicVerifier> activeVerifiers = SchematicVerifierManager.INSTANCE.getActiveVerifiers();
-
-            if (activeVerifiers.isEmpty() == false)
-            {
-                for (SchematicVerifier verifier : activeVerifiers)
-                {
-                    // TODO FIXME verifier rewrite
-                    List<BlockPairTypePosition> posList = null;//verifier.getClosestSelectedPositions(new BlockPos(eyesPos));
-                    RayTraceResult traceMismatch = null;//traceToPositions(posList, entity, range);
-
-                    // Mismatch overlay has priority over other hits
-                    if (traceMismatch != null)
-                    {
-                        trace = traceMismatch;
-                        type = HitType.MISMATCH_OVERLAY;
-                        break;
-                    }
-                }
             }
         }
 
@@ -726,8 +700,7 @@ public class RayTraceUtils
             SELECTION_ORIGIN,
             PLACEMENT_SUBREGION,
             PLACEMENT_ORIGIN,
-            SCHEMATIC_BLOCK,
-            MISMATCH_OVERLAY;
+            SCHEMATIC_BLOCK;
         }
     }
 }

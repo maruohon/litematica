@@ -376,7 +376,7 @@ public class EasyPlaceUtils
     {
         double reach = Math.max(6, mc.playerController.getBlockReachDistance());
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, RayTraceFluidHandling.ANY, reach, true, false);
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true, RayTraceFluidHandling.ANY);
         HitPosition targetPosition = getTargetPosition(traceWrapper, mc);
 
         // No position override, and didn't ray trace to a schematic block
