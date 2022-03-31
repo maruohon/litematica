@@ -75,13 +75,13 @@ public class ToolHud extends InfoHud
     @Override
     protected int getOffsetX()
     {
-        return Configs.InfoOverlays.TOOL_HUD_OFFSET_X.getIntegerValue();
+        return Configs.InfoOverlays.TOOL_HUD_OFFSET.getValue().x;
     }
 
     @Override
     protected int getOffsetY()
     {
-        return Configs.InfoOverlays.TOOL_HUD_OFFSET_Y.getIntegerValue();
+        return Configs.InfoOverlays.TOOL_HUD_OFFSET.getValue().y;
     }
 
     @Override

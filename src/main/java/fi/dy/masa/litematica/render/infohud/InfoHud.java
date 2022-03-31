@@ -9,6 +9,7 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.ScreenContext;
 import fi.dy.masa.malilib.render.text.StringListRenderer;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Configs.InfoOverlays;
 
 public class InfoHud
 {
@@ -53,12 +54,12 @@ public class InfoHud
 
     protected int getOffsetX()
     {
-        return Configs.InfoOverlays.INFO_HUD_OFFSET_X.getIntegerValue();
+        return Configs.InfoOverlays.INFO_HUD_OFFSET.getValue().x;
     }
 
     protected int getOffsetY()
     {
-        return Configs.InfoOverlays.INFO_HUD_OFFSET_Y.getIntegerValue();
+        return Configs.InfoOverlays.INFO_HUD_OFFSET.getValue().y;
     }
 
     public void renderHud()

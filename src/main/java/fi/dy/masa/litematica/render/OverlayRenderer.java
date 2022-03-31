@@ -33,6 +33,7 @@ import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.position.Vec2i;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -482,8 +483,9 @@ public class OverlayRenderer
             this.infoUpdateTime = currentTime;
         }
 
-        int x = Configs.InfoOverlays.BLOCK_INFO_LINES_OFFSET_X.getIntegerValue();
-        int y = Configs.InfoOverlays.BLOCK_INFO_LINES_OFFSET_Y.getIntegerValue();
+        Vec2i offset = Configs.InfoOverlays.BLOCK_INFO_LINES_OFFSET.getValue();
+        int x = offset.x;
+        int y = offset.y;
         double fontScale = Configs.InfoOverlays.BLOCK_INFO_LINES_FONT_SCALE.getDoubleValue();
         int textColor = 0xFFFFFFFF;
         int bgColor = 0xA0505050;

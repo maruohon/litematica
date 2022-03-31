@@ -14,9 +14,11 @@ import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
 import fi.dy.masa.malilib.config.option.OptionalDirectoryConfig;
 import fi.dy.masa.malilib.config.option.StringConfig;
+import fi.dy.masa.malilib.config.option.Vec2iConfig;
 import fi.dy.masa.malilib.config.value.FileBrowserColumns;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.malilib.util.position.Vec2i;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
@@ -208,12 +210,10 @@ public class Configs
         public static final HotkeyedBooleanConfig VERIFIER_OVERLAY_RENDERING        = new HotkeyedBooleanConfig("verifierOverlay", true, "");
 
         public static final DoubleConfig  BLOCK_INFO_LINES_FONT_SCALE               = new DoubleConfig( "blockInfoLinesFontScale", 0.5, 0.0, 10.0);
-        public static final IntegerConfig BLOCK_INFO_LINES_OFFSET_X                 = new IntegerConfig("blockInfoLinesOffsetX", 4, 0, 2000);
-        public static final IntegerConfig BLOCK_INFO_LINES_OFFSET_Y                 = new IntegerConfig("blockInfoLinesOffsetY", 4, 0, 2000);
+        public static final Vec2iConfig   BLOCK_INFO_LINES_OFFSET                   = new Vec2iConfig(  "blockInfoLinesOffset", new Vec2i(4, 4));
         public static final IntegerConfig BLOCK_INFO_OVERLAY_OFFSET_Y               = new IntegerConfig("blockInfoOverlayOffsetY", 6, -2000, 2000);
         public static final IntegerConfig INFO_HUD_MAX_LINES                        = new IntegerConfig("infoHudMaxLines", 10, 1, 128);
-        public static final IntegerConfig INFO_HUD_OFFSET_X                         = new IntegerConfig("infoHudOffsetX", 1, 0, 8192);
-        public static final IntegerConfig INFO_HUD_OFFSET_Y                         = new IntegerConfig("infoHudOffsetY", 1, 0, 8192);
+        public static final Vec2iConfig   INFO_HUD_OFFSET                           = new Vec2iConfig(  "infoHudOffset", new Vec2i(1, 1));
         public static final DoubleConfig  INFO_HUD_SCALE                            = new DoubleConfig( "infoHudScale", 1.0, 0.1, 4.0);
         public static final IntegerConfig MATERIAL_LIST_HUD_MAX_LINES               = new IntegerConfig("materialListHudMaxLines", 10, 1, 128);
         public static final DoubleConfig  MATERIAL_LIST_HUD_SCALE                   = new DoubleConfig( "materialListHudScale", 1.0, 0.1, 4.0);
@@ -221,8 +221,7 @@ public class Configs
         public static final BooleanConfig MATERIAL_LIST_SLOT_HIGHLIGHT              = new BooleanConfig("materialListSlotHighlight", true);
         public static final BooleanConfig STATUS_INFO_HUD_AUTO                      = new BooleanConfig("statusInfoHudAuto", true);
         public static final BooleanConfig TOOL_HUD_ALWAYS_VISIBLE                   = new BooleanConfig("toolHudAlwaysVisible", false);
-        public static final IntegerConfig TOOL_HUD_OFFSET_X                         = new IntegerConfig("toolHudOffsetX", 1, 0, 8192);
-        public static final IntegerConfig TOOL_HUD_OFFSET_Y                         = new IntegerConfig("toolHudOffsetY", 1, 0, 8192);
+        public static final Vec2iConfig   TOOL_HUD_OFFSET                           = new Vec2iConfig(  "toolHudOffset", new Vec2i(1, 1));
         public static final DoubleConfig  TOOL_HUD_SCALE                            = new DoubleConfig( "toolHudScale", 1.0, 0.1, 4.0);
         public static final DoubleConfig  VERIFIER_ERROR_HIGHLIGHT_ALPHA            = new DoubleConfig("verifierErrorHighlightAlpha", 0.2, 0.0, 1.0);
         public static final IntegerConfig VERIFIER_ERROR_HIGHLIGHT_MAX_POSITIONS    = new IntegerConfig("verifierErrorHighlightMaxPositions", 1000, 1, 1000000);
@@ -252,18 +251,15 @@ public class Configs
                 INFO_HUD_ALIGNMENT,
                 TOOL_HUD_ALIGNMENT,
 
-                BLOCK_INFO_LINES_OFFSET_X,
-                BLOCK_INFO_LINES_OFFSET_Y,
+                BLOCK_INFO_LINES_OFFSET,
                 BLOCK_INFO_LINES_FONT_SCALE,
                 BLOCK_INFO_OVERLAY_OFFSET_Y,
                 INFO_HUD_MAX_LINES,
-                INFO_HUD_OFFSET_X,
-                INFO_HUD_OFFSET_Y,
+                INFO_HUD_OFFSET,
                 INFO_HUD_SCALE,
                 MATERIAL_LIST_HUD_MAX_LINES,
                 MATERIAL_LIST_HUD_SCALE,
-                TOOL_HUD_OFFSET_X,
-                TOOL_HUD_OFFSET_Y,
+                TOOL_HUD_OFFSET,
                 TOOL_HUD_SCALE,
                 VERIFIER_ERROR_HIGHLIGHT_ALPHA,
                 VERIFIER_ERROR_HIGHLIGHT_MAX_POSITIONS
