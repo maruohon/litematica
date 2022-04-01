@@ -73,6 +73,7 @@ public class Hotkeys
     public static final HotkeyConfig TOOL_SELECT_ELEMENTS                   = new HotkeyConfig("toolSelectElements",                "MIDDLE_MOUSE", KeyBindSettings.INGAME_EXTRA);
     public static final HotkeyConfig TOOL_SELECT_MODIFIER_BLOCK_1           = new HotkeyConfig("toolSelectModifierBlock1",          "L_ALT", KeyBindSettings.INGAME_MODIFIER);
     public static final HotkeyConfig TOOL_SELECT_MODIFIER_BLOCK_2           = new HotkeyConfig("toolSelectModifierBlock2",          "L_SHIFT", KeyBindSettings.INGAME_MODIFIER);
+    public static final HotkeyConfig TRANSLUCENT_SCHEMATIC_RENDERING        = new HotkeyConfig("translucentSchematicRendering",     "");
     public static final HotkeyConfig UNLOAD_CURRENT_SCHEMATIC               = new HotkeyConfig("unloadCurrentSchematic",            "");
     public static final HotkeyConfig UPDATE_BLOCKS                          = new HotkeyConfig("updateBlocks",                      "");
 
@@ -144,6 +145,7 @@ public class Hotkeys
             TOOL_SELECT_MODIFIER_BLOCK_2,
             TOOL_PLACE_CORNER_1,
             TOOL_PLACE_CORNER_2,
+            TRANSLUCENT_SCHEMATIC_RENDERING,
             UNLOAD_CURRENT_SCHEMATIC,
             UPDATE_BLOCKS
     );

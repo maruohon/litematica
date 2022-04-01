@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.config;
 
 import net.minecraft.client.Minecraft;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
+import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.InventoryUtils;
@@ -73,6 +74,7 @@ public class HotkeyCallbacks
         Hotkeys.TOOL_MODE_CYCLE_FORWARD.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeyBind().setCallback(hotkeyCallbackMisc);
+        Hotkeys.TRANSLUCENT_SCHEMATIC_RENDERING.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback<>(Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING));
         Hotkeys.UNLOAD_CURRENT_SCHEMATIC.getKeyBind().setCallback(hotkeyCallbackMisc);
         Hotkeys.UPDATE_BLOCKS.getKeyBind().setCallback(hotkeyCallbackMisc);
 
@@ -102,7 +104,6 @@ public class HotkeyCallbacks
         Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_STATE.addValueChangeListener(refreshCallback);
         Configs.Visuals.SCHEMATIC_RENDERING.addValueChangeListener(refreshCallback);
-        Configs.Visuals.TRANSLUCENT_SCHEMATIC_ALPHA.addValueChangeListener(refreshCallback);
         Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING.addValueChangeListener(refreshCallback);
     }
 

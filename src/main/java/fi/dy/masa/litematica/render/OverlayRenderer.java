@@ -35,6 +35,7 @@ import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.position.Vec2i;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Configs.Visuals;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widget.SchematicVerifierBlockInfoWidget;
@@ -186,7 +187,7 @@ public class OverlayRenderer
 
                         if (Configs.Visuals.PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
                         {
-                            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
+                            float alpha = (float) Visuals.PLACEMENT_ENCLOSING_BOX_SIDES.getDoubleValue();
                             color = new Color4f(color.r, color.g, color.b, alpha);
                             RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, renderViewEntity, partialTicks);
                         }
@@ -261,14 +262,14 @@ public class OverlayRenderer
         {
             color1 = this.colorBoxPlacementSelected;
             color2 = color1;
-            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
+            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDES.getDoubleValue();
             sideColor = new Color4f(color1.r, color1.g, color1.b, alpha);
         }
         else if (boxType == BoxType.PLACEMENT_UNSELECTED)
         {
             color1 = placement.getBoundingBoxColor();
             color2 = color1;
-            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
+            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDES.getDoubleValue();
             sideColor = new Color4f(color1.r, color1.g, color1.b, alpha);
         }
         else
@@ -733,7 +734,7 @@ public class OverlayRenderer
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder buffer = tessellator.getBuffer();
 
-                LitematicaRenderer.enableAlphaShader(Configs.Visuals.TRANSLUCENT_SCHEMATIC_ALPHA.getFloatValue());
+                LitematicaRenderer.enableAlphaShader(Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING.getFloatValue());
 
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                 LitematicaRenderer.getInstance().getWorldRenderer().renderBlock(stateSchematic, pos, worldSchematic, buffer);

@@ -257,7 +257,7 @@ public class LitematicaRenderer
 
         if (this.translucentSchematic)
         {
-            enableAlphaShader(Configs.Visuals.TRANSLUCENT_SCHEMATIC_ALPHA.getFloatValue());
+            enableAlphaShader(Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING.getFloatValue());
         }
     }
 

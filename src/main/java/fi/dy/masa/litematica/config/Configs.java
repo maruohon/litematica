@@ -4,6 +4,7 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.category.BaseConfigOptionCategory;
 import fi.dy.masa.malilib.config.category.ConfigOptionCategory;
+import fi.dy.masa.malilib.config.option.BooleanAndDoubleConfig;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.ConfigOption;
@@ -117,7 +118,6 @@ public class Configs
         public static final HotkeyedBooleanConfig AREA_SELECTION_RENDERING              = new HotkeyedBooleanConfig("areaSelectionRendering", true, "");
         public static final HotkeyedBooleanConfig MAIN_RENDERING_TOGGLE                 = new HotkeyedBooleanConfig("mainRenderingToggle", true, "M,R");
         public static final HotkeyedBooleanConfig PLACEMENT_BOX_RENDERING               = new HotkeyedBooleanConfig("placementBoundingBoxRendering", true, "");
-        public static final HotkeyedBooleanConfig PLACEMENT_BOX_SIDES                   = new HotkeyedBooleanConfig("placementBoxSides", false, "");
         public static final HotkeyedBooleanConfig RENDER_COLLIDING_BLOCK_AT_CURSOR      = new HotkeyedBooleanConfig("renderCollidingBlockAtCursor", false, "");
         public static final HotkeyedBooleanConfig RENDER_COLLIDING_SCHEMATIC_BLOCKS     = new HotkeyedBooleanConfig("renderCollidingSchematicBlocks", false, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_BLOCKS_RENDERING            = new HotkeyedBooleanConfig("schematicBlocksRendering", true, "M,B");
@@ -128,12 +128,13 @@ public class Configs
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_MISSING        = new HotkeyedBooleanConfig("schematicOverlayTypeMissing", true, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK    = new HotkeyedBooleanConfig("schematicOverlayTypeWrongBlock", true, "");
         public static final HotkeyedBooleanConfig SCHEMATIC_OVERLAY_TYPE_WRONG_STATE    = new HotkeyedBooleanConfig("schematicOverlayTypeWrongState", true, "");
-        public static final HotkeyedBooleanConfig TRANSLUCENT_SCHEMATIC_RENDERING       = new HotkeyedBooleanConfig("translucentSchematicRendering", false, "");
+
+        public static final BooleanAndDoubleConfig PLACEMENT_BOX_SIDES                  = new BooleanAndDoubleConfig("placementBoxSides", false, 0.2, 0.0, 1.0);
+        public static final BooleanAndDoubleConfig PLACEMENT_ENCLOSING_BOX_SIDES        = new BooleanAndDoubleConfig("placementEnclosingBoxSides", false, 0.2, 0.0, 1.0);
+        public static final BooleanAndDoubleConfig TRANSLUCENT_SCHEMATIC_RENDERING      = new BooleanAndDoubleConfig("translucentSchematicRendering", false, 0.5, 0.0, 1.0);
 
         public static final BooleanConfig IGNORE_EXISTING_FLUIDS                    = new BooleanConfig("ignoreExistingFluids", true);
         public static final BooleanConfig OVERLAY_REDUCED_INNER_SIDES               = new BooleanConfig("overlayReducedInnerSides", false);
-        public static final DoubleConfig  PLACEMENT_BOX_SIDE_ALPHA                  = new DoubleConfig( "placementBoxSideAlpha", 0.2, 0.0, 1.0);
-        public static final BooleanConfig PLACEMENT_ENCLOSING_BOX_SIDES             = new BooleanConfig("placementEnclosingBoxSides", false);
         public static final BooleanConfig SCHEMATIC_OVERLAY_MODEL_OUTLINE           = new BooleanConfig("schematicOverlayModelOutline", true);
         public static final BooleanConfig SCHEMATIC_OVERLAY_MODEL_SIDES             = new BooleanConfig("schematicOverlayModelSides", true);
         public static final BooleanConfig SCHEMATIC_OVERLAY_OUTLINES                = new BooleanConfig("schematicOverlayOutlines", true);
@@ -142,7 +143,6 @@ public class Configs
         public static final BooleanConfig SCHEMATIC_OVERLAY_SIDES                   = new BooleanConfig("schematicOverlaySides", true);
         public static final BooleanConfig SCHEMATIC_VERIFIER_BLOCK_MODELS           = new BooleanConfig("schematicVerifierUseBlockModels", false);
         public static final BooleanConfig TRANSLUCENT_INNER_SIDES                   = new BooleanConfig("translucentBlockInnerSides", false);
-        public static final DoubleConfig  TRANSLUCENT_SCHEMATIC_ALPHA               = new DoubleConfig( "translucentSchematicAlpha", 0.5, 0.0, 1.0);
         public static final BooleanConfig VERIFIER_HIGHLIGHT_CONNECTIONS            = new BooleanConfig("verifierHighlightConnections", false);
         public static final BooleanConfig VERIFIER_HIGHLIGHT_SIDES                  = new BooleanConfig("verifierHighlightSides", true);
 
@@ -150,8 +150,6 @@ public class Configs
                 AREA_SELECTION_BOX_SIDES,
                 AREA_SELECTION_RENDERING,
                 MAIN_RENDERING_TOGGLE,
-                PLACEMENT_BOX_RENDERING,
-                PLACEMENT_BOX_SIDES,
                 RENDER_COLLIDING_BLOCK_AT_CURSOR,
                 RENDER_COLLIDING_SCHEMATIC_BLOCKS,
                 SCHEMATIC_BLOCKS_RENDERING,
@@ -162,24 +160,23 @@ public class Configs
                 SCHEMATIC_OVERLAY_TYPE_MISSING,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_STATE,
-                TRANSLUCENT_SCHEMATIC_RENDERING,
 
                 IGNORE_EXISTING_FLUIDS,
                 OVERLAY_REDUCED_INNER_SIDES,
+                PLACEMENT_BOX_RENDERING,
+                PLACEMENT_BOX_SIDES,
                 PLACEMENT_ENCLOSING_BOX_SIDES,
                 SCHEMATIC_OVERLAY_MODEL_OUTLINE,
                 SCHEMATIC_OVERLAY_MODEL_SIDES,
                 SCHEMATIC_OVERLAY_OUTLINES,
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH,
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH,
                 SCHEMATIC_OVERLAY_SIDES,
                 SCHEMATIC_VERIFIER_BLOCK_MODELS,
                 TRANSLUCENT_INNER_SIDES,
                 VERIFIER_HIGHLIGHT_CONNECTIONS,
                 VERIFIER_HIGHLIGHT_SIDES,
-
-                PLACEMENT_BOX_SIDE_ALPHA,
-                SCHEMATIC_OVERLAY_OUTLINE_WIDTH,
-                SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH,
-                TRANSLUCENT_SCHEMATIC_ALPHA
+                TRANSLUCENT_SCHEMATIC_RENDERING
         );
 
         public static final ImmutableList<HotkeyedBooleanConfig> HOTKEYS = ImmutableList.of(
@@ -187,14 +184,12 @@ public class Configs
                 AREA_SELECTION_RENDERING,
                 MAIN_RENDERING_TOGGLE,
                 PLACEMENT_BOX_RENDERING,
-                PLACEMENT_BOX_SIDES,
                 RENDER_COLLIDING_BLOCK_AT_CURSOR,
                 RENDER_COLLIDING_SCHEMATIC_BLOCKS,
                 SCHEMATIC_BLOCKS_RENDERING,
                 SCHEMATIC_OVERLAY,
                 SCHEMATIC_RENDERING,
                 SCHEMATIC_OVERLAY_RENDER_THROUGH,
-                TRANSLUCENT_SCHEMATIC_RENDERING,
                 SCHEMATIC_OVERLAY_TYPE_EXTRA,
                 SCHEMATIC_OVERLAY_TYPE_MISSING,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK,
