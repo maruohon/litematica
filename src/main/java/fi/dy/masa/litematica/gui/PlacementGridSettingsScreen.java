@@ -2,8 +2,8 @@ package fi.dy.masa.litematica.gui;
 
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
+import fi.dy.masa.malilib.gui.widget.Vec3iEditWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.litematica.data.DataManager;
@@ -20,9 +20,9 @@ public class PlacementGridSettingsScreen extends BaseScreen
     protected final LabelWidget repeatCountLabel;
     protected final GenericButton resetGridSizeButton;
     protected final OnOffButton toggleGridEnabledButton;
-    protected final BlockPosEditWidget sizeEditWidget;
-    protected final BlockPosEditWidget negRepeatEditWidget;
-    protected final BlockPosEditWidget posRepeatEditWidget;
+    protected final Vec3iEditWidget sizeEditWidget;
+    protected final Vec3iEditWidget negRepeatEditWidget;
+    protected final Vec3iEditWidget posRepeatEditWidget;
 
     public PlacementGridSettingsScreen(SchematicPlacement placement)
     {
@@ -40,9 +40,9 @@ public class PlacementGridSettingsScreen extends BaseScreen
                                                          this.placement.getGridSettings()::isEnabled,
                                                          this::toggleGridEnabled);
 
-        this.sizeEditWidget = new BlockPosEditWidget(90, 60, 2, false, settings.getSize(), this::setGridSize);
-        this.negRepeatEditWidget = new BlockPosEditWidget(90, 60, 2, false, settings.getRepeatNegative(), this::setRepeatNegative);
-        this.posRepeatEditWidget = new BlockPosEditWidget(90, 60, 2, false, settings.getRepeatPositive(), this::setRepeatPositive);
+        this.sizeEditWidget = new Vec3iEditWidget(90, 60, 2, false, settings.getSize(), this::setGridSize);
+        this.negRepeatEditWidget = new Vec3iEditWidget(90, 60, 2, false, settings.getRepeatNegative(), this::setRepeatNegative);
+        this.posRepeatEditWidget = new Vec3iEditWidget(90, 60, 2, false, settings.getRepeatPositive(), this::setRepeatPositive);
 
         Vec3i s = settings.getDefaultSize();
         this.sizeEditWidget.setValidRange(s.getX(), s.getY(), s.getZ(), 1000000, 1000000, 1000000);
