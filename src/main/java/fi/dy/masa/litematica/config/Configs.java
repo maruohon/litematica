@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.category.BaseConfigOptionCategory;
 import fi.dy.masa.malilib.config.category.ConfigOptionCategory;
 import fi.dy.masa.malilib.config.option.BooleanAndDoubleConfig;
+import fi.dy.masa.malilib.config.option.BooleanAndFileConfig;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.ConfigOption;
@@ -13,7 +14,6 @@ import fi.dy.masa.malilib.config.option.DualColorConfig;
 import fi.dy.masa.malilib.config.option.HotkeyedBooleanConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
-import fi.dy.masa.malilib.config.option.OptionalDirectoryConfig;
 import fi.dy.masa.malilib.config.option.StringConfig;
 import fi.dy.masa.malilib.config.option.Vec2iConfig;
 import fi.dy.masa.malilib.config.value.FileBrowserColumns;
@@ -39,12 +39,13 @@ public class Configs
         public static final HotkeyedBooleanConfig SIGN_TEXT_PASTE                   = new HotkeyedBooleanConfig("signTextPaste", true, "");
         public static final HotkeyedBooleanConfig TOOL_ITEM_ENABLED                 = new HotkeyedBooleanConfig("toolItemEnabled", true, "M,T");
 
+        public static final BooleanAndFileConfig CUSTOM_SCHEMATIC_DIRECTORY         = new BooleanAndFileConfig("customSchematicDirectory", false, DefaultDirectories.getDefaultSchematicDirectory());
+
         public static final BooleanConfig AREAS_PER_WORLD                           = new BooleanConfig("areaSelectionsPerWorld", true);
         public static final BooleanConfig BETTER_RENDER_ORDER                       = new BooleanConfig("betterRenderOrder", true);
         public static final BooleanConfig CHANGE_SELECTED_CORNER                    = new BooleanConfig("changeSelectedCornerOnMove", true);
         public static final BooleanConfig CLONE_AT_ORIGINAL_POS                     = new BooleanConfig("cloneAtOriginalPosition", true);
         public static final StringConfig  COMMAND_NAME_SETBLOCK                     = new StringConfig("commandNameSetblock", "setblock");
-        public static final OptionalDirectoryConfig CUSTOM_SCHEMATIC_DIRECTORY      = new OptionalDirectoryConfig("customSchematicDirectory", false, DefaultDirectories.getDefaultSchematicDirectory());
         public static final BooleanConfig DEBUG_MESSAGES                            = new BooleanConfig("debugMessages", false);
         public static final BooleanConfig EASY_PLACE_CLICK_ADJACENT                 = new BooleanConfig("easyPlaceClickAdjacent", false);
         public static final BooleanConfig EASY_PLACE_HOLD_ENABLED                   = new BooleanConfig("easyPlaceHold", false);

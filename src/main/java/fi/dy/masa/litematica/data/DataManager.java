@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import fi.dy.masa.malilib.config.option.OptionalDirectoryConfig.BooleanAndFile;
+import fi.dy.masa.malilib.config.option.BooleanAndFileConfig.BooleanAndFile;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
