@@ -174,6 +174,11 @@ public class SchematicVerifier implements IInfoHudRenderer
         }
     }
 
+    public int getVisibleCategoriesCount()
+    {
+        return this.visibleCategories.size();
+    }
+
     public boolean hasIgnoredPairs()
     {
         return this.ignoredPairs.isEmpty() == false;

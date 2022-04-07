@@ -9,7 +9,6 @@ import fi.dy.masa.litematica.config.Configs;
 
 public enum VerifierResultType
 {
-    ALL           ("litematica.name.schematic_verifier.all",           Configs.Colors.VERIFIER_CORRECT), // color not used
     CORRECT_STATE ("litematica.name.schematic_verifier.correct_state", Configs.Colors.VERIFIER_CORRECT),
     EXTRA         ("litematica.name.schematic_verifier.extra",         Configs.Colors.VERIFIER_EXTRA),
     MISSING       ("litematica.name.schematic_verifier.missing",       Configs.Colors.VERIFIER_MISSING),
@@ -20,7 +19,16 @@ public enum VerifierResultType
             VerifierResultType.WRONG_BLOCK,
             VerifierResultType.WRONG_STATE,
             VerifierResultType.MISSING,
-            VerifierResultType.EXTRA);
+            VerifierResultType.EXTRA
+    );
+
+    public static final ImmutableList<VerifierResultType> SELECTABLE_CATEGORIES = ImmutableList.of(
+            VerifierResultType.WRONG_BLOCK,
+            VerifierResultType.WRONG_STATE,
+            VerifierResultType.MISSING,
+            VerifierResultType.EXTRA,
+            VerifierResultType.CORRECT_STATE
+    );
 
     private final String translationKey;
     private final DualColorConfig colorConfig;

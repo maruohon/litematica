@@ -12,6 +12,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
@@ -40,6 +41,7 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
 
     protected final SchematicVerifier verifier;
     protected final LabelWidget statusLabel;
+    protected final DropDownListWidget<VerifierResultType> visibleCategoriesDropdown;
     protected final GenericButton autoRefreshButton;
     protected final GenericButton clearSelectionButton;
     protected final GenericButton infoHudButton;
@@ -77,6 +79,11 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         this.statusLabel.getBorderRenderer().getNormalSettings().setEnabled(true);
         this.statusLabel.getPadding().setAll(3, 3, 0, 3);
 
+        this.visibleCategoriesDropdown = new DropDownListWidget<>(18, 10, VerifierResultType.SELECTABLE_CATEGORIES, VerifierResultType::getDisplayName);
+        this.visibleCategoriesDropdown.setSelectionHandler(new DropDownListWidget.SimpleMultiEntrySelectionHandler<>(this::isResultTypeVisible, this::toggleResultTypeVisible, this::getVisibleCategoriesCount));
+        this.visibleCategoriesDropdown.setCloseOnSelect(false);
+        this.visibleCategoriesDropdown.setMultiSelectionTranslationKey("litematica.label.schematic_verifier.visible_categories_count");
+
         this.setTitle("litematica.title.screen.schematic_verifier", verifier.getName());
         this.updateStatusLabel();
     }
@@ -109,6 +116,7 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         this.addWidget(this.resetVerifierButton);
         this.addWidget(this.startButton);
         this.addWidget(this.stopButton);
+        this.addWidget(this.visibleCategoriesDropdown);
 
         this.addWidget(this.statusLabel);
     }
@@ -129,6 +137,7 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         this.rangeButton.setPosition(this.infoHudButton.getRight() + 2, y);
         this.autoRefreshButton.setPosition(this.rangeButton.getRight() + 2, y);
         this.clearSelectionButton.setPosition(this.autoRefreshButton.getRight() + 2, y);
+        this.visibleCategoriesDropdown.setPosition(this.clearSelectionButton.getRight() + 4, y);
 
         this.statusLabel.setX(this.x + 10);
         this.statusLabel.setBottom(this.getBottom() - 2);
@@ -249,6 +258,22 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         this.rangeButton.updateButtonState();
         this.updateWidgetPositions();
         this.getListWidget().refreshEntries();
+    }
+
+    protected boolean isResultTypeVisible(VerifierResultType type)
+    {
+        return this.verifier.isCategoryVisible(type);
+    }
+
+    protected void toggleResultTypeVisible(VerifierResultType type)
+    {
+        this.verifier.toggleCategoryVisible(type);
+        this.getListWidget().refreshEntries();
+    }
+
+    protected int getVisibleCategoriesCount()
+    {
+        return this.verifier.getVisibleCategoriesCount();
     }
 
     protected void updateStatusLabel()

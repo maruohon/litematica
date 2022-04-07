@@ -5,17 +5,15 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 import fi.dy.masa.malilib.gui.icon.DefaultIcons;
-import fi.dy.masa.malilib.gui.icon.MultiIcon;
-import fi.dy.masa.malilib.gui.icon.MultiIconProvider;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
+import fi.dy.masa.malilib.gui.widget.IconWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicType;
 
@@ -39,8 +37,7 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
         this.revertNameButton = GenericButton.create(DefaultIcons.RESET_12, this::revertName);
         this.saveButton = GenericButton.create(18, "litematica.button.save_schematic.save_schematic", this::saveSchematic);
 
-        this.schematicTypeDropdown = new DropDownListWidget<>(-1, 18, 110, 6, SchematicType.KNOWN_TYPES, SchematicType::getDisplayName);
-        this.schematicTypeDropdown.setIconProvider(new SchematicIconProvider());
+        this.schematicTypeDropdown = new DropDownListWidget<>(18, 6, SchematicType.KNOWN_TYPES, SchematicType::getDisplayName, (e) -> new IconWidget(e.getIcon()));
         this.schematicTypeDropdown.setSelectedEntry(SchematicType.LITEMATICA);
 
         this.revertNameButton.translateAndAddHoverString("litematica.hover.button.save_schematic.revert_name");
@@ -169,20 +166,5 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
         }
 
         return name;
-    }
-
-    public static class SchematicIconProvider implements MultiIconProvider<SchematicType<?>>
-    {
-        @Override
-        public int getExpectedWidth()
-        {
-            return LitematicaIcons.FILE_ICON_LITEMATIC.getWidth();
-        }
-
-        @Override
-        public MultiIcon getIconFor(SchematicType<?> entry)
-        {
-            return entry.getIcon();
-        }
     }
 }
