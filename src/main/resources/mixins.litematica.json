@@ -5,6 +5,7 @@
 	"refmap": "mixins.litematica.refmap.json",
 	"minVersion": "0.7",
 	"client": [
+		"debug.GuiOverlayDebugMixin",
 		"IMixinBlockRendererDispatcher",
 		"IMixinCompiledChunk",
 		"IMixinDataFixer",
