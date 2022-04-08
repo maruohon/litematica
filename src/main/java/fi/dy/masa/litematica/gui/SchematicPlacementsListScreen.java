@@ -33,7 +33,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
 
         this.manager = DataManager.getSchematicPlacementManager();
 
-        this.iconsTextToggleButton               = GenericButton.create(18, this::getIconVsTextButtonLabel, this::toggleIconsVsText);
+        this.iconsTextToggleButton               = GenericButton.create(16, this::getIconVsTextButtonLabel, this::toggleIconsVsText);
         this.loadSchematicsScreenButton          = GenericButton.create("litematica.button.change_menu.load_schematics", LitematicaIcons.SCHEMATIC_BROWSER);
         this.loadedSchematicsListScreenButton    = GenericButton.create("litematica.button.change_menu.loaded_schematics", LitematicaIcons.LOADED_SCHEMATICS);
         this.mainMenuButton                      = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
@@ -73,8 +73,8 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     {
         super.updateWidgetPositions();
 
-        this.iconsTextToggleButton.setRight(this.getRight() - 22);
-        this.iconsTextToggleButton.setBottom(this.getListY() - 12);
+        this.iconsTextToggleButton.setRight(this.getRight() - 10);
+        this.iconsTextToggleButton.setBottom(this.getListY() - 1);
 
         int y = this.getBottom() - 24;
         this.loadSchematicsScreenButton.setPosition(this.x + 10, y);
