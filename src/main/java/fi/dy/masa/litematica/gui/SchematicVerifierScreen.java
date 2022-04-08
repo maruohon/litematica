@@ -82,6 +82,7 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         this.visibleCategoriesDropdown = new DropDownListWidget<>(18, 10, VerifierResultType.SELECTABLE_CATEGORIES, VerifierResultType::getDisplayName);
         this.visibleCategoriesDropdown.setSelectionHandler(new DropDownListWidget.SimpleMultiEntrySelectionHandler<>(this::isResultTypeVisible, this::toggleResultTypeVisible, this::getVisibleCategoriesCount));
         this.visibleCategoriesDropdown.setCloseOnSelect(false);
+        this.visibleCategoriesDropdown.setMultiSelectionHoverTextSupplier(this::getMultiEntryHoverText);
         this.visibleCategoriesDropdown.setMultiSelectionTranslationKey("litematica.label.schematic_verifier.visible_categories_count");
 
         this.setTitle("litematica.title.screen.schematic_verifier", verifier.getName());
@@ -131,13 +132,13 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         this.stopButton.setPosition(this.startButton.getRight() + 2, y);
         this.resetVerifierButton.setPosition(this.stopButton.getRight() + 2, y);
         this.resetIgnoredButton.setPosition(this.resetVerifierButton.getRight() + 2, y);
+        this.clearSelectionButton.setPosition(this.resetIgnoredButton.getRight() + 2, y);
 
         y += 20;
         this.infoHudButton.setPosition(this.x + 10, y);
         this.rangeButton.setPosition(this.infoHudButton.getRight() + 2, y);
         this.autoRefreshButton.setPosition(this.rangeButton.getRight() + 2, y);
-        this.clearSelectionButton.setPosition(this.autoRefreshButton.getRight() + 2, y);
-        this.visibleCategoriesDropdown.setPosition(this.clearSelectionButton.getRight() + 4, y);
+        this.visibleCategoriesDropdown.setPosition(this.autoRefreshButton.getRight() + 4, y);
 
         this.statusLabel.setX(this.x + 10);
         this.statusLabel.setBottom(this.getBottom() - 2);
@@ -322,6 +323,27 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
     {
         String name = this.verifier.getVerifierType().getDisplayName();
         return StringUtils.translate("litematica.button.schematic_verifier.range", name);
+    }
+
+    protected List<StyledTextLine> getMultiEntryHoverText()
+    {
+        List<StyledTextLine> list = new ArrayList<>();
+
+        if (this.getVisibleCategoriesCount() > 1)
+        {
+            list.add(StyledTextLine.translate("litematica.hover.schematic_verifier.visible_categories.title"));
+            String key = "litematica.hover.schematic_verifier.visible_categories.entry";
+
+            for (VerifierResultType type : VerifierResultType.SELECTABLE_CATEGORIES)
+            {
+                if (this.isResultTypeVisible(type))
+                {
+                    list.add(StyledTextLine.translate(key, type.getDisplayName()));
+                }
+            }
+        }
+
+        return list;
     }
 
     public static class WidgetFactory implements ListEntryWidgetFactory

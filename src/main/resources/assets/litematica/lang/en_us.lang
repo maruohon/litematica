@@ -170,6 +170,8 @@ litematica.hover.schematic_list.schematic_name=Schematic name: §a%s
 litematica.hover.schematic_list.schematic_type=Type: §b%s
 litematica.hover.schematic_verifier.color_config.overlay_color=Schematic Verifier §fOverlay§r color
 litematica.hover.schematic_verifier.color_config.text_color=Schematic Verifier §fScreen/HUD Text§r color
+litematica.hover.schematic_verifier.visible_categories.entry=<c=888>  %s
+litematica.hover.schematic_verifier.visible_categories.title=<c=888>Visible/enabled categories in the list:
 
 litematica.hud.area_selection.mode.corners=Corners
 litematica.hud.area_selection.mode.expand=Expand
