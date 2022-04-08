@@ -24,7 +24,7 @@ public class InitHandler implements InitializationHandler
     public void registerModHandlers()
     {
         // Reset all KeyBindSettings when updating to the first post-malilib-refactor version
-        ConfigDataUpdater updater = new KeyBindSettingsResetter(LitematicaHotkeyProvider.INSTANCE::getAllHotkeys, 1);
+        ConfigDataUpdater updater = new KeyBindSettingsResetter(LitematicaHotkeyProvider.INSTANCE::getAllHotkeys, 0);
         Registry.CONFIG_MANAGER.registerConfigHandler(JsonModConfig.createJsonModConfig(Reference.MOD_INFO, Configs.CURRENT_VERSION, Configs.CATEGORIES, updater));
 
         Registry.CONFIG_SCREEN.registerConfigScreenFactory(Reference.MOD_INFO, ConfigScreen::create);

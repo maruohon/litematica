@@ -17,7 +17,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;

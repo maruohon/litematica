@@ -15,7 +15,7 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.ISchematic;

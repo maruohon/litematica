@@ -175,9 +175,9 @@ public class Configs
                 SCHEMATIC_OVERLAY_SIDES,
                 SCHEMATIC_VERIFIER_BLOCK_MODELS,
                 TRANSLUCENT_INNER_SIDES,
+                TRANSLUCENT_SCHEMATIC_RENDERING,
                 VERIFIER_HIGHLIGHT_CONNECTIONS,
-                VERIFIER_HIGHLIGHT_SIDES,
-                TRANSLUCENT_SCHEMATIC_RENDERING
+                VERIFIER_HIGHLIGHT_SIDES
         );
 
         public static final ImmutableList<HotkeyedBooleanConfig> HOTKEYS = ImmutableList.of(

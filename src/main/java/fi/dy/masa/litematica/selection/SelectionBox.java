@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 
 public class SelectionBox extends Box

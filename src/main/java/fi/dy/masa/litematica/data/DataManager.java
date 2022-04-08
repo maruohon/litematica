@@ -18,14 +18,15 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.malilib.config.option.BooleanAndFileConfig.BooleanAndFile;
+import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
@@ -371,7 +372,7 @@ public class DataManager implements DirectoryCache
 
     public static File getCurrentConfigDirectory()
     {
-        return new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
+        return ConfigUtils.getConfigDirectoryPath().resolve(Reference.MOD_ID).toFile();
     }
 
     public static File getSchematicsBaseDirectory()

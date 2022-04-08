@@ -9,7 +9,6 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.ScreenContext;
 import fi.dy.masa.malilib.render.text.StringListRenderer;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Configs.InfoOverlays;
 
 public class InfoHud
 {

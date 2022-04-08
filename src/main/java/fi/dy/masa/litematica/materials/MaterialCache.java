@@ -32,7 +32,7 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
-import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
@@ -346,7 +346,7 @@ public class MaterialCache
 
     protected File getCacheDir()
     {
-        return new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
+        return ConfigUtils.getConfigDirectoryPath().resolve(Reference.MOD_ID).toFile();
     }
 
     protected File getCacheFile()
