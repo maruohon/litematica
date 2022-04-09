@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
+import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
@@ -28,7 +29,7 @@ public class ConfigScreen
     public static final BaseConfigTab INFO_OVERLAYS = new BaseConfigTab(MOD_INFO, "info_overlays", 160, Configs.InfoOverlays.OPTIONS, ConfigScreen::create);
     public static final BaseConfigTab VISUALS       = new BaseConfigTab(MOD_INFO, "visuals",       160, Configs.Visuals.OPTIONS,      ConfigScreen::create);
     public static final BaseConfigTab COLORS        = new BaseConfigTab(MOD_INFO, "colors",        100, Configs.Colors.OPTIONS,       ConfigScreen::create);
-    public static final BaseConfigTab HOTKEYS       = new BaseConfigTab(MOD_INFO, "hotkeys",       200, Hotkeys.HOTKEY_LIST,          ConfigScreen::create);
+    public static final BaseConfigTab HOTKEYS       = new BaseConfigTab(MOD_INFO, "hotkeys",       200, getHotkeys(),                 ConfigScreen::create);
     public static final BaseScreenTab RENDER_LAYERS = new BaseScreenTab(MOD_INFO, "render_layers", RenderLayerEditScreen::screenValidator, RenderLayerEditScreen::openRenderLayerEditScreen);
 
     public static final ImmutableList<ConfigTab> CONFIG_TABS = ImmutableList.of(
@@ -102,5 +103,20 @@ public class ConfigScreen
         RenderLayerEditScreen screen = new RenderLayerEditScreen();
         //screen.setCurrentTab(RENDER_LAYERS);
         return screen;
+    }
+
+    private static ImmutableList<ConfigInfo> getHotkeys()
+    {
+        ArrayList<ConfigInfo> list = new ArrayList<>(Hotkeys.HOTKEY_LIST);
+
+        list.add(ConfigUtils.extractOptionsToExpandableGroup(list, MOD_INFO, "hotkey.open_screen",      c -> c.getName().startsWith("open")));
+        list.add(ConfigUtils.extractOptionsToExpandableGroup(list, MOD_INFO, "hotkey.render_layer",     c -> c.getName().startsWith("layer")));
+        list.add(ConfigUtils.extractOptionsToExpandableGroup(list, MOD_INFO, "hotkey.schematic_edit",   c -> c.getName().startsWith("schematicEdit")));
+        list.add(ConfigUtils.extractOptionsToExpandableGroup(list, MOD_INFO, "hotkey.selection",        c -> c.getName().startsWith("selection")));
+        list.add(ConfigUtils.extractOptionsToExpandableGroup(list, MOD_INFO, "hotkey.tool",             c -> c.getName().startsWith("tool")));
+
+        ConfigUtils.sortConfigsByDisplayName(list);
+
+        return ImmutableList.copyOf(list);
     }
 }

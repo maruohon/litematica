@@ -676,6 +676,17 @@ litematica.message.warning.invalid_number=Invalid input for a number '%s'
 
 litematica.warning.area_editor.area_rendering_disabled=Note: The Area Selection boxes rendering is currently disabled\nSee Visuals -> %s, or Hotkeys -> %s ['%s']
 
+litematica.config_group.comment.hotkey.open_screen=Open Screen Hotkeys
+litematica.config_group.comment.hotkey.render_layer=Render Layer Hotkeys
+litematica.config_group.comment.hotkey.schematic_edit=Schematic Edit Hotkeys
+litematica.config_group.comment.hotkey.selection=Selection Related Hotkeys
+litematica.config_group.comment.hotkey.tool=Tool Related Hotkeys
+litematica.config_group.name.hotkey.open_screen=Open Screen Hotkeys
+litematica.config_group.name.hotkey.render_layer=Render Layer Hotkeys
+litematica.config_group.name.hotkey.schematic_edit=Schematic Edit Hotkeys
+litematica.config_group.name.hotkey.selection=Selection Related Hotkeys
+litematica.config_group.name.hotkey.tool=Tool Related Hotkeys
+
 litematica.config.comment.areaselectionsperworld=Use per-world or per-server save directories for the Area Selections (in the Area Selection Browser). If disabled, then the same "global" save directory is used for all worlds.\n\n§eWARNING:§r Don't switch this §cOFF§r while you are for example live streaming, as then the Area Selection Browser will show the server IP in the navigation widget and also in the current selection name/path until you change the current directory and selection again.
 litematica.config.comment.betterrenderorder=If enabled, then the schematic rendering is done by injecting the different render call into the vanilla rendering code.\n\nThis should result in better translucent block rendering/ordering and schematic blocks not getting rendered through the client world blocks/terrain.\n\nIf the rendering doesn't work (for example with Optifine), then try disabling this option. But in most cases you want to keep this enabled.
 litematica.config.comment.changeselectedcorneronmove=If enabled, then the "element selection" of an area selection is always set to the last moved corner, when using the set corner hotkeys (Hotkeys -> §eSet Selection Box Corner 1 & 2§r).\n\nThe selected element is what the tool item and some hotkeys will control/move. This is basically the same as usin gthe §eTool Select Elements§r key (using default hotkeys middle clicking) with the tool on the moved corner to select it.
