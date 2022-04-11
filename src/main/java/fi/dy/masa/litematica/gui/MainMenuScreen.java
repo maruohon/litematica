@@ -100,7 +100,7 @@ public class MainMenuScreen extends BaseScreen
         {
             // FIXME meh what a mess...
             String modeName1 = SelectionMode.SIMPLE.getDisplayName();
-            String modeName2 = SelectionMode.NORMAL.getDisplayName();
+            String modeName2 = SelectionMode.MULTI_REGION.getDisplayName();
             String s1 = StringUtils.translate("litematica.button.area_editor.selection_mode", modeName1);
             String s2 = StringUtils.translate("litematica.button.area_editor.selection_mode", modeName2);
             this.equalWidthWidgetMaxWidth = Math.max(this.equalWidthWidgetMaxWidth, this.getStringWidth(s1) + 10);

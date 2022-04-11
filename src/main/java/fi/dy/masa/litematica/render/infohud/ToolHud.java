@@ -148,7 +148,9 @@ public class ToolHud extends InfoHud
 
         if (selection != null)
         {
-            if (sm.getSelectionMode() == SelectionMode.NORMAL)
+            boolean multiRegionMode = sm.getSelectionMode() == SelectionMode.MULTI_REGION;
+
+            if (multiRegionMode)
             {
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.selected_area.multi_region", selection.getName()));
             }
@@ -170,7 +172,7 @@ public class ToolHud extends InfoHud
                 originMode = StringUtils.translate("litematica.label.misc.origin.manual");
             }
 
-            if (sm.getSelectionMode() == SelectionMode.NORMAL)
+            if (multiRegionMode)
             {
                 int count = selection.getAllSubRegionBoxes().size();
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.origin.multi_region",
@@ -187,8 +189,8 @@ public class ToolHud extends InfoHud
 
             if (subRegionName != null && box != null)
             {
-                // Only show the sub-region name for Normal mode selections
-                if (sm.getSelectionMode() == SelectionMode.NORMAL)
+                // Only show the sub-region name for Multi-Region mode selections
+                if (multiRegionMode)
                 {
                     lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.selected_sub_region", subRegionName));
                 }
@@ -303,7 +305,7 @@ public class ToolHud extends InfoHud
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection selection = sm.getCurrentSelection();
 
-        if (selection != null && sm.getSelectionMode() == SelectionMode.NORMAL)
+        if (selection != null && sm.getSelectionMode() == SelectionMode.MULTI_REGION)
         {
             String subRegionName = selection.getCurrentSubRegionBoxName();
 

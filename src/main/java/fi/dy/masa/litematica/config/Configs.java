@@ -22,6 +22,7 @@ import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.position.Vec2i;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
+import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.DefaultDirectories;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
@@ -64,6 +65,7 @@ public class Configs
         public static final BooleanConfig RENDER_THREAD_NO_TIMEOUT                  = new BooleanConfig("renderThreadNoTimeout", true);
         public static final StringConfig  TOOL_ITEM                                 = new StringConfig( "toolItem", "minecraft:stick");
 
+        public static final OptionListConfig<SelectionMode> DEFAULT_AREA_SELECTION_MODE   = new OptionListConfig<>("defaultAreaSelectionMode", SelectionMode.SIMPLE, SelectionMode.VALUES);
         public static final OptionListConfig<ReplaceBehavior> PASTE_REPLACE_BEHAVIOR        = new OptionListConfig<>("pasteReplaceBehavior", ReplaceBehavior.NONE, ReplaceBehavior.VALUES);
         public static final OptionListConfig<FileBrowserColumns> SCHEMATIC_BROWSER_COLUMNS  = new OptionListConfig<>("schematicBrowserColumns", FileBrowserColumns.MTIME, FileBrowserColumns.VALUES);
         public static final OptionListConfig<CornerSelectionMode> SELECTION_CORNERS_MODE    = new OptionListConfig<>("selectionCornersMode", CornerSelectionMode.CORNERS, CornerSelectionMode.VALUES);
@@ -76,6 +78,7 @@ public class Configs
                 COMMAND_NAME_SETBLOCK,
                 CUSTOM_SCHEMATIC_DIRECTORY,
                 DEBUG_MESSAGES,
+                DEFAULT_AREA_SELECTION_MODE,
                 EASY_PLACE_CLICK_ADJACENT,
                 EASY_PLACE_HOLD_ENABLED,
                 EASY_PLACE_MODE,

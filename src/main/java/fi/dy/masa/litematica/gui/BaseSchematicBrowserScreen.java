@@ -8,7 +8,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.litematica.config.Configs.Generic;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.SchematicBrowserIconProvider;
 import fi.dy.masa.litematica.gui.widget.SchematicInfoWidget;
@@ -79,7 +79,7 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         listWidget.setFileFilter(SchematicType.SCHEMATIC_FILE_FILTER);
         listWidget.setRootDirectoryDisplayName(StringUtils.translate("litematica.label.schematic_browser.schematics"));
 
-        FileBrowserColumns mode = Generic.SCHEMATIC_BROWSER_COLUMNS.getValue();
+        FileBrowserColumns mode = Configs.Generic.SCHEMATIC_BROWSER_COLUMNS.getValue();
 
         if (mode == FileBrowserColumns.MTIME || mode == FileBrowserColumns.SIZE_MTIME)
         {

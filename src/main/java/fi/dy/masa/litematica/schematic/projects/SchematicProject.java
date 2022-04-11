@@ -166,7 +166,7 @@ public class SchematicProject
 
     public void switchSelectionMode()
     {
-        this.selectionMode = this.selectionMode.cycle(true);
+        this.selectionMode = this.selectionMode == SelectionMode.MULTI_REGION ? SelectionMode.SIMPLE : SelectionMode.MULTI_REGION;
         this.dirty = true;
     }
 
@@ -408,7 +408,7 @@ public class SchematicProject
         obj.add("selection_normal", this.selection.toJson());
         obj.add("selection_simple", this.selectionSimple.toJson());
         obj.add("last_seen_area", this.lastSeenArea.toJson());
-        obj.add("selection_mode", new JsonPrimitive(this.selectionMode.name()));
+        obj.add("selection_mode", new JsonPrimitive(this.selectionMode.getName()));
 
         JsonArray arr = new JsonArray();
 
@@ -454,7 +454,8 @@ public class SchematicProject
 
             if (JsonUtils.hasString(obj, "selection_mode"))
             {
-                project.selectionMode = SelectionMode.fromString(JsonUtils.getString(obj, "selection_mode"));
+                String name = JsonUtils.getString(obj, "selection_mode");
+                project.selectionMode = SelectionMode.findValueByName(name, SelectionMode.VALUES);
             }
 
             if (JsonUtils.hasArray(obj, "versions"))

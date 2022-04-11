@@ -1,64 +1,17 @@
 package fi.dy.masa.litematica.selection;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 
-public enum SelectionMode
+public class SelectionMode extends BaseOptionListConfigValue
 {
-    NORMAL  ("litematica.label.area_selection.mode.multi_region"),
-    SIMPLE  ("litematica.label.area_selection.mode.simple");
+    public static final SelectionMode SIMPLE       = new SelectionMode("simple",       "litematica.label.area_selection.mode.simple");
+    public static final SelectionMode MULTI_REGION = new SelectionMode("multi_region", "litematica.label.area_selection.mode.multi_region");
 
-    public static final ImmutableList<SelectionMode> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<SelectionMode> VALUES = ImmutableList.of(SIMPLE, MULTI_REGION);
 
-    private final String translationKey;
-
-    SelectionMode(String translationKey)
+    public SelectionMode(String name, String translationKey)
     {
-        this.translationKey = translationKey;
-    }
-
-    public String getTranslationKey()
-    {
-        return this.translationKey;
-    }
-
-    public String getDisplayName()
-    {
-        return StringUtils.translate(this.translationKey);
-    }
-
-    public SelectionMode cycle(boolean forward)
-    {
-        int id = this.ordinal();
-
-        if (forward)
-        {
-            if (++id >= 2)
-            {
-                id = 0;
-            }
-        }
-        else
-        {
-            if (--id < 0)
-            {
-                id = 2 - 1;
-            }
-        }
-
-        return values()[id % 2];
-    }
-
-    public static SelectionMode fromString(String name)
-    {
-        for (SelectionMode mode : VALUES)
-        {
-            if (mode.name().equalsIgnoreCase(name))
-            {
-                return mode;
-            }
-        }
-
-        return SelectionMode.NORMAL;
+        super(name, translationKey);
     }
 }

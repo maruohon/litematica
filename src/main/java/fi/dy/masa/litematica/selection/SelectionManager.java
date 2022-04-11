@@ -74,14 +74,14 @@ public class SelectionManager
         }
         else
         {
-            this.mode = this.mode.cycle(true);
+            this.mode = this.mode == SelectionMode.MULTI_REGION ? SelectionMode.SIMPLE : SelectionMode.MULTI_REGION;
         }
     }
 
     @Nullable
     public String getCurrentSelectionId()
     {
-        return this.mode == SelectionMode.NORMAL ? this.currentSelectionId : null;
+        return this.mode == SelectionMode.MULTI_REGION ? this.currentSelectionId : null;
     }
 
     @Nullable
@@ -703,6 +703,7 @@ public class SelectionManager
 
     public void clear()
     {
+        this.mode = Configs.Generic.DEFAULT_AREA_SELECTION_MODE.getValue();
         this.grabbedElement = null;
         this.currentSelectionId = null;
         this.selections.clear();
@@ -720,7 +721,7 @@ public class SelectionManager
             return null;
         }
 
-        if (this.getSelectionMode() == SelectionMode.NORMAL)
+        if (this.getSelectionMode() == SelectionMode.MULTI_REGION)
         {
             return new NormalModeAreaEditorScreen(selection);
         }
@@ -766,7 +767,8 @@ public class SelectionManager
 
         if (JsonUtils.hasString(obj, "mode"))
         {
-            this.mode = SelectionMode.fromString(obj.get("mode").getAsString());
+            String name = obj.get("mode").getAsString();
+            this.mode = SelectionMode.findValueByName(name, SelectionMode.VALUES);
         }
     }
 
@@ -774,7 +776,7 @@ public class SelectionManager
     {
         JsonObject obj = new JsonObject();
 
-        obj.add("mode", new JsonPrimitive(this.mode.name()));
+        obj.add("mode", new JsonPrimitive(this.mode.getName()));
 
         try
         {

@@ -221,7 +221,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
     protected void removeSelection()
     {
         if (this.selectionManager.removeSelection(this.selectionId) &&
-            this.selectionManager.getSelectionMode() == SelectionMode.NORMAL &&
+            this.selectionManager.getSelectionMode() == SelectionMode.MULTI_REGION &&
             this.selectionId.equals(this.selectionManager.getCurrentNormalSelectionId()))
         {
             GuiUtils.reInitCurrentScreen();
