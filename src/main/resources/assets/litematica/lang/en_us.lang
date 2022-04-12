@@ -352,6 +352,7 @@ litematica.title.screen.material_list.select_schematic_regions=Select the sub-re
 litematica.title.screen.loaded_schematics=Litematica %s - Loaded Schematics List
 litematica.title.screen.main_menu=Litematica %s
 litematica.title.screen.placement_grid_settings=Grid/Repeat Settings for Placement §e%s
+litematica.title.screen.render_layers=Litematica %s - Render Layers
 litematica.title.screen.save_in_memory_schematic=Create an In-Memory-Only Schematic
 litematica.title.screen.save_schematic_from_area=Save Schematic from selection §e%s§r
 litematica.title.screen.saved_placements=Litematica %s - Saved Schematic Placements

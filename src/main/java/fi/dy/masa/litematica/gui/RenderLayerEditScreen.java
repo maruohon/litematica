@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.gui.edit.BaseRenderLayerEditScreen;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 
 public class RenderLayerEditScreen extends BaseRenderLayerEditScreen
@@ -17,6 +18,9 @@ public class RenderLayerEditScreen extends BaseRenderLayerEditScreen
         this.shouldCreateTabButtons = true;
         this.controlsStartX = 10;
         this.controlsStartY = 60;
+
+        this.setTitle("litematica.title.screen.render_layers", Reference.MOD_VERSION);
+        this.createSwitchModConfigScreenDropDown(Reference.MOD_INFO);
     }
 
     @Override
