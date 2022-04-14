@@ -22,6 +22,7 @@
 		"MixinMinecraftClient",
 		"MixinModelOverrideList",
 		"MixinRailBlocks",
+		"MixinServerPlayNetworkHandler",
 		"MixinWorld",
 		"MixinWorldChunk",
 		"MixinWorldRenderer"
