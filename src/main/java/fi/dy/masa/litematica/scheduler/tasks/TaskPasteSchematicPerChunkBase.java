@@ -4,13 +4,13 @@ import java.util.Collection;
 import java.util.Set;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
 
 public abstract class TaskPasteSchematicPerChunkBase extends TaskProcessChunkMultiPhase
 {
@@ -57,6 +57,7 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskProcessChunkMul
     {
         Set<ChunkPos> touchedChunks = placement.getTouchedChunks();
 
+
         for (ChunkPos pos : touchedChunks)
         {
             int count = 0;
@@ -67,8 +68,16 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskProcessChunkMul
 
                 if (box != null)
                 {
-                    this.boxesInChunks.put(pos, box);
-                    ++count;
+                    // Clamp the box to the world bounds.
+                    // This is also important for the fill-based strip generation code to not
+                    // overflow the work array bounds.
+                    box = PositionUtils.clampBoxToWorldHeightRange(box, this.clientWorld);
+
+                    if (box != null)
+                    {
+                        this.boxesInChunks.put(pos, box);
+                        ++count;
+                    }
                 }
             }
 

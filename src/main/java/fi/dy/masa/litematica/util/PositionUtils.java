@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -23,6 +23,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -30,11 +35,6 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class PositionUtils
 {
@@ -267,6 +267,26 @@ public class PositionUtils
                         Math.max(posMax.getY(), posToCheck.getY()),
                         Math.max(posMax.getZ(), posToCheck.getZ()));
         }
+    }
+
+    @Nullable
+    public static IntBoundingBox clampBoxToWorldHeightRange(IntBoundingBox box, World world)
+    {
+        int minY = world.getBottomY();
+        int maxY = world.getTopY() - 1;
+
+        if (box.minY > maxY || box.maxY < minY)
+        {
+            return null;
+        }
+
+        if (box.minY < minY || box.maxY > maxY)
+        {
+            box = new IntBoundingBox(box.minX, Math.max(box.minY, minY), box.minZ,
+                                     box.maxX, Math.min(box.maxY, maxY), box.maxZ);
+        }
+
+        return box;
     }
 
     public static int getTotalVolume(Collection<Box> boxes)

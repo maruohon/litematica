@@ -8,16 +8,16 @@ import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
 
 public abstract class TaskProcessChunkBase extends TaskBase
 {
@@ -112,16 +112,26 @@ public abstract class TaskProcessChunkBase extends TaskBase
 
         if (range.getLayerMode() == LayerMode.ALL)
         {
-            PositionUtils.getPerChunkBoxes(allBoxes, this.boxesInChunks::put);
+            PositionUtils.getPerChunkBoxes(allBoxes, this::clampToWorldHeightAndAddBox);
         }
         else
         {
-            PositionUtils.getLayerRangeClampedPerChunkBoxes(allBoxes, range, this.boxesInChunks::put);
+            PositionUtils.getLayerRangeClampedPerChunkBoxes(allBoxes, range, this::clampToWorldHeightAndAddBox);
         }
 
         this.pendingChunks.addAll(this.boxesInChunks.keySet());
 
         this.sortChunkList();
+    }
+
+    protected void clampToWorldHeightAndAddBox(ChunkPos pos, IntBoundingBox box)
+    {
+        box = PositionUtils.clampBoxToWorldHeightRange(box, this.clientWorld);
+
+        if (box != null)
+        {
+            this.boxesInChunks.put(pos, box);
+        }
     }
 
     protected List<IntBoundingBox> getBoxesInChunk(ChunkPos pos)
