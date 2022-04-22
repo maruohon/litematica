@@ -11,10 +11,10 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.ToBooleanFunction;
-import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
 {
@@ -152,7 +152,8 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
         {
             if ("commands.gamerule.query".equals(translatableText.getKey()))
             {
-                this.shouldEnableFeedback = translatableText.getString().contains("true");
+                Object[] args = translatableText.getArgs();
+                this.shouldEnableFeedback = args.length == 1 && args[0].equals("true");
                 this.phase = TaskPhase.WAIT_FOR_CHUNKS;
 
                 if (this.shouldEnableFeedback)

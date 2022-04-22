@@ -8,20 +8,30 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.DimensionTypes;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 
 public class SchematicWorldHandler
 {
+    public static final DimensionType DIMENSIONTYPE = new DimensionType(OptionalLong.of(6000L),
+                                                                        false, false, false, false,
+                                                                        1.0,
+                                                                        false, false, false, false,
+                                                                        -64, 384, 384,
+                                                                        BlockTags.INFINIBURN_END, DimensionTypes.OVERWORLD_ID, 0.0F);
+
     @Nullable private static WorldSchematic world;
-    public static final DimensionType DIMENSIONTYPE = DimensionType.create(OptionalLong.of(6000L), false, false, false, false, 1.0,
-                                                                           false, false, false, false, false, -64, 384, 384,
-                                                                            BlockTags.INFINIBURN_END, DimensionType.OVERWORLD_ID, 0.0F);
 
     @Nullable
     public static WorldSchematic getSchematicWorld()
     {
+        if (world == null)
+        {
+            world = createSchematicWorld();
+        }
+
         return world;
     }
 

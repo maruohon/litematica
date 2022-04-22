@@ -493,7 +493,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             Vec3d posVec = new Vec3d(placementPos.getX() + 0.5, placementPos.getY() + 0.5, placementPos.getZ() + 0.5);
             BlockHitResult hitResult = new BlockHitResult(posVec, Direction.UP, placementPos, true);
 
-            this.mc.interactionManager.interactBlock(this.mc.player, clientWorld, Hand.OFF_HAND, hitResult);
+            this.mc.interactionManager.interactBlock(this.mc.player, Hand.OFF_HAND, hitResult);
             this.placedPositionTimestamps.put(placementPos.asLong(), System.nanoTime());
 
             return placementPos;
