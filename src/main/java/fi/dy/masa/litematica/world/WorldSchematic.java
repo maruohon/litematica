@@ -25,6 +25,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.DynamicRegistryManager;
@@ -59,11 +60,11 @@ public class WorldSchematic extends World
     private int nextEntityId;
     private int entityCount;
 
-    protected WorldSchematic(MutableWorldProperties mutableWorldProperties,
-                             RegistryEntry<DimensionType> dimensionType,
-                             Supplier<Profiler> supplier)
+    public WorldSchematic(MutableWorldProperties properties,
+                          RegistryEntry<DimensionType> dimension,
+                          Supplier<Profiler> supplier)
     {
-        super(mutableWorldProperties, REGISTRY_KEY, dimensionType, supplier, true, true, 0L);
+        super(properties, REGISTRY_KEY, dimension, supplier, true, false, 0L, 64);
 
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
@@ -427,6 +428,24 @@ public class WorldSchematic extends World
     @Override
     public void syncWorldEvent(@Nullable PlayerEntity entity, int id, BlockPos pos, int data)
     {
+    }
+
+    @Override
+    public void emitGameEvent(GameEvent event, Vec3d pos, @Nullable GameEvent.Emitter emitter)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playSound(@Nullable PlayerEntity except, double x, double y, double z, SoundEvent sound, SoundCategory category, float volume, float pitch, long seed)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playSoundFromEntity(@Nullable PlayerEntity except, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch, long seed)
+    {
+        // NO-OP
     }
 
     @Override
