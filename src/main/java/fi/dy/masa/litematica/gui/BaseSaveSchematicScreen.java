@@ -84,9 +84,14 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
             this.saveSchematic();
             return true;
         }
-        else if (this.fileNameTextField.onKeyTyped(keyCode, scanCode, modifiers))
+        else if (keyCode != Keyboard.KEY_ESCAPE && this.fileNameTextField.onKeyTyped(keyCode, scanCode, modifiers))
         {
             this.getListWidget().clearSelection();
+            return true;
+        }
+        else if (keyCode == Keyboard.KEY_ESCAPE)
+        {
+            this.closeScreenOrShowParent();
             return true;
         }
 
@@ -102,11 +107,24 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
     protected abstract void saveSchematic();
 
     @Nullable
-    protected File getSchematicFileIfCanSave(boolean isHoldingShift)
+    protected File getSchematicFileIfCanSave(boolean overwrite)
     {
-        String name = this.fileNameTextField.getText();
         File dir = this.getListWidget().getCurrentDirectory();
+        String name = this.fileNameTextField.getText();
+        SchematicType<?> outputType = this.schematicTypeDropdown.getSelectedEntry();
 
+        if (outputType == null)
+        {
+            MessageDispatcher.error("litematica.message.error.save_schematic.no_type_selected");
+            return null;
+        }
+
+        return getSchematicFileIfCanSave(dir, name, outputType, overwrite);
+    }
+
+    @Nullable
+    public static File getSchematicFileIfCanSave(File dir, String name, SchematicType<?> outputType, boolean overwrite)
+    {
         if (dir.isDirectory() == false)
         {
             MessageDispatcher.error("litematica.message.error.save_schematic.invalid_directory", dir.getAbsolutePath());
@@ -125,21 +143,31 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
             return null;
         }
 
-        SchematicType<?> outputType = this.schematicTypeDropdown.getSelectedEntry();
+        String extension = outputType.getFileNameExtension();
 
-        if (outputType == null)
+        if (name.endsWith(extension) == false)
         {
-            MessageDispatcher.error("litematica.message.error.save_schematic.no_type_selected");
-            return null;
+            name += extension;
         }
 
-        File file = new File(dir, name + outputType.getFileNameExtension());
+        File file = new File(dir, name);
 
-        if (isHoldingShift == false && file.exists())
+        if (overwrite == false && file.exists())
         {
             MessageDispatcher.error("litematica.message.error.file_exists.hold_shift_to_override", file.getName());
             return null;
         }
+
+        try
+        {
+            if (file.exists() == false && file.createNewFile() == false)
+            {
+                MessageDispatcher.error("litematica.message.error.schematic_save.failed_to_create_empty_file",
+                                        file.getName());
+                return null;
+            }
+        }
+        catch (Exception ignore) {}
 
         return file;
     }

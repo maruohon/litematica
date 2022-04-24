@@ -13,12 +13,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.tuple.Pair;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -186,6 +188,24 @@ public class AreaSelection
         ImmutableMap.Builder<String, SelectionBox> builder = ImmutableMap.builder();
         builder.putAll(this.subRegionBoxes);
         return builder.build();
+    }
+
+    public NBTTagCompound getSubRegionsAsCompound()
+    {
+        NBTTagCompound tag = new NBTTagCompound();
+
+        for (Map.Entry<String, SelectionBox> entry : this.subRegionBoxes.entrySet())
+        {
+            IntBoundingBox bb = entry.getValue().asIntBoundingBox();
+
+            if (bb != null)
+            {
+                String regionName = entry.getKey();
+                tag.setTag(regionName, bb.toNbtIntArray());
+            }
+        }
+
+        return tag;
     }
 
     @Nullable

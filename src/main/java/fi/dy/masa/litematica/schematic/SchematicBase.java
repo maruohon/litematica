@@ -96,7 +96,7 @@ public abstract class SchematicBase implements ISchematic
         }
     }
 
-    protected boolean readPaletteFromLitematicaFormatTag(NBTTagList tagList, ILitematicaBlockStatePalette palette)
+    public static boolean readPaletteFromLitematicaFormatTag(NBTTagList tagList, ILitematicaBlockStatePalette palette)
     {
         final int size = tagList.tagCount();
         List<IBlockState> list = new ArrayList<>(size);

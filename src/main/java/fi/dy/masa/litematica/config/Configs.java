@@ -21,6 +21,7 @@ import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.position.Vec2i;
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.gui.SaveSchematicFromAreaScreen.SaveSide;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
@@ -316,11 +317,15 @@ public class Configs
     {
         public static final BooleanConfig CREATE_PLACEMENT_ON_LOAD      = new BooleanConfig("createPlacementOnLoad", true);
         public static final BooleanConfig PLACEMENT_LIST_ICON_BUTTONS   = new BooleanConfig("placementListIconButtons", false);
+        public static final BooleanConfig SAVE_WITH_CUSTOM_SETTINGS     = new BooleanConfig("saveWithCustomSettings", false);
         public static final BooleanConfig SCHEMATIC_LIST_ICON_BUTTONS   = new BooleanConfig("schematicListIconButtons", false);
+        public static final OptionListConfig<SaveSide> SAVE_SIDE        = new OptionListConfig<>("saveSide", SaveSide.AUTO, SaveSide.VALUES);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 CREATE_PLACEMENT_ON_LOAD,
                 PLACEMENT_LIST_ICON_BUTTONS,
+                SAVE_WITH_CUSTOM_SETTINGS,
+                SAVE_SIDE,
                 SCHEMATIC_LIST_ICON_BUTTONS
         );
     }

@@ -37,6 +37,7 @@ public class LitematicaSchematic extends SchematicBase
 
     private final Map<String, LitematicaBlockStateContainerFull> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, NBTTagCompound>> blockEntities = new HashMap<>();
+    // TODO FIXME use a custom class for holding this data
     private final Map<String, Map<BlockPos, NextTickListEntry>> pendingBlockTicks = new HashMap<>();
     private final Map<String, List<EntityInfo>> entities = new HashMap<>();
     private final Map<String, SubRegion> subRegions = new HashMap<>();
@@ -55,7 +56,7 @@ public class LitematicaSchematic extends SchematicBase
     @Override
     public int getSubRegionCount()
     {
-        return this.blockContainers.size();
+        return this.subRegions.size();
     }
 
     @Override
@@ -77,7 +78,7 @@ public class LitematicaSchematic extends SchematicBase
 
     @Override
     @Nullable
-    public ISchematicRegion getSchematicRegion(String regionName)
+    public LitematicaSubRegion getSchematicRegion(String regionName)
     {
         return this.subRegions.containsKey(regionName) ? new LitematicaSubRegion(this, regionName) : null;
     }
@@ -133,13 +134,34 @@ public class LitematicaSchematic extends SchematicBase
     }
 
     /**
+     * Sets the sub-regions and creates the empty HashMaps and Lists,
+     * but does not create the block state containers.
+     */
+    public void setSubRegions(List<SelectionBox> boxes, BlockPos areaOrigin)
+    {
+        this.clear();
+
+        for (SelectionBox box : boxes)
+        {
+            String regionName = box.getName();
+            BlockPos pos = box.getPos1().subtract(areaOrigin);
+            Vec3i size = box.getSize();
+
+            this.subRegions.put(regionName, new SubRegion(pos, size));
+            this.blockEntities.put(regionName, new HashMap<>());
+            this.entities.put(regionName, new ArrayList<>());
+            this.pendingBlockTicks.put(regionName, new HashMap<>());
+        }
+    }
+
+    /**
      * Sets the sub-region boxes for this schematic.
      * <b>Note:</b> This also clears any previous data, and this is meant to be
      * called before reading things from the world, when creating a schematic.
      * @param boxes the sub-region boxes, using absolute world coordinates
      * @param areaOrigin the area selection origin point
      */
-    public void setSubRegions(List<SelectionBox> boxes, BlockPos areaOrigin)
+    public void setAndInitializeSubRegions(List<SelectionBox> boxes, BlockPos areaOrigin)
     {
         this.clear();
 
@@ -265,7 +287,7 @@ public class LitematicaSchematic extends SchematicBase
         {
             for (String regionName : this.blockContainers.keySet())
             {
-                LitematicaBlockStateContainerFull blockContainer = (LitematicaBlockStateContainerFull) this.blockContainers.get(regionName);
+                LitematicaBlockStateContainerFull blockContainer = this.blockContainers.get(regionName);
                 Map<BlockPos, NBTTagCompound> tileMap = this.blockEntities.get(regionName);
                 List<EntityInfo> entityList = this.entities.get(regionName);
                 Map<BlockPos, NextTickListEntry> pendingTicks = this.pendingBlockTicks.get(regionName);
@@ -383,7 +405,7 @@ public class LitematicaSchematic extends SchematicBase
                             return false;
                         }
 
-                        this.readPaletteFromLitematicaFormatTag(paletteTag, container.getPalette());
+                        readPaletteFromLitematicaFormatTag(paletteTag, container.getPalette());
                         this.blockContainers.put(regionName, container);
                     }
                     else
@@ -474,14 +496,9 @@ public class LitematicaSchematic extends SchematicBase
 
     public static Boolean isValidSchematic(NBTTagCompound tag)
     {
-        if (tag.hasKey("Version", Constants.NBT.TAG_INT) &&
-            tag.hasKey("Regions", Constants.NBT.TAG_COMPOUND) &&
-            tag.hasKey("Metadata", Constants.NBT.TAG_COMPOUND))
-        {
-            return true;
-        }
-
-        return false;
+        return tag.hasKey("Version", Constants.NBT.TAG_INT) &&
+               tag.hasKey("Regions", Constants.NBT.TAG_COMPOUND) &&
+               tag.hasKey("Metadata", Constants.NBT.TAG_COMPOUND);
     }
 
     @Nullable
@@ -530,19 +547,54 @@ public class LitematicaSchematic extends SchematicBase
         @Override
         public Map<BlockPos, NBTTagCompound> getBlockEntityMap()
         {
-            return this.schematic.blockEntities.computeIfAbsent(this.regionName, (name) -> { return new HashMap<>(); });
+            return this.schematic.blockEntities.computeIfAbsent(this.regionName, name -> new HashMap<>());
         }
 
         @Override
         public List<EntityInfo> getEntityList()
         {
-            return this.schematic.entities.computeIfAbsent(this.regionName, (name) -> { return new ArrayList<>(); });
+            return this.schematic.entities.computeIfAbsent(this.regionName, name -> new ArrayList<>());
         }
 
         @Override
         public Map<BlockPos, NextTickListEntry> getBlockTickMap()
         {
-            return this.schematic.pendingBlockTicks.computeIfAbsent(this.regionName, (name) -> { return new HashMap<>(); });
+            return this.schematic.pendingBlockTicks.computeIfAbsent(this.regionName, name -> new HashMap<>());
+        }
+
+        // TODO FIXME clean this up by moving these to a MutableSchematicRegion interface and class
+
+        public void setBlockStateContainer(LitematicaBlockStateContainerFull container)
+        {
+            Vec3i containerSize = container.getSize();
+            Vec3i regionSize = this.getSize();
+
+            if (Math.abs(containerSize.getX()) == Math.abs(regionSize.getX()) &&
+                Math.abs(containerSize.getY()) == Math.abs(regionSize.getY()) &&
+                Math.abs(containerSize.getZ()) == Math.abs(regionSize.getZ()))
+            {
+                this.schematic.blockContainers.put(this.regionName, container);
+            }
+            else
+            {
+                // FIXME/TODO
+                MessageDispatcher.error("Invalid container size %s, expected %s", containerSize, regionSize);
+            }
+        }
+
+        public void setBlockEntityMap(Map<BlockPos, NBTTagCompound> map)
+        {
+            this.schematic.blockEntities.put(this.regionName, map);
+        }
+
+        public void setEntityList(List<EntityInfo> list)
+        {
+            this.schematic.entities.put(this.regionName, list);
+        }
+
+        public void setBlockTickMap(Map<BlockPos, NextTickListEntry> map)
+        {
+            this.schematic.pendingBlockTicks.put(this.regionName, map);
         }
     }
 }

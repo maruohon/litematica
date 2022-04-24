@@ -139,7 +139,7 @@ public class SchematicCreationUtils
     public static void setSchematicMetadataOnCreation(ISchematic schematic, String schematicName)
     {
         long time = System.currentTimeMillis();
-        schematic.getMetadata().setAuthor(GameUtils.getClientPlayer().getName());
+        schematic.getMetadata().setAuthor(GameUtils.getPlayerName());
         schematic.getMetadata().setName(schematicName);
         schematic.getMetadata().setTimeCreated(time);
         schematic.getMetadata().setTimeModified(time);
@@ -162,7 +162,7 @@ public class SchematicCreationUtils
         LitematicaSchematic schematic = SchematicType.LITEMATICA.createSchematic(null);
         SchematicMetadata metadata = schematic.getMetadata();
 
-        schematic.setSubRegions(boxes, area.getEffectiveOrigin());
+        schematic.setAndInitializeSubRegions(boxes, area.getEffectiveOrigin());
         metadata.setRegionCount(boxes.size());
         metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
         metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
@@ -189,7 +189,7 @@ public class SchematicCreationUtils
         long time = System.currentTimeMillis();
 
         BlockPos origin = area.getEffectiveOrigin();
-        schematic.setSubRegions(boxes, origin);
+        schematic.setAndInitializeSubRegions(boxes, origin);
 
         takeBlocksFromWorld(schematic, world, boxes);
 

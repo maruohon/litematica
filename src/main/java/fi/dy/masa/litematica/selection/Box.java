@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 
@@ -49,6 +50,17 @@ public class Box
     public Vec3i getSize()
     {
         return this.size;
+    }
+
+    @Nullable
+    public IntBoundingBox asIntBoundingBox()
+    {
+        if (this.pos1 != null && this.pos2 != null)
+        {
+            return IntBoundingBox.createProper(this.pos1, this.pos2);
+        }
+
+        return null;
     }
 
     public void setPos1(@Nullable BlockPos pos)

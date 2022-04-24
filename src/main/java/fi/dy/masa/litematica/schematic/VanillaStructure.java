@@ -87,7 +87,7 @@ public class VanillaStructure extends SingleRegionSchematic
             LitematicaBlockStateContainerSparse container = (LitematicaBlockStateContainerSparse) this.blockContainer;
             ILitematicaBlockStatePalette palette = container.getPalette();
 
-            if (this.readPaletteFromLitematicaFormatTag(paletteTag, palette) == false)
+            if (readPaletteFromLitematicaFormatTag(paletteTag, palette) == false)
             {
                 MessageDispatcher.error().translate("litematica.message.error.schematic_read.vanilla.failed_to_read_palette");
                 return false;

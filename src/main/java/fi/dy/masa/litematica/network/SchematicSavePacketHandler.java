@@ -1,0 +1,129 @@
+package fi.dy.masa.litematica.network;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+import com.google.common.collect.ImmutableList;
+import io.netty.buffer.Unpooled;
+import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
+import fi.dy.masa.malilib.network.PacketSplitter;
+import fi.dy.masa.malilib.network.message.BasePacketHandler;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.util.SchematicSaveSettings;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.task.MultiplayerCreateSchematicTask;
+
+public class SchematicSavePacketHandler extends BasePacketHandler
+{
+    public static final SchematicSavePacketHandler INSTANCE = new SchematicSavePacketHandler();
+
+    protected final ResourceLocation channelId = new ResourceLocation("litematica:save");
+    protected final List<ResourceLocation> channels = ImmutableList.of(this.channelId);
+    protected final HashMap<UUID, MultiplayerCreateSchematicTask> pendingSaveTasks = new HashMap<>();
+
+    protected SchematicSavePacketHandler()
+    {
+        this.usePacketSplitter = true;
+    }
+
+    @Override
+    public List<ResourceLocation> getChannels()
+    {
+        return this.channels;
+    }
+
+    @Override
+    public void onPacketReceived(PacketBuffer buf)
+    {
+        try
+        {
+            NBTTagCompound tag = buf.readCompoundTag();
+            UUID taskId = NbtUtils.readUUID(tag);
+
+            if (taskId != null)
+            {
+                MultiplayerCreateSchematicTask task = this.pendingSaveTasks.get(taskId);
+
+                if (task != null)
+                {
+                    task.onReceiveData(tag);
+                    this.removeSaveTask(taskId);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            MessageDispatcher.error("litematica.message.error.schematic_save.server_side.failed_reading_data");
+            MessageDispatcher.error(e.getMessage());
+        }
+    }
+
+    public void removeSaveTask(UUID taskId)
+    {
+        this.pendingSaveTasks.remove(taskId);
+    }
+
+    public void requestSchematicSaveAllAtOnce(AreaSelection selection,
+                                              SchematicSaveSettings settings,
+                                              Consumer<ISchematic> listener)
+    {
+        this.requestSchematicSave(selection, settings, "AllAtOnce", listener);
+    }
+
+    public void requestSchematicSavePerChunk(AreaSelection selection,
+                                             SchematicSaveSettings settings,
+                                             Consumer<ISchematic> listener)
+    {
+        this.requestSchematicSave(selection, settings, "PerChunk", listener);
+    }
+
+    protected void requestSchematicSave(AreaSelection selection,
+                                        SchematicSaveSettings settings,
+                                        String saveMethod,
+                                        Consumer<ISchematic> listener)
+    {
+        NetHandlerPlayClient handler = GameUtils.getClient().getConnection();
+        UUID taskId = UUID.randomUUID();
+
+        if (handler != null && this.sendSaveRequestPacket(selection, settings, taskId, saveMethod, handler))
+        {
+            MultiplayerCreateSchematicTask task = new MultiplayerCreateSchematicTask(selection, taskId, listener);
+            this.pendingSaveTasks.put(taskId, task);
+            TaskScheduler.getInstanceClient().scheduleTask(task, 10);
+        }
+    }
+
+    protected boolean sendSaveRequestPacket(AreaSelection selection,
+                                            SchematicSaveSettings settings,
+                                            UUID taskId,
+                                            String saveMethod,
+                                            NetHandlerPlayClient handler)
+    {
+        NBTTagCompound dataTypesTag = new NBTTagCompound();
+        dataTypesTag.setBoolean("Blocks", settings.saveBlocks.getBooleanValue());
+        dataTypesTag.setBoolean("BlockEntities", settings.saveBlockEntities.getBooleanValue());
+        dataTypesTag.setBoolean("BlockTicks", settings.saveBlockTicks.getBooleanValue());
+        dataTypesTag.setBoolean("Entities", settings.saveEntities.getBooleanValue());
+        dataTypesTag.setBoolean("ExposedBlocksOnly", settings.exposedBlocksOnly.getBooleanValue());
+
+        NBTTagCompound tag = new NBTTagCompound();
+        NbtUtils.writeUUID(tag, taskId);
+        tag.setString("SaveMethod", saveMethod);
+        tag.setTag("RequestedData", dataTypesTag);
+        tag.setTag("Regions", selection.getSubRegionsAsCompound());
+
+        PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
+        buf.writeCompoundTag(tag);
+        PacketSplitter.send(this.channelId, buf, handler);
+
+        return true;
+    }
+}

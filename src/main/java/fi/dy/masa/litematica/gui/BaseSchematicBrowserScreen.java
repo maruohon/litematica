@@ -34,6 +34,21 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     }
 
     @Override
+    protected void initScreen()
+    {
+        this.schematicInfoWidget.clearCache();
+        super.initScreen();
+        this.getListWidget().clearSelection();
+    }
+
+    @Override
+    protected void onScreenClosed()
+    {
+        super.onScreenClosed();
+        this.schematicInfoWidget.clearCache();
+    }
+
+    @Override
     protected void reAddActiveWidgets()
     {
         super.reAddActiveWidgets();
@@ -51,13 +66,6 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
         this.mainMenuScreenButton.setRight(this.getRight() - 10);
         this.mainMenuScreenButton.setBottom(this.getBottom() - 6);
-    }
-
-    @Override
-    protected void onScreenClosed()
-    {
-        super.onScreenClosed();
-        this.schematicInfoWidget.clearCache();
     }
 
     @Override

@@ -1,23 +1,43 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.option.BooleanConfig;
+import fi.dy.masa.malilib.config.option.OptionListConfig;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
+import fi.dy.masa.malilib.gui.widget.BooleanEditWidget;
+import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+import fi.dy.masa.malilib.gui.widget.button.OptionListConfigButton;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.data.SimpleBooleanStorage;
+import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.network.SchematicSavePacketHandler;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
+import fi.dy.masa.litematica.schematic.util.SchematicSaveSettings;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.task.CreateSchematicTask;
 
 public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
 {
     protected final AreaSelection selection;
-    protected final CheckBoxWidget ignoreEntitiesCheckbox;
-    protected final SimpleBooleanStorage ignoreEntitiesValue = new SimpleBooleanStorage(false);
+    protected final SchematicSaveSettings settings = new SchematicSaveSettings();
+    protected final OptionListConfig<SaveSide> saveSide;
+    protected final BooleanConfig customSettingsEnabled = new BooleanConfig("-", false);
+    protected final BooleanConfigButton customSettingsButton;
+    protected final OptionListConfigButton saveSideButton;
+    protected final BooleanEditWidget saveBlocksWidget;
+    protected final BooleanEditWidget saveBlockEntitiesWidget;
+    protected final BooleanEditWidget saveBlockTicksWidget;
+    protected final BooleanEditWidget saveEntitiesWidget;
+    protected final BooleanEditWidget exposedBlocksOnlyWidget;
+    protected final BooleanEditWidget fromNormalWorldWidget;
+    protected final BooleanEditWidget fromSchematicWorldWidget;
 
     public SaveSchematicFromAreaScreen(AreaSelection selection)
     {
@@ -28,10 +48,47 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
         this.originalName = getFileNameFromDisplayName(areaName);
         this.fileNameTextField.setText(this.originalName);
 
-        this.ignoreEntitiesCheckbox = new CheckBoxWidget("litematica.checkmark.save_schematic.ignore_entities",
-                                                         this.ignoreEntitiesValue);
+        SaveSide side = Configs.Internal.SAVE_SIDE.getValue();
+        this.saveSide = new OptionListConfig<>("-", side, SaveSide.VALUES);
+        this.customSettingsEnabled.setBooleanValue(Configs.Internal.SAVE_WITH_CUSTOM_SETTINGS.getBooleanValue());
+
+        this.customSettingsButton = new BooleanConfigButton(-1, 18, this.customSettingsEnabled, OnOffButton.OnOffStyle.TEXT_ON_OFF, "litematica.button.schematic_save.custom_settings");
+        this.saveSideButton = new OptionListConfigButton(-1, 16, this.saveSide, "litematica.button.schematic_save.save_side");
+
+        this.saveBlocksWidget         = new BooleanEditWidget(14, this.settings.saveBlocks,             "litematica.button.schematic_save.save_blocks");
+        this.saveBlockEntitiesWidget  = new BooleanEditWidget(14, this.settings.saveBlockEntities,      "litematica.button.schematic_save.save_block_entities");
+        this.saveBlockTicksWidget     = new BooleanEditWidget(14, this.settings.saveBlockTicks,         "litematica.button.schematic_save.save_block_ticks");
+        this.saveEntitiesWidget       = new BooleanEditWidget(14, this.settings.saveEntities,           "litematica.button.schematic_save.save_entities");
+        this.exposedBlocksOnlyWidget  = new BooleanEditWidget(14, this.settings.exposedBlocksOnly,      "litematica.button.schematic_save.exposed_blocks_only");
+        this.fromNormalWorldWidget    = new BooleanEditWidget(14, this.settings.saveFromNormalWorld,    "litematica.button.schematic_save.from_normal_world");
+        this.fromSchematicWorldWidget = new BooleanEditWidget(14, this.settings.saveFromSchematicWorld, "litematica.button.schematic_save.from_schematic_world");
+
+        this.customSettingsEnabled.setValueChangeCallback((n, o) -> this.onCustomSettingsToggled());
+
+        String hoverKey;
+
+        if (GameUtils.isSinglePlayer())
+        {
+            hoverKey = "litematica.hover.button.schematic_save.save_side.single_player";
+            this.saveSideButton.getHoverInfoFactory().removeAll();
+            this.saveSideButton.setEnabled(false);
+        }
+        else
+        {
+            hoverKey = "litematica.hover.button.schematic_save.save_side.info";
+        }
+
+        this.saveSideButton.translateAndAddHoverString(hoverKey);
 
         this.setTitle("litematica.title.screen.save_schematic_from_area", areaName);
+    }
+
+    @Override
+    protected void onScreenClosed()
+    {
+        super.onScreenClosed();
+        Configs.Internal.SAVE_SIDE.setValue(this.saveSide.getValue());
+        Configs.Internal.SAVE_WITH_CUSTOM_SETTINGS.setBooleanValue(this.customSettingsEnabled.getBooleanValue());
     }
 
     @Override
@@ -40,7 +97,19 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
         super.reAddActiveWidgets();
 
         //this.addWidget(this.schematicTypeDropdown);
-        this.addWidget(this.ignoreEntitiesCheckbox);
+        this.addWidget(this.saveSideButton);
+        this.addWidget(this.customSettingsButton);
+
+        if (this.customSettingsEnabled.getBooleanValue())
+        {
+            this.addWidget(this.saveBlocksWidget);
+            this.addWidget(this.saveBlockEntitiesWidget);
+            this.addWidget(this.saveBlockTicksWidget);
+            this.addWidget(this.saveEntitiesWidget);
+            this.addWidget(this.exposedBlocksOnlyWidget);
+            this.addWidget(this.fromNormalWorldWidget);
+            this.addWidget(this.fromSchematicWorldWidget);
+        }
     }
 
     @Override
@@ -51,15 +120,36 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
         //this.schematicTypeDropdown.setPosition(this.fileNameTextField.getX(), this.fileNameTextField.getBottom() + 2);
         //this.saveButton.setPosition(this.schematicTypeDropdown.getRight() + 2, this.fileNameTextField.getBottom() + 2);
         this.saveButton.setPosition(this.fileNameTextField.getX(), this.fileNameTextField.getBottom() + 2);
-        this.ignoreEntitiesCheckbox.setX(this.saveButton.getRight() + 4);
-        this.ignoreEntitiesCheckbox.centerVerticallyInside(this.saveButton);
+
+        int x = this.schematicInfoWidget.getX();
+        this.saveSideButton.setPosition(x, this.y + 10);
+        this.customSettingsButton.setPosition(x, this.saveSideButton.getBottom() + 1);
+
+        if (this.customSettingsEnabled.getBooleanValue())
+        {
+            int gap = 1;
+            this.saveBlocksWidget.setPosition(x, this.customSettingsButton.getBottom() + gap);
+            this.saveBlockEntitiesWidget.setPosition(x, this.saveBlocksWidget.getBottom() + gap);
+            this.saveBlockTicksWidget.setPosition(x, this.saveBlockEntitiesWidget.getBottom() + gap);
+            this.saveEntitiesWidget.setPosition(x, this.saveBlockTicksWidget.getBottom() + gap);
+            this.exposedBlocksOnlyWidget.setPosition(x, this.saveEntitiesWidget.getBottom() + gap);
+            this.fromNormalWorldWidget.setPosition(x, this.exposedBlocksOnlyWidget.getBottom() + gap);
+            this.fromSchematicWorldWidget.setPosition(x, this.fromNormalWorldWidget.getBottom() + gap);
+            this.schematicInfoWidget.setY(this.fromSchematicWorldWidget.getBottom() + 4);
+            this.schematicInfoWidget.setHeight(this.getListHeight() - (this.schematicInfoWidget.getY() - this.getListY()));
+        }
+        else
+        {
+            this.schematicInfoWidget.setY(this.getListY());
+            this.schematicInfoWidget.setHeight(this.getListHeight());
+        }
     }
 
     @Override
     protected void saveSchematic()
     {
-        boolean isHoldingShift = BaseScreen.isShiftDown();
-        File file = this.getSchematicFileIfCanSave(isHoldingShift);
+        boolean overwrite = BaseScreen.isShiftDown();
+        File file = this.getSchematicFileIfCanSave(overwrite);
 
         if (file == null)
         {
@@ -68,21 +158,44 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
 
         //SchematicType<?> outputType = this.schematicTypeDropdown.getSelectedEntry();
         //ISchematic schematic = outputType.createSchematic(null); // TODO
+        SchematicSaveSettings settings = this.customSettingsEnabled.getBooleanValue() ? this.settings : new SchematicSaveSettings();
+        SaveSide side = this.saveSide.getValue();
+        boolean supportsServerSideSaving = false; // TODO
+
+        if (GameUtils.isSinglePlayer() == false &&
+            (side == SaveSide.SERVER || (side == SaveSide.AUTO && supportsServerSideSaving)))
+        {
+            this.saveSchematicOnServer(settings, file, overwrite);
+        }
+        else
+        {
+            this.saveSchematicOnClient(settings, file, overwrite);
+        }
+    }
+
+    protected void saveSchematicOnClient(SchematicSaveSettings settings, File file, boolean overwrite)
+    {
         LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(this.selection);
         CreateSchematicTask task = new CreateSchematicTask(schematic, this.selection,
-                                                           this.ignoreEntitiesValue.getBooleanValue(),
-                                                           () -> this.writeSchematicToFile(schematic, file, isHoldingShift));
+                                                           settings.saveEntities.getBooleanValue() == false,
+                                                           () -> this.writeSchematicToFile(schematic, file, overwrite));
 
         TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
     }
 
-    protected void writeSchematicToFile(ISchematic schematic, File file, boolean isHoldingShift)
+    protected void saveSchematicOnServer(SchematicSaveSettings settings, File file, boolean overwrite)
+    {
+        SchematicSavePacketHandler.INSTANCE.requestSchematicSaveAllAtOnce(this.selection, settings,
+                                                                          sch -> this.writeSchematicToFile(sch, file, overwrite));
+    }
+
+    protected void writeSchematicToFile(ISchematic schematic, File file, boolean overwrite)
     {
         String fileName = file.getName();
 
         SchematicCreationUtils.setSchematicMetadataOnCreation(schematic, this.selection.getName());
 
-        if (schematic.writeToFile(file, isHoldingShift))
+        if (schematic.writeToFile(file, overwrite))
         {
             this.onSchematicSaved(fileName);
         }
@@ -99,5 +212,25 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
         this.getListWidget().clearSelection();
         this.getListWidget().refreshEntries();
         MessageDispatcher.success("litematica.message.success.save_schematic_new", fileName);
+    }
+
+    protected void onCustomSettingsToggled()
+    {
+        this.reAddActiveWidgets();
+        this.updateWidgetPositions();
+    }
+
+    public static class SaveSide extends BaseOptionListConfigValue
+    {
+        public static final SaveSide AUTO   = new SaveSide("auto",   "litematica.name.save_side.auto");
+        public static final SaveSide CLIENT = new SaveSide("client", "litematica.name.save_side.client");
+        public static final SaveSide SERVER = new SaveSide("server", "litematica.name.save_side.server");
+
+        public static final ImmutableList<SaveSide> VALUES = ImmutableList.of(AUTO, CLIENT, SERVER);
+
+        public SaveSide(String name, String translationKey)
+        {
+            super(name, translationKey);
+        }
     }
 }
