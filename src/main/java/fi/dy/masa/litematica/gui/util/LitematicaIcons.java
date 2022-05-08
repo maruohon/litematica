@@ -1,12 +1,12 @@
 package fi.dy.masa.litematica.gui.util;
 
-import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.malilib.gui.icon.BaseMultiIcon;
+import fi.dy.masa.malilib.util.data.Identifier;
 import fi.dy.masa.litematica.Reference;
 
 public class LitematicaIcons extends BaseMultiIcon
 {
-    public static final ResourceLocation LITEMATICA_GUI_TEXTURES = new ResourceLocation(Reference.MOD_ID, "textures/gui/gui_widgets.png");
+    public static final Identifier LITEMATICA_GUI_TEXTURES = new Identifier(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 
     // Non-hover-variant icons
     public static final LitematicaIcons DUMMY                       = new LitematicaIcons(0, 0, 0, 0);

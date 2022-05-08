@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
 import fi.dy.masa.malilib.event.PostWorldRenderer;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -56,7 +57,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
     }
 
     @Override
-    public void onPostGameOverlayRender(Minecraft mc, float partialTicks)
+    public void onPostGameOverlayRender()
     {
         if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue())
         {
@@ -65,6 +66,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 
             if (GuiUtils.getCurrentScreen() == null)
             {
+                Minecraft mc = GameUtils.getClient();
                 ToolHud.getInstance().renderHud();
                 OverlayRenderer.getInstance().renderHoverInfo(mc);
 

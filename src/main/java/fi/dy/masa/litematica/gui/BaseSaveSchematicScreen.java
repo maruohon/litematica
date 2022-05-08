@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.input.Keyboard;
 import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
@@ -11,6 +10,7 @@ import fi.dy.masa.malilib.gui.widget.IconWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
+import fi.dy.masa.malilib.input.Keys;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.litematica.config.Configs;
@@ -79,17 +79,17 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
     @Override
     public boolean onKeyTyped(int keyCode, int scanCode, int modifiers)
     {
-        if (this.fileNameTextField.isFocused() && keyCode == Keyboard.KEY_RETURN)
+        if (this.fileNameTextField.isFocused() && keyCode == Keys.KEY_ENTER)
         {
             this.saveSchematic();
             return true;
         }
-        else if (keyCode != Keyboard.KEY_ESCAPE && this.fileNameTextField.onKeyTyped(keyCode, scanCode, modifiers))
+        else if (keyCode != Keys.KEY_ESCAPE && this.fileNameTextField.onKeyTyped(keyCode, scanCode, modifiers))
         {
             this.getListWidget().clearSelection();
             return true;
         }
-        else if (keyCode == Keyboard.KEY_ESCAPE)
+        else if (keyCode == Keys.KEY_ESCAPE)
         {
             this.closeScreenOrShowParent();
             return true;

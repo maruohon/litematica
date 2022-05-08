@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
+import fi.dy.masa.malilib.util.data.Identifier;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.schematic.ISchematic;
@@ -54,7 +54,7 @@ public class SchematicInfoCache
             if (schematic != null)
             {
                 SchematicMetadata metadata = schematic.getMetadata();
-                ResourceLocation iconName = new ResourceLocation(Reference.MOD_ID, file.getAbsolutePath());
+                Identifier iconName = new Identifier(Reference.MOD_ID, file.getAbsolutePath());
                 DynamicTexture texture = this.createPreviewImage(iconName, metadata);
                 data = new SchematicInfo(schematic, iconName, texture);
             }
@@ -64,7 +64,7 @@ public class SchematicInfoCache
     }
 
     @Nullable
-    protected DynamicTexture createPreviewImage(ResourceLocation iconName, SchematicMetadata meta)
+    protected DynamicTexture createPreviewImage(Identifier iconName, SchematicMetadata meta)
     {
         int[] previewImageData = meta.getPreviewImagePixelData();
 
@@ -97,11 +97,11 @@ public class SchematicInfoCache
     public static class SchematicInfo
     {
         public final ISchematic schematic;
-        public final ResourceLocation iconName;
+        public final Identifier iconName;
         @Nullable public final DynamicTexture texture;
 
         protected SchematicInfo(ISchematic schematic,
-                                ResourceLocation iconName,
+                                Identifier iconName,
                                 @Nullable DynamicTexture texture)
         {
             this.schematic = schematic;

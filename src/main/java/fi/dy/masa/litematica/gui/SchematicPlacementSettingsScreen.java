@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -295,7 +294,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
                 // Ctrl + Shift + Right click: load settings from clip board
                 if (isCtrlDown())
                 {
-                    String str = getClipboardString();
+                    String str = getStringFromClipboard();
 
                     if (this.manager.loadPlacementSettings(this.placement, str))
                     {
@@ -308,7 +307,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
             else
             {
                 String str = JsonUtils.jsonToString(this.placement.baseSettingsToJson(true), true);
-                GuiScreen.setClipboardString(str);
+                setStringToClipboard(str);
                 MessageDispatcher.success("litematica.message.info.settings_copied_to_clipboard");
             }
         }
