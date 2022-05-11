@@ -42,7 +42,8 @@ public class HotkeyCallbackMisc implements HotkeyCallback
     @Override
     public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
-        if (this.mc.player == null || this.mc.world == null)
+        if (this.mc.player == null || this.mc.world == null ||
+            fi.dy.masa.malilib.util.EntityUtils.getCameraEntity() == null)
         {
             return ActionResult.FAIL;
         }
@@ -98,7 +99,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         {
             if (DataManager.getSchematicPlacementManager().duplicateSelectedPlacement())
             {
-                BlockPos pos = new BlockPos(this.mc.player);
+                BlockPos pos = new BlockPos(fi.dy.masa.malilib.util.EntityUtils.getCameraEntity());
                 pos = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(pos);
                 DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos);
                 MessageDispatcher.generic().customHotbar().translate("litematica.message.duplicated_selected_placement");
@@ -177,7 +178,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.LAYER_SET_HERE.getKeyBind())
         {
-            DataManager.getRenderLayerRange().setSingleBoundaryToPosition(this.mc.player);
+            DataManager.getRenderLayerRange().setSingleBoundaryToPosition(fi.dy.masa.malilib.util.EntityUtils.getCameraEntity());
             return ActionResult.SUCCESS;
         }
         else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeyBind())
@@ -189,7 +190,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
 
                 if (selection != null)
                 {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                    BlockPos pos = new BlockPos(fi.dy.masa.malilib.util.EntityUtils.getCameraEntity().getPositionVector());
 
                     if (mode == ToolMode.MOVE)
                     {
@@ -205,7 +206,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             }
             else if (mode.getUsesSchematic())
             {
-                BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                BlockPos pos = new BlockPos(fi.dy.masa.malilib.util.EntityUtils.getCameraEntity().getPositionVector());
                 pos = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(pos);
                 DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos);
                 return ActionResult.SUCCESS;
@@ -215,7 +216,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
                  key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeyBind())
         {
             int amount = key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeyBind() ? 1 : -1;
-            InputHandler.nudgeSelection(amount, mode, this.mc.player);
+            InputHandler.nudgeSelection(amount, mode, fi.dy.masa.malilib.util.EntityUtils.getCameraEntity());
             return ActionResult.SUCCESS;
         }
         else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeyBind())
@@ -351,7 +352,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
 
                 if (area != null)
                 {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                    BlockPos pos = new BlockPos(fi.dy.masa.malilib.util.EntityUtils.getCameraEntity().getPositionVector());
                     area.setExplicitOrigin(pos);
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                     MessageDispatcher.generic().customHotbar().translate("litematica.message.set_area_origin", posStr);
@@ -386,7 +387,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
 
                 if (area != null && area.getSelectedSubRegionBox() != null)
                 {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                    BlockPos pos = new BlockPos(fi.dy.masa.malilib.util.EntityUtils.getCameraEntity().getPositionVector());
                     Corner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeyBind() ? Corner.CORNER_1 : Corner.CORNER_2;
                     area.setSelectedSubRegionCornerPos(pos, corner);
 

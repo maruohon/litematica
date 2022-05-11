@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.event;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -117,16 +118,16 @@ public class InputHandler implements MouseInputHandler
         return false;
     }
 
-    public static boolean nudgeSelection(int amount, ToolMode mode, EntityPlayer player)
+    public static boolean nudgeSelection(int amount, ToolMode mode, Entity entity)
     {
         if (mode.getUsesAreaSelection())
         {
-            DataManager.getSelectionManager().moveSelectedElement(EntityUtils.getClosestLookingDirection(player), amount);
+            DataManager.getSelectionManager().moveSelectedElement(EntityUtils.getClosestLookingDirection(entity), amount);
             return true;
         }
         else if (mode.getUsesSchematic())
         {
-            EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
+            EnumFacing direction = EntityUtils.getClosestLookingDirection(entity);
             DataManager.getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
             return true;
         }
