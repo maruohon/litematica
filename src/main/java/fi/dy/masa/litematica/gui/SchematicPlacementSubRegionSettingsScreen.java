@@ -142,16 +142,6 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         this.openPlacementSettingsButton.setPosition(this.x + 10, y);
     }
 
-    protected void updateWidgetStates()
-    {
-        this.mirrorButton.updateWidgetState();
-        this.resetSubRegionButton.updateWidgetState();
-        this.rotateButton.updateWidgetState();
-        this.toggleEntitiesButton.updateWidgetState();
-        this.toggleRegionEnabledButton.updateWidgetState();
-        this.originEditWidget.updateWidgetState();
-    }
-
     protected boolean isNotLocked()
     {
         return this.placement.isLocked() == false;

@@ -229,17 +229,11 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.openPlacementListButton.setY(y);
     }
 
-    protected void updateWidgetStates()
+    @Override
+    public void updateWidgetStates()
     {
-        this.mirrorButton.updateWidgetState();
-        this.nameTextField.updateWidgetState();
-        this.originEditWidget.updateWidgetState();
-        this.resetSubRegionsButton.updateWidgetState();
-        this.rotateButton.updateWidgetState();
-        this.toggleEnclosingBoxButton.updateWidgetState();
-        this.toggleEntitiesButton.updateWidgetState();
-        this.toggleLockedButton.updateWidgetState();
-        this.togglePlacementEnabledButton.updateWidgetState();
+        this.updateLabels();
+        super.updateWidgetStates();
     }
 
     @Override
@@ -287,40 +281,42 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected boolean clickCopyPasteSettings(int mouseButton, GenericButton button)
     {
+        JsonObject origJson = this.placement.baseSettingsToJson(true);
+
         if (isShiftDown())
         {
-            if (mouseButton == 1)
-            {
-                // Ctrl + Shift + Right click: load settings from clip board
-                if (isCtrlDown())
-                {
-                    String str = getStringFromClipboard();
-
-                    if (this.manager.loadPlacementSettings(this.placement, str))
-                    {
-                        MessageDispatcher.success("litematica.message.info.settings_loaded_from_clipboard");
-                        this.initScreen();
-                    }
-                }
-            }
             // Shift + left click: Copy settings to clip board
-            else
+            if (mouseButton == 0)
             {
-                String str = JsonUtils.jsonToString(this.placement.baseSettingsToJson(true), true);
+                String str = JsonUtils.jsonToString(origJson, true);
                 setStringToClipboard(str);
                 MessageDispatcher.success("litematica.message.info.settings_copied_to_clipboard");
+                return true;
+            }
+            // Ctrl + Shift + Right click: load settings from clip board
+            else if (mouseButton == 1 && isCtrlDown())
+            {
+                String str = getStringFromClipboard();
+
+                if (this.loadSettingsFromString(str, origJson))
+                {
+                    MessageDispatcher.success("litematica.message.info.settings_loaded_from_clipboard");
+                    this.initScreen();
+                }
+
+                return true;
             }
         }
-        else
+        else if (mouseButton == 0)
         {
-            JsonObject origJson = this.placement.baseSettingsToJson(true);
             String titleKey = "litematica.title.screen.schematic_placement_settings.copy_or_load_settings";
 
             openPopupScreen(new TextInputScreen(titleKey, origJson.toString(),
                                                 (str) -> this.loadSettingsFromString(str, origJson), this));
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     protected boolean loadSettingsFromString(String str, JsonObject origJson)
@@ -329,6 +325,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
         if (el == null || el.isJsonObject() == false)
         {
+            MessageDispatcher.error("litematica.error.schematic_placements.settings_load.invalid_data");
             return false;
         }
 
@@ -336,7 +333,8 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
         if (obj.equals(origJson) == false && this.manager.loadPlacementSettings(this.placement, obj))
         {
-            MessageDispatcher.success("litematica.message.info.settings_loaded_from_clipboard");
+            this.originEditWidget.setPosNoUpdate(this.placement.getOrigin());
+            this.updateWidgetStates();
         }
 
         return true;
