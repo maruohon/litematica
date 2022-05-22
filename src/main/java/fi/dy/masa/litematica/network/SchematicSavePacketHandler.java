@@ -108,17 +108,17 @@ public class SchematicSavePacketHandler extends BasePacketHandler
                                             NetHandlerPlayClient handler)
     {
         NBTTagCompound dataTypesTag = new NBTTagCompound();
-        dataTypesTag.setBoolean("Blocks", settings.saveBlocks.getBooleanValue());
-        dataTypesTag.setBoolean("BlockEntities", settings.saveBlockEntities.getBooleanValue());
-        dataTypesTag.setBoolean("BlockTicks", settings.saveBlockTicks.getBooleanValue());
-        dataTypesTag.setBoolean("Entities", settings.saveEntities.getBooleanValue());
-        dataTypesTag.setBoolean("ExposedBlocksOnly", settings.exposedBlocksOnly.getBooleanValue());
+        NbtUtils.putBoolean(dataTypesTag, "Blocks", settings.saveBlocks.getBooleanValue());
+        NbtUtils.putBoolean(dataTypesTag, "BlockEntities", settings.saveBlockEntities.getBooleanValue());
+        NbtUtils.putBoolean(dataTypesTag, "BlockTicks", settings.saveBlockTicks.getBooleanValue());
+        NbtUtils.putBoolean(dataTypesTag, "Entities", settings.saveEntities.getBooleanValue());
+        NbtUtils.putBoolean(dataTypesTag, "ExposedBlocksOnly", settings.exposedBlocksOnly.getBooleanValue());
 
         NBTTagCompound tag = new NBTTagCompound();
         NbtUtils.writeUUID(tag, taskId);
-        tag.setString("SaveMethod", saveMethod);
-        tag.setTag("RequestedData", dataTypesTag);
-        tag.setTag("Regions", selection.getSubRegionsAsCompound());
+        NbtUtils.putString(tag, "SaveMethod", saveMethod);
+        NbtUtils.putTag(tag, "RequestedData", dataTypesTag);
+        NbtUtils.putTag(tag, "Regions", selection.getSubRegionsAsCompound());
 
         PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
         buf.writeCompoundTag(tag);

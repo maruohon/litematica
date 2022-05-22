@@ -33,7 +33,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
+import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.WorldUtils;
@@ -116,7 +118,7 @@ public class MaterialCache
             stack = state.getBlock().getItem(world, pos, state);
         }
 
-        if (stack == null || stack.isEmpty())
+        if (stack == null || ItemUtils.isEmpty(stack))
         {
             stack = ItemStack.EMPTY;
         }
@@ -284,8 +286,8 @@ public class MaterialCache
     {
         NBTTagCompound nbt = new NBTTagCompound();
 
-        nbt.setTag("MaterialCache", this.writeMapToNBT(this.buildItemsForStates));
-        nbt.setTag("DisplayMaterialCache", this.writeMapToNBT(this.displayItemsForStates));
+        NbtUtils.putTag(nbt, "MaterialCache", this.writeMapToNBT(this.buildItemsForStates));
+        NbtUtils.putTag(nbt, "DisplayMaterialCache", this.writeMapToNBT(this.displayItemsForStates));
 
         return nbt;
     }
@@ -300,10 +302,10 @@ public class MaterialCache
             NBTTagCompound stateTag = new NBTTagCompound();
             NBTUtil.writeBlockState(stateTag, entry.getKey());
 
-            tag.setTag("Block", stateTag);
-            tag.setTag("Item", entry.getValue().writeToNBT(new NBTTagCompound()));
+            NbtUtils.putTag(tag, "Block", stateTag);
+            NbtUtils.putTag(tag, "Item", entry.getValue().writeToNBT(new NBTTagCompound()));
 
-            list.appendTag(tag);
+            NbtUtils.addTag(list, tag);
         }
 
         return list;
@@ -320,23 +322,23 @@ public class MaterialCache
 
     protected void readMapFromNBT(NBTTagCompound nbt, String tagName, IdentityHashMap<IBlockState, ItemStack> map)
     {
-        if (nbt.hasKey(tagName, Constants.NBT.TAG_LIST))
+        if (NbtUtils.containsList(nbt, tagName))
         {
-            NBTTagList list = nbt.getTagList(tagName, Constants.NBT.TAG_COMPOUND);
-            final int count = list.tagCount();
+            NBTTagList list = NbtUtils.getList(nbt, tagName, Constants.NBT.TAG_COMPOUND);
+            final int count = NbtUtils.getListSize(list);
 
             for (int i = 0; i < count; ++i)
             {
-                NBTTagCompound tag = list.getCompoundTagAt(i);
+                NBTTagCompound tag = NbtUtils.getCompoundAt(list, i);
 
-                if (tag.hasKey("Block", Constants.NBT.TAG_COMPOUND) &&
-                    tag.hasKey("Item", Constants.NBT.TAG_COMPOUND))
+                if (NbtUtils.containsCompound(tag, "Block") &&
+                    NbtUtils.containsCompound(tag, "Item"))
                 {
-                    IBlockState state = NBTUtil.readBlockState(tag.getCompoundTag("Block"));
+                    IBlockState state = NBTUtil.readBlockState(NbtUtils.getCompound(tag, "Block"));
 
                     if (state != null)
                     {
-                        ItemStack stack = new ItemStack(tag.getCompoundTag("Item"));
+                        ItemStack stack = ItemUtils.fromTag(NbtUtils.getCompound(tag, "Item"));
                         this.buildItemsForStates.put(state, stack);
                     }
                 }

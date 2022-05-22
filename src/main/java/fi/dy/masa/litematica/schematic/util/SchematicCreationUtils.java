@@ -27,6 +27,7 @@ import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
@@ -236,7 +237,9 @@ public class SchematicCreationUtils
 
                 if (entity.writeToNBTOptional(tag))
                 {
-                    Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
+                    Vec3d posVec = new Vec3d(EntityUtils.getX(entity) - regionPosAbs.getX(),
+                                             EntityUtils.getY(entity) - regionPosAbs.getY(),
+                                             EntityUtils.getZ(entity) - regionPosAbs.getZ());
                     NbtUtils.writeVec3dToListTag(posVec, tag);
                     list.add(new EntityInfo(posVec, tag));
                 }
@@ -283,7 +286,9 @@ public class SchematicCreationUtils
 
                     if (entity.writeToNBTOptional(tag))
                     {
-                        Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
+                        Vec3d posVec = new Vec3d(EntityUtils.getX(entity) - regionPosAbs.getX(),
+                                                 EntityUtils.getY(entity) - regionPosAbs.getY(),
+                                                 EntityUtils.getZ(entity) - regionPosAbs.getZ());
                         NbtUtils.writeVec3dToListTag(posVec, tag);
                         schematicEntityList.add(new EntityInfo(posVec, tag));
                         existingEntities.add(uuid);
@@ -349,7 +354,7 @@ public class SchematicCreationUtils
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
                                 NBTTagCompound tag = te.writeToNBT(new NBTTagCompound());
-                                NbtUtils.writeBlockPosToTag(pos, tag);
+                                NbtUtils.putVec3i(tag, pos);
                                 blockEntityMap.put(pos, tag);
                             }
                         }
@@ -466,7 +471,7 @@ public class SchematicCreationUtils
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
                                 NBTTagCompound tag = te.writeToNBT(new NBTTagCompound());
-                                NbtUtils.writeBlockPosToTag(pos, tag);
+                                NbtUtils.putVec3i(tag, pos);
                                 blockEntityMap.put(pos, tag);
                             }
                         }

@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.config.Configs;
@@ -201,7 +202,7 @@ public class AreaSelection
             if (bb != null)
             {
                 String regionName = entry.getKey();
-                tag.setTag(regionName, bb.toNbtIntArray());
+                NbtUtils.putTag(tag, regionName, bb.toNbtIntArray());
             }
         }
 

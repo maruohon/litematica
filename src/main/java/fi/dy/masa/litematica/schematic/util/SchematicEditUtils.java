@@ -19,6 +19,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.position.LayerRange;
@@ -272,8 +273,8 @@ public class SchematicEditUtils
     {
         ItemStack stack = mc.player.getHeldItemMainhand();
 
-        if ((stack.isEmpty() == false && (stack.getItem() instanceof ItemBlock || stack.getItem() instanceof ItemBlockSpecial)) ||
-            (stack.isEmpty() && ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null))
+        if ((ItemUtils.notEmpty(stack) && (stack.getItem() instanceof ItemBlock || stack.getItem() instanceof ItemBlockSpecial)) ||
+            (ItemUtils.isEmpty(stack) && ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null))
         {
             WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
             Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();

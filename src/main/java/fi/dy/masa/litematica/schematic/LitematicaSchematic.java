@@ -242,10 +242,10 @@ public class LitematicaSchematic extends SchematicBase
     {
         NBTTagCompound nbt = new NBTTagCompound();
 
-        nbt.setInteger("Version", SCHEMATIC_VERSION);
-        nbt.setInteger("MinecraftDataVersion", MINECRAFT_DATA_VERSION);
-        nbt.setTag("Metadata", this.getMetadata().toTag());
-        nbt.setTag("Regions", this.writeSubRegionsToNBT());
+        NbtUtils.putInt(nbt, "Version", SCHEMATIC_VERSION);
+        NbtUtils.putInt(nbt, "MinecraftDataVersion", MINECRAFT_DATA_VERSION);
+        NbtUtils.putTag(nbt, "Metadata", this.getMetadata().toTag());
+        NbtUtils.putTag(nbt, "Regions", this.writeSubRegionsToNBT());
 
         return nbt;
     }
@@ -255,9 +255,9 @@ public class LitematicaSchematic extends SchematicBase
     {
         this.clear();
 
-        if (tag.hasKey("Version", Constants.NBT.TAG_INT))
+        if (NbtUtils.containsInt(tag, "Version"))
         {
-            final int version = tag.getInteger("Version");
+            final int version = NbtUtils.getInt(tag, "Version");
 
             if (version >= 1 && version <= SCHEMATIC_VERSION)
             {
@@ -294,30 +294,30 @@ public class LitematicaSchematic extends SchematicBase
 
                 NBTTagCompound tag = new NBTTagCompound();
 
-                tag.setTag("BlockStatePalette", this.writePaletteToLitematicaFormatTag(blockContainer.getPalette()));
-                tag.setTag("BlockStates", new NBTTagLongArray(blockContainer.getBackingLongArray()));
+                NbtUtils.putTag(tag, "BlockStatePalette", this.writePaletteToLitematicaFormatTag(blockContainer.getPalette()));
+                NbtUtils.putTag(tag, "BlockStates", new NBTTagLongArray(blockContainer.getBackingLongArray()));
 
                 if (tileMap != null)
                 {
-                    tag.setTag("TileEntities", this.writeBlockEntitiesToListTag(tileMap));
+                    NbtUtils.putTag(tag, "TileEntities", this.writeBlockEntitiesToListTag(tileMap));
                 }
 
                 if (pendingTicks != null)
                 {
-                    tag.setTag("PendingBlockTicks", this.writeBlockTicksToNBT(pendingTicks));
+                    NbtUtils.putTag(tag, "PendingBlockTicks", this.writeBlockTicksToNBT(pendingTicks));
                 }
 
                 // The entity list will not exist, if takeEntities is false when creating the schematic
                 if (entityList != null)
                 {
-                    tag.setTag("Entities", this.writeEntitiesToListTag(entityList));
+                    NbtUtils.putTag(tag, "Entities", this.writeEntitiesToListTag(entityList));
                 }
 
                 SubRegion region = this.subRegions.get(regionName);
-                tag.setTag("Position", NbtUtils.createBlockPosTag(region.pos));
-                tag.setTag("Size", NbtUtils.createBlockPosTag(region.size));
+                NbtUtils.putTag(tag, "Position", NbtUtils.createBlockPosTag(region.pos));
+                NbtUtils.putTag(tag, "Size", NbtUtils.createBlockPosTag(region.size));
 
-                wrapper.setTag(regionName, tag);
+                NbtUtils.putTag(wrapper, regionName, tag);
             }
         }
 
@@ -338,14 +338,12 @@ public class LitematicaSchematic extends SchematicBase
                 {
                     NBTTagCompound tag = new NBTTagCompound();
 
-                    tag.setString("Block", rl.toString());
-                    tag.setInteger("Priority", entry.priority);
-                    tag.setInteger("Time", (int) entry.scheduledTime);
-                    tag.setInteger("x", entry.position.getX());
-                    tag.setInteger("y", entry.position.getY());
-                    tag.setInteger("z", entry.position.getZ());
+                    NbtUtils.putString(tag, "Block", rl.toString());
+                    NbtUtils.putInt(tag, "Priority", entry.priority);
+                    NbtUtils.putInt(tag, "Time", (int) entry.scheduledTime);
+                    NbtUtils.putVec3i(tag, entry.position);
 
-                    tagList.appendTag(tag);
+                    NbtUtils.addTag(tagList, tag);
                 }
             }
         }
@@ -355,45 +353,48 @@ public class LitematicaSchematic extends SchematicBase
 
     private boolean readSubRegionsFromTag(NBTTagCompound tag, int version)
     {
-        tag = tag.getCompoundTag("Regions");
+        tag = NbtUtils.getCompound(tag, "Regions");
 
-        for (String regionName : tag.getKeySet())
+        for (String regionName : NbtUtils.getKeys(tag))
         {
-            if (tag.getTag(regionName).getId() == Constants.NBT.TAG_COMPOUND)
+            if (NbtUtils.getTypeId(NbtUtils.getTag(tag, regionName)) == Constants.NBT.TAG_COMPOUND)
             {
-                NBTTagCompound regionTag = tag.getCompoundTag(regionName);
-                BlockPos regionPos = NbtUtils.readBlockPos(regionTag.getCompoundTag("Position"));
-                BlockPos regionSize = NbtUtils.readBlockPos(regionTag.getCompoundTag("Size"));
+                NBTTagCompound regionTag = NbtUtils.getCompound(tag, regionName);
+                BlockPos regionPos = NbtUtils.readBlockPos(NbtUtils.getCompound(regionTag, "Position"));
+                BlockPos regionSize = NbtUtils.readBlockPos(NbtUtils.getCompound(regionTag, "Size"));
 
                 if (regionPos != null && regionSize != null)
                 {
                     this.subRegions.put(regionName, new SubRegion(regionPos, regionSize));
 
+                    NBTTagList beList = NbtUtils.getListOfCompounds(regionTag, "TileEntities");
+                    NBTTagList entityList = NbtUtils.getListOfCompounds(regionTag, "Entities");
+
                     if (version >= 2)
                     {
-                        this.blockEntities.put(regionName, this.readBlockEntitiesFromListTag(regionTag.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND)));
-                        this.entities.put(regionName, this.readEntitiesFromListTag(regionTag.getTagList("Entities", Constants.NBT.TAG_COMPOUND)));
+                        this.blockEntities.put(regionName, this.readBlockEntitiesFromListTag(beList));
+                        this.entities.put(regionName, this.readEntitiesFromListTag(entityList));
                     }
                     else if (version == 1)
                     {
-                        this.blockEntities.put(regionName, this.readTileEntitiesFromNBT_v1(regionTag.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND)));
-                        this.entities.put(regionName, this.readEntitiesFromNBT_v1(regionTag.getTagList("Entities", Constants.NBT.TAG_COMPOUND)));
+                        this.blockEntities.put(regionName, this.readTileEntitiesFromNBT_v1(beList));
+                        this.entities.put(regionName, this.readEntitiesFromNBT_v1(entityList));
                     }
 
                     if (version >= 3)
                     {
-                        this.pendingBlockTicks.put(regionName, this.readBlockTicksFromNBT(regionTag.getTagList("PendingBlockTicks", Constants.NBT.TAG_COMPOUND)));
+                        this.pendingBlockTicks.put(regionName, this.readBlockTicksFromNBT(NbtUtils.getListOfCompounds(regionTag, "PendingBlockTicks")));
                     }
 
-                    NBTBase nbtBase = regionTag.getTag("BlockStates");
+                    NBTBase nbtBase = NbtUtils.getTag(regionTag, "BlockStates");
 
                     // There are no convenience methods in NBTTagCompound yet in 1.12, so we'll have to do it the ugly way...
-                    if (nbtBase != null && nbtBase.getId() == Constants.NBT.TAG_LONG_ARRAY)
+                    if (nbtBase != null && NbtUtils.getTypeId(nbtBase) == Constants.NBT.TAG_LONG_ARRAY)
                     {
                         Vec3i size = new Vec3i(Math.abs(regionSize.getX()), Math.abs(regionSize.getY()), Math.abs(regionSize.getZ()));
-                        NBTTagList paletteTag = regionTag.getTagList("BlockStatePalette", Constants.NBT.TAG_COMPOUND);
+                        NBTTagList paletteTag = NbtUtils.getListOfCompounds(regionTag, "BlockStatePalette");
                         long[] blockStateArr = ((IMixinNBTTagLongArray) nbtBase).getArray();
-                        int paletteSize = paletteTag.tagCount();
+                        int paletteSize = NbtUtils.getListSize(paletteTag);
 
                         LitematicaBlockStateContainerFull container = LitematicaBlockStateContainerFull.createContainer(paletteSize, blockStateArr, size);
 
@@ -422,25 +423,25 @@ public class LitematicaSchematic extends SchematicBase
     private Map<BlockPos, NextTickListEntry> readBlockTicksFromNBT(NBTTagList tagList)
     {
         Map<BlockPos, NextTickListEntry> tickMap = new HashMap<>();
-        final int size = tagList.tagCount();
+        final int size = NbtUtils.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = tagList.getCompoundTagAt(i);
+            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, i);
 
-            if (tag.hasKey("Block", Constants.NBT.TAG_STRING) &&
-                tag.hasKey("Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
+            if (NbtUtils.containsString(tag, "Block") &&
+                NbtUtils.contains(tag, "Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
             {
-                Block block = Block.REGISTRY.getObject(new ResourceLocation(tag.getString("Block")));
+                Block block = Block.REGISTRY.getObject(new ResourceLocation(NbtUtils.getString(tag, "Block")));
 
                 if (block != null && block != Blocks.AIR)
                 {
-                    BlockPos pos = new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"));
+                    BlockPos pos = NbtUtils.readBlockPos(tag);
                     NextTickListEntry entry = new NextTickListEntry(pos, block);
-                    entry.setPriority(tag.getInteger("Priority"));
+                    entry.setPriority(NbtUtils.getInt(tag, "Priority"));
 
                     // Note: the time is a relative delay at this point
-                    entry.setScheduledTime(tag.getInteger("Time"));
+                    entry.setScheduledTime(NbtUtils.getInt(tag, "Time"));
 
                     tickMap.put(pos, entry);
                 }
@@ -453,13 +454,13 @@ public class LitematicaSchematic extends SchematicBase
     private List<EntityInfo> readEntitiesFromNBT_v1(NBTTagList tagList)
     {
         List<EntityInfo> entityList = new ArrayList<>();
-        final int size = tagList.tagCount();
+        final int size = NbtUtils.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = tagList.getCompoundTagAt(i);
+            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, i);
             Vec3d posVec = NbtUtils.readVec3d(tag);
-            NBTTagCompound entityData = tag.getCompoundTag("EntityData");
+            NBTTagCompound entityData = NbtUtils.getCompound(tag, "EntityData");
 
             if (posVec != null && entityData.isEmpty() == false)
             {
@@ -475,12 +476,12 @@ public class LitematicaSchematic extends SchematicBase
     private Map<BlockPos, NBTTagCompound> readTileEntitiesFromNBT_v1(NBTTagList tagList)
     {
         Map<BlockPos, NBTTagCompound> tileMap = new HashMap<>();
-        final int size = tagList.tagCount();
+        final int size = NbtUtils.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = tagList.getCompoundTagAt(i);
-            NBTTagCompound tileNbt = tag.getCompoundTag("TileNBT");
+            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, i);
+            NBTTagCompound tileNbt = NbtUtils.getCompound(tag, "TileNBT");
 
             // Note: This within-schematic relative position is not inside the tile tag!
             BlockPos pos = NbtUtils.readBlockPos(tag);
@@ -496,9 +497,9 @@ public class LitematicaSchematic extends SchematicBase
 
     public static Boolean isValidSchematic(NBTTagCompound tag)
     {
-        return tag.hasKey("Version", Constants.NBT.TAG_INT) &&
-               tag.hasKey("Regions", Constants.NBT.TAG_COMPOUND) &&
-               tag.hasKey("Metadata", Constants.NBT.TAG_COMPOUND);
+        return NbtUtils.containsInt(tag, "Version") &&
+               NbtUtils.containsCompound(tag, "Regions") &&
+               NbtUtils.containsCompound(tag, "Metadata");
     }
 
     @Nullable

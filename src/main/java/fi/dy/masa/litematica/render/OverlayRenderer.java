@@ -719,9 +719,9 @@ public class OverlayRenderer
             if (stateClient != stateSchematic && stateClient.getMaterial() != Material.AIR)
             {
                 Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-                double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-                double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-                double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+                double dx = entity.lastTickPosX + (EntityUtils.getX(entity) - entity.lastTickPosX) * partialTicks;
+                double dy = entity.lastTickPosY + (EntityUtils.getY(entity) - entity.lastTickPosY) * partialTicks;
+                double dz = entity.lastTickPosZ + (EntityUtils.getZ(entity) - entity.lastTickPosZ) * partialTicks;
 
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(-dx, -dy, -dz);

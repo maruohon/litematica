@@ -36,9 +36,10 @@ public class NbtUtils
 
     private static void writeTag(NBTBase tag, String tagName, DataOutput output) throws IOException
     {
-        output.writeByte(tag.getId());
+        int typeId = fi.dy.masa.malilib.util.nbt.NbtUtils.getTypeId(tag);
+        output.writeByte(typeId);
 
-        if (tag.getId() != 0)
+        if (typeId != 0)
         {
             output.writeUTF(tagName);
             ((IMixinNBTBase) tag).invokeWrite(output);

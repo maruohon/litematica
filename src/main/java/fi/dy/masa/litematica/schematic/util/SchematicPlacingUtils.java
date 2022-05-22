@@ -26,6 +26,7 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.Litematica;
@@ -295,9 +296,7 @@ public class SchematicPlacingUtils
                         if (te != null)
                         {
                             teNBT = teNBT.copy();
-                            teNBT.setInteger("x", pos.getX());
-                            teNBT.setInteger("y", pos.getY());
-                            teNBT.setInteger("z", pos.getZ());
+                            NbtUtils.putVec3i(teNBT, pos);
 
                             try
                             {
@@ -562,9 +561,7 @@ public class SchematicPlacingUtils
                         if (te != null)
                         {
                             teNBT = teNBT.copy();
-                            teNBT.setInteger("x", pos.getX());
-                            teNBT.setInteger("y", pos.getY());
-                            teNBT.setInteger("z", pos.getZ());
+                            NbtUtils.putVec3i(teNBT, pos);
 
                             try
                             {

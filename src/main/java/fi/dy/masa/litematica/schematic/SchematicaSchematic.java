@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -16,10 +15,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
-import fi.dy.masa.litematica.util.NbtUtils;
 
 public class SchematicaSchematic extends SingleRegionSchematic
 {
@@ -40,11 +38,11 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
     public static boolean isValidSchematic(NBTTagCompound tag)
     {
-        if (tag.hasKey("Width", Constants.NBT.TAG_SHORT) &&
-            tag.hasKey("Height", Constants.NBT.TAG_SHORT) &&
-            tag.hasKey("Length", Constants.NBT.TAG_SHORT) &&
-            tag.hasKey("Blocks", Constants.NBT.TAG_BYTE_ARRAY) &&
-            tag.hasKey("Data", Constants.NBT.TAG_BYTE_ARRAY))
+        if (NbtUtils.containsShort(tag, "Width") &&
+            NbtUtils.containsShort(tag, "Height") &&
+            NbtUtils.containsShort(tag, "Length") &&
+            NbtUtils.containsByteArray(tag, "Blocks") &&
+            NbtUtils.containsByteArray(tag, "Data"))
         {
             return isSizeValid(readSizeFromTagImpl(tag));
         }
@@ -54,7 +52,9 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
     private static Vec3i readSizeFromTagImpl(NBTTagCompound tag)
     {
-        return new Vec3i(tag.getShort("Width"), tag.getShort("Height"), tag.getShort("Length"));
+        return new Vec3i(NbtUtils.getShort(tag, "Width"),
+                         NbtUtils.getShort(tag, "Height"),
+                         NbtUtils.getShort(tag, "Length"));
     }
 
     @Override
@@ -72,13 +72,13 @@ public class SchematicaSchematic extends SingleRegionSchematic
     @Override
     protected Map<BlockPos, NBTTagCompound> readBlockEntitiesFromTag(NBTTagCompound tag)
     {
-        return this.readBlockEntitiesFromListTag(tag.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND));
+        return this.readBlockEntitiesFromListTag(NbtUtils.getListOfCompounds(tag, "TileEntities"));
     }
 
     @Override
     protected List<EntityInfo> readEntitiesFromTag(NBTTagCompound tag)
     {
-        return this.readEntitiesFromListTag(tag.getTagList("Entities", Constants.NBT.TAG_COMPOUND));
+        return this.readEntitiesFromListTag(NbtUtils.getListOfCompounds(tag, "Entities"));
     }
 
     @Override
@@ -90,9 +90,9 @@ public class SchematicaSchematic extends SingleRegionSchematic
         this.writeBlocksToTag(nbt);
         this.writePaletteToTag(nbt);
 
-        nbt.setTag("TileEntities", this.writeBlockEntitiesToListTag(this.blockEntities));
-        nbt.setTag("Entities", this.writeEntitiesToListTag(this.entities));
-        nbt.setTag("Metadata", this.getMetadata().toTag());
+        NbtUtils.putTag(nbt, "TileEntities", this.writeBlockEntitiesToListTag(this.blockEntities));
+        NbtUtils.putTag(nbt, "Entities", this.writeEntitiesToListTag(this.entities));
+        NbtUtils.putTag(nbt, "Metadata", this.getMetadata().toTag());
 
         return nbt;
     }
@@ -104,14 +104,14 @@ public class SchematicaSchematic extends SingleRegionSchematic
         Arrays.fill(this.palette, air);
 
         // Schematica palette
-        if (nbt.hasKey("SchematicaMapping", Constants.NBT.TAG_COMPOUND))
+        if (NbtUtils.containsCompound(nbt, "SchematicaMapping"))
         {
-            return this.readSchematicaPaletteFromTag(nbt.getCompoundTag("SchematicaMapping"));
+            return this.readSchematicaPaletteFromTag(NbtUtils.getCompound(nbt, "SchematicaMapping"));
         }
         // MCEdit2 palette
-        else if (nbt.hasKey("BlockIDs", Constants.NBT.TAG_COMPOUND))
+        else if (NbtUtils.containsCompound(nbt, "BlockIDs"))
         {
-            return this.readMCEdit2PaletteFromTag(nbt.getCompoundTag("BlockIDs"));
+            return this.readMCEdit2PaletteFromTag(NbtUtils.getCompound(nbt, "BlockIDs"));
         }
         // No palette, use the current registry IDs directly
         else
@@ -124,11 +124,9 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
     protected boolean readSchematicaPaletteFromTag(NBTTagCompound tag)
     {
-        Set<String> keys = tag.getKeySet();
-
-        for (String key : keys)
+        for (String key : NbtUtils.getKeys(tag))
         {
-            int id = tag.getShort(key);
+            int id = NbtUtils.getShort(tag, key);
 
             if (id >= this.palette.length)
             {
@@ -153,11 +151,9 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
     protected boolean readMCEdit2PaletteFromTag(NBTTagCompound tag)
     {
-        Set<String> keys = tag.getKeySet();
-
-        for (String idStr : keys)
+        for (String idStr : NbtUtils.getKeys(tag))
         {
-            String key = tag.getString(idStr);
+            String key = NbtUtils.getString(tag, idStr);
             int id;
 
             try
@@ -223,8 +219,8 @@ public class SchematicaSchematic extends SingleRegionSchematic
         final int sizeX = size.getX();
         final int sizeY = size.getY();
         final int sizeZ = size.getZ();
-        final byte[] blockIdsByte = tag.getByteArray("Blocks");
-        final byte[] metaArr = tag.getByteArray("Data");
+        final byte[] blockIdsByte = NbtUtils.getByteArray(tag, "Blocks");
+        final byte[] metaArr = NbtUtils.getByteArray(tag, "Data");
         final int numBlocks = blockIdsByte.length;
         final int layerSize = sizeX * sizeZ;
 
@@ -246,12 +242,12 @@ public class SchematicaSchematic extends SingleRegionSchematic
             return false;
         }
 
-        if (tag.hasKey("AddBlocks", Constants.NBT.TAG_BYTE_ARRAY))
+        if (NbtUtils.containsByteArray(tag, "AddBlocks"))
         {
             return this.readBlocks12Bit(tag, blockIdsByte, metaArr, sizeX, layerSize);
         }
         // Old Schematica format
-        else if (tag.hasKey("Add", Constants.NBT.TAG_BYTE_ARRAY))
+        else if (NbtUtils.containsByteArray(tag, "Add"))
         {
             // FIXME is this array 4 or 8 bits per block?
             MessageDispatcher.error().translate("litematica.message.error.schematic_read.schematica.old_schematica_format_not_supported");
@@ -281,7 +277,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
     {
         ILitematicaBlockStateContainer container = this.blockContainer;
         Block[] palette = this.palette;
-        byte[] add = nbt.getByteArray("AddBlocks");
+        byte[] add = NbtUtils.getByteArray(nbt, "AddBlocks");
         final int numBlocks = blockIdsByte.length;
         final int expectedAddLength = (int) Math.ceil((double) blockIdsByte.length / 2D);
 
@@ -381,12 +377,12 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
                 if (rl != null)
                 {
-                    tag.setShort(rl.toString(), (short) (i & 0xFFF));
+                    NbtUtils.putShort(tag, rl.toString(), (short) (i & 0xFFF));
                 }
             }
         }
 
-        nbt.setTag("SchematicaMapping", tag);
+        NbtUtils.putTag(nbt, "SchematicaMapping", tag);
     }
 
     protected void writeBlocksToTag(NBTTagCompound nbt)
@@ -395,10 +391,10 @@ public class SchematicaSchematic extends SingleRegionSchematic
         final int sizeX = size.getX();
         final int sizeZ = size.getZ();
 
-        nbt.setShort("Width", (short) sizeX);
-        nbt.setShort("Height", (short) size.getY());
-        nbt.setShort("Length", (short) sizeZ);
-        nbt.setString("Materials", "Alpha");
+        NbtUtils.putShort(nbt, "Width", (short) sizeX);
+        NbtUtils.putShort(nbt, "Height", (short) size.getY());
+        NbtUtils.putShort(nbt, "Length", (short) sizeZ);
+        NbtUtils.putString(nbt, "Materials", "Alpha");
 
         final int numBlocks = sizeX * size.getY() * sizeZ;
         final int loopMax = (int) Math.floor((double) numBlocks / 2D);
@@ -460,12 +456,12 @@ public class SchematicaSchematic extends SingleRegionSchematic
             metaArr[bi] = (byte) state.getBlock().getMetaFromState(state);
         }
 
-        nbt.setByteArray("Blocks", blockIdsArr);
-        nbt.setByteArray("Data", metaArr);
+        NbtUtils.putByteArray(nbt, "Blocks", blockIdsArr);
+        NbtUtils.putByteArray(nbt, "Data", metaArr);
 
         if (numAdd > 0)
         {
-            nbt.setByteArray("AddBlocks", addArr);
+            NbtUtils.putByteArray(nbt, "AddBlocks", addArr);
         }
     }
 
@@ -474,6 +470,6 @@ public class SchematicaSchematic extends SingleRegionSchematic
     {
         // MCEdit and World Edit require the root compound tag to be named "Schematic".
         // The vanilla util methods don't support doing that, so we have to use a custom method for it.
-        NbtUtils.writeCompressed(tag, "Schematic", outputStream);
+        fi.dy.masa.litematica.util.NbtUtils.writeCompressed(tag, "Schematic", outputStream);
     }
 }

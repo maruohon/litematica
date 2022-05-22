@@ -10,11 +10,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class ItemUtils
 {
@@ -53,12 +53,12 @@ public class ItemUtils
 
         ItemStack stack = getStateToItemOverride(state);
 
-        if (stack.isEmpty())
+        if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack))
         {
             stack = state.getBlock().getItem(world, pos, state);
         }
 
-        if (stack.isEmpty())
+        if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack))
         {
             stack = ItemStack.EMPTY;
         }
@@ -94,17 +94,17 @@ public class ItemUtils
         }
     }
 
-    public static ItemStack storeTEInStack(ItemStack stack, TileEntity te)
+    public static ItemStack storeBlockEntityInStack(ItemStack stack, TileEntity te)
     {
         NBTTagCompound nbt = te.writeToNBT(new NBTTagCompound());
 
         if (stack.getItem() == Items.SKULL && nbt.hasKey("Owner"))
         {
-            NBTTagCompound tagOwner = nbt.getCompoundTag("Owner");
+            NBTTagCompound tagOwner = NbtUtils.getCompound(nbt, "Owner");
             NBTTagCompound tagSkull = new NBTTagCompound();
 
-            tagSkull.setTag("SkullOwner", tagOwner);
-            stack.setTagCompound(tagSkull);
+            NbtUtils.putTag(tagSkull, "SkullOwner", tagOwner);
+            fi.dy.masa.malilib.util.ItemUtils.setTag(stack, tagSkull);
 
             return stack;
         }
@@ -113,8 +113,8 @@ public class ItemUtils
             NBTTagCompound tagLore = new NBTTagCompound();
             NBTTagList tagList = new NBTTagList();
 
-            tagList.appendTag(new NBTTagString("(+NBT)"));
-            tagLore.setTag("Lore", tagList);
+            NbtUtils.addTag(tagList, NbtUtils.asStringTag("(+NBT)"));
+            NbtUtils.putTag(tagLore, "Lore", tagList);
             stack.setTagInfo("display", tagLore);
             stack.setTagInfo("BlockEntityTag", nbt);
 
@@ -124,14 +124,14 @@ public class ItemUtils
 
     public static String getStackString(ItemStack stack)
     {
-        if (stack.isEmpty() == false)
+        if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(stack))
         {
             ResourceLocation rl = Item.REGISTRY.getNameForObject(stack.getItem());
+            NBTTagCompound tag = fi.dy.masa.malilib.util.ItemUtils.getTag(stack);
 
             return String.format("[%s @ %d - display: %s - NBT: %s] (%s)",
                     rl != null ? rl.toString() : "null", stack.getMetadata(), stack.getDisplayName(),
-                    stack.getTagCompound() != null ? stack.getTagCompound().toString() : "<no NBT>",
-                    stack.toString());
+                    tag != null ? tag.toString() : "<no NBT>", stack);
         }
 
         return "<empty>";

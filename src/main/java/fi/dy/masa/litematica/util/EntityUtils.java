@@ -18,8 +18,9 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.inventory.InventoryUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.RenderUtils;
@@ -49,9 +50,9 @@ public class EntityUtils
 
         ItemStack toolItem = DataManager.getToolItem();
 
-        if (toolItem.isEmpty())
+        if (ItemUtils.isEmpty(toolItem))
         {
-            return entity.getHeldItemMainhand().isEmpty();
+            return ItemUtils.isEmpty(entity.getHeldItemMainhand());
         }
 
         ItemStack stackHand = entity.getHeldItem(hand);
@@ -83,7 +84,7 @@ public class EntityUtils
             {
                 hand = EnumHand.MAIN_HAND;
             }
-            else if (player.getHeldItemMainhand().isEmpty() && ItemStack.areItemsEqualIgnoreDurability(player.getHeldItemOffhand(), stack))
+            else if (ItemUtils.isEmpty(player.getHeldItemMainhand()) && ItemStack.areItemsEqualIgnoreDurability(player.getHeldItemOffhand(), stack))
             {
                 hand = EnumHand.OFF_HAND;
             }
@@ -94,7 +95,7 @@ public class EntityUtils
             {
                 hand = EnumHand.MAIN_HAND;
             }
-            else if (player.getHeldItemMainhand().isEmpty() && InventoryUtils.areStacksEqual(player.getHeldItemOffhand(), stack))
+            else if (ItemUtils.isEmpty(player.getHeldItemMainhand()) && InventoryUtils.areStacksEqual(player.getHeldItemOffhand(), stack))
             {
                 hand = EnumHand.OFF_HAND;
             }
@@ -201,13 +202,14 @@ public class EntityUtils
         }
         else
         {
-            if (nbt.hasKey("Passengers", Constants.NBT.TAG_LIST))
+            if (NbtUtils.containsList(nbt, "Passengers"))
             {
-                NBTTagList taglist = nbt.getTagList("Passengers", Constants.NBT.TAG_COMPOUND);
+                NBTTagList list = NbtUtils.getListOfCompounds(nbt, "Passengers");
+                final int size = NbtUtils.getListSize(list);
 
-                for (int i = 0; i < taglist.tagCount(); ++i)
+                for (int i = 0; i < size; ++i)
                 {
-                    Entity passenger = createEntityAndPassengersFromNBT(taglist.getCompoundTagAt(i), world);
+                    Entity passenger = createEntityAndPassengersFromNBT(NbtUtils.getCompoundAt(list, i), world);
 
                     if (passenger != null)
                     {
@@ -226,7 +228,9 @@ public class EntityUtils
         {
             for (Entity passenger : entity.getPassengers())
             {
-                passenger.setPosition(entity.posX, entity.posY + entity.getMountedYOffset() + passenger.getYOffset(), entity.posZ);
+                passenger.setPosition(fi.dy.masa.malilib.util.EntityUtils.getX(entity),
+                                      fi.dy.masa.malilib.util.EntityUtils.getY(entity) + entity.getMountedYOffset() + passenger.getYOffset(),
+                                      fi.dy.masa.malilib.util.EntityUtils.getZ(entity));
                 spawnEntityAndPassengersInWorld(passenger, world);
             }
         }

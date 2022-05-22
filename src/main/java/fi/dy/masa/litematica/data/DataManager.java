@@ -16,7 +16,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.malilib.config.option.BooleanAndFileConfig.BooleanAndFile;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
@@ -24,6 +23,7 @@ import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
@@ -518,12 +518,12 @@ public class DataManager implements DirectoryCache
 
             if (itemName != null)
             {
-                Item item = Item.REGISTRY.getObject(new ResourceLocation(itemName));
+                Item item = ItemUtils.getItemByRegistryName(itemName);
 
                 if (item != null && item != Items.AIR)
                 {
                     toolItem = new ItemStack(item, 1, meta);
-                    toolItem.setTagCompound(nbt);
+                    ItemUtils.setTag(toolItem, nbt);
                     return;
                 }
             }
@@ -533,7 +533,7 @@ public class DataManager implements DirectoryCache
         // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
 
-        Configs.Generic.TOOL_ITEM.setValue(Item.REGISTRY.getNameForObject(Items.STICK).toString());
+        Configs.Generic.TOOL_ITEM.setValue(ItemUtils.getItemRegistryName(Items.STICK));
     }
 
     public static void setHeldItemAsTool()
@@ -543,13 +543,13 @@ public class DataManager implements DirectoryCache
         if (player != null)
         {
             ItemStack stack = player.getHeldItemMainhand();
-            toolItem = stack.isEmpty() ? ItemStack.EMPTY : stack.copy();
+            toolItem = ItemUtils.isEmpty(stack) ? ItemStack.EMPTY : stack.copy();
             String cfgStr = "";
 
-            if (stack.isEmpty() == false)
+            if (ItemUtils.notEmpty(stack))
             {
-                cfgStr = Item.REGISTRY.getNameForObject(stack.getItem()).toString();
-                NBTTagCompound nbt = stack.getTagCompound();
+                cfgStr = ItemUtils.getItemRegistryName(stack.getItem());
+                NBTTagCompound nbt = ItemUtils.getTag(stack);
 
                 if (stack.isItemStackDamageable() == false || nbt != null)
                 {

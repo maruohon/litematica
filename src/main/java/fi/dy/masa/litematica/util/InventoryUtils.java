@@ -116,18 +116,18 @@ public class InventoryUtils
             int slotNum = hotbarSlot + 36;
 
             // First try to put the current hotbar item into an empty slot in the player's inventory
-            if (inventory.getStackInSlot(hotbarSlot).isEmpty() == false)
+            if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(inventory.getStackInSlot(hotbarSlot)))
             {
                 // Shift click the stack
                 mc.playerController.windowClick(player.openContainer.windowId, slotNum, 0, ClickType.QUICK_MOVE, player);
 
                 // Wasn't able to move the items out
-                if (inventory.getStackInSlot(hotbarSlot).isEmpty() == false)
+                if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(inventory.getStackInSlot(hotbarSlot)))
                 {
                     // TODO try to combine partial stacks
 
                     // The off-hand slot is empty, move the current stack to it
-                    if (player.getHeldItemOffhand().isEmpty())
+                    if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(player.getHeldItemOffhand()))
                     {
                         fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
                         fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, 45, 0);
@@ -148,8 +148,6 @@ public class InventoryUtils
 
     /**
      * Does a ray trace to the schematic world, and returns either the closest or the furthest hit block.
-     * @param adjacentOnly whether to only accept traced schematic world position that are adjacent to a client world block, ie. normally placeable
-     * @param mc
      * @return true if the correct item was or is in the player's hand after the pick block
      */
     public static boolean pickBlockFirst(Minecraft mc)
@@ -201,7 +199,7 @@ public class InventoryUtils
         ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
 
-        if (stack.isEmpty() == false)
+        if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(stack))
         {
             EnumHand hand = EntityUtils.getUsedHandForItem(GameUtils.getClientPlayer(), stack, ignoreNbt);
 
@@ -217,7 +215,7 @@ public class InventoryUtils
                     if (BaseScreen.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
                     {
                         stack = stack.copy();
-                        ItemUtils.storeTEInStack(stack, te);
+                        ItemUtils.storeBlockEntityInStack(stack, te);
                     }
                 }
 
@@ -237,7 +235,7 @@ public class InventoryUtils
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
         EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
 
-        if (stack.isEmpty() == false && hand == null)
+        if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(stack) && hand == null)
         {
             switchItemToHand(stack, ignoreNbt, mc);
             hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
@@ -255,7 +253,7 @@ public class InventoryUtils
     {
         // First check the current slot
         if (PICK_BLOCKABLE_SLOTS.contains(inventory.currentItem) &&
-            inventory.mainInventory.get(inventory.currentItem).isEmpty())
+            fi.dy.masa.malilib.util.ItemUtils.isEmpty(inventory.mainInventory.get(inventory.currentItem)))
         {
             return inventory.currentItem;
         }
@@ -270,7 +268,7 @@ public class InventoryUtils
             {
                 ItemStack stack = inventory.mainInventory.get(slotNum);
 
-                if (stack.isEmpty())
+                if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack))
                 {
                     return slotNum;
                 }
@@ -286,7 +284,8 @@ public class InventoryUtils
         {
             ItemStack stack = inventory.mainInventory.get(inventory.currentItem);
 
-            if (stack.isEmpty() || (stack.getItem() instanceof ItemTool) == false)
+            if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack) ||
+                (stack.getItem() instanceof ItemTool) == false)
             {
                 return inventory.currentItem;
             }
@@ -297,12 +296,10 @@ public class InventoryUtils
             nextPickSlotIndex = 0;
         }
 
-        int slotNum = -1;
-
         // Try to find the next pick-blockable slot that doesn't have a tool in it
         for (int i = 0; i < PICK_BLOCKABLE_SLOTS.size(); ++i)
         {
-            slotNum = PICK_BLOCKABLE_SLOTS.get(nextPickSlotIndex);
+            int slotNum = PICK_BLOCKABLE_SLOTS.get(nextPickSlotIndex);
 
             if (++nextPickSlotIndex >= PICK_BLOCKABLE_SLOTS.size())
             {
@@ -311,7 +308,8 @@ public class InventoryUtils
 
             ItemStack stack = inventory.mainInventory.get(slotNum);
 
-            if (stack.isEmpty() || (stack.getItem() instanceof ItemTool) == false)
+            if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack) ||
+                (stack.getItem() instanceof ItemTool) == false)
             {
                 return slotNum;
             }

@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import com.google.common.collect.Lists;
 import org.lwjgl.opengl.GL11;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -48,6 +47,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
@@ -260,7 +260,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
             if (entity != null)
             {
-                this.viewFrustum.updateChunkPositions(entity.posX, entity.posZ);
+                this.viewFrustum.updateChunkPositions(EntityUtils.getX(entity), EntityUtils.getZ(entity));
             }
 
             this.renderEntitiesStartupCounter = 2;
@@ -287,48 +287,51 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
         world.profiler.startSection("camera");
 
-        double diffX = viewEntity.posX - this.frustumUpdatePosX;
-        double diffY = viewEntity.posY - this.frustumUpdatePosY;
-        double diffZ = viewEntity.posZ - this.frustumUpdatePosZ;
+        double entityX = EntityUtils.getX(viewEntity);
+        double entityY = EntityUtils.getY(viewEntity);
+        double entityZ = EntityUtils.getZ(viewEntity);
+        double diffX = entityX - this.frustumUpdatePosX;
+        double diffY = entityY - this.frustumUpdatePosY;
+        double diffZ = entityZ - this.frustumUpdatePosZ;
 
         if (this.frustumUpdatePosChunkX != viewEntity.chunkCoordX ||
             this.frustumUpdatePosChunkY != viewEntity.chunkCoordY ||
             this.frustumUpdatePosChunkZ != viewEntity.chunkCoordZ ||
             diffX * diffX + diffY * diffY + diffZ * diffZ > 16.0D)
         {
-            this.frustumUpdatePosX = viewEntity.posX;
-            this.frustumUpdatePosY = viewEntity.posY;
-            this.frustumUpdatePosZ = viewEntity.posZ;
+            this.frustumUpdatePosX = entityX;
+            this.frustumUpdatePosY = entityY;
+            this.frustumUpdatePosZ = entityZ;
             this.frustumUpdatePosChunkX = viewEntity.chunkCoordX;
             this.frustumUpdatePosChunkY = viewEntity.chunkCoordY;
             this.frustumUpdatePosChunkZ = viewEntity.chunkCoordZ;
-            this.viewFrustum.updateChunkPositions(viewEntity.posX, viewEntity.posZ);
+            this.viewFrustum.updateChunkPositions(entityX, entityZ);
         }
 
         world.profiler.endStartSection("renderlist_camera");
-        double x = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks;
-        double y = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks;
-        double z = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks;
+        double x = viewEntity.lastTickPosX + (entityX - viewEntity.lastTickPosX) * partialTicks;
+        double y = viewEntity.lastTickPosY + (entityY - viewEntity.lastTickPosY) * partialTicks;
+        double z = viewEntity.lastTickPosZ + (entityZ - viewEntity.lastTickPosZ) * partialTicks;
         this.renderContainer.initialize(x, y, z);
         y = y + (double) viewEntity.getEyeHeight();
 
         world.profiler.endStartSection("culling");
-        final int centerChunkX = ((int) MathHelper.floor(x)) >> 4;
-        final int centerChunkY = ((int) MathHelper.floor(y)) >> 4;
-        final int centerChunkZ = ((int) MathHelper.floor(z)) >> 4;
+        final int centerChunkX = MathHelper.floor(x) >> 4;
+        final int centerChunkY = MathHelper.floor(y) >> 4;
+        final int centerChunkZ = MathHelper.floor(z) >> 4;
         final int renderDistance = GameUtils.getRenderDistanceChunks();
         SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, centerChunkY, centerChunkZ);
         this.viewPosSubChunk.setPos(centerChunkX << 4, centerChunkY << 4, centerChunkZ << 4);
 
         this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false ||
-                viewEntity.posX != this.lastViewEntityX ||
-                viewEntity.posY != this.lastViewEntityY ||
-                viewEntity.posZ != this.lastViewEntityZ ||
+                entityX != this.lastViewEntityX ||
+                entityY != this.lastViewEntityY ||
+                entityZ != this.lastViewEntityZ ||
                 viewEntity.rotationPitch != this.lastViewEntityPitch ||
                 viewEntity.rotationYaw != this.lastViewEntityYaw;
-        this.lastViewEntityX = viewEntity.posX;
-        this.lastViewEntityY = viewEntity.posY;
-        this.lastViewEntityZ = viewEntity.posZ;
+        this.lastViewEntityX = entityX;
+        this.lastViewEntityY = entityY;
+        this.lastViewEntityZ = entityZ;
         this.lastViewEntityPitch = viewEntity.rotationPitch;
         this.lastViewEntityYaw = viewEntity.rotationYaw;
 
@@ -487,15 +490,18 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
             this.world.profiler.startSection("translucent_sort");
-            double diffX = entityIn.posX - this.prevRenderSortX;
-            double diffY = entityIn.posY - this.prevRenderSortY;
-            double diffZ = entityIn.posZ - this.prevRenderSortZ;
+            double entityX = EntityUtils.getX(entityIn);
+            double entityY = EntityUtils.getY(entityIn);
+            double entityZ = EntityUtils.getZ(entityIn);
+            double diffX = entityX - this.prevRenderSortX;
+            double diffY = entityY - this.prevRenderSortY;
+            double diffZ = entityZ - this.prevRenderSortZ;
 
             if (diffX * diffX + diffY * diffY + diffZ * diffZ > 1.0D)
             {
-                this.prevRenderSortX = entityIn.posX;
-                this.prevRenderSortY = entityIn.posY;
-                this.prevRenderSortZ = entityIn.posZ;
+                this.prevRenderSortX = entityX;
+                this.prevRenderSortY = entityY;
+                this.prevRenderSortZ = entityZ;
                 int i = 0;
 
                 for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
@@ -705,9 +711,12 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         }
         else
         {
-            double renderX = renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * (double)partialTicks;
-            double renderY = renderViewEntity.prevPosY + (renderViewEntity.posY - renderViewEntity.prevPosY) * (double)partialTicks;
-            double renderZ = renderViewEntity.prevPosZ + (renderViewEntity.posZ - renderViewEntity.prevPosZ) * (double)partialTicks;
+            double entityX = EntityUtils.getX(renderViewEntity);
+            double entityY = EntityUtils.getY(renderViewEntity);
+            double entityZ = EntityUtils.getZ(renderViewEntity);
+            double renderX = renderViewEntity.prevPosX + (entityX - renderViewEntity.prevPosX) * partialTicks;
+            double renderY = renderViewEntity.prevPosY + (entityY - renderViewEntity.prevPosY) * partialTicks;
+            double renderZ = renderViewEntity.prevPosZ + (entityZ - renderViewEntity.prevPosZ) * partialTicks;
             this.world.profiler.startSection("prepare");
             TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.objectMouseOver, partialTicks);
             this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
@@ -715,10 +724,6 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             this.countEntitiesRendered = 0;
             this.countEntitiesHidden = 0;
 
-            Entity entity = this.mc.getRenderViewEntity();
-            double entityX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
-            double entityY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
-            double entityZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
             TileEntityRendererDispatcher.staticPlayerX = entityX;
             TileEntityRendererDispatcher.staticPlayerY = entityY;
             TileEntityRendererDispatcher.staticPlayerZ = entityZ;
@@ -728,8 +733,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             this.countEntitiesTotal = this.world.getLoadedEntityList().size();
 
             this.world.profiler.endStartSection("regular_entities");
-            List<Entity> entitiesOutlined = Lists.<Entity>newArrayList();
-            List<Entity> entitiesMultipass = Lists.<Entity>newArrayList();
+            List<Entity> entitiesMultipass = new ArrayList<>();
             BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
             LayerRange layerRange = DataManager.getRenderLayerRange();
 
@@ -742,7 +746,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                 {
                     for (Entity entityTmp : classinheritancemultimap)
                     {
-                        if (layerRange.isPositionWithinRange((int) entityTmp.posX, (int) entityTmp.posY, (int) entityTmp.posZ) == false)
+                        if (layerRange.isPositionWithinRange((int) EntityUtils.getX(entityTmp), (int) EntityUtils.getY(entityTmp), (int) EntityUtils.getZ(entityTmp)) == false)
                         {
                             continue;
                         }
@@ -751,18 +755,14 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
                         if (shouldRender)
                         {
-                            boolean sleeping = this.mc.getRenderViewEntity() instanceof EntityLivingBase ? ((EntityLivingBase)this.mc.getRenderViewEntity()).isPlayerSleeping() : false;
+                            boolean sleeping = this.mc.getRenderViewEntity() instanceof EntityLivingBase && ((EntityLivingBase) this.mc.getRenderViewEntity()).isPlayerSleeping();
+                            double eY = EntityUtils.getY(entityTmp);
 
                             if ((entityTmp != this.mc.getRenderViewEntity() || this.mc.gameSettings.thirdPersonView != 0 || sleeping) &&
-                                (entityTmp.posY < 0.0D || entityTmp.posY >= 256.0D || this.world.isBlockLoaded(posMutable.setPos(entityTmp))))
+                                (eY < 0.0D || eY >= 256.0D || this.world.isBlockLoaded(posMutable.setPos(entityTmp))))
                             {
                                 ++this.countEntitiesRendered;
                                 this.renderManager.renderEntityStatic(entityTmp, 0f, false);
-
-                                if (this.isOutlineActive(entityTmp, entity, camera))
-                                {
-                                    entitiesOutlined.add(entityTmp);
-                                }
 
                                 if (this.renderManager.isRenderMultipass(entityTmp))
                                 {

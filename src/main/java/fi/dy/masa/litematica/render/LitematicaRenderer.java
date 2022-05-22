@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
 import fi.dy.masa.malilib.render.shader.ShaderProgram;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
@@ -468,9 +469,9 @@ public class LitematicaRenderer
 
     private ICamera createCamera(Entity entity, float partialTicks)
     {
-        double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double) partialTicks;
-        double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double) partialTicks;
-        double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double) partialTicks;
+        double x = entity.lastTickPosX + (EntityUtils.getX(entity) - entity.lastTickPosX) * (double) partialTicks;
+        double y = entity.lastTickPosY + (EntityUtils.getY(entity) - entity.lastTickPosY) * (double) partialTicks;
+        double z = entity.lastTickPosZ + (EntityUtils.getZ(entity) - entity.lastTickPosZ) * (double) partialTicks;
 
         this.entity = entity;
         this.camera = new Frustum();

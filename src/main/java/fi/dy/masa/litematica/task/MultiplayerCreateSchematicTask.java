@@ -83,8 +83,8 @@ public class MultiplayerCreateSchematicTask extends TaskBase
 
     public void onReceiveData(NBTTagCompound tag)
     {
-        if (NbtUtils.hasCompound(tag, "Regions") == false ||
-            NbtUtils.hasString(tag, "SaveMethod") == false)
+        if (NbtUtils.containsCompound(tag, "Regions") == false ||
+            NbtUtils.containsString(tag, "SaveMethod") == false)
         {
             MessageDispatcher.error("litematica.message.error.schematic_save.server_side.invalid_data");
             return;
@@ -120,7 +120,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
     {
         for (String regionName : NbtUtils.getKeys(regionsTag))
         {
-            if (NbtUtils.hasCompound(regionsTag, regionName))
+            if (NbtUtils.containsCompound(regionsTag, regionName))
             {
                 NBTTagCompound regionTag = NbtUtils.getCompound(regionsTag, regionName);
                 regionReader.accept(regionName, regionTag);
@@ -157,17 +157,17 @@ public class MultiplayerCreateSchematicTask extends TaskBase
 
     protected void readBlocks(NBTTagCompound regionTag, Consumer<LitematicaBlockStateContainerFull> consumer)
     {
-        if (NbtUtils.hasCompound(regionTag, "Blocks"))
+        if (NbtUtils.containsCompound(regionTag, "Blocks"))
         {
             NBTTagCompound blocksTag = NbtUtils.getCompound(regionTag, "Blocks");
 
-            if (NbtUtils.hasList(blocksTag, "BlockStatePalette") &&
-                NbtUtils.hasLongArray(blocksTag, "BlockStates") &&
-                NbtUtils.hasInt(blocksTag, "sizeX") &&
-                NbtUtils.hasInt(blocksTag, "sizeY") &&
-                NbtUtils.hasInt(blocksTag, "sizeZ"))
+            if (NbtUtils.containsList(blocksTag, "BlockStatePalette") &&
+                NbtUtils.containsLongArray(blocksTag, "BlockStates") &&
+                NbtUtils.containsInt(blocksTag, "sizeX") &&
+                NbtUtils.containsInt(blocksTag, "sizeY") &&
+                NbtUtils.containsInt(blocksTag, "sizeZ"))
             {
-                NBTBase nbtBase = blocksTag.getTag("BlockStates");
+                NBTBase nbtBase = NbtUtils.getTag(blocksTag, "BlockStates");
                 Vec3i size = new Vec3i(NbtUtils.getInt(blocksTag, "sizeX"),
                                        NbtUtils.getInt(blocksTag, "sizeY"),
                                        NbtUtils.getInt(blocksTag, "sizeZ"));
@@ -189,7 +189,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
                     consumer.accept(container);
                     long totalBlockCount;
 
-                    if (NbtUtils.hasLong(blocksTag, "TotalBlockCount"))
+                    if (NbtUtils.containsLong(blocksTag, "TotalBlockCount"))
                     {
                         totalBlockCount = NbtUtils.getLong(blocksTag, "TotalBlockCount");
                     }
@@ -214,7 +214,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
 
     protected void readBlockEntities(NBTTagCompound regionTag, Consumer<HashMap<BlockPos, NBTTagCompound>> consumer)
     {
-        if (NbtUtils.hasList(regionTag, "BlockEntities"))
+        if (NbtUtils.containsList(regionTag, "BlockEntities"))
         {
             NBTTagList listTag = NbtUtils.getListOfCompounds(regionTag, "BlockEntities");
             HashMap<BlockPos, NBTTagCompound> map = new HashMap<>();
@@ -222,7 +222,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
 
             for (int i = 0; i < size; ++i)
             {
-                NBTTagCompound tag = listTag.getCompoundTagAt(i);
+                NBTTagCompound tag = NbtUtils.getCompoundAt(listTag, i);
                 BlockPos pos = NbtUtils.readBlockPos(tag);
 
                 if (pos != null)
@@ -238,7 +238,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
 
     protected void readEntities(NBTTagCompound regionTag, Consumer<List<EntityInfo>> consumer)
     {
-        if (NbtUtils.hasList(regionTag, "Entities"))
+        if (NbtUtils.containsList(regionTag, "Entities"))
         {
             NBTTagList listTag = NbtUtils.getListOfCompounds(regionTag, "Entities");
             ArrayList<EntityInfo> list = new ArrayList<>();
@@ -246,7 +246,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
 
             for (int i = 0; i < size; ++i)
             {
-                NBTTagCompound tag = listTag.getCompoundTagAt(i);
+                NBTTagCompound tag = NbtUtils.getCompoundAt(listTag, i);
                 Vec3d pos = NbtUtils.readVec3dFromListTag(tag, "Pos");
 
                 if (pos != null)
@@ -265,7 +265,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
                                           //Function<String, T> objectFactory, // TODO
                                           Consumer<HashMap<BlockPos, NextTickListEntry>> consumer)
     {
-        if (NbtUtils.hasList(regionTag, tagName))
+        if (NbtUtils.containsList(regionTag, tagName))
         {
             NBTTagList listTag = NbtUtils.getListOfCompounds(regionTag, tagName);
             HashMap<BlockPos, NextTickListEntry> map = new HashMap<>();
@@ -273,7 +273,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
 
             for (int i = 0; i < size; ++i)
             {
-                NBTTagCompound tag = listTag.getCompoundTagAt(i);
+                NBTTagCompound tag = NbtUtils.getCompoundAt(listTag, i);
                 BlockPos pos = NbtUtils.readBlockPos(tag);
                 Block block = BlockUtils.getBlockByRegistryName(NbtUtils.getString(tag, "Block"));
 

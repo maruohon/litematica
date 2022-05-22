@@ -15,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
@@ -40,10 +39,10 @@ public class VanillaStructure extends SingleRegionSchematic
 
     public static boolean isValidSchematic(NBTTagCompound tag)
     {
-        if (tag.hasKey("blocks", Constants.NBT.TAG_LIST) &&
-            tag.hasKey("palette", Constants.NBT.TAG_LIST) &&
-            tag.hasKey("size", Constants.NBT.TAG_LIST) &&
-            tag.hasKey("DataVersion", Constants.NBT.TAG_INT))
+        if (NbtUtils.containsList(tag, "blocks") &&
+            NbtUtils.containsList(tag, "palette") &&
+            NbtUtils.containsList(tag, "size") &&
+            NbtUtils.containsInt(tag, "DataVersion"))
         {
             return isSizeValid(readSizeFromTagImpl(tag));
         }
@@ -79,11 +78,11 @@ public class VanillaStructure extends SingleRegionSchematic
     @Override
     protected boolean readBlocksFromTag(NBTTagCompound tag)
     {
-        if (tag.hasKey("palette", Constants.NBT.TAG_LIST) &&
-            tag.hasKey("blocks", Constants.NBT.TAG_LIST) &&
+        if (NbtUtils.containsList(tag, "palette") &&
+            NbtUtils.containsList(tag, "blocks") &&
             isSizeValid(this.getSize()))
         {
-            NBTTagList paletteTag = tag.getTagList("palette", Constants.NBT.TAG_COMPOUND);
+            NBTTagList paletteTag = NbtUtils.getListOfCompounds(tag, "palette");
             LitematicaBlockStateContainerSparse container = (LitematicaBlockStateContainerSparse) this.blockContainer;
             ILitematicaBlockStatePalette palette = container.getPalette();
 
@@ -93,17 +92,17 @@ public class VanillaStructure extends SingleRegionSchematic
                 return false;
             }
 
-            if (tag.hasKey("author", Constants.NBT.TAG_STRING))
+            if (NbtUtils.containsString(tag, "author"))
             {
-                this.getMetadata().setAuthor(tag.getString("author"));
+                this.getMetadata().setAuthor(NbtUtils.getString(tag, "author"));
             }
 
-            NBTTagList blockList = tag.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
-            final int count = blockList.tagCount();
+            NBTTagList blockList = NbtUtils.getListOfCompounds(tag, "blocks");
+            final int count = NbtUtils.getListSize(blockList);
 
             for (int i = 0; i < count; ++i)
             {
-                NBTTagCompound blockTag = blockList.getCompoundTagAt(i);
+                NBTTagCompound blockTag = NbtUtils.getCompoundAt(blockList, i);
                 BlockPos pos = NbtUtils.readBlockPosFromListTag(blockTag, "pos");
 
                 if (pos == null)
@@ -112,7 +111,7 @@ public class VanillaStructure extends SingleRegionSchematic
                     return false;
                 }
 
-                int id = blockTag.getInteger("state");
+                int id = NbtUtils.getInt(blockTag, "state");
                 IBlockState state = palette.getBlockState(id);
 
                 if (state == null)
@@ -122,9 +121,9 @@ public class VanillaStructure extends SingleRegionSchematic
 
                 container.setBlockState(pos.getX(), pos.getY(), pos.getZ(), state);
 
-                if (blockTag.hasKey("nbt", Constants.NBT.TAG_COMPOUND))
+                if (NbtUtils.containsCompound(blockTag, "nbt"))
                 {
-                    this.blockEntities.put(pos, blockTag.getCompoundTag("nbt"));
+                    this.blockEntities.put(pos, NbtUtils.getCompound(blockTag, "nbt"));
                 }
             }
 
@@ -144,17 +143,17 @@ public class VanillaStructure extends SingleRegionSchematic
     protected List<EntityInfo> readEntitiesFromTag(NBTTagCompound tag)
     {
         List<EntityInfo> entities = new ArrayList<>();
-        NBTTagList tagList = tag.getTagList("entities", Constants.NBT.TAG_COMPOUND);
-        final int size = tagList.tagCount();
+        NBTTagList tagList = NbtUtils.getListOfCompounds(tag, "entities");
+        final int size = NbtUtils.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound entityData = tagList.getCompoundTagAt(i);
+            NBTTagCompound entityData = NbtUtils.getCompoundAt(tagList, i);
             Vec3d pos = NbtUtils.readVec3dFromListTag(entityData, "pos");
 
-            if (pos != null && entityData.hasKey("nbt", Constants.NBT.TAG_COMPOUND))
+            if (pos != null && NbtUtils.containsCompound(entityData, "nbt"))
             {
-                entities.add(new EntityInfo(pos, entityData.getCompoundTag("nbt")));
+                entities.add(new EntityInfo(pos, NbtUtils.getCompound(entityData, "nbt")));
             }
         }
 
@@ -163,8 +162,8 @@ public class VanillaStructure extends SingleRegionSchematic
 
     protected void writeMetadataToTag(NBTTagCompound tag)
     {
-        tag.setTag("Metadata", this.getMetadata().toTag());
-        tag.setString("author", this.getMetadata().getAuthor());
+        NbtUtils.putTag(tag, "Metadata", this.getMetadata().toTag());
+        NbtUtils.putString(tag, "author", this.getMetadata().getAuthor());
     }
 
     protected void writeBlocksToTag(NBTTagCompound tag)
@@ -212,8 +211,8 @@ public class VanillaStructure extends SingleRegionSchematic
 
         NBTTagList paletteTag = this.writePaletteToLitematicaFormatTag(palette);
 
-        tag.setTag("palette", paletteTag);
-        tag.setTag("blocks", blockList);
+        NbtUtils.putTag(tag, "palette", paletteTag);
+        NbtUtils.putTag(tag, "blocks", blockList);
     }
 
     private void writeBlockToList(int x, int y, int z, int id, NBTTagList blockList)
@@ -222,16 +221,16 @@ public class VanillaStructure extends SingleRegionSchematic
         BlockPos pos = new BlockPos(x, y, z);
 
         NbtUtils.writeBlockPosToListTag(pos, blockTag, "pos");
-        blockTag.setInteger("state", id);
+        NbtUtils.putInt(blockTag, "state", id);
 
         NBTTagCompound beTag = this.blockEntities.get(pos);
 
         if (beTag != null)
         {
-            blockTag.setTag("nbt", beTag.copy());
+            NbtUtils.putTag(blockTag, "nbt", beTag.copy());
         }
 
-        blockList.appendTag(blockTag);
+        NbtUtils.addTag(blockList, blockTag);
     }
 
     protected void writeEntitiesToTag(NBTTagCompound tag)
@@ -245,13 +244,13 @@ public class VanillaStructure extends SingleRegionSchematic
             NbtUtils.writeBlockPosToListTag(new BlockPos(info.pos), entityData, "blockPos");
             NBTTagCompound entityTag = info.nbt.copy();
 
-            entityTag.removeTag("Pos");
-            entityData.setTag("nbt", entityTag);
+            NbtUtils.remove(entityTag, "Pos");
+            NbtUtils.putTag(entityData, "nbt", entityTag);
 
-            tagList.appendTag(entityData);
+            NbtUtils.addTag(tagList, entityData);
         }
 
-        tag.setTag("entities", tagList);
+        NbtUtils.putTag(tag, "entities", tagList);
     }
 
     @Override
@@ -265,7 +264,7 @@ public class VanillaStructure extends SingleRegionSchematic
 
         NbtUtils.writeBlockPosToListTag(this.getSize(), tag, "size");
 
-        tag.setInteger("DataVersion", LitematicaSchematic.MINECRAFT_DATA_VERSION);
+        NbtUtils.putInt(tag, "DataVersion", LitematicaSchematic.MINECRAFT_DATA_VERSION);
 
         return tag;
     }

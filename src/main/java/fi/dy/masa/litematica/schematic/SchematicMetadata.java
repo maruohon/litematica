@@ -174,40 +174,40 @@ public class SchematicMetadata
     {
         NBTTagCompound nbt = new NBTTagCompound();
 
-        nbt.setString("Name", this.name);
-        nbt.setString("Author", this.author);
-        nbt.setString("Description", this.description);
+        NbtUtils.putString(nbt, "Name", this.name);
+        NbtUtils.putString(nbt, "Author", this.author);
+        NbtUtils.putString(nbt, "Description", this.description);
 
         if (this.regionCount > 0)
         {
-            nbt.setInteger("RegionCount", this.regionCount);
+            NbtUtils.putInt(nbt, "RegionCount", this.regionCount);
         }
 
         if (this.totalVolume > 0)
         {
-            nbt.setLong("TotalVolume", this.totalVolume);
+            NbtUtils.putLong(nbt, "TotalVolume", this.totalVolume);
         }
 
         if (this.totalBlocks >= 0)
         {
-            nbt.setLong("TotalBlocks", this.totalBlocks);
+            NbtUtils.putLong(nbt, "TotalBlocks", this.totalBlocks);
         }
 
         if (this.timeCreated > 0)
         {
-            nbt.setLong("TimeCreated", this.timeCreated);
+            NbtUtils.putLong(nbt, "TimeCreated", this.timeCreated);
         }
 
         if (this.timeModified > 0)
         {
-            nbt.setLong("TimeModified", this.timeModified);
+            NbtUtils.putLong(nbt, "TimeModified", this.timeModified);
         }
 
-        nbt.setTag("EnclosingSize", NbtUtils.createBlockPosTag(this.enclosingSize));
+        NbtUtils.putTag(nbt, "EnclosingSize", NbtUtils.createBlockPosTag(this.enclosingSize));
 
         if (this.thumbnailPixelData != null)
         {
-            nbt.setIntArray("PreviewImageData", this.thumbnailPixelData);
+            NbtUtils.putIntArray(nbt, "PreviewImageData", this.thumbnailPixelData);
         }
 
         return nbt;
@@ -215,49 +215,26 @@ public class SchematicMetadata
 
     public void fromTag(NBTTagCompound tag)
     {
-        if (tag.hasKey("Name", Constants.NBT.TAG_STRING))
+        this.name = NbtUtils.getStringOrDefault(tag, "Name", this.name);
+        this.author = NbtUtils.getStringOrDefault(tag, "Author", this.author);
+        this.description = NbtUtils.getStringOrDefault(tag, "Description", this.description);
+        this.regionCount = NbtUtils.getIntOrDefault(tag, "RegionCount", this.regionCount);
+        this.timeCreated = NbtUtils.getLongOrDefault(tag, "TimeCreated", this.timeCreated);
+        this.timeModified = NbtUtils.getLongOrDefault(tag, "TimeModified", this.timeModified);
+
+        if (NbtUtils.contains(tag, "TotalVolume", Constants.NBT.TAG_ANY_NUMERIC))
         {
-            this.name = tag.getString("Name");
+            this.totalVolume = NbtUtils.getLong(tag, "TotalVolume");
         }
 
-        if (tag.hasKey("Author", Constants.NBT.TAG_STRING))
+        if (NbtUtils.contains(tag, "TotalBlocks", Constants.NBT.TAG_ANY_NUMERIC))
         {
-            this.author = tag.getString("Author");
+            this.totalBlocks = NbtUtils.getLong(tag, "TotalBlocks");
         }
 
-        if (tag.hasKey("Description", Constants.NBT.TAG_STRING))
+        if (NbtUtils.containsCompound(tag, "EnclosingSize"))
         {
-            this.description = tag.getString("Description");
-        }
-
-        if (tag.hasKey("RegionCount", Constants.NBT.TAG_INT))
-        {
-            this.regionCount = tag.getInteger("RegionCount");
-        }
-
-        if (tag.hasKey("TotalVolume", Constants.NBT.TAG_LONG) || tag.hasKey("TotalVolume", Constants.NBT.TAG_INT))
-        {
-            this.totalVolume = tag.getLong("TotalVolume");
-        }
-
-        if (tag.hasKey("TotalBlocks", Constants.NBT.TAG_LONG) || tag.hasKey("TotalBlocks", Constants.NBT.TAG_INT))
-        {
-            this.totalBlocks = tag.getLong("TotalBlocks");
-        }
-
-        if (tag.hasKey("TimeCreated", Constants.NBT.TAG_LONG))
-        {
-            this.timeCreated = tag.getLong("TimeCreated");
-        }
-
-        if (tag.hasKey("TimeModified", Constants.NBT.TAG_LONG))
-        {
-            this.timeModified = tag.getLong("TimeModified");
-        }
-
-        if (tag.hasKey("EnclosingSize", Constants.NBT.TAG_COMPOUND))
-        {
-            Vec3i size = NbtUtils.readBlockPos(tag.getCompoundTag("EnclosingSize"));
+            Vec3i size = NbtUtils.readBlockPos(NbtUtils.getCompound(tag, "EnclosingSize"));
 
             if (size != null)
             {
@@ -265,9 +242,9 @@ public class SchematicMetadata
             }
         }
 
-        if (tag.hasKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
+        if (NbtUtils.containsIntArray(tag, "PreviewImageData"))
         {
-            this.thumbnailPixelData = tag.getIntArray("PreviewImageData");
+            this.thumbnailPixelData = NbtUtils.getIntArray(tag, "PreviewImageData");
         }
         else
         {

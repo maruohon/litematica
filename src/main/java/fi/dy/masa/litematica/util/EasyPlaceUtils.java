@@ -32,6 +32,7 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.PlacementUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
@@ -397,7 +398,7 @@ public class EasyPlaceUtils
         ItemStack requiredStack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
         // The block is correct already, or it was recently placed, or some of the checks failed
-        if (stateSchematic == stateClient || requiredStack.isEmpty() ||
+        if (stateSchematic == stateClient || ItemUtils.isEmpty(requiredStack) ||
             easyPlaceIsPositionCached(targetBlockPos) ||
             canPlaceBlock(targetBlockPos, mc.world, stateSchematic, stateClient) == false)
         {
@@ -624,7 +625,7 @@ public class EasyPlaceUtils
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
-            return stack.isEmpty() || EntityUtils.getUsedHandForItem(mc.player, stack, true) == null;
+            return ItemUtils.isEmpty(stack) || EntityUtils.getUsedHandForItem(mc.player, stack, true) == null;
         }
 
         return false;
