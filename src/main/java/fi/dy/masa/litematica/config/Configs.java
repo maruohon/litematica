@@ -38,6 +38,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       CLONE_AT_ORIGINAL_POS   = new ConfigBoolean(    "cloneAtOriginalPosition", false, "If enabled, then using the Clone Selection hotkey will create\nthe placement at the original area selection position,\ninstead of at the player's current position");
         public static final ConfigBoolean       COMMAND_DISABLE_FEEDBACK = new ConfigBoolean(   "commandDisableFeedback", true, "If enabled, then command feedback is automatically disabled\nand then re-enabled for multiplayer Paste, Fill and Delete operations\n(which are using /setblock and /fill commands) by disabling and then\nre-enabling the sendCommandFeedback game rule when the task is finished");
         public static final ConfigInteger       COMMAND_FILL_MAX_VOLUME = new ConfigInteger(    "commandFillMaxVolume", 32768, 256, 60000000, "The maximum size/volume of each individual box\nthat can be filled via the command-based Fill/Delete\noperations. Bigger areas/volumes will get split to multiple commands.\nAll areas are also split to per-chunk boxes at first anyway.");
+        public static final ConfigBoolean       COMMAND_FILL_NO_CHUNK_CLAMP = new ConfigBoolean("commandFillNoChunkClamp", false, "Disables dividing the fill volumes (in the Fill, Replace and Delete modes)\nto per-chunk boxes");
         public static final ConfigInteger       COMMAND_LIMIT           = new ConfigInteger(    "commandLimitPerTick", 64, 1, 1000000, "Maximum number of commands sent per game tick,\nwhen using the Paste, Fill and Delete features on a server,\nwhere they will use setblock and fill commands.\nNote that he Paste feature can overshoot this by a couple of commands\nwhen using the NBT restore functionality, which needs two additional commands for each block.");
         public static final ConfigString        COMMAND_NAME_CLONE      = new ConfigString(     "commandNameClone", "clone", "The clone command name to use when using the\ncommand-based creative mode functionality on servers.\nThis is currently only used by the Paste function if the NBT restore\nbehavior is set to 'Place & Clone'.");
         public static final ConfigString        COMMAND_NAME_FILL       = new ConfigString(     "commandNameFill", "fill", "The fill command name to use when using the\ncommand-based creative mode functionality on servers");
@@ -90,6 +91,7 @@ public class Configs implements IConfigHandler
                 CHANGE_SELECTED_CORNER,
                 CLONE_AT_ORIGINAL_POS,
                 COMMAND_DISABLE_FEEDBACK,
+                COMMAND_FILL_NO_CHUNK_CLAMP,
                 COMMAND_USE_WORLDEDIT,
                 CUSTOM_SCHEMATIC_BASE_DIRECTORY_ENABLED,
                 DEBUG_LOGGING,
