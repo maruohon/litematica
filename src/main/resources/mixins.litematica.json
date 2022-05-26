@@ -5,12 +5,10 @@
 	"refmap": "mixins.litematica.refmap.json",
 	"minVersion": "0.7",
 	"client": [
-		"debug.GuiOverlayDebugMixin",
 		"IMixinBlockRendererDispatcher",
 		"IMixinCompiledChunk",
 		"IMixinDataFixer",
 		"IMixinItemBlockSpecial",
-		"IMixinNBTBase",
 		"IMixinViewFrustum",
 		"IMixinWorldClient",
 		"MixinBlock",
@@ -25,7 +23,8 @@
 		"MixinNetHandlerPlayClient",
 		"MixinPlayerControllerMP",
 		"MixinRenderGlobal",
-		"MixinWorld"
+		"MixinWorld",
+		"debug.GuiOverlayDebugMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

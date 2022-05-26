@@ -7,6 +7,7 @@ import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.input.KeyAction;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -69,7 +70,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
 
                     if (grabModifier && mode == ToolMode.MOVE)
                     {
-                        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                        Entity entity = GameUtils.getCameraEntity();
                         BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, entity, maxDistance, false);
 
                         if (pos != null)
@@ -96,7 +97,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
             }
             else if (isToolSelect)
             {
-                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                Entity entity = GameUtils.getCameraEntity();
 
                 if (mode.getUsesAreaSelection() || projectMode)
                 {

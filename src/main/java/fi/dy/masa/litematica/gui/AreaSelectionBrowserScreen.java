@@ -132,7 +132,9 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     protected void createSelection()
     {
         String title = "litematica.title.screen.create_area_selection";
-        BaseScreen.openPopupScreen(new TextInputScreen(title, "", this::createSelectionByName, this));
+        TextInputScreen screen = new TextInputScreen(title, "", this::createSelectionByName);
+        screen.setParent(this);
+        BaseScreen.openPopupScreen(screen);
     }
 
     protected boolean createSelectionByName(String name)
@@ -152,8 +154,9 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         {
             String title = "litematica.title.screen.area_selection_browser.selection_from_placement";
             TextInputScreen screen = new TextInputScreen(title, placement.getName(),
-                                                         this::selectionFromPlacementByName, this);
+                                                         this::selectionFromPlacementByName);
             screen.setInfoText("litematica.info.area_browser.from_placement");
+            screen.setParent(this);
             BaseScreen.openPopupScreen(screen);
         }
         else

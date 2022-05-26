@@ -26,10 +26,11 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
@@ -845,12 +846,12 @@ public class PositionUtils
     {
         if (Configs.Generic.PLACEMENTS_INFRONT.getBooleanValue())
         {
-            Entity entity = EntityUtils.getCameraEntity();
+            Entity entity = GameUtils.getCameraEntity();
 
             if (placement != null && entity != null)
             {
                 SubRegionPlacement sub = placement.getSelectedSubRegionPlacement();
-                Box box = null;
+                Box box;
 
                 if (sub != null)
                 {
@@ -868,7 +869,7 @@ public class PositionUtils
                     BlockPos originOffset = newOrigin.subtract(placement.getOrigin());
                     BlockPos corner1 = box.getPos1().add(originOffset);
                     BlockPos corner2 = box.getPos2().add(originOffset);
-                    BlockPos entityPos = new BlockPos(entity);
+                    BlockPos entityPos = EntityWrap.getEntityBlockPos(entity);
                     EnumFacing entityFrontDirection = entity.getHorizontalFacing();
                     EnumFacing entitySideDirection = fi.dy.masa.malilib.util.PositionUtils.getClosestSideDirection(entity);
                     Vec3i alignmentFrontOffset = getOffsetToMoveBoxInfrontOfEntityPos(entityPos, entityFrontDirection, corner1, corner2);

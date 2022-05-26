@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
-import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
@@ -95,9 +95,9 @@ public class ChunkRenderWorkerLitematica implements Runnable
             generator.setRegionRenderCacheBuilder(this.getRegionRenderCacheBuilder());
 
             ChunkCompileTaskGeneratorSchematic.Type generatorType = generator.getType();
-            float x = (float) EntityUtils.getX(entity);
-            float y = (float) EntityUtils.getY(entity) + entity.getEyeHeight();
-            float z = (float) EntityUtils.getZ(entity);
+            float x = (float) EntityWrap.getX(entity);
+            float y = (float) EntityWrap.getY(entity) + entity.getEyeHeight();
+            float z = (float) EntityWrap.getZ(entity);
 
             if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK)
             {

@@ -34,7 +34,7 @@ public class RenderLayerEditScreen extends BaseRenderLayerEditScreen
         return currentScreen instanceof RenderLayerEditScreen;
     }
 
-    public static RenderLayerEditScreen openRenderLayerEditScreen(@Nullable GuiScreen currentScreen)
+    public static RenderLayerEditScreen openRenderLayerEditScreen()
     {
         RenderLayerEditScreen screen = new RenderLayerEditScreen();
         screen.setCurrentTab(ConfigScreen.RENDER_LAYERS);

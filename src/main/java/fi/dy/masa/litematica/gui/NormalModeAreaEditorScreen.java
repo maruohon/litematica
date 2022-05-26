@@ -7,7 +7,6 @@ import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
@@ -15,7 +14,7 @@ import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
@@ -177,7 +176,8 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
     protected void createSubRegion()
     {
         String title = "litematica.title.screen.area_editor.create_sub_region";
-        TextInputScreen screen = new TextInputScreen(title, "", this::createSubRegionByName, GuiUtils.getCurrentScreen());
+        TextInputScreen screen = new TextInputScreen(title, "", this::createSubRegionByName);
+        screen.setParent(this);
         BaseScreen.openPopupScreen(screen);
     }
 
@@ -208,7 +208,7 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
         }
         else
         {
-            this.selection.setExplicitOrigin(EntityUtils.getCameraEntityBlockPos());
+            this.selection.setExplicitOrigin(EntityWrap.getCameraEntityBlockPos());
         }
 
         this.manualOriginButton.updateButtonState();

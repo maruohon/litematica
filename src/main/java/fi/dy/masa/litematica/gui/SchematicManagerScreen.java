@@ -184,7 +184,8 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
             String oldName = FileNameUtils.getFileNameWithoutExtension(oldFile.getName());
             String title = "litematica.title.screen.schematic_manager.rename_file";
             TextInputScreen screen = new TextInputScreen(title, oldName,
-                                                         (str) -> this.renameFileToName(oldFile, str), this);
+                                                         (str) -> this.renameFileToName(oldFile, str));
+            screen.setParent(this);
             BaseScreen.openPopupScreen(screen);
         }
     }
@@ -214,7 +215,8 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
 
             String oldName = info.schematic.getMetadata().getName();
             String title = "litematica.title.screen.schematic_manager.rename_schematic";
-            TextInputScreen screen = new TextInputScreen(title, oldName, this::renameSchematicToName, this);
+            TextInputScreen screen = new TextInputScreen(title, oldName, this::renameSchematicToName);
+            screen.setParent(this);
             BaseScreen.openPopupScreen(screen);
         }
     }

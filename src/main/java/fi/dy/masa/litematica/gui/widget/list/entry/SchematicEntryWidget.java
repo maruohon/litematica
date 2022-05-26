@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -164,7 +165,7 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
     protected void createPlacement()
     {
         ISchematic schematic = this.getData();
-        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+        BlockPos pos = EntityWrap.getCameraEntityBlockPos();
         String name = schematic.getMetadata().getName();
         boolean createAsEnabled = BaseScreen.isShiftDown() == false;
 

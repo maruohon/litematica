@@ -35,7 +35,7 @@ import net.minecraft.world.WorldType;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.WorldUtils;
@@ -286,8 +286,8 @@ public class MaterialCache
     {
         NBTTagCompound nbt = new NBTTagCompound();
 
-        NbtUtils.putTag(nbt, "MaterialCache", this.writeMapToNBT(this.buildItemsForStates));
-        NbtUtils.putTag(nbt, "DisplayMaterialCache", this.writeMapToNBT(this.displayItemsForStates));
+        NbtWrap.putTag(nbt, "MaterialCache", this.writeMapToNBT(this.buildItemsForStates));
+        NbtWrap.putTag(nbt, "DisplayMaterialCache", this.writeMapToNBT(this.displayItemsForStates));
 
         return nbt;
     }
@@ -302,10 +302,10 @@ public class MaterialCache
             NBTTagCompound stateTag = new NBTTagCompound();
             NBTUtil.writeBlockState(stateTag, entry.getKey());
 
-            NbtUtils.putTag(tag, "Block", stateTag);
-            NbtUtils.putTag(tag, "Item", entry.getValue().writeToNBT(new NBTTagCompound()));
+            NbtWrap.putTag(tag, "Block", stateTag);
+            NbtWrap.putTag(tag, "Item", entry.getValue().writeToNBT(new NBTTagCompound()));
 
-            NbtUtils.addTag(list, tag);
+            NbtWrap.addTag(list, tag);
         }
 
         return list;
@@ -322,23 +322,23 @@ public class MaterialCache
 
     protected void readMapFromNBT(NBTTagCompound nbt, String tagName, IdentityHashMap<IBlockState, ItemStack> map)
     {
-        if (NbtUtils.containsList(nbt, tagName))
+        if (NbtWrap.containsList(nbt, tagName))
         {
-            NBTTagList list = NbtUtils.getList(nbt, tagName, Constants.NBT.TAG_COMPOUND);
-            final int count = NbtUtils.getListSize(list);
+            NBTTagList list = NbtWrap.getList(nbt, tagName, Constants.NBT.TAG_COMPOUND);
+            final int count = NbtWrap.getListSize(list);
 
             for (int i = 0; i < count; ++i)
             {
-                NBTTagCompound tag = NbtUtils.getCompoundAt(list, i);
+                NBTTagCompound tag = NbtWrap.getCompoundAt(list, i);
 
-                if (NbtUtils.containsCompound(tag, "Block") &&
-                    NbtUtils.containsCompound(tag, "Item"))
+                if (NbtWrap.containsCompound(tag, "Block") &&
+                    NbtWrap.containsCompound(tag, "Item"))
                 {
-                    IBlockState state = NBTUtil.readBlockState(NbtUtils.getCompound(tag, "Block"));
+                    IBlockState state = NBTUtil.readBlockState(NbtWrap.getCompound(tag, "Block"));
 
                     if (state != null)
                     {
-                        ItemStack stack = ItemUtils.fromTag(NbtUtils.getCompound(tag, "Item"));
+                        ItemStack stack = ItemUtils.fromTag(NbtWrap.getCompound(tag, "Item"));
                         this.buildItemsForStates.put(state, stack);
                     }
                 }

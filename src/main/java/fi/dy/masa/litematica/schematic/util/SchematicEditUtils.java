@@ -19,6 +19,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
@@ -163,7 +164,7 @@ public class SchematicEditUtils
     public static boolean rebuildAcceptReplacement(Minecraft mc)
     {
         WorldSchematic schematicWorld = SchematicWorldHandler.getSchematicWorld();
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.ANY, false, 5);
 
         if (schematicWorld != null && trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
@@ -187,7 +188,7 @@ public class SchematicEditUtils
 
     private static boolean breakSchematicBlocks(Minecraft mc)
     {
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 20);
 
         if (wrapper != null)
@@ -213,7 +214,7 @@ public class SchematicEditUtils
 
     private static boolean breakAllIdenticalSchematicBlocks(Minecraft mc)
     {
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 20);
 
         // The state can be null in 1.13+
@@ -277,7 +278,7 @@ public class SchematicEditUtils
             (ItemUtils.isEmpty(stack) && ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null))
         {
             WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            Entity entity = GameUtils.getCameraEntity();
             RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 20, true);
 
             if (world != null && traceWrapper != null &&
@@ -344,7 +345,7 @@ public class SchematicEditUtils
     private static boolean setTargetedSchematicBlockState(Minecraft mc, IBlockState state)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 20, true);
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)

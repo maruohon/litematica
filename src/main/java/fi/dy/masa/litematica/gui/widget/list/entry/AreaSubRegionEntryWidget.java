@@ -141,7 +141,9 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
         {
             String title = "litematica.title.screen.area_editor.rename_sub_region";
             String name = box.getName();
-            BaseScreen.openPopupScreen(new TextInputScreen(title, name, this::renameRegionTo, GuiUtils.getCurrentScreen()));
+            TextInputScreen screen = new TextInputScreen(title, name, this::renameRegionTo);
+            screen.setParent(GuiUtils.getCurrentScreen());
+            BaseScreen.openPopupScreen(screen);
         }
     }
 

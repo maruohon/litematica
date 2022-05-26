@@ -14,7 +14,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 
 public class ItemUtils
 {
@@ -100,10 +100,10 @@ public class ItemUtils
 
         if (stack.getItem() == Items.SKULL && nbt.hasKey("Owner"))
         {
-            NBTTagCompound tagOwner = NbtUtils.getCompound(nbt, "Owner");
+            NBTTagCompound tagOwner = NbtWrap.getCompound(nbt, "Owner");
             NBTTagCompound tagSkull = new NBTTagCompound();
 
-            NbtUtils.putTag(tagSkull, "SkullOwner", tagOwner);
+            NbtWrap.putTag(tagSkull, "SkullOwner", tagOwner);
             fi.dy.masa.malilib.util.ItemUtils.setTag(stack, tagSkull);
 
             return stack;
@@ -113,8 +113,8 @@ public class ItemUtils
             NBTTagCompound tagLore = new NBTTagCompound();
             NBTTagList tagList = new NBTTagList();
 
-            NbtUtils.addTag(tagList, NbtUtils.asStringTag("(+NBT)"));
-            NbtUtils.putTag(tagLore, "Lore", tagList);
+            NbtWrap.addTag(tagList, NbtWrap.asStringTag("(+NBT)"));
+            NbtWrap.putTag(tagLore, "Lore", tagList);
             stack.setTagInfo("display", tagLore);
             stack.setTagInfo("BlockEntityTag", nbt);
 

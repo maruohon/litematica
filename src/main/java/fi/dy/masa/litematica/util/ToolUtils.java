@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -47,7 +48,7 @@ public class ToolUtils
     {
         IBlockState state = Blocks.AIR.getDefaultState();
         double reach = mc.playerController.getBlockReachDistance();
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true);
 
         if (wrapper != null)
@@ -369,12 +370,12 @@ public class ToolUtils
         }
         else
         {
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            Entity entity = GameUtils.getCameraEntity();
             origin = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, 6, false);
 
             if (origin == null)
             {
-                origin = new BlockPos(entity);
+                origin = EntityWrap.getEntityBlockPos(entity);
             }
         }
 

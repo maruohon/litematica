@@ -20,7 +20,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.inventory.InventoryUtils;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.RenderUtils;
@@ -111,21 +112,23 @@ public class EntityUtils
 
     public static EnumFacing getHorizontalLookingDirection(Entity entity)
     {
-        return EnumFacing.fromAngle(entity.rotationYaw);
+        return EnumFacing.fromAngle(EntityWrap.getYaw(entity));
     }
 
     public static EnumFacing getVerticalLookingDirection(Entity entity)
     {
-        return entity.rotationPitch > 0 ? EnumFacing.DOWN : EnumFacing.UP;
+        return EntityWrap.getPitch(entity) > 0 ? EnumFacing.DOWN : EnumFacing.UP;
     }
 
     public static EnumFacing getClosestLookingDirection(Entity entity)
     {
-        if (entity.rotationPitch > 60.0f)
+        float pitch = EntityWrap.getPitch(entity);
+
+        if (pitch > 60.0f)
         {
             return EnumFacing.DOWN;
         }
-        else if (-entity.rotationPitch > 60.0f)
+        else if (-pitch > 60.0f)
         {
             return EnumFacing.UP;
         }
@@ -202,14 +205,14 @@ public class EntityUtils
         }
         else
         {
-            if (NbtUtils.containsList(nbt, "Passengers"))
+            if (NbtWrap.containsList(nbt, "Passengers"))
             {
-                NBTTagList list = NbtUtils.getListOfCompounds(nbt, "Passengers");
-                final int size = NbtUtils.getListSize(list);
+                NBTTagList list = NbtWrap.getListOfCompounds(nbt, "Passengers");
+                final int size = NbtWrap.getListSize(list);
 
                 for (int i = 0; i < size; ++i)
                 {
-                    Entity passenger = createEntityAndPassengersFromNBT(NbtUtils.getCompoundAt(list, i), world);
+                    Entity passenger = createEntityAndPassengersFromNBT(NbtWrap.getCompoundAt(list, i), world);
 
                     if (passenger != null)
                     {
@@ -228,9 +231,9 @@ public class EntityUtils
         {
             for (Entity passenger : entity.getPassengers())
             {
-                passenger.setPosition(fi.dy.masa.malilib.util.EntityUtils.getX(entity),
-                                      fi.dy.masa.malilib.util.EntityUtils.getY(entity) + entity.getMountedYOffset() + passenger.getYOffset(),
-                                      fi.dy.masa.malilib.util.EntityUtils.getZ(entity));
+                passenger.setPosition(EntityWrap.getX(entity),
+                                      EntityWrap.getY(entity) + entity.getMountedYOffset() + passenger.getYOffset(),
+                                      EntityWrap.getZ(entity));
                 spawnEntityAndPassengersInWorld(passenger, world);
             }
         }

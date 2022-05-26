@@ -25,10 +25,10 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.inventory.InventoryRenderDefinition;
 import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.inventory.InventoryView;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
@@ -91,9 +91,9 @@ public class RenderUtils
                                                                 Entity renderViewEntity,
                                                                 float partialTicks)
     {
-        double dx = renderViewEntity.lastTickPosX + (EntityUtils.getX(renderViewEntity) - renderViewEntity.lastTickPosX) * partialTicks;
-        double dy = renderViewEntity.lastTickPosY + (EntityUtils.getY(renderViewEntity) - renderViewEntity.lastTickPosY) * partialTicks;
-        double dz = renderViewEntity.lastTickPosZ + (EntityUtils.getZ(renderViewEntity) - renderViewEntity.lastTickPosZ) * partialTicks;
+        double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
+        double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
+        double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
         double minX = fi.dy.masa.malilib.util.PositionUtils.unpackX(posLong) - dx - expand;
         double minY = fi.dy.masa.malilib.util.PositionUtils.unpackY(posLong) - dy - expand;
         double minZ = fi.dy.masa.malilib.util.PositionUtils.unpackZ(posLong) - dz - expand;
@@ -112,9 +112,9 @@ public class RenderUtils
                                                       Entity renderViewEntity,
                                                       float partialTicks)
     {
-        double dx = renderViewEntity.lastTickPosX + (EntityUtils.getX(renderViewEntity) - renderViewEntity.lastTickPosX) * partialTicks;
-        double dy = renderViewEntity.lastTickPosY + (EntityUtils.getY(renderViewEntity) - renderViewEntity.lastTickPosY) * partialTicks;
-        double dz = renderViewEntity.lastTickPosZ + (EntityUtils.getZ(renderViewEntity) - renderViewEntity.lastTickPosZ) * partialTicks;
+        double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
+        double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
+        double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
         double x1 = fi.dy.masa.malilib.util.PositionUtils.unpackX(pos1) - dx;
         double y1 = fi.dy.masa.malilib.util.PositionUtils.unpackY(pos1) - dy;
         double z1 = fi.dy.masa.malilib.util.PositionUtils.unpackZ(pos1) - dz;
@@ -145,9 +145,9 @@ public class RenderUtils
                                                      Entity renderViewEntity,
                                                      float partialTicks)
     {
-        final double dx = renderViewEntity.lastTickPosX + (EntityUtils.getX(renderViewEntity) - renderViewEntity.lastTickPosX) * partialTicks;
-        final double dy = renderViewEntity.lastTickPosY + (EntityUtils.getY(renderViewEntity) - renderViewEntity.lastTickPosY) * partialTicks;
-        final double dz = renderViewEntity.lastTickPosZ + (EntityUtils.getZ(renderViewEntity) - renderViewEntity.lastTickPosZ) * partialTicks;
+        final double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
+        final double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
+        final double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
 
         final double minX = pos.getX() - dx - expand;
         final double minY = pos.getY() - dy - expand;
@@ -306,9 +306,9 @@ public class RenderUtils
                                               float partialTicks,
                                               BufferBuilder buffer)
     {
-        double dx = renderViewEntity.lastTickPosX + (EntityUtils.getX(renderViewEntity) - renderViewEntity.lastTickPosX) * partialTicks;
-        double dy = renderViewEntity.lastTickPosY + (EntityUtils.getY(renderViewEntity) - renderViewEntity.lastTickPosY) * partialTicks;
-        double dz = renderViewEntity.lastTickPosZ + (EntityUtils.getZ(renderViewEntity) - renderViewEntity.lastTickPosZ) * partialTicks;
+        double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
+        double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
+        double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
         double minX = Math.min(pos1.getX(), pos2.getX()) - dx - expand;
         double minY = Math.min(pos1.getY(), pos2.getY()) - dy - expand;
         double minZ = Math.min(pos1.getZ(), pos2.getZ()) - dz - expand;
@@ -330,9 +330,9 @@ public class RenderUtils
                                               float partialTicks,
                                               BufferBuilder buffer)
     {
-        double dx = renderViewEntity.lastTickPosX + (EntityUtils.getX(renderViewEntity) - renderViewEntity.lastTickPosX) * partialTicks;
-        double dy = renderViewEntity.lastTickPosY + (EntityUtils.getY(renderViewEntity) - renderViewEntity.lastTickPosY) * partialTicks;
-        double dz = renderViewEntity.lastTickPosZ + (EntityUtils.getZ(renderViewEntity) - renderViewEntity.lastTickPosZ) * partialTicks;
+        double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
+        double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
+        double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
         int x1 = fi.dy.masa.malilib.util.PositionUtils.unpackX(pos1);
         int y1 = fi.dy.masa.malilib.util.PositionUtils.unpackY(pos1);
         int z1 = fi.dy.masa.malilib.util.PositionUtils.unpackZ(pos1);
@@ -360,9 +360,9 @@ public class RenderUtils
         final int zMax = Math.max(pos1.getZ(), pos2.getZ());
 
         final double expand = 0.001;
-        final double dx = renderViewEntity.lastTickPosX + (EntityUtils.getX(renderViewEntity) - renderViewEntity.lastTickPosX) * partialTicks;
-        final double dy = renderViewEntity.lastTickPosY + (EntityUtils.getY(renderViewEntity) - renderViewEntity.lastTickPosY) * partialTicks;
-        final double dz = renderViewEntity.lastTickPosZ + (EntityUtils.getZ(renderViewEntity) - renderViewEntity.lastTickPosZ) * partialTicks;
+        final double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
+        final double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
+        final double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
 
         final double dxMin = -dx - expand;
         final double dyMin = -dy - expand;
@@ -809,7 +809,7 @@ public class RenderUtils
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static AxisAlignedBB createAABB(int x, int y, int z, double expand, double partialTicks, Entity renderViewEntity)
+    public static AxisAlignedBB createAABB(int x, int y, int z, double expand, float partialTicks, Entity renderViewEntity)
     {
         return createAABB(x, y, z, x + 1, y + 1, z + 1, expand, partialTicks, renderViewEntity);
     }
@@ -817,11 +817,11 @@ public class RenderUtils
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static AxisAlignedBB createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, double expand, double partialTicks, Entity entity)
+    public static AxisAlignedBB createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, double expand, float partialTicks, Entity entity)
     {
-        double dx = entity.lastTickPosX + (EntityUtils.getX(entity) - entity.lastTickPosX) * partialTicks;
-        double dy = entity.lastTickPosY + (EntityUtils.getY(entity) - entity.lastTickPosY) * partialTicks;
-        double dz = entity.lastTickPosZ + (EntityUtils.getZ(entity) - entity.lastTickPosZ) * partialTicks;
+        double dx = EntityWrap.lerpX(entity, partialTicks);
+        double dy = EntityWrap.lerpY(entity, partialTicks);
+        double dz = EntityWrap.lerpZ(entity, partialTicks);
 
         return new AxisAlignedBB(   minX - dx - expand, minY - dy - expand, minZ - dz - expand,
                                     maxX - dx + expand, maxY - dy + expand, maxZ - dz + expand);

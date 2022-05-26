@@ -9,12 +9,11 @@ import net.minecraft.profiler.Profiler;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.IChunkProvider;
-import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.mixin.IMixinWorldClient;
 
 public class WorldSchematic extends WorldClient
@@ -57,8 +56,8 @@ public class WorldSchematic extends WorldClient
 
     private boolean spawnEntityBase(Entity entityIn)
     {
-        int cx = MathHelper.floor(EntityUtils.getX(entityIn) / 16.0D);
-        int cy = MathHelper.floor(EntityUtils.getZ(entityIn) / 16.0D);
+        int cx = EntityWrap.getChunkX(entityIn);
+        int cy = EntityWrap.getChunkZ(entityIn);
         boolean forceSpawn = entityIn.forceSpawn;
 
         if (entityIn instanceof EntityPlayer)

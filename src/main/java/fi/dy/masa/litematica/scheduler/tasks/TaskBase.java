@@ -7,10 +7,10 @@ import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -137,7 +137,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
         if (player != null && requiredChunks.isEmpty() == false)
         {
             List<ChunkPos> list = new ArrayList<>(requiredChunks);
-            PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPositionVector()));
+            PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(EntityWrap.getPlayerBlockPos());
             PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
             list.sort(PositionUtils.CHUNK_POS_COMPARATOR);
 

@@ -6,8 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 
 public class SchematicProjectsManager
 {
@@ -31,7 +31,7 @@ public class SchematicProjectsManager
 
         this.currentProject = new SchematicProject(dir, new File(dir, projectName + ".json"));
         this.currentProject.setName(projectName);
-        this.currentProject.setOrigin(EntityUtils.getCameraEntityBlockPos());
+        this.currentProject.setOrigin(EntityWrap.getCameraEntityBlockPos());
         this.currentProject.saveToFile();
     }
 

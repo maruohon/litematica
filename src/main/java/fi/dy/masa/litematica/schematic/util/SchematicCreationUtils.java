@@ -27,12 +27,12 @@ import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -87,18 +87,18 @@ public class SchematicCreationUtils
             {
                 String title = "litematica.title.screen.schematic_vcs.save_new_version";
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-                TextInputScreen gui = new TextInputScreen(title, project.getCurrentVersionName(),
-                                                          DataManager.getSchematicProjectsManager()::commitNewVersion,
-                                                          GuiUtils.getCurrentScreen());
-                BaseScreen.openPopupScreen(gui);
+                TextInputScreen screen = new TextInputScreen(title, project.getCurrentVersionName(),
+                                                             DataManager.getSchematicProjectsManager()::commitNewVersion);
+                screen.setParent(GuiUtils.getCurrentScreen());
+                BaseScreen.openPopupScreen(screen);
             }
             else if (inMemoryOnly)
             {
                 String title = "litematica.title.screen.save_in_memory_schematic";
-                TextInputScreen gui = new TextInputScreen(title, area.getName(),
-                                                          (str) -> saveInMemorySchematic(str, area),
-                                                          GuiUtils.getCurrentScreen());
-                BaseScreen.openPopupScreen(gui);
+                TextInputScreen screen = new TextInputScreen(title, area.getName(),
+                                                             (str) -> saveInMemorySchematic(str, area));
+                screen.setParent(GuiUtils.getCurrentScreen());
+                BaseScreen.openPopupScreen(screen);
             }
             else
             {
@@ -237,9 +237,9 @@ public class SchematicCreationUtils
 
                 if (entity.writeToNBTOptional(tag))
                 {
-                    Vec3d posVec = new Vec3d(EntityUtils.getX(entity) - regionPosAbs.getX(),
-                                             EntityUtils.getY(entity) - regionPosAbs.getY(),
-                                             EntityUtils.getZ(entity) - regionPosAbs.getZ());
+                    Vec3d posVec = new Vec3d(EntityWrap.getX(entity) - regionPosAbs.getX(),
+                                             EntityWrap.getY(entity) - regionPosAbs.getY(),
+                                             EntityWrap.getZ(entity) - regionPosAbs.getZ());
                     NbtUtils.writeVec3dToListTag(posVec, tag);
                     list.add(new EntityInfo(posVec, tag));
                 }
@@ -286,9 +286,9 @@ public class SchematicCreationUtils
 
                     if (entity.writeToNBTOptional(tag))
                     {
-                        Vec3d posVec = new Vec3d(EntityUtils.getX(entity) - regionPosAbs.getX(),
-                                                 EntityUtils.getY(entity) - regionPosAbs.getY(),
-                                                 EntityUtils.getZ(entity) - regionPosAbs.getZ());
+                        Vec3d posVec = new Vec3d(EntityWrap.getX(entity) - regionPosAbs.getX(),
+                                                 EntityWrap.getY(entity) - regionPosAbs.getY(),
+                                                 EntityWrap.getZ(entity) - regionPosAbs.getZ());
                         NbtUtils.writeVec3dToListTag(posVec, tag);
                         schematicEntityList.add(new EntityInfo(posVec, tag));
                         existingEntities.add(uuid);

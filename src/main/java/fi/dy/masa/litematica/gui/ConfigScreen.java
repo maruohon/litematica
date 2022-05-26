@@ -3,9 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.gui.GuiScreen;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
@@ -69,15 +67,7 @@ public class ConfigScreen
 
     public static BaseConfigScreen create()
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC,
-                                                       "litematica.title.screen.configs", Reference.MOD_VERSION);
-        screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
-        return screen;
-    }
-
-    public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)
-    {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC,
+        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, ALL_TABS, GENERIC,
                                                        "litematica.title.screen.configs", Reference.MOD_VERSION);
         screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
         return screen;
@@ -85,9 +75,7 @@ public class ConfigScreen
 
     public static BaseConfigScreen createOnTab(ConfigTab tab)
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC,
-                                                       "litematica.title.screen.configs", Reference.MOD_VERSION);
-        screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
+        BaseConfigScreen screen = create();
         screen.setCurrentTab(tab);
         DataManager.setConfigGuiTab(tab);
         return screen;
@@ -96,13 +84,6 @@ public class ConfigScreen
     public static void openConfigScreen()
     {
         BaseScreen.openScreen(create());
-    }
-
-    public static RenderLayerEditScreen openRenderLayersScreen(@Nullable GuiScreen currentScreen)
-    {
-        RenderLayerEditScreen screen = new RenderLayerEditScreen();
-        //screen.setCurrentTab(RENDER_LAYERS);
-        return screen;
     }
 
     private static ImmutableList<ConfigInfo> getHotkeys()

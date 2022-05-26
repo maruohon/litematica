@@ -311,8 +311,10 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         {
             String titleKey = "litematica.title.screen.schematic_placement_settings.copy_or_load_settings";
 
-            openPopupScreen(new TextInputScreen(titleKey, origJson.toString(),
-                                                (str) -> this.loadSettingsFromString(str, origJson), this));
+            TextInputScreen screen = new TextInputScreen(titleKey, origJson.toString(),
+                                                         (str) -> this.loadSettingsFromString(str, origJson));
+            screen.setParent(this);
+            openPopupScreen(screen);
             return true;
         }
 

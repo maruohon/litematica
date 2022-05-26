@@ -7,8 +7,8 @@ import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -187,7 +187,7 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
         }
         else
         {
-            this.selection.setExplicitOrigin(EntityUtils.getCameraEntityBlockPos());
+            this.selection.setExplicitOrigin(EntityWrap.getCameraEntityBlockPos());
         }
 
         this.manualOriginButton.updateButtonState();

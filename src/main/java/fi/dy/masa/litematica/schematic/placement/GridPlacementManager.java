@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -383,8 +383,8 @@ public class GridPlacementManager
             return null;
         }
 
-        int centerChunkX = ((int) Math.floor(EntityUtils.getX(player))) >> 4;
-        int centerChunkZ = ((int) Math.floor(EntityUtils.getZ(player))) >> 4;
+        int centerChunkX = EntityWrap.getChunkX(player);
+        int centerChunkZ = EntityWrap.getChunkZ(player);
         int chunkRadius = GameUtils.getRenderDistanceChunks() + expandChunks;
         BlockPos corner1 = new BlockPos( (centerChunkX - chunkRadius) << 4      ,   0,  (centerChunkZ - chunkRadius) << 4      );
         BlockPos corner2 = new BlockPos(((centerChunkX + chunkRadius) << 4) + 15, 255, ((centerChunkZ + chunkRadius) << 4) + 15);

@@ -29,6 +29,7 @@ import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -658,16 +659,16 @@ public class SchematicPlacingUtils
 
     public static void rotateEntity(Entity entity, double x, double y, double z, Rotation rotationCombined, Mirror mirrorMain, Mirror mirrorSub)
     {
-        float rotationYaw = entity.rotationYaw;
+        float rotationYaw = EntityWrap.getYaw(entity);
 
         if (mirrorMain != Mirror.NONE)          { rotationYaw = entity.getMirroredYaw(mirrorMain); }
         if (mirrorSub != Mirror.NONE)           { rotationYaw = entity.getMirroredYaw(mirrorSub); }
-        if (rotationCombined != Rotation.NONE)  { rotationYaw += entity.rotationYaw - entity.getRotatedYaw(rotationCombined); }
+        if (rotationCombined != Rotation.NONE)  { rotationYaw += EntityWrap.getYaw(entity) - entity.getRotatedYaw(rotationCombined); }
 
-        entity.setLocationAndAngles(x, y, z, rotationYaw, entity.rotationPitch);
+        entity.setLocationAndAngles(x, y, z, rotationYaw, EntityWrap.getPitch(entity));
 
         entity.prevRotationYaw = rotationYaw;
-        entity.prevRotationPitch = entity.rotationPitch;
+        entity.prevRotationPitch = EntityWrap.getPitch(entity);
 
         if (entity instanceof EntityLivingBase)
         {

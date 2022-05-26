@@ -32,6 +32,7 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.PlacementUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
@@ -168,7 +169,7 @@ public class EasyPlaceUtils
         if (overriddenPos != null)
         {
             double reach = Math.max(6, mc.playerController.getBlockReachDistance());
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            Entity entity = GameUtils.getCameraEntity();
             RayTraceResult trace = RayTraceUtils.traceToPositions(Collections.singletonList(overriddenPos), entity, reach);
             BlockPos pos = overriddenPos;
             Vec3d hitPos;
@@ -201,7 +202,7 @@ public class EasyPlaceUtils
     {
         World world = mc.world;
         double reach = Math.max(6, mc.playerController.getBlockReachDistance());
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         RayTraceResult traceVanilla = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (traceVanilla != null && traceVanilla.typeOfHit == RayTraceResult.Type.BLOCK)
@@ -376,7 +377,7 @@ public class EasyPlaceUtils
     private static EnumActionResult handleEasyPlace(Minecraft mc)
     {
         double reach = Math.max(6, mc.playerController.getBlockReachDistance());
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true, RayTraceFluidHandling.ANY);
         HitPosition targetPosition = getTargetPosition(traceWrapper, mc);
 
@@ -584,7 +585,7 @@ public class EasyPlaceUtils
      */
     private static boolean placementRestrictionInEffect(Minecraft mc)
     {
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         double reach = mc.playerController.getBlockReachDistance();
         RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
 

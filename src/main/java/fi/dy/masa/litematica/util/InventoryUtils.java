@@ -153,7 +153,7 @@ public class InventoryUtils
     public static boolean pickBlockFirst(Minecraft mc)
     {
         double reach = mc.playerController.getBlockReachDistance();
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, entity, reach);
 
         if (pos != null)
@@ -174,7 +174,7 @@ public class InventoryUtils
         if (pos == null)
         {
             double reach = mc.playerController.getBlockReachDistance();
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            Entity entity = GameUtils.getCameraEntity();
             pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, reach, adjacentOnly);
         }
 

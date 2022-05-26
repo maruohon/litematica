@@ -19,10 +19,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
-import fi.dy.masa.malilib.mixin.IMixinNBTTagLongArray;
+import fi.dy.masa.malilib.mixin.access.NBTTagLongArrayMixin;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
@@ -242,10 +243,10 @@ public class LitematicaSchematic extends SchematicBase
     {
         NBTTagCompound nbt = new NBTTagCompound();
 
-        NbtUtils.putInt(nbt, "Version", SCHEMATIC_VERSION);
-        NbtUtils.putInt(nbt, "MinecraftDataVersion", MINECRAFT_DATA_VERSION);
-        NbtUtils.putTag(nbt, "Metadata", this.getMetadata().toTag());
-        NbtUtils.putTag(nbt, "Regions", this.writeSubRegionsToNBT());
+        NbtWrap.putInt(nbt, "Version", SCHEMATIC_VERSION);
+        NbtWrap.putInt(nbt, "MinecraftDataVersion", MINECRAFT_DATA_VERSION);
+        NbtWrap.putTag(nbt, "Metadata", this.getMetadata().toTag());
+        NbtWrap.putTag(nbt, "Regions", this.writeSubRegionsToNBT());
 
         return nbt;
     }
@@ -255,9 +256,9 @@ public class LitematicaSchematic extends SchematicBase
     {
         this.clear();
 
-        if (NbtUtils.containsInt(tag, "Version"))
+        if (NbtWrap.containsInt(tag, "Version"))
         {
-            final int version = NbtUtils.getInt(tag, "Version");
+            final int version = NbtWrap.getInt(tag, "Version");
 
             if (version >= 1 && version <= SCHEMATIC_VERSION)
             {
@@ -294,30 +295,30 @@ public class LitematicaSchematic extends SchematicBase
 
                 NBTTagCompound tag = new NBTTagCompound();
 
-                NbtUtils.putTag(tag, "BlockStatePalette", this.writePaletteToLitematicaFormatTag(blockContainer.getPalette()));
-                NbtUtils.putTag(tag, "BlockStates", new NBTTagLongArray(blockContainer.getBackingLongArray()));
+                NbtWrap.putTag(tag, "BlockStatePalette", this.writePaletteToLitematicaFormatTag(blockContainer.getPalette()));
+                NbtWrap.putTag(tag, "BlockStates", new NBTTagLongArray(blockContainer.getBackingLongArray()));
 
                 if (tileMap != null)
                 {
-                    NbtUtils.putTag(tag, "TileEntities", this.writeBlockEntitiesToListTag(tileMap));
+                    NbtWrap.putTag(tag, "TileEntities", this.writeBlockEntitiesToListTag(tileMap));
                 }
 
                 if (pendingTicks != null)
                 {
-                    NbtUtils.putTag(tag, "PendingBlockTicks", this.writeBlockTicksToNBT(pendingTicks));
+                    NbtWrap.putTag(tag, "PendingBlockTicks", this.writeBlockTicksToNBT(pendingTicks));
                 }
 
                 // The entity list will not exist, if takeEntities is false when creating the schematic
                 if (entityList != null)
                 {
-                    NbtUtils.putTag(tag, "Entities", this.writeEntitiesToListTag(entityList));
+                    NbtWrap.putTag(tag, "Entities", this.writeEntitiesToListTag(entityList));
                 }
 
                 SubRegion region = this.subRegions.get(regionName);
-                NbtUtils.putTag(tag, "Position", NbtUtils.createBlockPosTag(region.pos));
-                NbtUtils.putTag(tag, "Size", NbtUtils.createBlockPosTag(region.size));
+                NbtWrap.putTag(tag, "Position", NbtUtils.createBlockPosTag(region.pos));
+                NbtWrap.putTag(tag, "Size", NbtUtils.createBlockPosTag(region.size));
 
-                NbtUtils.putTag(wrapper, regionName, tag);
+                NbtWrap.putTag(wrapper, regionName, tag);
             }
         }
 
@@ -338,12 +339,12 @@ public class LitematicaSchematic extends SchematicBase
                 {
                     NBTTagCompound tag = new NBTTagCompound();
 
-                    NbtUtils.putString(tag, "Block", rl.toString());
-                    NbtUtils.putInt(tag, "Priority", entry.priority);
-                    NbtUtils.putInt(tag, "Time", (int) entry.scheduledTime);
+                    NbtWrap.putString(tag, "Block", rl.toString());
+                    NbtWrap.putInt(tag, "Priority", entry.priority);
+                    NbtWrap.putInt(tag, "Time", (int) entry.scheduledTime);
                     NbtUtils.putVec3i(tag, entry.position);
 
-                    NbtUtils.addTag(tagList, tag);
+                    NbtWrap.addTag(tagList, tag);
                 }
             }
         }
@@ -353,22 +354,22 @@ public class LitematicaSchematic extends SchematicBase
 
     private boolean readSubRegionsFromTag(NBTTagCompound tag, int version)
     {
-        tag = NbtUtils.getCompound(tag, "Regions");
+        tag = NbtWrap.getCompound(tag, "Regions");
 
-        for (String regionName : NbtUtils.getKeys(tag))
+        for (String regionName : NbtWrap.getKeys(tag))
         {
-            if (NbtUtils.getTypeId(NbtUtils.getTag(tag, regionName)) == Constants.NBT.TAG_COMPOUND)
+            if (NbtWrap.getTypeId(NbtWrap.getTag(tag, regionName)) == Constants.NBT.TAG_COMPOUND)
             {
-                NBTTagCompound regionTag = NbtUtils.getCompound(tag, regionName);
-                BlockPos regionPos = NbtUtils.readBlockPos(NbtUtils.getCompound(regionTag, "Position"));
-                BlockPos regionSize = NbtUtils.readBlockPos(NbtUtils.getCompound(regionTag, "Size"));
+                NBTTagCompound regionTag = NbtWrap.getCompound(tag, regionName);
+                BlockPos regionPos = NbtUtils.readBlockPos(NbtWrap.getCompound(regionTag, "Position"));
+                BlockPos regionSize = NbtUtils.readBlockPos(NbtWrap.getCompound(regionTag, "Size"));
 
                 if (regionPos != null && regionSize != null)
                 {
                     this.subRegions.put(regionName, new SubRegion(regionPos, regionSize));
 
-                    NBTTagList beList = NbtUtils.getListOfCompounds(regionTag, "TileEntities");
-                    NBTTagList entityList = NbtUtils.getListOfCompounds(regionTag, "Entities");
+                    NBTTagList beList = NbtWrap.getListOfCompounds(regionTag, "TileEntities");
+                    NBTTagList entityList = NbtWrap.getListOfCompounds(regionTag, "Entities");
 
                     if (version >= 2)
                     {
@@ -383,18 +384,18 @@ public class LitematicaSchematic extends SchematicBase
 
                     if (version >= 3)
                     {
-                        this.pendingBlockTicks.put(regionName, this.readBlockTicksFromNBT(NbtUtils.getListOfCompounds(regionTag, "PendingBlockTicks")));
+                        this.pendingBlockTicks.put(regionName, this.readBlockTicksFromNBT(NbtWrap.getListOfCompounds(regionTag, "PendingBlockTicks")));
                     }
 
-                    NBTBase nbtBase = NbtUtils.getTag(regionTag, "BlockStates");
+                    NBTBase nbtBase = NbtWrap.getTag(regionTag, "BlockStates");
 
                     // There are no convenience methods in NBTTagCompound yet in 1.12, so we'll have to do it the ugly way...
-                    if (nbtBase != null && NbtUtils.getTypeId(nbtBase) == Constants.NBT.TAG_LONG_ARRAY)
+                    if (nbtBase != null && NbtWrap.getTypeId(nbtBase) == Constants.NBT.TAG_LONG_ARRAY)
                     {
                         Vec3i size = new Vec3i(Math.abs(regionSize.getX()), Math.abs(regionSize.getY()), Math.abs(regionSize.getZ()));
-                        NBTTagList paletteTag = NbtUtils.getListOfCompounds(regionTag, "BlockStatePalette");
-                        long[] blockStateArr = ((IMixinNBTTagLongArray) nbtBase).getArray();
-                        int paletteSize = NbtUtils.getListSize(paletteTag);
+                        NBTTagList paletteTag = NbtWrap.getListOfCompounds(regionTag, "BlockStatePalette");
+                        long[] blockStateArr = ((NBTTagLongArrayMixin) nbtBase).getArray();
+                        int paletteSize = NbtWrap.getListSize(paletteTag);
 
                         LitematicaBlockStateContainerFull container = LitematicaBlockStateContainerFull.createContainer(paletteSize, blockStateArr, size);
 
@@ -423,25 +424,25 @@ public class LitematicaSchematic extends SchematicBase
     private Map<BlockPos, NextTickListEntry> readBlockTicksFromNBT(NBTTagList tagList)
     {
         Map<BlockPos, NextTickListEntry> tickMap = new HashMap<>();
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, i);
+            NBTTagCompound tag = NbtWrap.getCompoundAt(tagList, i);
 
-            if (NbtUtils.containsString(tag, "Block") &&
-                NbtUtils.contains(tag, "Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
+            if (NbtWrap.containsString(tag, "Block") &&
+                NbtWrap.contains(tag, "Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
             {
-                Block block = Block.REGISTRY.getObject(new ResourceLocation(NbtUtils.getString(tag, "Block")));
+                Block block = Block.REGISTRY.getObject(new ResourceLocation(NbtWrap.getString(tag, "Block")));
 
                 if (block != null && block != Blocks.AIR)
                 {
                     BlockPos pos = NbtUtils.readBlockPos(tag);
                     NextTickListEntry entry = new NextTickListEntry(pos, block);
-                    entry.setPriority(NbtUtils.getInt(tag, "Priority"));
+                    entry.setPriority(NbtWrap.getInt(tag, "Priority"));
 
                     // Note: the time is a relative delay at this point
-                    entry.setScheduledTime(NbtUtils.getInt(tag, "Time"));
+                    entry.setScheduledTime(NbtWrap.getInt(tag, "Time"));
 
                     tickMap.put(pos, entry);
                 }
@@ -454,13 +455,13 @@ public class LitematicaSchematic extends SchematicBase
     private List<EntityInfo> readEntitiesFromNBT_v1(NBTTagList tagList)
     {
         List<EntityInfo> entityList = new ArrayList<>();
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, i);
+            NBTTagCompound tag = NbtWrap.getCompoundAt(tagList, i);
             Vec3d posVec = NbtUtils.readVec3d(tag);
-            NBTTagCompound entityData = NbtUtils.getCompound(tag, "EntityData");
+            NBTTagCompound entityData = NbtWrap.getCompound(tag, "EntityData");
 
             if (posVec != null && entityData.isEmpty() == false)
             {
@@ -476,12 +477,12 @@ public class LitematicaSchematic extends SchematicBase
     private Map<BlockPos, NBTTagCompound> readTileEntitiesFromNBT_v1(NBTTagList tagList)
     {
         Map<BlockPos, NBTTagCompound> tileMap = new HashMap<>();
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, i);
-            NBTTagCompound tileNbt = NbtUtils.getCompound(tag, "TileNBT");
+            NBTTagCompound tag = NbtWrap.getCompoundAt(tagList, i);
+            NBTTagCompound tileNbt = NbtWrap.getCompound(tag, "TileNBT");
 
             // Note: This within-schematic relative position is not inside the tile tag!
             BlockPos pos = NbtUtils.readBlockPos(tag);
@@ -497,9 +498,9 @@ public class LitematicaSchematic extends SchematicBase
 
     public static Boolean isValidSchematic(NBTTagCompound tag)
     {
-        return NbtUtils.containsInt(tag, "Version") &&
-               NbtUtils.containsCompound(tag, "Regions") &&
-               NbtUtils.containsCompound(tag, "Metadata");
+        return NbtWrap.containsInt(tag, "Version") &&
+               NbtWrap.containsCompound(tag, "Regions") &&
+               NbtWrap.containsCompound(tag, "Metadata");
     }
 
     @Nullable

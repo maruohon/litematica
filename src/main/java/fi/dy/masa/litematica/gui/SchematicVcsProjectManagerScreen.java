@@ -9,8 +9,8 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widget.SchematicVcsProjectInfoWidget;
@@ -142,7 +142,7 @@ public class SchematicVcsProjectManagerScreen extends BaseListScreen<DataListWid
 
         if (project != null)
         {
-            project.setOrigin(EntityUtils.getCameraEntityBlockPos());
+            project.setOrigin(EntityWrap.getCameraEntityBlockPos());
             this.projectInfoWidget.updateProjectInfo();
         }
     }

@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.litematica.mixin.IMixinDataFixer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
@@ -89,20 +90,20 @@ public abstract class SchematicBase implements ISchematic
 
     protected void readMetadataFromTag(NBTTagCompound tag)
     {
-        if (NbtUtils.containsCompound(tag, "Metadata"))
+        if (NbtWrap.containsCompound(tag, "Metadata"))
         {
-            this.getMetadata().fromTag(NbtUtils.getCompound(tag, "Metadata"));
+            this.getMetadata().fromTag(NbtWrap.getCompound(tag, "Metadata"));
         }
     }
 
     public static boolean readPaletteFromLitematicaFormatTag(NBTTagList tagList, ILitematicaBlockStatePalette palette)
     {
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
         List<IBlockState> list = new ArrayList<>(size);
 
         for (int id = 0; id < size; ++id)
         {
-            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, id);
+            NBTTagCompound tag = NbtWrap.getCompoundAt(tagList, id);
             IBlockState state = NBTUtil.readBlockState(tag);
             list.add(state);
         }
@@ -113,11 +114,11 @@ public abstract class SchematicBase implements ISchematic
     protected List<EntityInfo> readEntitiesFromListTag(NBTTagList tagList)
     {
         List<EntityInfo> entityList = new ArrayList<>();
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound entityData = NbtUtils.getCompoundAt(tagList, i);
+            NBTTagCompound entityData = NbtWrap.getCompoundAt(tagList, i);
             Vec3d posVec = NbtUtils.readVec3dFromListTag(entityData);
 
             if (posVec != null && entityData.isEmpty() == false)
@@ -132,11 +133,11 @@ public abstract class SchematicBase implements ISchematic
     protected Map<BlockPos, NBTTagCompound> readBlockEntitiesFromListTag(NBTTagList tagList)
     {
         Map<BlockPos, NBTTagCompound> tileMap = new HashMap<>();
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = NbtUtils.getCompoundAt(tagList, i);
+            NBTTagCompound tag = NbtWrap.getCompoundAt(tagList, i);
             BlockPos pos = NbtUtils.readBlockPos(tag);
             NbtUtils.removeBlockPosFromTag(tag);
 
@@ -159,7 +160,7 @@ public abstract class SchematicBase implements ISchematic
         {
             NBTTagCompound tag = new NBTTagCompound();
             NBTUtil.writeBlockState(tag, list.get(id));
-            NbtUtils.addTag(tagList, tag);
+            NbtWrap.addTag(tagList, tag);
         }
 
         return tagList;
@@ -173,7 +174,7 @@ public abstract class SchematicBase implements ISchematic
         {
             for (EntityInfo info : entityList)
             {
-                NbtUtils.addTag(tagList, info.nbt);
+                NbtWrap.addTag(tagList, info.nbt);
             }
         }
 
@@ -190,7 +191,7 @@ public abstract class SchematicBase implements ISchematic
             {
                 NBTTagCompound tag = entry.getValue();
                 NbtUtils.putVec3i(tag, entry.getKey());
-                NbtUtils.addTag(tagList, tag);
+                NbtWrap.addTag(tagList, tag);
             }
         }
 

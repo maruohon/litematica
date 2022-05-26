@@ -15,6 +15,7 @@ import fi.dy.masa.malilib.network.message.BasePacketHandler;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.util.SchematicSaveSettings;
@@ -108,17 +109,17 @@ public class SchematicSavePacketHandler extends BasePacketHandler
                                             NetHandlerPlayClient handler)
     {
         NBTTagCompound dataTypesTag = new NBTTagCompound();
-        NbtUtils.putBoolean(dataTypesTag, "Blocks", settings.saveBlocks.getBooleanValue());
-        NbtUtils.putBoolean(dataTypesTag, "BlockEntities", settings.saveBlockEntities.getBooleanValue());
-        NbtUtils.putBoolean(dataTypesTag, "BlockTicks", settings.saveBlockTicks.getBooleanValue());
-        NbtUtils.putBoolean(dataTypesTag, "Entities", settings.saveEntities.getBooleanValue());
-        NbtUtils.putBoolean(dataTypesTag, "ExposedBlocksOnly", settings.exposedBlocksOnly.getBooleanValue());
+        NbtWrap.putBoolean(dataTypesTag, "Blocks", settings.saveBlocks.getBooleanValue());
+        NbtWrap.putBoolean(dataTypesTag, "BlockEntities", settings.saveBlockEntities.getBooleanValue());
+        NbtWrap.putBoolean(dataTypesTag, "BlockTicks", settings.saveBlockTicks.getBooleanValue());
+        NbtWrap.putBoolean(dataTypesTag, "Entities", settings.saveEntities.getBooleanValue());
+        NbtWrap.putBoolean(dataTypesTag, "ExposedBlocksOnly", settings.exposedBlocksOnly.getBooleanValue());
 
         NBTTagCompound tag = new NBTTagCompound();
         NbtUtils.writeUUID(tag, taskId);
-        NbtUtils.putString(tag, "SaveMethod", saveMethod);
-        NbtUtils.putTag(tag, "RequestedData", dataTypesTag);
-        NbtUtils.putTag(tag, "Regions", selection.getSubRegionsAsCompound());
+        NbtWrap.putString(tag, "SaveMethod", saveMethod);
+        NbtWrap.putTag(tag, "RequestedData", dataTypesTag);
+        NbtWrap.putTag(tag, "Regions", selection.getSubRegionsAsCompound());
 
         PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
         buf.writeCompoundTag(tag);

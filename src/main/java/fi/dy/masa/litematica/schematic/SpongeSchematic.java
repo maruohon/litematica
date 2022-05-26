@@ -17,6 +17,7 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 
@@ -39,12 +40,12 @@ public class SpongeSchematic extends SingleRegionSchematic
 
     public static boolean isValidSchematic(NBTTagCompound tag)
     {
-        if (NbtUtils.contains(tag, "Width", Constants.NBT.TAG_ANY_NUMERIC) &&
-            NbtUtils.contains(tag, "Height", Constants.NBT.TAG_ANY_NUMERIC) &&
-            NbtUtils.contains(tag, "Length", Constants.NBT.TAG_ANY_NUMERIC) &&
-            NbtUtils.containsInt(tag, "Version") &&
-            NbtUtils.containsCompound(tag, "Palette") &&
-            NbtUtils.containsByteArray(tag, "BlockData"))
+        if (NbtWrap.contains(tag, "Width", Constants.NBT.TAG_ANY_NUMERIC) &&
+            NbtWrap.contains(tag, "Height", Constants.NBT.TAG_ANY_NUMERIC) &&
+            NbtWrap.contains(tag, "Length", Constants.NBT.TAG_ANY_NUMERIC) &&
+            NbtWrap.containsInt(tag, "Version") &&
+            NbtWrap.containsCompound(tag, "Palette") &&
+            NbtWrap.containsByteArray(tag, "BlockData"))
         {
             return isSizeValid(readSizeFromTagImpl(tag));
         }
@@ -55,7 +56,7 @@ public class SpongeSchematic extends SingleRegionSchematic
     @Override
     protected void initFromTag(NBTTagCompound tag)
     {
-        this.version = NbtUtils.getInt(tag, "Version");
+        this.version = NbtWrap.getInt(tag, "Version");
     }
 
     @Override
@@ -66,7 +67,7 @@ public class SpongeSchematic extends SingleRegionSchematic
 
     private static Vec3i readSizeFromTagImpl(NBTTagCompound tag)
     {
-        return new Vec3i(NbtUtils.getInt(tag, "Width"), NbtUtils.getInt(tag, "Height"), NbtUtils.getInt(tag, "Length"));
+        return new Vec3i(NbtWrap.getInt(tag, "Width"), NbtWrap.getInt(tag, "Height"), NbtWrap.getInt(tag, "Length"));
     }
 
     @Override
@@ -74,14 +75,14 @@ public class SpongeSchematic extends SingleRegionSchematic
     {
         super.readMetadataFromTag(tag);
 
-        if (NbtUtils.containsCompound(tag, "Metadata"))
+        if (NbtWrap.containsCompound(tag, "Metadata"))
         {
-            NBTTagCompound metaTag = NbtUtils.getCompound(tag, "Metadata");
+            NBTTagCompound metaTag = NbtWrap.getCompound(tag, "Metadata");
 
-            if (NbtUtils.containsLong(metaTag, "Date") &&
+            if (NbtWrap.containsLong(metaTag, "Date") &&
                 this.getMetadata().getTimeCreated() <= 0)
             {
-                long time = NbtUtils.getLong(metaTag, "Date");
+                long time = NbtWrap.getLong(metaTag, "Date");
                 this.getMetadata().setTimeCreated(time);
                 this.getMetadata().setTimeModified(time);
             }
@@ -90,7 +91,7 @@ public class SpongeSchematic extends SingleRegionSchematic
 
     protected boolean readPaletteFromTag(NBTTagCompound tag, ILitematicaBlockStatePalette palette)
     {
-        Set<String> keys = NbtUtils.getKeys(tag);
+        Set<String> keys = NbtWrap.getKeys(tag);
         final int size = keys.size();
         List<IBlockState> list = new ArrayList<>(size);
         for (int i = 0; i < size; ++i) { list.add(null); }
@@ -98,7 +99,7 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (String key : keys)
         {
             Optional<IBlockState> stateOptional = BlockUtils.getBlockStateFromString(key);
-            int id = NbtUtils.getInt(tag, key);
+            int id = NbtWrap.getInt(tag, key);
             IBlockState state;
 
             if (stateOptional.isPresent())
@@ -126,13 +127,13 @@ public class SpongeSchematic extends SingleRegionSchematic
     @Override
     protected boolean readBlocksFromTag(NBTTagCompound tag)
     {
-        if (NbtUtils.containsCompound(tag, "Palette") &&
-            NbtUtils.containsByteArray(tag, "BlockData") &&
+        if (NbtWrap.containsCompound(tag, "Palette") &&
+            NbtWrap.containsByteArray(tag, "BlockData") &&
             isSizeValid(this.getSize()))
         {
-            NBTTagCompound paletteTag = NbtUtils.getCompound(tag, "Palette");
-            byte[] blockData = NbtUtils.getByteArray(tag, "BlockData");
-            int paletteSize = NbtUtils.getKeys(paletteTag).size();
+            NBTTagCompound paletteTag = NbtWrap.getCompound(tag, "Palette");
+            byte[] blockData = NbtWrap.getByteArray(tag, "BlockData");
+            int paletteSize = NbtWrap.getKeys(paletteTag).size();
 
             this.blockContainer = LitematicaBlockStateContainerFull.createContainer(paletteSize, blockData, this.getSize());
 
@@ -154,26 +155,26 @@ public class SpongeSchematic extends SingleRegionSchematic
         Map<BlockPos, NBTTagCompound> blockEntities = new HashMap<>();
 
         String tagName = this.version == 1 ? "TileEntities" : "BlockEntities";
-        NBTTagList tagList = NbtUtils.getListOfCompounds(tag, tagName);
+        NBTTagList tagList = NbtWrap.getListOfCompounds(tag, tagName);
 
-        final int size = NbtUtils.getListSize(tagList);
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound beTag = NbtUtils.getCompoundAt(tagList, i);
+            NBTTagCompound beTag = NbtWrap.getCompoundAt(tagList, i);
             BlockPos pos = NbtUtils.readBlockPosFromArrayTag(beTag, "Pos");
 
             if (pos != null && beTag.isEmpty() == false)
             {
-                NbtUtils.putString(beTag, "id", NbtUtils.getString(beTag, "Id"));
+                NbtWrap.putString(beTag, "id", NbtWrap.getString(beTag, "Id"));
 
                 // Remove the Sponge tags from the data that is kept in memory
-                NbtUtils.remove(beTag, "Id");
-                NbtUtils.remove(beTag, "Pos");
+                NbtWrap.remove(beTag, "Id");
+                NbtWrap.remove(beTag, "Pos");
 
                 if (this.version == 1)
                 {
-                    NbtUtils.remove(beTag, "ContentVersion");
+                    NbtWrap.remove(beTag, "ContentVersion");
                 }
 
                 blockEntities.put(pos, beTag);
@@ -187,20 +188,20 @@ public class SpongeSchematic extends SingleRegionSchematic
     protected List<EntityInfo> readEntitiesFromTag(NBTTagCompound tag)
     {
         List<EntityInfo> entities = new ArrayList<>();
-        NBTTagList tagList = NbtUtils.getListOfCompounds(tag, "Entities");
-        final int size = NbtUtils.getListSize(tagList);
+        NBTTagList tagList = NbtWrap.getListOfCompounds(tag, "Entities");
+        final int size = NbtWrap.getListSize(tagList);
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound entityData = NbtUtils.getCompoundAt(tagList, i);
+            NBTTagCompound entityData = NbtWrap.getCompoundAt(tagList, i);
             Vec3d pos = NbtUtils.readVec3dFromListTag(entityData);
 
             if (pos != null && entityData.isEmpty() == false)
             {
-                NbtUtils.putString(entityData, "id", NbtUtils.getString(entityData, "Id"));
+                NbtWrap.putString(entityData, "id", NbtWrap.getString(entityData, "Id"));
 
                 // Remove the Sponge tags from the data that is kept in memory
-                NbtUtils.remove(entityData, "Id");
+                NbtWrap.remove(entityData, "Id");
 
                 entities.add(new EntityInfo(pos, entityData));
             }
@@ -215,10 +216,10 @@ public class SpongeSchematic extends SingleRegionSchematic
 
         if (this.getMetadata().getTimeCreated() > 0)
         {
-            NbtUtils.putLong(metaTag, "Date", this.getMetadata().getTimeCreated());
+            NbtWrap.putLong(metaTag, "Date", this.getMetadata().getTimeCreated());
         }
 
-        NbtUtils.putTag(tag, "Metadata", metaTag);
+        NbtWrap.putTag(tag, "Metadata", metaTag);
     }
 
     protected void writeBlocksToTag(NBTTagCompound tag)
@@ -226,8 +227,8 @@ public class SpongeSchematic extends SingleRegionSchematic
         NBTTagCompound paletteTag = this.writePaletteToTag(this.blockContainer.getPalette().getMapping());
         byte[] blockData = ((LitematicaBlockStateContainerFull) this.blockContainer).getBackingArrayAsByteArray();
 
-        NbtUtils.putTag(tag, "Palette", paletteTag);
-        NbtUtils.putByteArray(tag, "BlockData", blockData);
+        NbtWrap.putTag(tag, "Palette", paletteTag);
+        NbtWrap.putByteArray(tag, "BlockData", blockData);
     }
 
     protected NBTTagCompound writePaletteToTag(List<IBlockState> list)
@@ -238,7 +239,7 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (int id = 0; id < size; ++id)
         {
             IBlockState state = list.get(id);
-            NbtUtils.putInt(tag, state.toString(), id);
+            NbtWrap.putInt(tag, state.toString(), id);
         }
 
         return tag;
@@ -255,18 +256,18 @@ public class SpongeSchematic extends SingleRegionSchematic
             NbtUtils.writeBlockPosToArrayTag(entry.getKey(), beTag, "Pos");
 
             // Add the Sponge tag and remove the vanilla/Litematica tag
-            NbtUtils.putString(beTag, "Id", NbtUtils.getString(beTag, "id"));
-            NbtUtils.remove(beTag, "id");
+            NbtWrap.putString(beTag, "Id", NbtWrap.getString(beTag, "id"));
+            NbtWrap.remove(beTag, "id");
 
             if (this.version == 1)
             {
-                NbtUtils.putInt(beTag, "ContentVersion", 1);
+                NbtWrap.putInt(beTag, "ContentVersion", 1);
             }
 
-            NbtUtils.addTag(tagList, beTag);
+            NbtWrap.addTag(tagList, beTag);
         }
 
-        NbtUtils.putTag(tag, tagName, tagList);
+        NbtWrap.putTag(tag, tagName, tagList);
     }
 
     protected void writeEntitiesToTag(NBTTagCompound tag)
@@ -279,18 +280,18 @@ public class SpongeSchematic extends SingleRegionSchematic
             NbtUtils.writeVec3dToListTag(info.pos, entityData);
 
             // Add the Sponge tag and remove the vanilla/Litematica tag
-            NbtUtils.putString(entityData, "Id", NbtUtils.getString(entityData, "id"));
-            NbtUtils.remove(entityData, "id");
+            NbtWrap.putString(entityData, "Id", NbtWrap.getString(entityData, "id"));
+            NbtWrap.remove(entityData, "id");
 
             if (this.version == 1)
             {
-                NbtUtils.putInt(entityData, "ContentVersion", 1);
+                NbtWrap.putInt(entityData, "ContentVersion", 1);
             }
 
-            NbtUtils.addTag(tagList, entityData);
+            NbtWrap.addTag(tagList, entityData);
         }
 
-        NbtUtils.putTag(tag, "Entities", tagList);
+        NbtWrap.putTag(tag, "Entities", tagList);
     }
 
     @Override
@@ -303,12 +304,12 @@ public class SpongeSchematic extends SingleRegionSchematic
         this.writeEntitiesToTag(tag);
         this.writeMetadataToTag(tag);
 
-        NbtUtils.putInt(tag, "DataVersion", LitematicaSchematic.MINECRAFT_DATA_VERSION);
-        NbtUtils.putInt(tag, "Version", this.version);
-        NbtUtils.putInt(tag, "PaletteMax", this.blockContainer.getPalette().getPaletteSize() - 1);
-        NbtUtils.putShort(tag, "Width", (short) this.getSize().getX());
-        NbtUtils.putShort(tag, "Height", (short) this.getSize().getY());
-        NbtUtils.putShort(tag, "Length", (short) this.getSize().getZ());
+        NbtWrap.putInt(tag, "DataVersion", LitematicaSchematic.MINECRAFT_DATA_VERSION);
+        NbtWrap.putInt(tag, "Version", this.version);
+        NbtWrap.putInt(tag, "PaletteMax", this.blockContainer.getPalette().getPaletteSize() - 1);
+        NbtWrap.putShort(tag, "Width", (short) this.getSize().getX());
+        NbtWrap.putShort(tag, "Height", (short) this.getSize().getY());
+        NbtWrap.putShort(tag, "Length", (short) this.getSize().getZ());
 
         return tag;
     }

@@ -47,10 +47,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
@@ -260,7 +260,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
             if (entity != null)
             {
-                this.viewFrustum.updateChunkPositions(EntityUtils.getX(entity), EntityUtils.getZ(entity));
+                this.viewFrustum.updateChunkPositions(EntityWrap.getX(entity), EntityWrap.getZ(entity));
             }
 
             this.renderEntitiesStartupCounter = 2;
@@ -287,9 +287,9 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
         world.profiler.startSection("camera");
 
-        double entityX = EntityUtils.getX(viewEntity);
-        double entityY = EntityUtils.getY(viewEntity);
-        double entityZ = EntityUtils.getZ(viewEntity);
+        double entityX = EntityWrap.getX(viewEntity);
+        double entityY = EntityWrap.getY(viewEntity);
+        double entityZ = EntityWrap.getZ(viewEntity);
         double diffX = entityX - this.frustumUpdatePosX;
         double diffY = entityY - this.frustumUpdatePosY;
         double diffZ = entityZ - this.frustumUpdatePosZ;
@@ -309,9 +309,9 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         }
 
         world.profiler.endStartSection("renderlist_camera");
-        double x = viewEntity.lastTickPosX + (entityX - viewEntity.lastTickPosX) * partialTicks;
-        double y = viewEntity.lastTickPosY + (entityY - viewEntity.lastTickPosY) * partialTicks;
-        double z = viewEntity.lastTickPosZ + (entityZ - viewEntity.lastTickPosZ) * partialTicks;
+        double x = EntityWrap.lerpX(viewEntity, (float) partialTicks);
+        double y = EntityWrap.lerpY(viewEntity, (float) partialTicks);
+        double z = EntityWrap.lerpZ(viewEntity, (float) partialTicks);
         this.renderContainer.initialize(x, y, z);
         y = y + (double) viewEntity.getEyeHeight();
 
@@ -327,13 +327,13 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                 entityX != this.lastViewEntityX ||
                 entityY != this.lastViewEntityY ||
                 entityZ != this.lastViewEntityZ ||
-                viewEntity.rotationPitch != this.lastViewEntityPitch ||
-                viewEntity.rotationYaw != this.lastViewEntityYaw;
+                EntityWrap.getPitch(viewEntity) != this.lastViewEntityPitch ||
+                EntityWrap.getYaw(viewEntity) != this.lastViewEntityYaw;
         this.lastViewEntityX = entityX;
         this.lastViewEntityY = entityY;
         this.lastViewEntityZ = entityZ;
-        this.lastViewEntityPitch = viewEntity.rotationPitch;
-        this.lastViewEntityYaw = viewEntity.rotationYaw;
+        this.lastViewEntityPitch = EntityWrap.getPitch(viewEntity);
+        this.lastViewEntityYaw = EntityWrap.getYaw(viewEntity);
 
         world.profiler.endStartSection("update");
 
@@ -490,9 +490,9 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
             this.world.profiler.startSection("translucent_sort");
-            double entityX = EntityUtils.getX(entityIn);
-            double entityY = EntityUtils.getY(entityIn);
-            double entityZ = EntityUtils.getZ(entityIn);
+            double entityX = EntityWrap.getX(entityIn);
+            double entityY = EntityWrap.getY(entityIn);
+            double entityZ = EntityWrap.getZ(entityIn);
             double diffX = entityX - this.prevRenderSortX;
             double diffY = entityY - this.prevRenderSortY;
             double diffZ = entityZ - this.prevRenderSortZ;
@@ -711,12 +711,12 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         }
         else
         {
-            double entityX = EntityUtils.getX(renderViewEntity);
-            double entityY = EntityUtils.getY(renderViewEntity);
-            double entityZ = EntityUtils.getZ(renderViewEntity);
-            double renderX = renderViewEntity.prevPosX + (entityX - renderViewEntity.prevPosX) * partialTicks;
-            double renderY = renderViewEntity.prevPosY + (entityY - renderViewEntity.prevPosY) * partialTicks;
-            double renderZ = renderViewEntity.prevPosZ + (entityZ - renderViewEntity.prevPosZ) * partialTicks;
+            double entityX = EntityWrap.getX(renderViewEntity);
+            double entityY = EntityWrap.getY(renderViewEntity);
+            double entityZ = EntityWrap.getZ(renderViewEntity);
+            double renderX = EntityWrap.lerpX(renderViewEntity, partialTicks);
+            double renderY = EntityWrap.lerpY(renderViewEntity, partialTicks);
+            double renderZ = EntityWrap.lerpZ(renderViewEntity, partialTicks);
             this.world.profiler.startSection("prepare");
             TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.objectMouseOver, partialTicks);
             this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
@@ -746,7 +746,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                 {
                     for (Entity entityTmp : classinheritancemultimap)
                     {
-                        if (layerRange.isPositionWithinRange((int) EntityUtils.getX(entityTmp), (int) EntityUtils.getY(entityTmp), (int) EntityUtils.getZ(entityTmp)) == false)
+                        if (layerRange.isPositionWithinRange((int) EntityWrap.getX(entityTmp), (int) EntityWrap.getY(entityTmp), (int) EntityWrap.getZ(entityTmp)) == false)
                         {
                             continue;
                         }
@@ -756,7 +756,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                         if (shouldRender)
                         {
                             boolean sleeping = this.mc.getRenderViewEntity() instanceof EntityLivingBase && ((EntityLivingBase) this.mc.getRenderViewEntity()).isPlayerSleeping();
-                            double eY = EntityUtils.getY(entityTmp);
+                            double eY = EntityWrap.getY(entityTmp);
 
                             if ((entityTmp != this.mc.getRenderViewEntity() || this.mc.gameSettings.thirdPersonView != 0 || sleeping) &&
                                 (eY < 0.0D || eY >= 256.0D || this.world.isBlockLoaded(posMutable.setPos(entityTmp))))

@@ -2,18 +2,17 @@ package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
@@ -118,8 +117,8 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
         {
             if (this.mc.player != null)
             {
-                this.comparator.setReferencePosition(new BlockPos(this.mc.player));
-                Collections.sort(this.chunks, this.comparator);
+                this.comparator.setReferencePosition(EntityWrap.getEntityBlockPos(this.mc.player));
+                this.chunks.sort(this.comparator);
             }
 
             this.onChunkListSorted();

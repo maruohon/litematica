@@ -29,11 +29,12 @@ import fi.dy.masa.malilib.gui.util.ScreenContext;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.position.Vec2i;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Configs.Visuals;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -106,7 +107,7 @@ public class OverlayRenderer
 
     public void renderBoxes(float partialTicks)
     {
-        Entity renderViewEntity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity renderViewEntity = GameUtils.getCameraEntity();
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         boolean renderAreas = currentSelection != null && Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue();
@@ -333,7 +334,7 @@ public class OverlayRenderer
 
         if (activeVerifiers.isEmpty() == false)
         {
-            BlockPos cameraPos = EntityUtils.getCameraEntityBlockPos();
+            BlockPos cameraPos = EntityWrap.getCameraEntityBlockPos();
 
             for (SchematicVerifier verifier : activeVerifiers)
             {
@@ -342,7 +343,7 @@ public class OverlayRenderer
                 if (list.isEmpty() == false)
                 {
                     List<BlockPairTypePosition> posList = verifier.getClosestSelectedPositions(cameraPos);
-                    Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                    Entity entity = GameUtils.getCameraEntity();
                     BlockPairTypePosition lookPos = RayTraceUtils.traceToVerifierResultPositions(posList, entity, 128);
                     this.renderSchematicMismatches(list, lookPos, partialTicks);
                 }
@@ -360,7 +361,7 @@ public class OverlayRenderer
 
         GlStateManager.glLineWidth(2f);
 
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
@@ -454,7 +455,7 @@ public class OverlayRenderer
 
             if (renderBlockInfoLines || renderInfoOverlay)
             {
-                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                Entity entity = GameUtils.getCameraEntity();
                 traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10, true);
             }
 
@@ -503,11 +504,11 @@ public class OverlayRenderer
 
         if (activeVerifiers.isEmpty() == false)
         {
-            BlockPos cameraPos = EntityUtils.getCameraEntityBlockPos();
+            BlockPos cameraPos = EntityWrap.getCameraEntityBlockPos();
 
             for (SchematicVerifier verifier : activeVerifiers)
             {
-                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                Entity entity = GameUtils.getCameraEntity();
                 List<BlockPairTypePosition> posList = verifier.getClosestSelectedPositions(cameraPos);
                 BlockPairTypePosition lookPos = RayTraceUtils.traceToVerifierResultPositions(posList, entity, 32);
 
@@ -648,7 +649,7 @@ public class OverlayRenderer
     public void renderSchematicRebuildTargetingOverlay(float partialTicks)
     {
         RayTraceWrapper traceWrapper = null;
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         Color4f color = null;
         boolean direction = false;
 
@@ -718,10 +719,10 @@ public class OverlayRenderer
 
             if (stateClient != stateSchematic && stateClient.getMaterial() != Material.AIR)
             {
-                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-                double dx = entity.lastTickPosX + (EntityUtils.getX(entity) - entity.lastTickPosX) * partialTicks;
-                double dy = entity.lastTickPosY + (EntityUtils.getY(entity) - entity.lastTickPosY) * partialTicks;
-                double dz = entity.lastTickPosZ + (EntityUtils.getZ(entity) - entity.lastTickPosZ) * partialTicks;
+                Entity entity = GameUtils.getCameraEntity();
+                double dx = EntityWrap.lerpX(entity, partialTicks);
+                double dy = EntityWrap.lerpY(entity, partialTicks);
+                double dz = EntityWrap.lerpZ(entity, partialTicks);
 
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(-dx, -dy, -dz);

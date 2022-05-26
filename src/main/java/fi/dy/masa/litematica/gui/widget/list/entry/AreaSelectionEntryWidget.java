@@ -196,7 +196,9 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
             String selectionName = this.selection.getName();
             String title = StringUtils.translate(titleKey, selectionName);
             ResultingStringConsumer callback = (str) -> this.renameSelectionUsingName(str, true);
-            BaseScreen.openPopupScreen(new TextInputScreen(title, selectionName, callback, GuiUtils.getCurrentScreen()));
+            TextInputScreen screen = new TextInputScreen(title, selectionName, callback);
+            screen.setParent(GuiUtils.getCurrentScreen());
+            BaseScreen.openPopupScreen(screen);
         }
         else
         {
@@ -209,7 +211,9 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         String title = "litematica.title.screen.area_selection_browser.rename_selection";
         String name = this.selection != null ? this.selection.getName() : "<error>";
         ResultingStringConsumer callback = (str) -> this.renameSelectionUsingName(str, false);
-        BaseScreen.openPopupScreen(new TextInputScreen(title, name, callback, GuiUtils.getCurrentScreen()));
+        TextInputScreen screen = new TextInputScreen(title, name, callback);
+        screen.setParent(GuiUtils.getCurrentScreen());
+        BaseScreen.openPopupScreen(screen);
     }
 
     protected boolean renameSelectionUsingName(String name, boolean copy)

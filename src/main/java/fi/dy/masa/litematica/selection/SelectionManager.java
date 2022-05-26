@@ -19,10 +19,11 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.FileNameUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -331,7 +332,7 @@ public class SelectionManager
 
         AreaSelection selection = new AreaSelection();
         selection.setName(name);
-        BlockPos pos = new BlockPos(Minecraft.getMinecraft().player);
+        BlockPos pos = EntityWrap.getCameraEntityBlockPos();
         selection.createNewSubRegionBox(pos, name);
 
         this.selections.put(selectionId, selection);
@@ -348,7 +349,7 @@ public class SelectionManager
 
         if (selection != null && mc.player != null)
         {
-            BlockPos pos = new BlockPos(mc.player.getPositionVector());
+            BlockPos pos = EntityWrap.getCameraEntityBlockPos();
 
             if (selection.createNewSubRegionBox(pos, selection.getName()) != null)
             {
@@ -369,7 +370,7 @@ public class SelectionManager
     public boolean createNewSubRegionIfNotExists(String name)
     {
         AreaSelection selection = this.getCurrentSelection();
-        Entity cameraEntity = EntityUtils.getCameraEntity();
+        Entity cameraEntity = GameUtils.getCameraEntity();
 
         if (selection != null && cameraEntity != null)
         {
@@ -379,7 +380,7 @@ public class SelectionManager
                 return false;
             }
 
-            BlockPos pos = new BlockPos(cameraEntity.getPositionVector());
+            BlockPos pos = EntityWrap.getCameraEntityBlockPos();
 
             if (selection.createNewSubRegionBox(pos, name) != null)
             {
@@ -499,7 +500,7 @@ public class SelectionManager
     public boolean grabElement(Minecraft mc, int maxDistance)
     {
         World world = mc.world;
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        Entity entity = GameUtils.getCameraEntity();
         AreaSelection area = this.getCurrentSelection();
 
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
@@ -534,7 +535,7 @@ public class SelectionManager
 
             if (movingCorner || movingOrigin)
             {
-                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                Entity entity = GameUtils.getCameraEntity();
                 BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
 
                 if (pos == null)
@@ -595,7 +596,7 @@ public class SelectionManager
         {
             if (selection.isOriginSelected())
             {
-                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                Entity entity = GameUtils.getCameraEntity();
                 BlockPos newOrigin = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
 
                 if (newOrigin != null)
@@ -622,7 +623,7 @@ public class SelectionManager
 
         if (area != null && area.getSelectedSubRegionBox() != null)
         {
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            Entity entity = GameUtils.getCameraEntity();
             BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
 
             if (pos != null)
@@ -639,7 +640,7 @@ public class SelectionManager
 
         if (sel != null && sel.getSelectedSubRegionBox() != null)
         {
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            Entity entity = GameUtils.getCameraEntity();
             BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
 
             if (pos != null)
