@@ -18,10 +18,10 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.util.ItemUtils;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
+import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
 import fi.dy.masa.malilib.util.inventory.InventoryUtils;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.wrap.NbtWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.RenderUtils;
@@ -51,9 +51,9 @@ public class EntityUtils
 
         ItemStack toolItem = DataManager.getToolItem();
 
-        if (ItemUtils.isEmpty(toolItem))
+        if (ItemWrap.isEmpty(toolItem))
         {
-            return ItemUtils.isEmpty(entity.getHeldItemMainhand());
+            return ItemWrap.isEmpty(entity.getHeldItemMainhand());
         }
 
         ItemStack stackHand = entity.getHeldItem(hand);
@@ -85,7 +85,7 @@ public class EntityUtils
             {
                 hand = EnumHand.MAIN_HAND;
             }
-            else if (ItemUtils.isEmpty(player.getHeldItemMainhand()) && ItemStack.areItemsEqualIgnoreDurability(player.getHeldItemOffhand(), stack))
+            else if (ItemWrap.isEmpty(player.getHeldItemMainhand()) && ItemStack.areItemsEqualIgnoreDurability(player.getHeldItemOffhand(), stack))
             {
                 hand = EnumHand.OFF_HAND;
             }
@@ -96,7 +96,7 @@ public class EntityUtils
             {
                 hand = EnumHand.MAIN_HAND;
             }
-            else if (ItemUtils.isEmpty(player.getHeldItemMainhand()) && InventoryUtils.areStacksEqual(player.getHeldItemOffhand(), stack))
+            else if (ItemWrap.isEmpty(player.getHeldItemMainhand()) && InventoryUtils.areStacksEqual(player.getHeldItemOffhand(), stack))
             {
                 hand = EnumHand.OFF_HAND;
             }

@@ -19,7 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.registry.Registry;
-import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -116,18 +117,18 @@ public class InventoryUtils
             int slotNum = hotbarSlot + 36;
 
             // First try to put the current hotbar item into an empty slot in the player's inventory
-            if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(inventory.getStackInSlot(hotbarSlot)))
+            if (ItemWrap.notEmpty(inventory.getStackInSlot(hotbarSlot)))
             {
                 // Shift click the stack
                 mc.playerController.windowClick(player.openContainer.windowId, slotNum, 0, ClickType.QUICK_MOVE, player);
 
                 // Wasn't able to move the items out
-                if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(inventory.getStackInSlot(hotbarSlot)))
+                if (ItemWrap.notEmpty(inventory.getStackInSlot(hotbarSlot)))
                 {
                     // TODO try to combine partial stacks
 
                     // The off-hand slot is empty, move the current stack to it
-                    if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(player.getHeldItemOffhand()))
+                    if (ItemWrap.isEmpty(player.getHeldItemOffhand()))
                     {
                         fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
                         fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, 45, 0);
@@ -199,7 +200,7 @@ public class InventoryUtils
         ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
 
-        if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(stack))
+        if (ItemWrap.notEmpty(stack))
         {
             EnumHand hand = EntityUtils.getUsedHandForItem(GameUtils.getClientPlayer(), stack, ignoreNbt);
 
@@ -235,7 +236,7 @@ public class InventoryUtils
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
         EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
 
-        if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(stack) && hand == null)
+        if (ItemWrap.notEmpty(stack) && hand == null)
         {
             switchItemToHand(stack, ignoreNbt, mc);
             hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
@@ -253,7 +254,7 @@ public class InventoryUtils
     {
         // First check the current slot
         if (PICK_BLOCKABLE_SLOTS.contains(inventory.currentItem) &&
-            fi.dy.masa.malilib.util.ItemUtils.isEmpty(inventory.mainInventory.get(inventory.currentItem)))
+            ItemWrap.isEmpty(inventory.mainInventory.get(inventory.currentItem)))
         {
             return inventory.currentItem;
         }
@@ -268,7 +269,7 @@ public class InventoryUtils
             {
                 ItemStack stack = inventory.mainInventory.get(slotNum);
 
-                if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack))
+                if (ItemWrap.isEmpty(stack))
                 {
                     return slotNum;
                 }
@@ -284,7 +285,7 @@ public class InventoryUtils
         {
             ItemStack stack = inventory.mainInventory.get(inventory.currentItem);
 
-            if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack) ||
+            if (ItemWrap.isEmpty(stack) ||
                 (stack.getItem() instanceof ItemTool) == false)
             {
                 return inventory.currentItem;
@@ -308,7 +309,7 @@ public class InventoryUtils
 
             ItemStack stack = inventory.mainInventory.get(slotNum);
 
-            if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack) ||
+            if (ItemWrap.isEmpty(stack) ||
                 (stack.getItem() instanceof ItemTool) == false)
             {
                 return slotNum;

@@ -31,15 +31,15 @@ import fi.dy.masa.malilib.input.Keys;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.registry.Registry;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.ItemUtils;
-import fi.dy.masa.malilib.util.PlacementUtils;
-import fi.dy.masa.malilib.util.PositionUtils;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.game.BlockUtils;
+import fi.dy.masa.malilib.util.game.PlacementUtils;
+import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.malilib.util.position.HitPosition;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.position.PositionUtils;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
@@ -203,7 +203,7 @@ public class EasyPlaceUtils
         World world = mc.world;
         double reach = Math.max(6, mc.playerController.getBlockReachDistance());
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceResult traceVanilla = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
+        RayTraceResult traceVanilla = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (traceVanilla != null && traceVanilla.typeOfHit == RayTraceResult.Type.BLOCK)
         {
@@ -218,7 +218,7 @@ public class EasyPlaceUtils
             }
         }
 
-        for (EnumFacing side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
+        for (EnumFacing side : PositionUtils.ALL_DIRECTIONS)
         {
             BlockPos posSide = targetPos.offset(side);
 
@@ -399,7 +399,7 @@ public class EasyPlaceUtils
         ItemStack requiredStack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
         // The block is correct already, or it was recently placed, or some of the checks failed
-        if (stateSchematic == stateClient || ItemUtils.isEmpty(requiredStack) ||
+        if (stateSchematic == stateClient || ItemWrap.isEmpty(requiredStack) ||
             easyPlaceIsPositionCached(targetBlockPos) ||
             canPlaceBlock(targetBlockPos, mc.world, stateSchematic, stateClient) == false)
         {
@@ -516,7 +516,7 @@ public class EasyPlaceUtils
         double y = hitVecIn.y;
         double z = hitVecIn.z;
         Block block = state.getBlock();
-        Optional<EnumFacing> facingOptional = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
+        Optional<EnumFacing> facingOptional = BlockUtils.getFirstPropertyFacingValue(state);
 
         if (facingOptional.isPresent())
         {
@@ -587,7 +587,7 @@ public class EasyPlaceUtils
     {
         Entity entity = GameUtils.getCameraEntity();
         double reach = mc.playerController.getBlockReachDistance();
-        RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
+        RayTraceResult trace = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
@@ -626,7 +626,7 @@ public class EasyPlaceUtils
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
-            return ItemUtils.isEmpty(stack) || EntityUtils.getUsedHandForItem(mc.player, stack, true) == null;
+            return ItemWrap.isEmpty(stack) || EntityUtils.getUsedHandForItem(mc.player, stack, true) == null;
         }
 
         return false;

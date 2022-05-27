@@ -29,8 +29,8 @@ public class WorldUtils
     public static void loadChunksClientWorld(WorldClient world, BlockPos origin, Vec3i areaSize)
     {
         BlockPos posEnd = origin.add(PositionUtils.getRelativeEndPositionFromAreaSize(areaSize));
-        BlockPos posMin = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(origin, posEnd);
-        BlockPos posMax = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(origin, posEnd);
+        BlockPos posMin = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(origin, posEnd);
+        BlockPos posMax = fi.dy.masa.malilib.util.position.PositionUtils.getMaxCorner(origin, posEnd);
         final int cxMin = posMin.getX() >> 4;
         final int czMin = posMin.getZ() >> 4;
         final int cxMax = posMax.getX() >> 4;

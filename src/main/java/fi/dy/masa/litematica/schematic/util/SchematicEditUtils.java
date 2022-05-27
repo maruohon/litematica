@@ -19,11 +19,11 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.ItemUtils;
-import fi.dy.masa.malilib.util.PositionUtils;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.position.PositionUtils;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -133,7 +133,7 @@ public class SchematicEditUtils
         if (info != null && info.stateNew != null)
         {
             EnumFacing playerFacingH = mc.player.getHorizontalFacing();
-            EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
+            EnumFacing direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
 
             // Center region
             if (direction == info.side)
@@ -165,7 +165,7 @@ public class SchematicEditUtils
     {
         WorldSchematic schematicWorld = SchematicWorldHandler.getSchematicWorld();
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.ANY, false, 5);
+        RayTraceResult trace = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.ANY, false, 5);
 
         if (schematicWorld != null && trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
@@ -196,7 +196,7 @@ public class SchematicEditUtils
             RayTraceResult trace = wrapper.getRayTraceResult();
             BlockPos pos = trace.getBlockPos();
             EnumFacing playerFacingH = mc.player.getHorizontalFacing();
-            EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(trace.sideHit, playerFacingH, pos, trace.hitVec);
+            EnumFacing direction = PositionUtils.getTargetedDirection(trace.sideHit, playerFacingH, pos, trace.hitVec);
 
             // Center region
             if (direction == trace.sideHit)
@@ -238,7 +238,7 @@ public class SchematicEditUtils
         if (info != null && info.stateNew != null)
         {
             EnumFacing playerFacingH = mc.player.getHorizontalFacing();
-            EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
+            EnumFacing direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
             BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
 
             if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).getMaterial() == Material.AIR)
@@ -274,8 +274,8 @@ public class SchematicEditUtils
     {
         ItemStack stack = mc.player.getHeldItemMainhand();
 
-        if ((ItemUtils.notEmpty(stack) && (stack.getItem() instanceof ItemBlock || stack.getItem() instanceof ItemBlockSpecial)) ||
-            (ItemUtils.isEmpty(stack) && ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null))
+        if ((ItemWrap.notEmpty(stack) && (stack.getItem() instanceof ItemBlock || stack.getItem() instanceof ItemBlockSpecial)) ||
+            (ItemWrap.isEmpty(stack) && ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null))
         {
             WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
             Entity entity = GameUtils.getCameraEntity();

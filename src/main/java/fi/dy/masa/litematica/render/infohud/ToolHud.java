@@ -13,9 +13,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.overlay.message.MessageHelpers;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.game.BlockUtils;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -232,7 +232,7 @@ public class ToolHud extends InfoHud
             ItemStack stack = this.mc.player.getHeldItemMainhand();
 
             if (state != null && mode == ToolMode.SCHEMATIC_EDIT &&
-                (ItemUtils.isEmpty(stack) || EntityUtils.hasToolItem(this.mc.player)))
+                (ItemWrap.isEmpty(stack) || EntityUtils.hasToolItem(this.mc.player)))
             {
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.used_block", this.getBlockStateString(state)));
                 this.getBlockStateProperties(state, lines);

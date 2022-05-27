@@ -33,9 +33,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
-import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.wrap.NbtWrap;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
+import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.WorldUtils;
@@ -118,7 +118,7 @@ public class MaterialCache
             stack = state.getBlock().getItem(world, pos, state);
         }
 
-        if (stack == null || ItemUtils.isEmpty(stack))
+        if (stack == null || ItemWrap.isEmpty(stack))
         {
             stack = ItemStack.EMPTY;
         }
@@ -338,7 +338,7 @@ public class MaterialCache
 
                     if (state != null)
                     {
-                        ItemStack stack = ItemUtils.fromTag(NbtWrap.getCompound(tag, "Item"));
+                        ItemStack stack = ItemWrap.fromTag(NbtWrap.getCompound(tag, "Item"));
                         this.buildItemsForStates.put(state, stack);
                     }
                 }

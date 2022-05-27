@@ -19,9 +19,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.malilib.listener.EventListener;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.RunStatus;
+import fi.dy.masa.malilib.util.game.BlockUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.config.Configs;
@@ -360,7 +360,7 @@ public class SchematicVerifier implements IInfoHudRenderer
             {
                 if (this.completedChunks.contains(posLong))
                 {
-                    ChunkPos pos = fi.dy.masa.malilib.util.PositionUtils.chunkPosFromLong(posLong);
+                    ChunkPos pos = fi.dy.masa.malilib.util.position.PositionUtils.chunkPosFromLong(posLong);
                     boxes.putAll(pos, this.boxesInChunks.get(pos));
                 }
             }
@@ -604,9 +604,9 @@ public class SchematicVerifier implements IInfoHudRenderer
         for (int i = 0; i < endIndex; ++i)
         {
             BlockPairTypePosition pair = this.closestSelectedPositions.get(i);
-            int x = fi.dy.masa.malilib.util.PositionUtils.unpackX(pair.posLong);
-            int y = fi.dy.masa.malilib.util.PositionUtils.unpackY(pair.posLong);
-            int z = fi.dy.masa.malilib.util.PositionUtils.unpackZ(pair.posLong);
+            int x = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(pair.posLong);
+            int y = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(pair.posLong);
+            int z = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(pair.posLong);
             String name;
 
             if (pair.type == VerifierResultType.EXTRA)

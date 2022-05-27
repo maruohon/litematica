@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
 import fi.dy.masa.malilib.event.PostWorldRenderer;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.tool.ToolMode;
 public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 {
     @Override
-    public void onPostWorldRender(Minecraft mc, float partialTicks)
+    public void onPostWorldRender(float tickDelta)
     {
         if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue())
         {
@@ -28,14 +28,14 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
             if (Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() != invert &&
                 Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() == false)
             {
-                LitematicaRenderer.getInstance().renderSchematicWorld(partialTicks);
+                LitematicaRenderer.getInstance().renderSchematicWorld(tickDelta);
             }
 
-            OverlayRenderer.getInstance().renderBoxes(partialTicks);
+            OverlayRenderer.getInstance().renderBoxes(tickDelta);
 
             if (Configs.InfoOverlays.VERIFIER_OVERLAY_RENDERING.getBooleanValue())
             {
-                OverlayRenderer.getInstance().renderSchematicVerifierMismatches(partialTicks);
+                OverlayRenderer.getInstance().renderSchematicVerifierMismatches(tickDelta);
             }
 
             if (Configs.Visuals.RENDER_COLLIDING_BLOCK_AT_CURSOR.getBooleanValue())
@@ -45,13 +45,13 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 
                 if (render)
                 {
-                    OverlayRenderer.getInstance().renderHoveredSchematicBlock(mc, partialTicks);
+                    OverlayRenderer.getInstance().renderHoveredSchematicBlock(tickDelta);
                 }
             }
 
             if (DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT)
             {
-                OverlayRenderer.getInstance().renderSchematicRebuildTargetingOverlay(partialTicks);
+                OverlayRenderer.getInstance().renderSchematicRebuildTargetingOverlay(tickDelta);
             }
         }
     }

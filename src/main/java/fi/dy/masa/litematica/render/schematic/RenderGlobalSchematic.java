@@ -47,10 +47,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
@@ -278,14 +278,14 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
     public void setupTerrain(Entity viewEntity, double partialTicks, ICamera camera, int frameCount, boolean playerSpectator)
     {
         World world = this.world;
-        world.profiler.startSection("setup_terrain");
+        GameUtils.profilerPush("setup_terrain");
 
         if (this.viewFrustum == null || GameUtils.getRenderDistanceChunks() != this.renderDistanceChunks)
         {
             this.loadRenderers();
         }
 
-        world.profiler.startSection("camera");
+        GameUtils.profilerPush("camera");
 
         double entityX = EntityWrap.getX(viewEntity);
         double entityY = EntityWrap.getY(viewEntity);
@@ -308,14 +308,14 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             this.viewFrustum.updateChunkPositions(entityX, entityZ);
         }
 
-        world.profiler.endStartSection("renderlist_camera");
+        GameUtils.profilerSwap("renderlist_camera");
         double x = EntityWrap.lerpX(viewEntity, (float) partialTicks);
         double y = EntityWrap.lerpY(viewEntity, (float) partialTicks);
         double z = EntityWrap.lerpZ(viewEntity, (float) partialTicks);
         this.renderContainer.initialize(x, y, z);
         y = y + (double) viewEntity.getEyeHeight();
 
-        world.profiler.endStartSection("culling");
+        GameUtils.profilerSwap("culling");
         final int centerChunkX = MathHelper.floor(x) >> 4;
         final int centerChunkY = MathHelper.floor(y) >> 4;
         final int centerChunkZ = MathHelper.floor(z) >> 4;
@@ -335,11 +335,11 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         this.lastViewEntityPitch = EntityWrap.getPitch(viewEntity);
         this.lastViewEntityYaw = EntityWrap.getYaw(viewEntity);
 
-        world.profiler.endStartSection("update");
+        GameUtils.profilerSwap("update");
 
         if (this.displayListEntitiesDirty)
         {
-            world.profiler.startSection("fetch");
+            GameUtils.profilerPush("fetch");
 
             this.displayListEntitiesDirty = false;
             this.renderInfos.clear();
@@ -370,7 +370,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
             //if (GuiBase.isCtrlDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
-            world.profiler.endStartSection("iteration");
+            GameUtils.profilerSwap("iteration");
 
             //while (queuePositions.isEmpty() == false)
             for (int i = 0; i < this.subChunksWithinRenderRange.size(); ++i)
@@ -403,10 +403,10 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                 }
             }
 
-            world.profiler.endSection();
+            GameUtils.profilerPop();
         }
 
-        world.profiler.endStartSection("rebuild_near");
+        GameUtils.profilerSwap("rebuild_near");
         Set<RenderChunkSchematicVbo> set = this.chunksToUpdate;
         this.chunksToUpdate = new LinkedHashSet<>();
 
@@ -425,20 +425,20 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                 else
                 {
                     //if (GuiBase.isCtrlDown()) System.out.printf("====== update now\n");
-                    world.profiler.startSection("build_near");
+                    GameUtils.profilerPush("build_near");
 
                     this.renderDispatcher.updateChunkNow(renderChunkTmp);
                     renderChunkTmp.clearNeedsUpdate();
 
-                    world.profiler.endSection();
+                    GameUtils.profilerPop();
                 }
             }
         }
 
         this.chunksToUpdate.addAll(set);
 
-        world.profiler.endSection();
-        world.profiler.endSection();
+        GameUtils.profilerPop();
+        GameUtils.profilerPop();
     }
 
     @Override
@@ -483,13 +483,13 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
     public int renderBlockLayer(BlockRenderLayer blockLayerIn, double partialTicks, Entity entityIn)
     {
-        this.world.profiler.startSection("render_block_layer_" + blockLayerIn);
+        GameUtils.profilerPush("render_block_layer_" + blockLayerIn);
 
         RenderUtils.disableItemLighting();
 
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
-            this.world.profiler.startSection("translucent_sort");
+            GameUtils.profilerPush("translucent_sort");
             double entityX = EntityWrap.getX(entityIn);
             double entityY = EntityWrap.getY(entityIn);
             double entityZ = EntityWrap.getZ(entityIn);
@@ -514,10 +514,10 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                 }
             }
 
-            this.world.profiler.endSection();
+            GameUtils.profilerPop();
         }
 
-        this.world.profiler.startSection("filter_empty");
+        GameUtils.profilerPush("filter_empty");
         boolean reverse = blockLayerIn == BlockRenderLayer.TRANSLUCENT;
         int startIndex = reverse ? this.renderInfos.size() - 1 : 0;
         int stopIndex = reverse ? -1 : this.renderInfos.size();
@@ -535,12 +535,12 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             }
         }
 
-        this.world.profiler.endStartSection("render");
+        GameUtils.profilerSwap("render");
 
         this.renderBlockLayer(blockLayerIn);
 
-        this.world.profiler.endSection();
-        this.world.profiler.endSection();
+        GameUtils.profilerPop();
+        GameUtils.profilerPop();
 
         return count;
     }
@@ -598,8 +598,8 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
     private void renderBlockOverlay(OverlayRenderType type)
     {
-        this.world.profiler.startSection("overlay_" + type.name());
-        this.world.profiler.startSection("filter_empty");
+        GameUtils.profilerPush("overlay_" + type.name());
+        GameUtils.profilerPush("filter_empty");
 
         for (int i = this.renderInfos.size() - 1; i >= 0; --i)
         {
@@ -616,12 +616,12 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             }
         }
 
-        this.world.profiler.endStartSection("render");
+        GameUtils.profilerSwap("render");
 
         this.renderBlockOverlayBuffers(type);
 
-        this.world.profiler.endSection();
-        this.world.profiler.endSection();
+        GameUtils.profilerPop();
+        GameUtils.profilerPop();
     }
 
     private void renderBlockOverlayBuffers(OverlayRenderType type)
@@ -717,8 +717,8 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             double renderX = EntityWrap.lerpX(renderViewEntity, partialTicks);
             double renderY = EntityWrap.lerpY(renderViewEntity, partialTicks);
             double renderZ = EntityWrap.lerpZ(renderViewEntity, partialTicks);
-            this.world.profiler.startSection("prepare");
-            TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.objectMouseOver, partialTicks);
+            GameUtils.profilerPush("prepare");
+            TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, this.mc.getRenderViewEntity(), GameUtils.getHitResult(), partialTicks);
             this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
             this.countEntitiesTotal = 0;
             this.countEntitiesRendered = 0;
@@ -732,7 +732,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
             this.countEntitiesTotal = this.world.getLoadedEntityList().size();
 
-            this.world.profiler.endStartSection("regular_entities");
+            GameUtils.profilerSwap("regular_entities");
             List<Entity> entitiesMultipass = new ArrayList<>();
             BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
             LayerRange layerRange = DataManager.getRenderLayerRange();
@@ -787,7 +787,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             /*
             if (this.isRenderEntityOutlines() && (entitiesOutlined.isEmpty() == false || this.entityOutlinesRendered))
             {
-                this.world.profiler.endStartSection("entityOutlines");
+                GameUtils.profilerSwap("entityOutlines");
                 this.entityOutlineFramebuffer.framebufferClear();
                 this.entityOutlinesRendered = entitiesOutlined.isEmpty() == false;
 
@@ -824,7 +824,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             }
             */
 
-            this.world.profiler.endStartSection("block_entities");
+            GameUtils.profilerSwap("block_entities");
             fi.dy.masa.malilib.render.RenderUtils.enableItemLighting();
 
             for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
@@ -849,7 +849,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             }
 
             this.mc.entityRenderer.disableLightmap();
-            this.world.profiler.endSection();
+            GameUtils.profilerPop();
         }
     }
 

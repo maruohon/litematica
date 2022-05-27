@@ -14,7 +14,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.util.wrap.NbtWrap;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
+import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
 
 public class ItemUtils
 {
@@ -53,12 +54,12 @@ public class ItemUtils
 
         ItemStack stack = getStateToItemOverride(state);
 
-        if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack))
+        if (ItemWrap.isEmpty(stack))
         {
             stack = state.getBlock().getItem(world, pos, state);
         }
 
-        if (fi.dy.masa.malilib.util.ItemUtils.isEmpty(stack))
+        if (ItemWrap.isEmpty(stack))
         {
             stack = ItemStack.EMPTY;
         }
@@ -104,7 +105,7 @@ public class ItemUtils
             NBTTagCompound tagSkull = new NBTTagCompound();
 
             NbtWrap.putTag(tagSkull, "SkullOwner", tagOwner);
-            fi.dy.masa.malilib.util.ItemUtils.setTag(stack, tagSkull);
+            ItemWrap.setTag(stack, tagSkull);
 
             return stack;
         }
@@ -124,10 +125,10 @@ public class ItemUtils
 
     public static String getStackString(ItemStack stack)
     {
-        if (fi.dy.masa.malilib.util.ItemUtils.notEmpty(stack))
+        if (ItemWrap.notEmpty(stack))
         {
             ResourceLocation rl = Item.REGISTRY.getNameForObject(stack.getItem());
-            NBTTagCompound tag = fi.dy.masa.malilib.util.ItemUtils.getTag(stack);
+            NBTTagCompound tag = ItemWrap.getTag(stack);
 
             return String.format("[%s @ %d - display: %s - NBT: %s] (%s)",
                     rl != null ? rl.toString() : "null", stack.getMetadata(), stack.getDisplayName(),

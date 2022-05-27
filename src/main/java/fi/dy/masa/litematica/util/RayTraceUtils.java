@@ -15,8 +15,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceCalculationData;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceCalculationData;
+import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -43,7 +43,7 @@ public class RayTraceUtils
     @Nullable
     public static BlockPos getTargetedPosition(World world, Entity entity, double maxDistance, boolean sneakToOffset)
     {
-        RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils
+        RayTraceResult trace = fi.dy.masa.malilib.util.game.RayTraceUtils
                 .getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, maxDistance);
 
         if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
@@ -69,7 +69,7 @@ public class RayTraceUtils
         Vec3d rangedLookRot = entity.getLook(1f).scale(range);
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
-        RayTraceResult result = fi.dy.masa.malilib.util.RayTraceUtils
+        RayTraceResult result = fi.dy.masa.malilib.util.game.RayTraceUtils
                 .getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, range);
         double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
 
@@ -372,11 +372,11 @@ public class RayTraceUtils
 
         LayerRange layerRange = respectRenderRange ? DataManager.getRenderLayerRange() : null;
 
-        return fi.dy.masa.malilib.util.RayTraceUtils.rayTraceBlocks(world, start, end,
-                fi.dy.masa.malilib.util.RayTraceUtils::checkRayCollision,
-                fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling.SOURCE_ONLY,
-                fi.dy.masa.malilib.util.RayTraceUtils.BLOCK_FILTER_NON_AIR,
-                false, true, layerRange, 200);
+        return fi.dy.masa.malilib.util.game.RayTraceUtils.rayTraceBlocks(world, start, end,
+                                                                         fi.dy.masa.malilib.util.game.RayTraceUtils::checkRayCollision,
+                                                                         fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling.SOURCE_ONLY,
+                                                                         fi.dy.masa.malilib.util.game.RayTraceUtils.BLOCK_FILTER_NON_AIR,
+                                                                         false, true, layerRange, 200);
     }
 
     @Nullable
@@ -395,7 +395,7 @@ public class RayTraceUtils
                                                   boolean respectRenderRange,
                                                   RayTraceFluidHandling fluidHandling)
     {
-        RayTraceResult traceClient = fi.dy.masa.malilib.util.RayTraceUtils
+        RayTraceResult traceClient = fi.dy.masa.malilib.util.game.RayTraceUtils
                 .getRayTraceFromEntity(worldClient, entity, fluidHandling, false, range);
         RayTraceResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange);
         double distClosest = -1D;
@@ -461,7 +461,7 @@ public class RayTraceUtils
         Vec3d rangedLookRot = entity.getLook(1f).scale(maxRange);
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
-        RayTraceResult traceVanilla = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(worldClient, entity, RayTraceFluidHandling.NONE, false, maxRange);
+        RayTraceResult traceVanilla = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(worldClient, entity, RayTraceFluidHandling.NONE, false, maxRange);
 
         if (traceVanilla.typeOfHit != RayTraceResult.Type.BLOCK)
         {
@@ -553,17 +553,17 @@ public class RayTraceUtils
         }
 
         RayTraceCalculationData data = new RayTraceCalculationData(start, end, RayTraceFluidHandling.SOURCE_ONLY,
-                                                                   fi.dy.masa.malilib.util.RayTraceUtils.BLOCK_FILTER_NON_AIR, DataManager.getRenderLayerRange());
+                                                                   fi.dy.masa.malilib.util.game.RayTraceUtils.BLOCK_FILTER_NON_AIR, DataManager.getRenderLayerRange());
         List<RayTraceResult> hits = new ArrayList<>();
 
         while (--maxSteps >= 0)
         {
-            if (fi.dy.masa.malilib.util.RayTraceUtils.checkRayCollision(data, world, false))
+            if (fi.dy.masa.malilib.util.game.RayTraceUtils.checkRayCollision(data, world, false))
             {
                 hits.add(data.trace);
             }
 
-            if (fi.dy.masa.malilib.util.RayTraceUtils.rayTraceAdvance(data))
+            if (fi.dy.masa.malilib.util.game.RayTraceUtils.rayTraceAdvance(data))
             {
                 break;
             }

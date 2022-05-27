@@ -23,10 +23,11 @@ import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.game.ItemUtils;
+import fi.dy.masa.malilib.util.game.WorldUtils;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
@@ -523,7 +524,7 @@ public class DataManager implements DirectoryCache
                 if (item != null && item != Items.AIR)
                 {
                     toolItem = new ItemStack(item, 1, meta);
-                    ItemUtils.setTag(toolItem, nbt);
+                    ItemWrap.setTag(toolItem, nbt);
                     return;
                 }
             }
@@ -543,13 +544,13 @@ public class DataManager implements DirectoryCache
         if (player != null)
         {
             ItemStack stack = player.getHeldItemMainhand();
-            toolItem = ItemUtils.isEmpty(stack) ? ItemStack.EMPTY : stack.copy();
+            toolItem = ItemWrap.isEmpty(stack) ? ItemStack.EMPTY : stack.copy();
             String cfgStr = "";
 
-            if (ItemUtils.notEmpty(stack))
+            if (ItemWrap.notEmpty(stack))
             {
                 cfgStr = ItemUtils.getItemRegistryName(stack.getItem());
-                NBTTagCompound nbt = ItemUtils.getTag(stack);
+                NBTTagCompound nbt = ItemWrap.getTag(stack);
 
                 if (stack.isItemStackDamageable() == false || nbt != null)
                 {

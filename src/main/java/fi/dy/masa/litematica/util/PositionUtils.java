@@ -26,11 +26,11 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.position.Coordinate;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
@@ -371,8 +371,8 @@ public class PositionUtils
         {
             if (isBoxValid(box))
             {
-                BlockPos min = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
-                BlockPos max = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+                BlockPos min = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+                BlockPos max = fi.dy.masa.malilib.util.position.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
                 volume += (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
             }
         }
@@ -598,9 +598,9 @@ public class PositionUtils
      */
     public static AxisAlignedBB createAABBForPosition(long posLong)
     {
-        int x = fi.dy.masa.malilib.util.PositionUtils.unpackX(posLong);
-        int y = fi.dy.masa.malilib.util.PositionUtils.unpackY(posLong);
-        int z = fi.dy.masa.malilib.util.PositionUtils.unpackZ(posLong);
+        int x = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(posLong);
+        int y = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(posLong);
+        int z = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(posLong);
         return createAABBForPosition(x, y, z);
     }
 
@@ -871,7 +871,7 @@ public class PositionUtils
                     BlockPos corner2 = box.getPos2().add(originOffset);
                     BlockPos entityPos = EntityWrap.getEntityBlockPos(entity);
                     EnumFacing entityFrontDirection = entity.getHorizontalFacing();
-                    EnumFacing entitySideDirection = fi.dy.masa.malilib.util.PositionUtils.getClosestSideDirection(entity);
+                    EnumFacing entitySideDirection = fi.dy.masa.malilib.util.position.PositionUtils.getClosestSideDirection(entity);
                     Vec3i alignmentFrontOffset = getOffsetToMoveBoxInfrontOfEntityPos(entityPos, entityFrontDirection, corner1, corner2);
                     Vec3i alignmentSideOffset = getOffsetToMoveBoxInfrontOfEntityPos(entityPos, entitySideDirection, corner1, corner2);
 
@@ -885,8 +885,8 @@ public class PositionUtils
 
     public static Vec3i getOffsetToMoveBoxInfrontOfEntityPos(BlockPos entityPos, EnumFacing entityHorizontalFacing, BlockPos corner1, BlockPos corner2)
     {
-        BlockPos minPos = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(corner1, corner2);
-        BlockPos maxPos = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(corner1, corner2);
+        BlockPos minPos = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(corner1, corner2);
+        BlockPos maxPos = fi.dy.masa.malilib.util.position.PositionUtils.getMaxCorner(corner1, corner2);
         int offX = 0;
         int offZ = 0;
 

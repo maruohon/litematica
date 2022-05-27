@@ -14,8 +14,8 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.StringListSelectionScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.util.ItemUtils;
 import fi.dy.masa.malilib.util.data.ItemType;
+import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.malilib.util.inventory.InventoryUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -136,7 +136,7 @@ public class MaterialListUtils
             {
                 ItemStack stack = cache.getRequiredBuildItemForState(state);
 
-                if (ItemUtils.notEmpty(stack))
+                if (ItemWrap.notEmpty(stack))
                 {
                     ItemType type = new ItemType(stack, false, true);
                     itemTypesOut.addTo(type, blockStatesIn.getLong(state) * stack.getCount());

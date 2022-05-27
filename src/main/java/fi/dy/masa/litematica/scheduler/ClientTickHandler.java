@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.scheduler;
 
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.malilib.util.GameUtils;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;

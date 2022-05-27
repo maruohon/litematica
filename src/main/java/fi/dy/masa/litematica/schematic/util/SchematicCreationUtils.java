@@ -27,12 +27,12 @@ import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -325,7 +325,7 @@ public class SchematicCreationUtils
             // We want to loop nice & easy from 0 to n here, but the per-sub-region pos1 can be at
             // any corner of the area. Thus we need to offset from the total area origin
             // to the minimum/negative (ie. 0,0 in the loop) corner here.
-            final BlockPos minCorner = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            final BlockPos minCorner = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
             final int startX = minCorner.getX();
             final int startY = minCorner.getY();
             final int startZ = minCorner.getZ();
@@ -435,7 +435,7 @@ public class SchematicCreationUtils
             // We want to loop nice & easy from 0 to n here, but the per-sub-region pos1 can be at
             // any corner of the area. Thus we need to offset from the total area origin
             // to the minimum/negative corner (ie. 0,0 in the loop) corner here.
-            final BlockPos minCorner = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            final BlockPos minCorner = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
             final int offsetX = minCorner.getX();
             final int offsetY = minCorner.getY();
             final int offsetZ = minCorner.getZ();

@@ -13,7 +13,8 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
 import fi.dy.masa.malilib.render.shader.ShaderProgram;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
@@ -91,7 +92,7 @@ public class LitematicaRenderer
     {
         if (this.mc.skipRenderWorld == false)
         {
-            this.mc.profiler.startSection("litematica_schematic_world_render");
+            GameUtils.profilerPush("litematica_schematic_world_render");
 
             if (this.mc.getRenderViewEntity() == null)
             {
@@ -107,31 +108,31 @@ public class LitematicaRenderer
 
             GlStateManager.popMatrix();
 
-            this.mc.profiler.endSection();
+            GameUtils.profilerPop();
         }
     }
 
     private void renderWorld(float partialTicks, long finishTimeNano)
     {
-        this.mc.profiler.startSection("culling");
+        GameUtils.profilerPush("culling");
         Entity entity = this.mc.getRenderViewEntity();
         ICamera icamera = this.createCamera(entity, partialTicks);
 
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        this.mc.profiler.endStartSection("prepare_terrain");
+        GameUtils.profilerSwap("prepare_terrain");
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         fi.dy.masa.malilib.render.RenderUtils.disableItemLighting();
 
         RenderGlobalSchematic renderGlobal = this.getWorldRenderer();
 
-        this.mc.profiler.endStartSection("terrain_setup");
+        GameUtils.profilerSwap("terrain_setup");
         renderGlobal.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
 
-        this.mc.profiler.endStartSection("update_chunks");
+        GameUtils.profilerSwap("update_chunks");
         renderGlobal.updateChunks(finishTimeNano);
 
-        this.mc.profiler.endStartSection("terrain");
+        GameUtils.profilerSwap("terrain");
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.disableAlpha();
 
@@ -170,7 +171,7 @@ public class LitematicaRenderer
             GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.popMatrix();
 
-            this.mc.profiler.endStartSection("entities");
+            GameUtils.profilerSwap("entities");
 
             GlStateManager.pushMatrix();
 
@@ -191,7 +192,7 @@ public class LitematicaRenderer
             this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-            this.mc.profiler.endStartSection("translucent");
+            GameUtils.profilerSwap("translucent");
             GlStateManager.depthMask(false);
 
             GlStateManager.pushMatrix();
@@ -205,7 +206,7 @@ public class LitematicaRenderer
             this.disableShader();
         }
 
-        this.mc.profiler.endStartSection("overlay");
+        GameUtils.profilerSwap("overlay");
         this.renderSchematicOverlay();
 
         GlStateManager.enableAlpha();
@@ -214,7 +215,7 @@ public class LitematicaRenderer
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableCull();
 
-        this.mc.profiler.endSection();
+        GameUtils.profilerPop();
     }
 
     public void renderSchematicOverlay()
@@ -301,7 +302,7 @@ public class LitematicaRenderer
             this.renderPiecewiseSchematic = Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() != invert;
             this.renderPiecewiseBlocks = this.renderPiecewiseSchematic && Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue();
 
-            this.mc.profiler.startSection("litematica_culling");
+            GameUtils.profilerPush("litematica_culling");
 
             Entity entity = this.mc.getRenderViewEntity();
             ICamera icamera = this.createCamera(entity, partialTicks);
@@ -309,13 +310,13 @@ public class LitematicaRenderer
             this.calculateFinishTime();
             RenderGlobalSchematic renderGlobal = this.getWorldRenderer();
 
-            this.mc.profiler.endStartSection("litematica_terrain_setup");
+            GameUtils.profilerSwap("litematica_terrain_setup");
             renderGlobal.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
 
-            this.mc.profiler.endStartSection("litematica_update_chunks");
+            GameUtils.profilerSwap("litematica_update_chunks");
             renderGlobal.updateChunks(this.finishTimeNano);
 
-            this.mc.profiler.endSection();
+            GameUtils.profilerPop();
 
             this.renderPiecewisePrepared = true;
         }
@@ -325,7 +326,7 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewiseBlocks)
         {
-            this.mc.profiler.startSection("litematica_blocks_solid");
+            GameUtils.profilerPush("litematica_blocks_solid");
 
             if (renderColliding)
             {
@@ -345,7 +346,7 @@ public class LitematicaRenderer
                 GlStateManager.disablePolygonOffset();
             }
 
-            this.mc.profiler.endSection();
+            GameUtils.profilerPop();
         }
     }
 
@@ -353,7 +354,7 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewiseBlocks)
         {
-            this.mc.profiler.startSection("litematica_blocks_cutout_mipped");
+            GameUtils.profilerPush("litematica_blocks_cutout_mipped");
 
             if (renderColliding)
             {
@@ -373,7 +374,7 @@ public class LitematicaRenderer
                 GlStateManager.disablePolygonOffset();
             }
 
-            this.mc.profiler.endSection();
+            GameUtils.profilerPop();
         }
     }
 
@@ -381,7 +382,7 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewiseBlocks)
         {
-            this.mc.profiler.startSection("litematica_blocks_cutout");
+            GameUtils.profilerPush("litematica_blocks_cutout");
 
             if (renderColliding)
             {
@@ -401,7 +402,7 @@ public class LitematicaRenderer
                 GlStateManager.disablePolygonOffset();
             }
 
-            this.mc.profiler.endSection();
+            GameUtils.profilerPop();
         }
     }
 
@@ -411,7 +412,7 @@ public class LitematicaRenderer
         {
             if (this.renderPiecewiseBlocks)
             {
-                this.mc.profiler.startSection("litematica_translucent");
+                GameUtils.profilerPush("litematica_translucent");
 
                 if (renderColliding)
                 {
@@ -431,16 +432,16 @@ public class LitematicaRenderer
                     GlStateManager.disablePolygonOffset();
                 }
 
-                this.mc.profiler.endSection();
+                GameUtils.profilerPop();
             }
 
             if (this.renderPiecewiseSchematic)
             {
-                this.mc.profiler.startSection("litematica_overlay");
+                GameUtils.profilerPush("litematica_overlay");
 
                 this.renderSchematicOverlay();
 
-                this.mc.profiler.endSection();
+                GameUtils.profilerPop();
             }
 
             this.cleanup();
@@ -451,7 +452,7 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewiseBlocks)
         {
-            this.mc.profiler.startSection("litematica_entities");
+            GameUtils.profilerPush("litematica_entities");
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
@@ -463,7 +464,7 @@ public class LitematicaRenderer
 
             GlStateManager.disableBlend();
 
-            this.mc.profiler.endSection();
+            GameUtils.profilerPop();
         }
     }
 

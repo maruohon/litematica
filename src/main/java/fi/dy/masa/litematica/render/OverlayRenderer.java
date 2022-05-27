@@ -28,13 +28,13 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.ScreenContext;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.game.BlockUtils;
+import fi.dy.masa.malilib.util.game.WorldUtils;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.position.Vec2i;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Configs.Visuals;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -706,23 +706,24 @@ public class OverlayRenderer
         }
     }
 
-    public void renderHoveredSchematicBlock(Minecraft mc, float partialTicks)
+    public void renderHoveredSchematicBlock(float tickDelta)
     {
-        RayTraceResult trace = mc.objectMouseOver;
+        Minecraft mc = GameUtils.getClient();
+        RayTraceResult hitResult = GameUtils.getHitResult();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
-        if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK && worldSchematic != null)
+        if (hitResult != null && hitResult.typeOfHit == RayTraceResult.Type.BLOCK && worldSchematic != null)
         {
-            BlockPos pos = trace.getBlockPos();
+            BlockPos pos = hitResult.getBlockPos();
             IBlockState stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
             IBlockState stateSchematic = worldSchematic.getBlockState(pos);
 
             if (stateClient != stateSchematic && stateClient.getMaterial() != Material.AIR)
             {
                 Entity entity = GameUtils.getCameraEntity();
-                double dx = EntityWrap.lerpX(entity, partialTicks);
-                double dy = EntityWrap.lerpY(entity, partialTicks);
-                double dz = EntityWrap.lerpZ(entity, partialTicks);
+                double dx = EntityWrap.lerpX(entity, tickDelta);
+                double dy = EntityWrap.lerpY(entity, tickDelta);
+                double dz = EntityWrap.lerpZ(entity, tickDelta);
 
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(-dx, -dy, -dz);

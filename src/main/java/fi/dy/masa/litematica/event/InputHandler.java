@@ -60,7 +60,7 @@ public class InputHandler implements MouseInputHandler
 
         final int amount = dWheel > 0 ? 1 : -1;
         ToolMode mode = DataManager.getToolMode();
-        EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getClosestLookingDirection(player);
+        EnumFacing direction = fi.dy.masa.malilib.util.position.PositionUtils.getClosestLookingDirection(player);
 
         if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())
         {

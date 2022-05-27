@@ -28,12 +28,12 @@ import net.minecraft.world.World;
 import fi.dy.masa.malilib.config.value.LayerMode;
 import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.GameUtils;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
-import fi.dy.masa.malilib.util.wrap.EntityWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -1004,7 +1004,7 @@ public class SchematicPlacementManager
         if (schematicPlacement != null)
         {
             Entity entity = GameUtils.getCameraEntity();
-            RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, maxDistance);
+            RayTraceResult trace = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, maxDistance);
 
             if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
             {
