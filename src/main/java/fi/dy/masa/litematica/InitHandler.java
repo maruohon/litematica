@@ -11,10 +11,10 @@ import fi.dy.masa.litematica.config.HotkeyCallbacks;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.FileMigrationUtils;
 import fi.dy.masa.litematica.event.ClientWorldChangeHandler;
-import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.input.LitematicaHotkeyProvider;
+import fi.dy.masa.litematica.input.MouseScrollHandlerImpl;
 import fi.dy.masa.litematica.network.SchematicSavePacketHandler;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.ClientTickHandler;
@@ -32,7 +32,7 @@ public class InitHandler implements InitializationHandler
         Registry.CONFIG_TAB.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
         Registry.HOTKEY_MANAGER.registerHotkeyProvider(new LitematicaHotkeyProvider());
-        Registry.INPUT_DISPATCHER.registerMouseInputHandler(InputHandler.getInstance());
+        Registry.INPUT_DISPATCHER.registerMouseScrollHandler(new MouseScrollHandlerImpl());
 
         RenderHandler renderer = new RenderHandler();
         Registry.RENDER_EVENT_DISPATCHER.registerGameOverlayRenderer(renderer);

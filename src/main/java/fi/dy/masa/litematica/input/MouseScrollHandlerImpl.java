@@ -1,13 +1,13 @@
-package fi.dy.masa.litematica.event;
+package fi.dy.masa.litematica.input;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.input.MouseInputHandler;
+import fi.dy.masa.malilib.input.MouseScrollHandler;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -21,46 +21,28 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 
-public class InputHandler implements MouseInputHandler
+public class MouseScrollHandlerImpl implements MouseScrollHandler
 {
-    private static final InputHandler INSTANCE = new InputHandler();
-
-    private InputHandler()
-    {
-    }
-
-    public static InputHandler getInstance()
-    {
-        return INSTANCE;
-    }
-
     @Override
-    public boolean onMouseInput(int eventButton, int wheelDelta, boolean eventButtonState)
+    public boolean onMouseScroll(int mouseX, int mouseY, double deltaX, double deltaY)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        boolean toolEnabled = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
+                              Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
-        // Not in a GUI
-        if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null && wheelDelta != 0)
-        {
-            return this.handleMouseScroll(wheelDelta, mc);
-        }
-
-        return false;
-    }
-
-    private boolean handleMouseScroll(double dWheel, Minecraft mc)
-    {
-        EntityPlayer player = mc.player;
-        boolean toolEnabled = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
-
-        if (toolEnabled == false || EntityUtils.hasToolItem(player) == false)
+        if (GuiUtils.getCurrentScreen() != null ||
+            GameUtils.getClientWorld() == null ||
+            GameUtils.getClientPlayer() == null ||
+            deltaY == 0 ||
+            toolEnabled == false ||
+            EntityUtils.hasToolItem(GameUtils.getClientPlayer()) == false)
         {
             return false;
         }
 
-        final int amount = dWheel > 0 ? 1 : -1;
+        final int amount = deltaY > 0 ? 1 : -1;
         ToolMode mode = DataManager.getToolMode();
-        EnumFacing direction = fi.dy.masa.malilib.util.position.PositionUtils.getClosestLookingDirection(player);
+        Entity cameraEntity = GameUtils.getCameraEntity();
+        EnumFacing direction = fi.dy.masa.malilib.util.position.PositionUtils.getClosestLookingDirection(cameraEntity);
 
         if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())
         {
@@ -73,19 +55,19 @@ public class InputHandler implements MouseInputHandler
 
             if (sm.hasGrabbedElement())
             {
-                sm.changeGrabDistance(player, amount);
+                sm.changeGrabDistance(cameraEntity, amount);
                 return true;
             }
             else if (sm.hasSelectedOrigin())
             {
                 AreaSelection area = sm.getCurrentSelection();
                 BlockPos old = area.getEffectiveOrigin();
-                area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(player), amount), false);
+                area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(cameraEntity), amount), false);
                 return true;
             }
             else if (mode == ToolMode.MOVE)
             {
-                ToolUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, player, mc);
+                ToolUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, cameraEntity);
                 return true;
             }
         }
@@ -97,7 +79,7 @@ public class InputHandler implements MouseInputHandler
 
         if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeyBind().isKeyBindHeld())
         {
-            return nudgeSelection(amount, mode, player);
+            return nudgeSelection(amount, mode, cameraEntity);
         }
 
         if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeyBind().isKeyBindHeld())

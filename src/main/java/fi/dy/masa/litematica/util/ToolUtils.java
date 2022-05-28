@@ -230,21 +230,21 @@ public class ToolUtils
         }
     }
 
-    public static void moveCurrentlySelectedWorldRegionToLookingDirection(int amount, EntityPlayer player, Minecraft mc)
+    public static void moveCurrentlySelectedWorldRegionToLookingDirection(int amount, Entity cameraEntity)
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
 
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
-            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(player), amount);
-            moveCurrentlySelectedWorldRegionTo(pos, mc);
+            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(cameraEntity), amount);
+            moveCurrentlySelectedWorldRegionTo(pos);
         }
     }
 
-    public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos, Minecraft mc)
+    public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos)
     {
-        if (mc.player == null || GameUtils.isCreativeMode() == false)
+        if (GameUtils.isCreativeMode() == false)
         {
             MessageDispatcher.error("litematica.error.generic.creative_mode_only");
             return;

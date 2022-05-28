@@ -75,7 +75,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
 
                         if (pos != null)
                         {
-                            ToolUtils.moveCurrentlySelectedWorldRegionTo(pos, mc);
+                            ToolUtils.moveCurrentlySelectedWorldRegionTo(pos);
                         }
                     }
                     else if (Configs.Generic.SELECTION_CORNERS_MODE.getValue() == CornerSelectionMode.CORNERS)

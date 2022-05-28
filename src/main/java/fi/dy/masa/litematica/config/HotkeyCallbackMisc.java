@@ -13,7 +13,7 @@ import fi.dy.masa.malilib.util.ListUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.event.InputHandler;
+import fi.dy.masa.litematica.input.MouseScrollHandlerImpl;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.SetSchematicPreviewTask;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -196,7 +196,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
 
                     if (mode == ToolMode.MOVE)
                     {
-                        ToolUtils.moveCurrentlySelectedWorldRegionTo(pos, this.mc);
+                        ToolUtils.moveCurrentlySelectedWorldRegionTo(pos);
                     }
                     else
                     {
@@ -218,7 +218,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
                  key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeyBind())
         {
             int amount = key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeyBind() ? 1 : -1;
-            InputHandler.nudgeSelection(amount, mode, GameUtils.getCameraEntity());
+            MouseScrollHandlerImpl.nudgeSelection(amount, mode, GameUtils.getCameraEntity());
             return ActionResult.SUCCESS;
         }
         else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeyBind())
