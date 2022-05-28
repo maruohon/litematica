@@ -711,23 +711,21 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         }
         else
         {
-            double entityX = EntityWrap.getX(renderViewEntity);
-            double entityY = EntityWrap.getY(renderViewEntity);
-            double entityZ = EntityWrap.getZ(renderViewEntity);
             double renderX = EntityWrap.lerpX(renderViewEntity, partialTicks);
             double renderY = EntityWrap.lerpY(renderViewEntity, partialTicks);
             double renderZ = EntityWrap.lerpZ(renderViewEntity, partialTicks);
+
             GameUtils.profilerPush("prepare");
-            TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, this.mc.getRenderViewEntity(), GameUtils.getHitResult(), partialTicks);
-            this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
+            TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, renderViewEntity, GameUtils.getHitResult(), partialTicks);
+            this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, renderViewEntity, this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
             this.countEntitiesTotal = 0;
             this.countEntitiesRendered = 0;
             this.countEntitiesHidden = 0;
 
-            TileEntityRendererDispatcher.staticPlayerX = entityX;
-            TileEntityRendererDispatcher.staticPlayerY = entityY;
-            TileEntityRendererDispatcher.staticPlayerZ = entityZ;
-            this.renderManager.setRenderPosition(entityX, entityY, entityZ);
+            TileEntityRendererDispatcher.staticPlayerX = renderX;
+            TileEntityRendererDispatcher.staticPlayerY = renderY;
+            TileEntityRendererDispatcher.staticPlayerZ = renderZ;
+            this.renderManager.setRenderPosition(renderX, renderY, renderZ);
             this.mc.entityRenderer.enableLightmap();
 
             this.countEntitiesTotal = this.world.getLoadedEntityList().size();
