@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui.util;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -10,11 +10,11 @@ import fi.dy.masa.litematica.schematic.SchematicType;
 
 public class SchematicBrowserIconProvider implements FileBrowserIconProvider
 {
-    protected final HashMap<File, MultiIcon> cachedIcons = new HashMap<>();
+    protected final HashMap<Path, MultiIcon> cachedIcons = new HashMap<>();
 
     @Override
     @Nullable
-    public MultiIcon getIconForFile(File file)
+    public MultiIcon getIconForFile(Path file)
     {
         MultiIcon icon = this.cachedIcons.get(file);
 
@@ -33,7 +33,7 @@ public class SchematicBrowserIconProvider implements FileBrowserIconProvider
         return icon;
     }
 
-    public void setIconForFile(File file, @Nullable MultiIcon icon)
+    public void setIconForFile(Path file, @Nullable MultiIcon icon)
     {
         this.cachedIcons.put(file, icon);
     }

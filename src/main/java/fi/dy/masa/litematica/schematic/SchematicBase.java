@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,18 +25,18 @@ public abstract class SchematicBase implements ISchematic
 {
     public static final int MINECRAFT_DATA_VERSION = ((IMixinDataFixer) Minecraft.getMinecraft().getDataFixer()).getVersion();
 
-    @Nullable protected final File schematicFile;
+    @Nullable protected final Path schematicFile;
     protected final SchematicMetadata metadata = new SchematicMetadata();
     protected long totalBlocksReadFromWorld;
 
-    public SchematicBase(@Nullable File file)
+    public SchematicBase(@Nullable Path file)
     {
         this.schematicFile = file;
     }
 
     @Override
     @Nullable
-    public File getFile()
+    public Path getFile()
     {
         return this.schematicFile;
     }

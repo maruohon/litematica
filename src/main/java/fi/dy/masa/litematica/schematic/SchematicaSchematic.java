@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
     private Block[] palette;
 
-    SchematicaSchematic(@Nullable File fileName)
+    SchematicaSchematic(@Nullable Path fileName)
     {
         super(fileName);
     }
@@ -209,6 +209,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
         }
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     protected boolean readBlocksFromTag(NBTTagCompound tag)
     {

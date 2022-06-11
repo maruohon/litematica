@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.malilib.gui.BaseScreen;
@@ -125,7 +125,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
         {
             String title = "litematica.title.screen.schematic_manager.confirm_file_deletion";
             String msg = "litematica.info.schematic_manager.confirm_file_deletion";
-            String fileName = entry.getFullPath().getAbsolutePath();
+            String fileName = entry.getFullPath().toAbsolutePath().toString();
             ConfirmActionScreen screen = new ConfirmActionScreen(320, title, this::executeFileDelete, msg, fileName);
             screen.setParent(this);
             BaseScreen.openPopupScreen(screen);
@@ -153,11 +153,11 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
 
         if (entry != null)
         {
-            File file = entry.getFullPath();
+            Path file = entry.getFullPath();
 
             try
             {
-                boolean success = file.delete();
+                boolean success = FileUtils.delete(file);
 
                 this.schematicInfoWidget.clearCache();
                 this.getListWidget().clearSelection();
@@ -167,7 +167,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
             }
             catch (Exception e)
             {
-                MessageDispatcher.error("malilib.message.error.failed_to_delete_file", file.getAbsolutePath());
+                MessageDispatcher.error("malilib.message.error.failed_to_delete_file", file.toAbsolutePath().toString());
             }
         }
 
@@ -180,8 +180,8 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
 
         if (entry != null)
         {
-            File oldFile = entry.getFullPath();
-            String oldName = FileNameUtils.getFileNameWithoutExtension(oldFile.getName());
+            Path oldFile = entry.getFullPath();
+            String oldName = FileNameUtils.getFileNameWithoutExtension(oldFile.getFileName().toString());
             String title = "litematica.title.screen.schematic_manager.rename_file";
             TextInputScreen screen = new TextInputScreen(title, oldName,
                                                          (str) -> this.renameFileToName(oldFile, str));
@@ -190,7 +190,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
         }
     }
 
-    protected boolean renameFileToName(File oldFile, String newName)
+    protected boolean renameFileToName(Path oldFile, String newName)
     {
         boolean success = FileUtils.renameFileToName(oldFile, newName, MessageDispatcher::error);
 
@@ -232,7 +232,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
             String oldName = schematic.getMetadata().getName();
             schematic.getMetadata().setName(newName);
             schematic.getMetadata().setTimeModifiedToNow();
-            File file = schematic.getFile();
+            Path file = schematic.getFile();
 
             if (schematic.writeToFile(file, true))
             {

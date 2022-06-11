@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic.util;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 public class SchematicCreationUtils
 {
     @Nullable
-    public static <S extends ISchematic> S createFromFile(File file, Function<File, S> factory)
+    public static <S extends ISchematic> S createFromFile(Path file, Function<Path, S> factory)
     {
         S schematic = factory.apply(file);
 

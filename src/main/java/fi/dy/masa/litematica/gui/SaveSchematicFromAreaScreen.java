@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.OptionListConfig;
@@ -149,7 +149,7 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
     protected void saveSchematic()
     {
         boolean overwrite = BaseScreen.isShiftDown();
-        File file = this.getSchematicFileIfCanSave(overwrite);
+        Path file = this.getSchematicFileIfCanSave(overwrite);
 
         if (file == null)
         {
@@ -173,7 +173,7 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
         }
     }
 
-    protected void saveSchematicOnClient(SchematicSaveSettings settings, File file, boolean overwrite)
+    protected void saveSchematicOnClient(SchematicSaveSettings settings, Path file, boolean overwrite)
     {
         LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(this.selection);
         CreateSchematicTask task = new CreateSchematicTask(schematic, this.selection,
@@ -183,15 +183,15 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
         TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
     }
 
-    protected void saveSchematicOnServer(SchematicSaveSettings settings, File file, boolean overwrite)
+    protected void saveSchematicOnServer(SchematicSaveSettings settings, Path file, boolean overwrite)
     {
         SchematicSavePacketHandler.INSTANCE.requestSchematicSaveAllAtOnce(this.selection, settings,
                                                                           sch -> this.writeSchematicToFile(sch, file, overwrite));
     }
 
-    protected void writeSchematicToFile(ISchematic schematic, File file, boolean overwrite)
+    protected void writeSchematicToFile(ISchematic schematic, Path file, boolean overwrite)
     {
-        String fileName = file.getName();
+        String fileName = file.getFileName().toString();
 
         SchematicCreationUtils.setSchematicMetadataOnCreation(schematic, this.selection.getName());
 

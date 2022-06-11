@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
@@ -71,7 +71,8 @@ public class SchematicBrowserScreen extends BaseSchematicBrowserScreen
         }
 
         SchematicHolder.getInstance().addSchematic(schematic, true);
-        MessageDispatcher.success("litematica.message.info.schematic_loaded_to_memory", schematic.getFile().getName());
+        MessageDispatcher.success("litematica.message.info.schematic_loaded_to_memory",
+                                  schematic.getFile().getFileName().toString());
 
         // Clear the parent after loading as schematic, as presumably in most cases
         // the user would just want to close the screen at that point.
@@ -96,7 +97,7 @@ public class SchematicBrowserScreen extends BaseSchematicBrowserScreen
 
     public static ISchematic tryLoadSchematic(DirectoryEntry entry)
     {
-        File file = entry != null && entry.getType() == DirectoryEntryType.FILE ? entry.getFullPath() : null;
+        Path file = entry != null && entry.getType() == DirectoryEntryType.FILE ? entry.getFullPath() : null;
 
         if (file == null)
         {

@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.selection;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.FileNameUtils;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
@@ -180,11 +183,11 @@ public class SelectionManager
     @Nullable
     private AreaSelection tryLoadSelectionFromFile(String selectionId)
     {
-        return tryLoadSelectionFromFile(new File(selectionId));
+        return tryLoadSelectionFromFile(Paths.get(selectionId));
     }
 
     @Nullable
-    public static AreaSelection tryLoadSelectionFromFile(File file)
+    public static AreaSelection tryLoadSelectionFromFile(Path file)
     {
         JsonElement el = JsonUtils.parseJsonFile(file);
 
@@ -205,11 +208,11 @@ public class SelectionManager
                 this.currentSelectionId = null;
             }
 
-            File file = new File(selectionId);
+            Path file = Paths.get(selectionId);
 
-            if (file.exists() && file.isFile())
+            if (Files.exists(file))
             {
-                file.delete();
+                FileUtils.delete(file);
             }
 
             return true;
@@ -220,48 +223,48 @@ public class SelectionManager
 
     public boolean renameSelection(String selectionId, String newName, MessageOutput output)
     {
-        File dir = new File(selectionId);
-        dir = dir.getParentFile();
+        Path dir = Paths.get(selectionId);
+        dir = dir.getParent();
 
         return this.renameSelection(dir, selectionId, newName, output);
     }
 
-    public boolean renameSelection(File dir, String selectionId, String newName, MessageOutput output)
+    public boolean renameSelection(Path dir, String selectionId, String newName, MessageOutput output)
     {
         return this.renameSelection(dir, selectionId, newName, false, output);
     }
 
-    public boolean renameSelection(File dir, String selectionId, String newName, boolean copy, MessageOutput output)
+    public boolean renameSelection(Path dir, String selectionId, String newName, boolean copy, MessageOutput output)
     {
-        File file = new File(selectionId);
+        Path file = Paths.get(selectionId);
 
-        if (file.exists() && file.isFile())
+        if (Files.isRegularFile(file))
         {
             String newFileName = FileNameUtils.generateSafeFileName(newName);
 
             if (newFileName.isEmpty())
             {
-                MessageDispatcher.error().type(output)
-                        .translate("litematica.error.area_selection.rename.invalid_safe_file_name", newFileName);
+                String key = "litematica.error.area_selection.rename.invalid_safe_file_name";
+                MessageDispatcher.error().type(output).translate(key, newFileName);
                 return false;
             }
 
-            File newFile = new File(dir, newFileName + ".json");
+            Path newFile = dir.resolve(newFileName + ".json");
 
-            if (newFile.exists() == false && (copy || file.renameTo(newFile)))
+            if (Files.exists(newFile) == false && (copy || FileUtils.move(file, newFile)))
             {
-                String newId = newFile.getAbsolutePath();
+                String newId = newFile.toAbsolutePath().toString();
                 AreaSelection selection;
 
                 if (copy)
                 {
                     try
                     {
-                        org.apache.commons.io.FileUtils.copyFile(file, newFile);
+                        Files.copy(file, newFile);
                     }
                     catch (Exception e)
                     {
-                        MessageDispatcher.error().type(output)
+                        MessageDispatcher.error().console().type(output)
                                 .translate("litematica.error.area_selection.copy_failed");
                         Litematica.logger.warn("Copy failed", e);
                         return false;
@@ -292,7 +295,8 @@ public class SelectionManager
             else
             {
                 MessageDispatcher.error().type(output)
-                        .translate("litematica.error.area_selection.rename.already_exists", newFile.getName());
+                        .translate("litematica.error.area_selection.rename.already_exists",
+                                   newFile.getFileName().toString());
             }
         }
 
@@ -313,20 +317,20 @@ public class SelectionManager
      * Creates a new schematic selection and returns the name of it
      * @return
      */
-    public String createNewSelection(File dir, final String nameIn)
+    public String createNewSelection(Path dir, final String nameIn)
     {
         String name = nameIn;
         String safeName = FileNameUtils.generateSafeFileName(name);
-        File file = new File(dir, safeName + ".json");
-        String selectionId = file.getAbsolutePath();
+        Path file = dir.resolve(safeName + ".json");
+        String selectionId = file.toAbsolutePath().toString();
         int i = 1;
 
-        while (i < 1000 && (safeName.isEmpty() || this.selections.containsKey(selectionId) || file.exists()))
+        while (i < 1000 && (safeName.isEmpty() || this.selections.containsKey(selectionId) || Files.exists(file)))
         {
             name = nameIn + " " + i;
             safeName = FileNameUtils.generateSafeFileName(name);
-            file = new File(dir, safeName + ".json");
-            selectionId = file.getAbsolutePath();
+            file = dir.resolve(safeName + ".json");
+            selectionId = file.toAbsolutePath().toString();
             i++;
         }
 
@@ -394,7 +398,7 @@ public class SelectionManager
         return false;
     }
 
-    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, String name)
+    public boolean createSelectionFromPlacement(Path dir, SchematicPlacement placement, String name)
     {
         String safeName = FileNameUtils.generateSafeFileName(name);
 
@@ -404,8 +408,8 @@ public class SelectionManager
             return false;
         }
 
-        File file = new File(dir, safeName + ".json");
-        String selectionId = file.getAbsolutePath();
+        Path file = dir.resolve(safeName + ".json");
+        String selectionId = file.toAbsolutePath().toString();
         AreaSelection selection = this.getOrLoadSelectionReadOnly(selectionId);
 
         if (selection == null)
@@ -783,7 +787,7 @@ public class SelectionManager
         {
             for (Map.Entry<String, AreaSelection> entry : this.selections.entrySet())
             {
-                JsonUtils.writeJsonToFile(entry.getValue().toJson(), new File(entry.getKey()));
+                JsonUtils.writeJsonToFile(entry.getValue().toJson(), Paths.get(entry.getKey()));
             }
         }
         catch (Exception e)

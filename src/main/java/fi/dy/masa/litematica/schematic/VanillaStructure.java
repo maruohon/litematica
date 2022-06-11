@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class VanillaStructure extends SingleRegionSchematic
 {
     public static final String FILE_NAME_EXTENSION = ".nbt";
 
-    VanillaStructure(File file)
+    VanillaStructure(Path file)
     {
         super(file);
     }

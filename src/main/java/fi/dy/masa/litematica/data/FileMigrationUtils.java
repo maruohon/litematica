@@ -1,44 +1,46 @@
 package fi.dy.masa.litematica.data;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.google.common.io.Files;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.litematica.Litematica;
 
 public class FileMigrationUtils
 {
     private static final Pattern PATTERN_PER_DIM_DATA_FILE = Pattern.compile("litematica_(?<world>.*?)_dim(?<dim>-?[0-9]+)\\.json");
 
-    private static final FileFilter IS_OLD_WORLD_DATA_FILE = (file) -> {
-        String name = file.getName();
-        return file.isFile() && name.startsWith("litematica_") && name.endsWith(".json");
+    private static final Predicate<Path> IS_OLD_WORLD_DATA_FILE = path -> {
+        String name = path.getFileName().toString();
+        return Files.isRegularFile(path) && name.startsWith("litematica_") && name.endsWith(".json");
     };
 
     public static void tryMigrateOldPerWorldData()
     {
-        File configDir = DataManager.getCurrentConfigDirectory();
-        File newDataDirBase = DataManager.getPerWorldDataBaseDirectory();
+        Path configDir = DataManager.getCurrentConfigDirectory();
+        Path newDataDirBase = DataManager.getPerWorldDataBaseDirectory();
 
-        if (configDir.exists() == false || configDir.canRead() == false)
+        if (Files.isDirectory(configDir) == false || Files.isReadable(configDir) == false)
         {
             return;
         }
 
-        for (File file : configDir.listFiles(IS_OLD_WORLD_DATA_FILE))
+        for (Path file : FileUtils.getDirectoryContents(configDir, IS_OLD_WORLD_DATA_FILE, false))
         {
-            String name = file.getName();
+            String name = file.getFileName().toString();
             Matcher matcher = PATTERN_PER_DIM_DATA_FILE.matcher(name);
             String worldName;
             String newName;
-            File newDataDir;
+            Path newDataDir;
 
             // Per-dimension data file
             if (matcher.matches())
             {
                 worldName = matcher.group("world");
-                newDataDir = new File(newDataDirBase, worldName);
+                newDataDir = newDataDirBase.resolve(worldName);
 
                 String dim = matcher.group("dim");
                 newName = "data_dim_" + dim + ".json";
@@ -47,93 +49,104 @@ public class FileMigrationUtils
             else
             {
                 worldName = name.substring(11, name.length() - 5);
-                newDataDir = new File(newDataDirBase, worldName);
+                newDataDir = newDataDirBase.resolve(worldName);
                 newName = "data_common.json";
             }
 
-            if (newDataDir.exists() == false && newDataDir.mkdirs() == false)
+            if (FileUtils.createDirectoriesIfMissing(newDataDir) == false)
             {
-                MessageDispatcher.error().translate("Failed to create directory '" + newDataDir.getAbsolutePath() + "'");
+                MessageDispatcher.error().translate("Failed to create directory '" +
+                                                    newDataDir.toAbsolutePath() + "'");
                 continue;
             }
 
-            File newFile = new File(newDataDir, newName);
+            Path newFile = newDataDir.resolve(newName);
 
             try
             {
-                Files.move(file, newFile);
-                System.out.printf("moving '%s' => '%s'\n", file, newFile);
+                FileUtils.move(file, newFile);
+                Litematica.logger.info("Moving '{}' => '{}'\n", file, newFile);
             }
             catch (Exception e)
             {
-                MessageDispatcher.error().translate("Failed to move data file '" + file.getAbsolutePath() + "' to '" + newFile.getAbsolutePath() + "'");
+                MessageDispatcher.error().translate("Failed to move data file '" +
+                                                    file.toAbsolutePath() + "' to '" +
+                                                    newFile.toAbsolutePath() + "'");
             }
         }
     }
 
     public static void tryMigrateOldAreaSelections()
     {
-        File oldDirPerWorldBase = new File(DataManager.getCurrentConfigDirectory(), "area_selections_per_world");
-        File newDirPerWorldBase = new File(DataManager.getDataBaseDirectory("area_selections"), "per_world");
+        Path oldDirPerWorldBase = DataManager.getCurrentConfigDirectory().resolve("area_selections_per_world");
+        Path newDirPerWorldBase = DataManager.getDataBaseDirectory("area_selections").resolve("per_world");
 
-        if (oldDirPerWorldBase.exists() && oldDirPerWorldBase.isDirectory() && oldDirPerWorldBase.canRead())
+        if (Files.isDirectory(oldDirPerWorldBase) &&
+            Files.isReadable(oldDirPerWorldBase))
         {
-            if (newDirPerWorldBase.exists() == false && newDirPerWorldBase.mkdirs() == false)
+            if (FileUtils.createDirectoriesIfMissing(newDirPerWorldBase) == false)
             {
-                MessageDispatcher.error().translate("Failed to create directory '" + newDirPerWorldBase.getAbsolutePath() + "'");
+                MessageDispatcher.error().translate("Failed to create directory '" +
+                                                    newDirPerWorldBase.toAbsolutePath() + "'");
             }
             else
             {
-                for (File file : oldDirPerWorldBase.listFiles((f) -> f.isDirectory()))
+                for (Path file : FileUtils.getSubDirectories(oldDirPerWorldBase))
                 {
-                    File oldDir = new File(file, "area_selections");
+                    Path oldDir = file.resolve("area_selections");
 
-                    if (oldDir.exists() && oldDir.isDirectory() && oldDir.canRead())
+                    if (Files.isDirectory(oldDir) && Files.isReadable(oldDir))
                     {
-                        File newDir = new File(newDirPerWorldBase, file.getName());
+                        Path newDir = newDirPerWorldBase.resolve(file.getFileName().toString());
 
-                        if (newDir.exists() == false)
+                        if (Files.exists(newDir) == false)
                         {
                             try
                             {
-                                System.out.printf("Moving '%s' => '%s'\n", oldDir, newDir);
+                                Litematica.logger.info("Moving '{}' => '%s'\n", oldDir, newDir);
                                 Files.move(oldDir, newDir);
                             }
                             catch (Exception e)
                             {
-                                MessageDispatcher.error().translate("Failed to move directory '" + oldDir.getAbsolutePath() + "' to '" + newDir.getAbsolutePath() + "'");
+                                MessageDispatcher.error().translate("Failed to move directory '" +
+                                                                    oldDir.toAbsolutePath() + "' to '" +
+                                                                    newDir.toAbsolutePath() + "'");
                             }
                         }
 
-                        if (file.list().length == 0)
+                        if (FileUtils.isDirectoryEmpty(file))
                         {
-                            System.out.printf("Deleting '%s'\n", file);
-                            file.delete();
+                            Litematica.logger.info("Deleting '{}'\n", file);
+                            FileUtils.delete(file);
                         }
                     }
                 }
 
-                if (oldDirPerWorldBase.list().length == 0)
+                if (FileUtils.isDirectoryEmpty(oldDirPerWorldBase))
                 {
-                    System.out.printf("Deleting '%s'\n", oldDirPerWorldBase);
-                    oldDirPerWorldBase.delete();
+                    Litematica.logger.info("Deleting '{}'\n", oldDirPerWorldBase);
+                    FileUtils.delete(oldDirPerWorldBase);
                 }
             }
         }
 
-        File oldDirGlobal = new File(DataManager.getCurrentConfigDirectory(), "area_selections");
-        File newDirGlobal = new File(DataManager.getDataBaseDirectory("area_selections"), "global");
+        Path oldDirGlobal = DataManager.getCurrentConfigDirectory().resolve("area_selections");
+        Path newDirGlobal = DataManager.getDataBaseDirectory("area_selections").resolve("global");
 
-        if (oldDirGlobal.exists() && oldDirGlobal.isDirectory() && oldDirGlobal.canRead() && newDirGlobal.exists() == false)
+        if (Files.isDirectory(oldDirGlobal) &&
+            Files.isReadable(oldDirGlobal) &&
+            Files.exists(newDirGlobal) == false)
         {
             try
             {
-                System.out.printf("Moving '%s' => '%s'\n", oldDirGlobal, newDirGlobal);
+                Litematica.logger.info("Moving '{}' => '{}'\n", oldDirGlobal, newDirGlobal);
                 Files.move(oldDirGlobal, newDirGlobal);
             }
             catch (Exception e)
             {
-                MessageDispatcher.error().translate("Failed to move directory '" + oldDirGlobal.getAbsolutePath() + "' to '" + newDirGlobal.getAbsolutePath() + "'");
+                MessageDispatcher.error().translate("Failed to move directory '" +
+                                                    oldDirGlobal.toAbsolutePath() + "' to '" +
+                                                    newDirGlobal.toAbsolutePath() + "'");
             }
         }
     }

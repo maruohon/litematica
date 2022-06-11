@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import javax.annotation.Nullable;
 import fi.dy.masa.malilib.gui.BaseListScreen;
@@ -107,7 +108,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        File dir = DataManager.getVCSProjectsBaseDirectory();
+        Path dir = DataManager.getVCSProjectsBaseDirectory();
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE, "vcs_projects");
 
         listWidget.setParentScreen(this.getParent());
@@ -141,10 +142,10 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
 
     protected boolean createProjectByName(String projectName)
     {
-        File dir = this.getListWidget().getCurrentDirectory();
-        File file = new File(dir, projectName + ".json");
+        Path dir = this.getListWidget().getCurrentDirectory();
+        Path file = dir.resolve(projectName + ".json");
 
-        if (file.exists() == false)
+        if (Files.exists(file) == false)
         {
             DataManager.getSchematicProjectsManager().createAndOpenProject(dir, projectName);
             SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
@@ -182,7 +183,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
 
         if (entry != null && entry.getType() == DirectoryEntryType.FILE)
         {
-            File file = entry.getFullPath();
+            Path file = entry.getFullPath();
             FileUtils.deleteFiles(Collections.singletonList(file), MessageDispatcher.error()::send);
             this.getListWidget().clearSelection();
             this.getListWidget().refreshEntries();

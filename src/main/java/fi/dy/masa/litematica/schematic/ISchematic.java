@@ -1,8 +1,9 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -10,6 +11,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.Litematica;
 
@@ -23,7 +25,7 @@ public interface ISchematic
     /**
      * @return the file this schematic was read from, or null if this is an in-memory-only schematic.
      */
-    @Nullable File getFile();
+    @Nullable Path getFile();
 
     /**
      * @return the metadata object for this schematic
@@ -83,12 +85,12 @@ public interface ISchematic
      * Writes this schematic to a file by the given file name, in the given directory
      * @return true on success, false on failure
      */
-    default boolean writeToFile(File dir, String fileName, boolean override)
+    default boolean writeToFile(Path dir, String fileName, boolean override)
     {
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (FileUtils.createDirectoriesIfMissing(dir) == false)
         {
             String key = "litematica.error.schematic_write_to_file_failed.directory_creation_failed";
-            MessageDispatcher.error(key, dir.getAbsolutePath());
+            MessageDispatcher.error(key, dir.toAbsolutePath().toString());
             return false;
         }
 
@@ -99,7 +101,7 @@ public interface ISchematic
             fileName = fileName + extension;
         }
 
-        File file = new File(dir, fileName);
+        Path file = dir.resolve(fileName);
 
         return this.writeToFile(file, override);
     }
@@ -108,18 +110,18 @@ public interface ISchematic
      * Writes this schematic to the given file.
      * @return true on success, false on failure
      */
-    default boolean writeToFile(File file, boolean override)
+    default boolean writeToFile(Path file, boolean override)
     {
         try
         {
-            if (override == false && file.exists())
+            if (override == false && Files.exists(file))
             {
                 MessageDispatcher.error("litematica.error.schematic_write_to_file_failed.exists",
-                                        file.getAbsolutePath());
+                                        file.toAbsolutePath().toString());
                 return false;
             }
 
-            FileOutputStream os = new FileOutputStream(file);
+            FileOutputStream os = new FileOutputStream(file.toFile());
             this.writeToStream(this.toTag(), os);
             os.close();
 
@@ -127,9 +129,9 @@ public interface ISchematic
         }
         catch (Exception e)
         {
-            MessageDispatcher.error("litematica.error.schematic_write_to_file_failed.exception",
-                                    file.getAbsolutePath());
-            Litematica.logger.warn("Failed to write schematic to file '{}'", file.getAbsolutePath(), e);
+            String name = file.toAbsolutePath().toString();
+            MessageDispatcher.error("litematica.error.schematic_write_to_file_failed.exception", name);
+            Litematica.logger.warn("Failed to write schematic to file '{}'", name, e);
         }
 
         return false;
@@ -147,7 +149,7 @@ public interface ISchematic
      */
     default boolean readFromFile()
     {
-        File file = this.getFile();
+        Path file = this.getFile();
 
         if (file == null)
         {
@@ -160,7 +162,7 @@ public interface ISchematic
         if (tag == null)
         {
             MessageDispatcher.error("litematica.error.schematic_read_from_file_failed.cant_read",
-                                    file.getAbsolutePath());
+                                    file.toAbsolutePath().toString());
             return false;
         }
 

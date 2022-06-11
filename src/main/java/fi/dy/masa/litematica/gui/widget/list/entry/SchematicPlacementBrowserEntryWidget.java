@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui.widget.list.entry;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -64,14 +64,14 @@ public class SchematicPlacementBrowserEntryWidget extends DirectoryEntryWidget
 
     protected void loadSavedPlacement()
     {
-        File file = this.data.getFullPath();
+        Path file = this.data.getFullPath();
         DataManager.getSchematicPlacementManager().loadPlacementFromFile(file);
     }
 
     protected void removeSavedPlacement()
     {
         this.scheduleTask(() -> {
-            File file = this.data.getFullPath();
+            Path file = this.data.getFullPath();
             FileUtils.deleteFiles(Collections.singletonList(file), MessageDispatcher::error);
             this.listWidget.clearSelection();
             this.listWidget.refreshEntries();

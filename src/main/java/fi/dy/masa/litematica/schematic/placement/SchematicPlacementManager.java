@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic.placement;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -285,7 +285,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void updateDependentPlacements(ISchematic schematic, File newSchematicFile, boolean selectedOnly)
+    public void updateDependentPlacements(ISchematic schematic, Path newSchematicFile, boolean selectedOnly)
     {
         if (selectedOnly)
         {
@@ -1110,7 +1110,7 @@ public class SchematicPlacementManager
         SchematicHolder.getInstance().clearLoadedSchematics();
     }
 
-    public void loadPlacementFromFile(File file)
+    public void loadPlacementFromFile(Path file)
     {
         SchematicPlacementUnloaded placement = SchematicPlacementUnloaded.fromFile(file);
 
@@ -1120,7 +1120,7 @@ public class SchematicPlacementManager
         }
         else
         {
-            MessageDispatcher.error("litematica.error.schematic_placements.load_fail", file.getName());
+            MessageDispatcher.error("litematica.error.schematic_placements.load_fail", file.getFileName().toString());
         }
     }
 

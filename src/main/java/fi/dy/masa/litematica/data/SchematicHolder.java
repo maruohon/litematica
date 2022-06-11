@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.data;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -22,7 +23,7 @@ public class SchematicHolder
         this.schematics.clear();
     }
 
-    public List<ISchematic> getAllOf(File file)
+    public List<ISchematic> getAllOf(Path file)
     {
         List<ISchematic> list = new ArrayList<>();
 
@@ -38,9 +39,9 @@ public class SchematicHolder
     }
 
     @Nullable
-    public ISchematic getOrLoad(File file)
+    public ISchematic getOrLoad(Path file)
     {
-        if (file.exists() == false || file.isFile() == false || file.canRead() == false)
+        if (Files.isRegularFile(file) == false || Files.isReadable(file) == false)
         {
             return null;
         }

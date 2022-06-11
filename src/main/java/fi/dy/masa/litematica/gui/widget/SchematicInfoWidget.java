@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui.widget;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -81,7 +81,7 @@ public class SchematicInfoWidget extends ContainerWidget
     {
         if (entry != null)
         {
-            File file = entry.getFullPath();
+            Path file = entry.getFullPath();
             this.infoCache.cacheSchematicInfo(file);
             this.currentInfo = this.infoCache.getSchematicInfo(file);
         }

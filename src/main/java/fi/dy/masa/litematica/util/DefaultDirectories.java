@@ -1,12 +1,12 @@
 package fi.dy.masa.litematica.util;
 
-import java.io.File;
+import java.nio.file.Path;
 import fi.dy.masa.malilib.util.FileUtils;
 
 public class DefaultDirectories
 {
-    public static File getDefaultSchematicDirectory()
+    public static Path getDefaultSchematicDirectory()
     {
-        return FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics"));
+        return FileUtils.getMinecraftDirectory().resolve("schematics");
     }
 }

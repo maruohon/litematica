@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,7 @@ public class LitematicaSchematic extends SchematicBase
     private final Map<String, List<EntityInfo>> entities = new HashMap<>();
     private final Map<String, SubRegion> subRegions = new HashMap<>();
 
-    LitematicaSchematic(@Nullable File file)
+    LitematicaSchematic(@Nullable Path file)
     {
         super(file);
     }
@@ -401,7 +401,7 @@ public class LitematicaSchematic extends SchematicBase
 
                         if (container == null)
                         {
-                            String fileName = this.getFile() != null ? this.getFile().getName() : "<null>";
+                            String fileName = this.getFile() != null ? this.getFile().getFileName().toString() : "<null>";
                             MessageDispatcher.error().translate("litematica.error.schematic_read_from_file_failed.region_container",
                                                                 regionName, fileName);
                             return false;
@@ -504,14 +504,14 @@ public class LitematicaSchematic extends SchematicBase
     }
 
     @Nullable
-    public static LitematicaSchematic createFromFile(File dir, String fileName)
+    public static LitematicaSchematic createFromFile(Path dir, String fileName)
     {
         if (fileName.endsWith(FILE_NAME_EXTENSION) == false)
         {
             fileName = fileName + FILE_NAME_EXTENSION;
         }
 
-        File file = new File(dir, fileName);
+        Path file = dir.resolve(fileName);
         LitematicaSchematic schematic = new LitematicaSchematic(file);
 
         return schematic.readFromFile() ? schematic : null;

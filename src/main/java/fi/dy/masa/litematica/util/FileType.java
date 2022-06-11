@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.util;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import com.google.common.collect.ImmutableList;
 
@@ -30,11 +31,11 @@ public enum FileType
         return this.isSchematic;
     }
 
-    public static FileType fromFileName(File file)
+    public static FileType fromFileName(Path file)
     {
-        if (file.isFile() && file.canRead())
+        if (Files.isRegularFile(file) && Files.isReadable(file))
         {
-            String name = file.getName().toLowerCase(Locale.ROOT);
+            String name = file.getFileName().toString().toLowerCase(Locale.ROOT);
 
             for (FileType type : VALUES)
             {

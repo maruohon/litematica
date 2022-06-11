@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui.util;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
@@ -15,11 +15,11 @@ import fi.dy.masa.litematica.schematic.SchematicType;
 
 public class SchematicInfoCache
 {
-    protected final HashMap<File, SchematicInfo> cachedData = new HashMap<>();
+    protected final HashMap<Path, SchematicInfo> cachedData = new HashMap<>();
     protected final Minecraft mc = Minecraft.getMinecraft();
 
     @Nullable
-    public SchematicInfo getSchematicInfo(File file)
+    public SchematicInfo getSchematicInfo(Path file)
     {
         return this.cachedData.get(file);
     }
@@ -37,7 +37,7 @@ public class SchematicInfoCache
         this.cachedData.clear();
     }
 
-    public void cacheSchematicInfo(File file)
+    public void cacheSchematicInfo(Path file)
     {
         if (this.cachedData.containsKey(file))
         {
@@ -54,7 +54,7 @@ public class SchematicInfoCache
             if (schematic != null)
             {
                 SchematicMetadata metadata = schematic.getMetadata();
-                Identifier iconName = new Identifier(Reference.MOD_ID, file.getAbsolutePath());
+                Identifier iconName = new Identifier(Reference.MOD_ID, file.toAbsolutePath().toString());
                 DynamicTexture texture = this.createPreviewImage(iconName, metadata);
                 data = new SchematicInfo(schematic, iconName, texture);
             }

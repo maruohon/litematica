@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
@@ -213,14 +213,14 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
     {
         boolean csv = BaseScreen.isShiftDown();
         Format format = csv ? Format.CSV : Format.ASCII;
-        File dir = DataManager.getDataBaseDirectory("material_lists");
-        File file = DataDump.dumpDataToFile(dir, "material_list", csv ? ".csv" : ".txt",
+        Path dir = DataManager.getDataBaseDirectory("material_lists");
+        Path file = DataDump.dumpDataToFile(dir, "material_list", csv ? ".csv" : ".txt",
                                             this.materialList.getMaterialListDump(format).getLines());
 
         if (file != null)
         {
             String key = "litematica.message.info.material_list.written_to_file";
-            MessageDispatcher.generic(key, file.getName());
+            MessageDispatcher.generic(key, file.getFileName().toString());
             StringUtils.sendOpenFileChatMessage(this.mc.player, key, file);
         }
     }

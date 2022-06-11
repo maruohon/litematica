@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
@@ -94,7 +94,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        File dir = DataManager.getAreaSelectionsBaseDirectory();
+        Path dir = DataManager.getAreaSelectionsBaseDirectory();
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE, "area_selections");
 
         listWidget.setListEntryWidgetFixedHeight(18);
@@ -114,7 +114,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
         if (currentSelection != null)
         {
-            int len = DataManager.getAreaSelectionsBaseDirectory().getAbsolutePath().length();
+            int len = DataManager.getAreaSelectionsBaseDirectory().toAbsolutePath().toString().length();
 
             if (currentSelection.length() > len + 1)
             {
@@ -139,7 +139,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
     protected boolean createSelectionByName(String name)
     {
-        File dir = this.getListWidget().getCurrentDirectory();
+        Path dir = this.getListWidget().getCurrentDirectory();
         this.selectionManager.createNewSelection(dir, name);
         this.getListWidget().refreshEntries();
         this.updateCurrentSelectionLabel();
@@ -168,7 +168,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     protected boolean selectionFromPlacementByName(String name)
     {
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
-        File dir = this.getListWidget().getCurrentDirectory();
+        Path dir = this.getListWidget().getCurrentDirectory();
 
         if (placement != null && this.selectionManager.createSelectionFromPlacement(dir, placement, name))
         {
@@ -194,7 +194,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         if (entry.getType() == BaseFileBrowserWidget.DirectoryEntryType.FILE &&
             FileType.fromFileName(entry.getFullPath()) == FileType.JSON)
         {
-            String selectionId = entry.getFullPath().getAbsolutePath();
+            String selectionId = entry.getFullPath().toAbsolutePath().toString();
 
             if (selectionId.equals(this.selectionManager.getCurrentNormalSelectionId()))
             {

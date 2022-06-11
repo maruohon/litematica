@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import fi.dy.masa.malilib.gui.icon.DefaultIcons;
@@ -13,6 +14,7 @@ import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryTy
 import fi.dy.masa.malilib.input.Keys;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicType;
@@ -107,9 +109,9 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
     protected abstract void saveSchematic();
 
     @Nullable
-    protected File getSchematicFileIfCanSave(boolean overwrite)
+    protected Path getSchematicFileIfCanSave(boolean overwrite)
     {
-        File dir = this.getListWidget().getCurrentDirectory();
+        Path dir = this.getListWidget().getCurrentDirectory();
         String name = this.fileNameTextField.getText();
         SchematicType<?> outputType = this.schematicTypeDropdown.getSelectedEntry();
 
@@ -123,11 +125,12 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
     }
 
     @Nullable
-    public static File getSchematicFileIfCanSave(File dir, String name, SchematicType<?> outputType, boolean overwrite)
+    public static Path getSchematicFileIfCanSave(Path dir, String name, SchematicType<?> outputType, boolean overwrite)
     {
-        if (dir.isDirectory() == false)
+        if (Files.isDirectory(dir) == false)
         {
-            MessageDispatcher.error("litematica.message.error.save_schematic.invalid_directory", dir.getAbsolutePath());
+            String key = "litematica.message.error.save_schematic.invalid_directory";
+            MessageDispatcher.error(key, dir.toAbsolutePath());
             return null;
         }
 
@@ -150,20 +153,21 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
             name += extension;
         }
 
-        File file = new File(dir, name);
+        Path file = dir.resolve(name);
 
-        if (overwrite == false && file.exists())
+        if (overwrite == false && Files.exists(file))
         {
-            MessageDispatcher.error("litematica.message.error.file_exists.hold_shift_to_override", file.getName());
+            String key = "litematica.message.error.file_exists.hold_shift_to_override";
+            MessageDispatcher.error(key, name);
             return null;
         }
 
         try
         {
-            if (file.exists() == false && file.createNewFile() == false)
+            if (Files.exists(file) == false && FileUtils.createFile(file) == false)
             {
-                MessageDispatcher.error("litematica.message.error.schematic_save.failed_to_create_empty_file",
-                                        file.getName());
+                String key = "litematica.message.error.schematic_save.failed_to_create_empty_file";
+                MessageDispatcher.error(key, name);
                 return null;
             }
         }
@@ -174,11 +178,11 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
 
     public static String getDefaultFileNameForSchematic(ISchematic schematic)
     {
-        File file = schematic.getFile();
+        Path file = schematic.getFile();
 
         if (file != null)
         {
-            return FileNameUtils.getFileNameWithoutExtension(file.getName());
+            return FileNameUtils.getFileNameWithoutExtension(file.getFileName().toString());
         }
         else
         {

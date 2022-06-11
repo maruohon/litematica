@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -50,8 +50,8 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         this.manager = DataManager.getSchematicPlacementManager();
 
         ISchematic schematic = placement.getSchematic();
-        File file = schematic.getFile();
-        String fileName = file != null ? file.getName() : "-";
+        Path file = schematic.getFile();
+        String fileName = file != null ? file.getFileName().toString() : "-";
 
         this.originLabel = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.region_position");
         this.placementNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.placement_name", placement.getName()));

@@ -1,22 +1,22 @@
 package fi.dy.masa.litematica.gui.util;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 
 public class SchematicPlacementInfoCache
 {
-    protected final HashMap<File, SchematicPlacementUnloaded> cachedData = new HashMap<>();
+    protected final HashMap<Path, SchematicPlacementUnloaded> cachedData = new HashMap<>();
 
     @Nullable
-    public SchematicPlacementUnloaded getPlacementInfo(File file)
+    public SchematicPlacementUnloaded getPlacementInfo(Path file)
     {
         return this.cachedData.get(file);
     }
 
     @Nullable
-    public SchematicPlacementUnloaded cacheAndGetPlacementInfo(File file)
+    public SchematicPlacementUnloaded cacheAndGetPlacementInfo(Path file)
     {
         if (this.cachedData.containsKey(file) == false)
         {

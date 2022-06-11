@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -81,8 +81,8 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.manager = DataManager.getSchematicPlacementManager();
 
         ISchematic schematic = placement.getSchematic();
-        File file = schematic.getFile();
-        String fileName = file != null ? file.getName() : "-";
+        Path file = schematic.getFile();
+        String fileName = file != null ? file.getFileName().toString() : "-";
 
         this.nameTextField = new BaseTextFieldWidget(300, 16, placement.getName());
         this.originLabel = new LabelWidget("litematica.label.schematic_placement_settings.placement_origin");

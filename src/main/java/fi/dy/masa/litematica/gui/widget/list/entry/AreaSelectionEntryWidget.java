@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui.widget.list.entry;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -47,8 +47,8 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
     {
         super(entry, constructData, fileBrowserWidget, iconProvider);
 
-        File file = this.data.getFullPath();
-        this.selectionId = file.getAbsolutePath();
+        Path file = this.data.getFullPath();
+        this.selectionId = file.toAbsolutePath().toString();
         this.selection = selectionManager.getOrLoadSelection(this.selectionId);
         this.fileType = FileType.fromFileName(file);
         this.selectionManager = selectionManager;
@@ -218,7 +218,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
     protected boolean renameSelectionUsingName(String name, boolean copy)
     {
-        File dir = this.data.getDirectory();
+        Path dir = this.data.getDirectory();
         return this.selectionManager.renameSelection(dir, this.selectionId, name, copy, MessageOutput.MESSAGE_OVERLAY);
     }
 

@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +27,7 @@ public class SpongeSchematic extends SingleRegionSchematic
 
     protected int version = 1;
 
-    SpongeSchematic(File file)
+    SpongeSchematic(Path file)
     {
         super(file);
     }

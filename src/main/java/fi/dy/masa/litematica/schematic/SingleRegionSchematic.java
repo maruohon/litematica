@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +31,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
     protected BlockPos regionPos = BlockPos.ORIGIN;
     private Vec3i regionSize = Vec3i.NULL_VECTOR;
 
-    public SingleRegionSchematic(File file)
+    public SingleRegionSchematic(Path file)
     {
         super(file);
 
@@ -291,7 +291,8 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
         if (isSizeValid(this.regionSize) == false)
         {
-            MessageDispatcher.error().translate("litematica.message.error.schematic_read.invalid_or_missing_size", this.getFile().getAbsolutePath());
+            String key = "litematica.message.error.schematic_read.invalid_or_missing_size";
+            MessageDispatcher.error().translate(key, this.getFile().toAbsolutePath().toString());
             return false;
         }
 
@@ -305,7 +306,8 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         }
         else
         {
-            MessageDispatcher.error().translate("litematica.message.error.schematic_read.missing_or_invalid_data", this.getFile().getAbsolutePath());
+            String key = "litematica.message.error.schematic_read.missing_or_invalid_data";
+            MessageDispatcher.error().translate(key, this.getFile().toAbsolutePath().toString());
             return false;
         }
     }

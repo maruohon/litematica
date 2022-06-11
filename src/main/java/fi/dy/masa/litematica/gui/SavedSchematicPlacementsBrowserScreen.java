@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
@@ -79,7 +79,7 @@ public class SavedSchematicPlacementsBrowserScreen extends BaseListScreen<BaseFi
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        File dir = SchematicPlacementUnloaded.getSaveDirectory();
+        Path dir = SchematicPlacementUnloaded.getSaveDirectory();
         String context = "saved_placements_" + StringUtils.getWorldOrServerNameOrDefault("__fallback");
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE, context);
         FileBrowserIconProvider iconProvider = null;
@@ -111,11 +111,11 @@ public class SavedSchematicPlacementsBrowserScreen extends BaseListScreen<BaseFi
         if (placement != null)
         {
             DirectoryEntry entry = this.getListWidget().getLastSelectedEntry();
-            File schematicFile = placement.getSchematicFile();
+            Path schematicFile = placement.getSchematicFile();
             String placementName = placement.getName();
-            String placementFile = entry != null ? entry.getFullPath().getName() : "-";
-            String schematicName = schematicFile != null ? schematicFile.getName() : "-";
-            String schematicPath = schematicFile != null ? schematicFile.getParentFile().getAbsolutePath() : "-";
+            String placementFile = entry != null ? entry.getFullPath().getFileName().toString() : "-";
+            String schematicName = schematicFile != null ? schematicFile.getFileName().toString() : "-";
+            String schematicPath = schematicFile != null ? schematicFile.getParent().toAbsolutePath().toString() : "-";
             StyledText text = StyledText.translate("litematica.label.saved_placement.names",
                                                    placementName, schematicName, schematicPath, placementFile);
 

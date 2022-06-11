@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui.widget.list.entry;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -167,9 +167,9 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
     protected void addHoverInfo(SchematicPlacementUnloaded placement)
     {
-        File schematicFile = placement.getSchematicFile();
+        Path schematicFile = placement.getSchematicFile();
         SchematicMetadata metadata = this.loadedPlacement != null ? this.loadedPlacement.getSchematic().getMetadata() : null;
-        String fileName = schematicFile != null ? schematicFile.getName() :
+        String fileName = schematicFile != null ? schematicFile.getFileName().toString() :
                           StringUtils.translate("litematica.hover.schematic_list.in_memory_only");
         List<String> lines = new ArrayList<>();
         boolean saved = placement.isSavedToFile();
@@ -277,7 +277,7 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
         if (entry.getSchematicFile() != null)
         {
-            fileName = entry.getSchematicFile().getName().toLowerCase(Locale.ROOT);
+            fileName = entry.getSchematicFile().getFileName().toString().toLowerCase(Locale.ROOT);
             fileName = FileNameUtils.getFileNameWithoutExtension(fileName);
         }
 

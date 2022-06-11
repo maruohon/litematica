@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic.placement;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,7 +37,12 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     @Nullable protected SchematicVerifier verifier;
     @Nullable protected MaterialListBase materialList;
 
-    protected SchematicPlacement(ISchematic schematic, @Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled)
+    protected SchematicPlacement(ISchematic schematic,
+                                 @Nullable String storageFile,
+                                 @Nullable Path schematicFile,
+                                 BlockPos origin,
+                                 String name,
+                                 boolean enabled)
     {
         super(storageFile, schematicFile, origin, name, enabled);
 

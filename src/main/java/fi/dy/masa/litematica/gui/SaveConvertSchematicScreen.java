@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.RadioButtonWidget;
@@ -32,7 +32,8 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
         this.addUpdatePlacementsElement = addUpdatePlacementsElement;
         this.originalName = getDefaultFileNameForSchematic(schematic);
 
-        this.updatePlacementsWidget = new RadioButtonWidget<>(UpdatePlacementsOption.VALUES, UpdatePlacementsOption::getDisplayString,
+        this.updatePlacementsWidget = new RadioButtonWidget<>(UpdatePlacementsOption.VALUES,
+                                                              UpdatePlacementsOption::getDisplayString,
                                                               "litematica.hover.save_schematic.update_dependent_placements");
         this.updatePlacementsWidget.setSelection(UpdatePlacementsOption.NONE, false);
 
@@ -79,7 +80,7 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
     protected void saveSchematic()
     {
         boolean isHoldingShift = BaseScreen.isShiftDown();
-        File file = this.getSchematicFileIfCanSave(isHoldingShift);
+        Path file = this.getSchematicFileIfCanSave(isHoldingShift);
 
         if (file == null)
         {
@@ -111,17 +112,20 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
         }
         else
         {
-            MessageDispatcher.error("litematica.message.error.save_schematic.failed_to_save_converted", file.getName());
+            String key = "litematica.message.error.save_schematic.failed_to_save_converted";
+            MessageDispatcher.error(key, file.getFileName().toString());
         }
     }
 
-    protected void onSchematicSaved(File newSchematicFile)
+    protected void onSchematicSaved(Path newSchematicFile)
     {
         this.schematic.getMetadata().clearModifiedSinceSaved();
         this.schematicInfoWidget.clearCache();
         this.getListWidget().clearSelection();
         this.getListWidget().refreshEntries();
-        MessageDispatcher.success("litematica.message.success.save_schematic_convert", newSchematicFile.getName());
+
+        String key = "litematica.message.success.save_schematic_convert";
+        MessageDispatcher.success(key, newSchematicFile.getFileName().toString());
 
         UpdatePlacementsOption option = this.updatePlacementsWidget.getSelection();
 
@@ -132,7 +136,7 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
         }
     }
 
-    protected void updateDependentPlacements(File newSchematicFile, boolean selectedOnly)
+    protected void updateDependentPlacements(Path newSchematicFile, boolean selectedOnly)
     {
         if (this.schematic != null)
         {

@@ -1,11 +1,12 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NBTTagCompound;
@@ -58,17 +59,17 @@ public class SchematicType<S extends ISchematic>
 
     public static final ImmutableList<SchematicType<?>> KNOWN_TYPES = ImmutableList.of(LITEMATICA, SCHEMATICA, SPONGE, VANILLA);
 
-    public static final FileFilter SCHEMATIC_FILE_FILTER = (file) -> file.isFile() && file.canRead() && getPossibleTypesFromFileName(file).isEmpty() == false;
+    public static final Predicate<Path> SCHEMATIC_FILE_FILTER = p -> Files.isRegularFile(p) && Files.isReadable(p) && getPossibleTypesFromFileName(p).isEmpty() == false;
 
     private final String extension;
     private final MultiIcon icon;
-    private final Function<File, S> factory;
+    private final Function<Path, S> factory;
     private final Function<String, Boolean> extensionValidator;
     private final Function<NBTTagCompound, Boolean> dataValidator;
     private final String displayName;
     private final boolean hasName;
 
-    private SchematicType(String displayName, Function<File, S> factory, Function<NBTTagCompound, Boolean> dataValidator,
+    private SchematicType(String displayName, Function<Path, S> factory, Function<NBTTagCompound, Boolean> dataValidator,
                           String extension, Function<String, Boolean> extensionValidator, MultiIcon icon, boolean hasName)
     {
         this.displayName = displayName;
@@ -116,13 +117,13 @@ public class SchematicType<S extends ISchematic>
      * @param file
      * @return
      */
-    public S createSchematic(@Nullable File file)
+    public S createSchematic(@Nullable Path file)
     {
         return this.factory.apply(file);
     }
 
     @Nullable
-    public S createSchematicAndReadFromTag(@Nullable File file, NBTTagCompound tag)
+    public S createSchematicAndReadFromTag(@Nullable Path file, NBTTagCompound tag)
     {
         S schematic = this.factory.apply(file);
 
@@ -134,9 +135,9 @@ public class SchematicType<S extends ISchematic>
         return null;
     }
 
-    public static List<SchematicType<?>> getPossibleTypesFromFileName(File file)
+    public static List<SchematicType<?>> getPossibleTypesFromFileName(Path file)
     {
-        return getPossibleTypesFromFileName(file.getName());
+        return getPossibleTypesFromFileName(file.getFileName().toString());
     }
 
     public static List<SchematicType<?>> getPossibleTypesFromFileName(String fileName)
@@ -156,7 +157,7 @@ public class SchematicType<S extends ISchematic>
     }
 
     @Nullable
-    public static SchematicType<?> getType(File file, NBTTagCompound tag)
+    public static SchematicType<?> getType(Path file, NBTTagCompound tag)
     {
         List<SchematicType<?>> possibleTypes = getPossibleTypesFromFileName(file);
 
@@ -175,7 +176,7 @@ public class SchematicType<S extends ISchematic>
     }
 
     @Nullable
-    public static ISchematic tryCreateSchematicFrom(File file)
+    public static ISchematic tryCreateSchematicFrom(Path file)
     {
         List<SchematicType<?>> possibleTypes = getPossibleTypesFromFileName(file);
 
@@ -198,7 +199,7 @@ public class SchematicType<S extends ISchematic>
     }
 
     @Nullable
-    public static ISchematic tryCreateSchematicFrom(File file, NBTTagCompound tag)
+    public static ISchematic tryCreateSchematicFrom(Path file, NBTTagCompound tag)
     {
         SchematicType<?> type = getType(file, tag);
         return type != null ? type.createSchematicAndReadFromTag(file, tag) : null;
@@ -206,14 +207,14 @@ public class SchematicType<S extends ISchematic>
 
     public static <S extends ISchematic> Builder<S> builder()
     {
-        return new Builder<S>();
+        return new Builder<>();
     }
 
     public static class Builder<S extends ISchematic>
     {
         private String extension = null;
         private MultiIcon icon = null;
-        private Function<File, S> factory = null;
+        private Function<Path, S> factory = null;
         private Function<String, Boolean> extensionValidator = null;
         private Function<NBTTagCompound, Boolean> dataValidator = null;
         private String displayName = "?";
@@ -243,7 +244,7 @@ public class SchematicType<S extends ISchematic>
             return this;
         }
 
-        public Builder<S> setFactory(Function<File, S> factory)
+        public Builder<S> setFactory(Function<Path, S> factory)
         {
             this.factory = factory;
             return this;
@@ -263,7 +264,7 @@ public class SchematicType<S extends ISchematic>
 
         public SchematicType<S> build()
         {
-            return new SchematicType<S>(this.displayName, this.factory, this.dataValidator, this.extension, this.extensionValidator, this.icon, this.hasName);
+            return new SchematicType<>(this.displayName, this.factory, this.dataValidator, this.extension, this.extensionValidator, this.icon, this.hasName);
         }
     }
 }

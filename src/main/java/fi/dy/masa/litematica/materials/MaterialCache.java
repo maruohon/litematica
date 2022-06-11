@@ -1,8 +1,9 @@
 package fi.dy.masa.litematica.materials;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -33,6 +34,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import fi.dy.masa.malilib.config.util.ConfigUtils;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
@@ -339,21 +341,21 @@ public class MaterialCache
                     if (state != null)
                     {
                         ItemStack stack = ItemWrap.fromTag(NbtWrap.getCompound(tag, "Item"));
-                        this.buildItemsForStates.put(state, stack);
+                        map.put(state, stack);
                     }
                 }
             }
         }
     }
 
-    protected File getCacheDir()
+    protected Path getCacheDir()
     {
-        return ConfigUtils.getConfigDirectoryPath().resolve(Reference.MOD_ID).toFile();
+        return ConfigUtils.getConfigDirectory().resolve(Reference.MOD_ID);
     }
 
-    protected File getCacheFile()
+    protected Path getCacheFile()
     {
-        return new File(this.getCacheDir(), "material_cache.nbt");
+        return this.getCacheDir().resolve("material_cache.nbt");
     }
 
     public boolean writeToFile()
@@ -363,18 +365,19 @@ public class MaterialCache
             return false;
         }
 
-        File dir = this.getCacheDir();
-        File file = this.getCacheFile();
+        Path dir = this.getCacheDir();
+        Path file = this.getCacheFile();
 
         try
         {
-            if (dir.exists() == false && dir.mkdirs() == false)
+            if (FileUtils.createDirectoriesIfMissing(dir) == false)
             {
-                Litematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath());
+                Litematica.logger.warn("Failed to write the material list cache to file '{}'",
+                                       file.toAbsolutePath().toString());
                 return false;
             }
 
-            FileOutputStream os = new FileOutputStream(file);
+            OutputStream os = Files.newOutputStream(file);
             CompressedStreamTools.writeCompressed(this.writeToNBT(), os);
             os.close();
             this.dirty = false;
@@ -383,7 +386,8 @@ public class MaterialCache
         }
         catch (Exception e)
         {
-            Litematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath(), e);
+            Litematica.logger.warn("Failed to write the material list cache to file '{}'",
+                                   file.toAbsolutePath().toString(), e);
         }
 
         return false;
@@ -391,16 +395,16 @@ public class MaterialCache
 
     public void readFromFile()
     {
-        File file = this.getCacheFile();
+        Path file = this.getCacheFile();
 
-        if (file.exists() == false || file.canRead() == false)
+        if (Files.isRegularFile(file) == false || Files.isReadable(file) == false)
         {
             return;
         }
 
         try
         {
-            FileInputStream is = new FileInputStream(file);
+            InputStream is = Files.newInputStream(file);
             NBTTagCompound nbt = CompressedStreamTools.readCompressed(is);
             is.close();
 
@@ -413,7 +417,8 @@ public class MaterialCache
         }
         catch (Exception e)
         {
-            Litematica.logger.warn("Failed to read the material list cache from file '{}'", file.getAbsolutePath(), e);
+            Litematica.logger.warn("Failed to read the material list cache from file '{}'",
+                                   file.toAbsolutePath().toString(), e);
         }
     }
 }

@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
+import java.nio.file.Path;
 import javax.annotation.Nullable;
 import fi.dy.masa.malilib.config.value.FileBrowserColumns;
 import fi.dy.masa.malilib.gui.BaseListScreen;
@@ -71,7 +71,7 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        File dir = DataManager.getSchematicsBaseDirectory();
+        Path dir = DataManager.getSchematicsBaseDirectory();
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE,
                                                                      this.browserContext, this.cachingIconProvider);
 

@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.schematic.projects;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,18 +27,18 @@ public class SchematicProjectsManager
         return this.currentProject != null;
     }
 
-    public void createAndOpenProject(File dir, String projectName)
+    public void createAndOpenProject(Path dir, String projectName)
     {
         this.closeCurrentProject();
 
-        this.currentProject = new SchematicProject(dir, new File(dir, projectName + ".json"));
+        this.currentProject = new SchematicProject(dir, dir.resolve(projectName + ".json"));
         this.currentProject.setName(projectName);
         this.currentProject.setOrigin(EntityWrap.getCameraEntityBlockPos());
         this.currentProject.saveToFile();
     }
 
     @Nullable
-    public SchematicProject openProject(File projectFile)
+    public SchematicProject openProject(Path projectFile)
     {
         this.closeCurrentProject();
         this.currentProject = this.loadProjectFromFile(projectFile, true);
@@ -44,9 +46,11 @@ public class SchematicProjectsManager
     }
 
     @Nullable
-    public SchematicProject loadProjectFromFile(File projectFile, boolean createPlacement)
+    public SchematicProject loadProjectFromFile(Path projectFile, boolean createPlacement)
     {
-        if (projectFile.getName().endsWith(".json") && projectFile.exists() && projectFile.isFile() && projectFile.canRead())
+        if (projectFile.getFileName().toString().endsWith(".json") &&
+            Files.isRegularFile(projectFile) &&
+            Files.isReadable(projectFile))
         {
             JsonElement el = JsonUtils.parseJsonFile(projectFile);
 
@@ -150,7 +154,7 @@ public class SchematicProjectsManager
 
         if (this.currentProject != null)
         {
-            obj.add("current_project", new JsonPrimitive(this.currentProject.getProjectFile().getAbsolutePath()));
+            obj.add("current_project", new JsonPrimitive(this.currentProject.getProjectFile().toAbsolutePath().toString()));
         }
 
         return obj;
@@ -160,7 +164,7 @@ public class SchematicProjectsManager
     {
         if (JsonUtils.hasString(obj, "current_project"))
         {
-            File file = new File(JsonUtils.getString(obj, "current_project"));
+            Path file = Paths.get(JsonUtils.getString(obj, "current_project"));
             this.currentProject = this.loadProjectFromFile(file, true);
         }
     }

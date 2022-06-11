@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.data;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,6 +29,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.game.ItemUtils;
 import fi.dy.masa.malilib.util.game.WorldUtils;
+import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.Litematica;
@@ -53,7 +56,7 @@ public class DataManager implements DirectoryCache
     private static final Pattern PATTERN_ITEM_META_NBT = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)@(?<meta>[0-9]+)(?<nbt>\\{.*\\})$");
     private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)@(?<meta>[0-9]+)$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)$");
-    private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
+    private static final Map<String, Path> LAST_DIRECTORIES = new HashMap<>();
 
     private static ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private static ItemStack toolItem = new ItemStack(Items.STICK);
@@ -169,15 +172,15 @@ public class DataManager implements DirectoryCache
 
     @Override
     @Nullable
-    public File getCurrentDirectoryForContext(String context)
+    public Path getCurrentDirectoryForContext(String context)
     {
         return LAST_DIRECTORIES.get(context);
     }
 
     @Override
-    public void setCurrentDirectoryForContext(String context, File dir)
+    public void setCurrentDirectoryForContext(String context, Path dir)
     {
-        LAST_DIRECTORIES.put(context, FileUtils.getCanonicalFileIfPossible(dir));
+        LAST_DIRECTORIES.put(context, dir);
     }
 
     public static void clear()
@@ -217,7 +220,7 @@ public class DataManager implements DirectoryCache
     {
         LAST_DIRECTORIES.clear();
 
-        File file = getCurrentStorageFile(true);
+        Path file = getCurrentStorageFile(true);
         JsonElement element = JsonUtils.parseJsonFile(file);
 
         if (element != null && element.isJsonObject())
@@ -250,9 +253,9 @@ public class DataManager implements DirectoryCache
 
                     if (el.isJsonPrimitive())
                     {
-                        File dir = new File(el.getAsString());
+                        Path dir = Paths.get(el.getAsString());
 
-                        if (dir.exists() && dir.isDirectory())
+                        if (Files.isDirectory(dir))
                         {
                             LAST_DIRECTORIES.put(name, dir);
                         }
@@ -266,7 +269,7 @@ public class DataManager implements DirectoryCache
     {
         this.clearData(false);
 
-        File file = getCurrentStorageFile(false);
+        Path file = getCurrentStorageFile(false);
         JsonElement element = JsonUtils.parseJsonFile(file);
 
         if (element != null && element.isJsonObject())
@@ -315,9 +318,9 @@ public class DataManager implements DirectoryCache
         JsonObject root = new JsonObject();
         JsonObject objDirs = new JsonObject();
 
-        for (Map.Entry<String, File> entry : LAST_DIRECTORIES.entrySet())
+        for (Map.Entry<String, Path> entry : LAST_DIRECTORIES.entrySet())
         {
-            objDirs.add(entry.getKey(), new JsonPrimitive(entry.getValue().getAbsolutePath()));
+            objDirs.add(entry.getKey(), new JsonPrimitive(entry.getValue().toAbsolutePath().toString()));
         }
 
         root.add("config_gui_tab", new JsonPrimitive(configGuiTab.getName()));
@@ -325,7 +328,7 @@ public class DataManager implements DirectoryCache
         root.add("tool_mode_data", toolModeDataToJson());
         root.add("last_directories", objDirs);
 
-        File file = getCurrentStorageFile(true);
+        Path file = getCurrentStorageFile(true);
         JsonUtils.writeJsonToFile(root, file);
     }
 
@@ -333,7 +336,7 @@ public class DataManager implements DirectoryCache
     {
         this.schematicProjectsManager.saveCurrentProject();
 
-        File file = getCurrentStorageFile(false);
+        Path file = getCurrentStorageFile(false);
         JsonUtils.writeJsonToFile(this.toJson(), file);
     }
 
@@ -371,16 +374,16 @@ public class DataManager implements DirectoryCache
         }
     }
 
-    public static File getCurrentConfigDirectory()
+    public static Path getCurrentConfigDirectory()
     {
-        return ConfigUtils.getConfigDirectoryPath().resolve(Reference.MOD_ID).toFile();
+        return ConfigUtils.getConfigDirectory().resolve(Reference.MOD_ID);
     }
 
-    public static File getSchematicsBaseDirectory()
+    public static Path getSchematicsBaseDirectory()
     {
         BooleanAndFile value = Configs.Generic.CUSTOM_SCHEMATIC_DIRECTORY.getValue();
         boolean useCustom = value.booleanValue;
-        File dir = null;
+        Path dir = null;
 
         if (useCustom)
         {
@@ -392,76 +395,80 @@ public class DataManager implements DirectoryCache
             dir = DefaultDirectories.getDefaultSchematicDirectory();
         }
 
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (FileUtils.createDirectoriesIfMissing(dir) == false)
         {
-            Litematica.logger.warn("Failed to create the schematic directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the schematic directory '{}'",
+                                   dir.toAbsolutePath().toString());
         }
 
         return dir;
     }
 
-    public static File getAreaSelectionsBaseDirectory()
+    public static Path getAreaSelectionsBaseDirectory()
     {
-        File dir;
         String name = StringUtils.getWorldOrServerName();
-        File baseDir = getDataBaseDirectory("area_selections");
+        Path baseDir = getDataBaseDirectory("area_selections");
+        Path dir;
 
         if (Configs.Generic.AREAS_PER_WORLD.getBooleanValue() && name != null)
         {
             // The 'area_selections' sub-directory is to prevent showing the world name or server IP in the browser,
             // as the root directory name is shown in the navigation widget
-            dir = FileUtils.getCanonicalFileIfPossible(new File(new File(baseDir, "per_world"), name));
+            dir = baseDir.resolve("per_world").resolve(name);
         }
         else
         {
-            dir = FileUtils.getCanonicalFileIfPossible(new File(baseDir, "global"));
+            dir = baseDir.resolve("global");
         }
 
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (FileUtils.createDirectoriesIfMissing(dir) == false)
         {
-            Litematica.logger.warn("Failed to create the area selections base directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the area selections base directory '{}'",
+                                   dir.toAbsolutePath().toString());
         }
 
         return dir;
     }
 
-    public static File getVCSProjectsBaseDirectory()
+    public static Path getVCSProjectsBaseDirectory()
     {
-        File dir = new File(getSchematicsBaseDirectory(), "VCS");
+        Path dir = getSchematicsBaseDirectory().resolve("VCS");
 
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (FileUtils.createDirectoriesIfMissing(dir) == false)
         {
-            Litematica.logger.warn("Failed to create the VCS Projects base directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the VCS Projects base directory '{}'",
+                                   dir.toAbsolutePath().toString());
         }
 
         return dir;
     }
 
-    public static File getPerWorldDataBaseDirectory()
+    public static Path getPerWorldDataBaseDirectory()
     {
         return getDataBaseDirectory("world_specific_data");
     }
 
-    public static File getDataBaseDirectory(String dirName)
+    public static Path getDataBaseDirectory(String dirName)
     {
-        File dir = new File(new File(FileUtils.getMinecraftDirectory(), "litematica"), dirName);
+        Path dir = FileUtils.getMinecraftDirectory().resolve("litematica").resolve(dirName);
 
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (FileUtils.createDirectoriesIfMissing(dir) == false)
         {
-            MessageDispatcher.error().translate("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
+            String key = "litematica.message.error.schematic_placement.failed_to_create_directory";
+            MessageDispatcher.error().translate(key, dir.toAbsolutePath().toString());
         }
 
         return dir;
     }
 
-    private static File getCurrentStorageFile(boolean globalData)
+    private static Path getCurrentStorageFile(boolean globalData)
     {
-        File dir;
+        Path dir;
         String worldName = StringUtils.getWorldOrServerName();
 
         if (worldName != null)
         {
-            dir = new File(getPerWorldDataBaseDirectory(), worldName);
+            dir = getPerWorldDataBaseDirectory().resolve(worldName);
         }
         // Fall back to a common set of files at the base directory
         else
@@ -469,17 +476,17 @@ public class DataManager implements DirectoryCache
             dir = getPerWorldDataBaseDirectory();
         }
 
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (FileUtils.createDirectoriesIfMissing(dir) == false)
         {
-            Litematica.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the config directory '{}'", dir.toAbsolutePath().toString());
         }
 
-        return new File(dir, getStorageFileName(globalData));
+        return dir.resolve(getStorageFileName(globalData));
     }
 
     private static String getStorageFileName(boolean globalData)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = GameUtils.getClient();
         return globalData ? "data_common.json" : "data_dim_" + WorldUtils.getDimensionAsString(mc.world) + ".json";
     }
 

@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.schematic.placement;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -13,6 +15,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
@@ -27,7 +30,7 @@ public class SchematicPlacementUnloaded
 {
     protected static int lastColor;
 
-    @Nullable protected File schematicFile;
+    @Nullable protected Path schematicFile;
     protected final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
     protected final GridSettings gridSettings = new GridSettings();
 
@@ -50,13 +53,18 @@ public class SchematicPlacementUnloaded
     @Nullable protected String selectedSubRegionName;
     @Nullable protected JsonObject materialListData;
 
-    protected SchematicPlacementUnloaded(@Nullable String storageFile, @Nullable File schematicFile)
+    protected SchematicPlacementUnloaded(@Nullable String storageFile,
+                                         @Nullable Path schematicFile)
     {
         this.placementSaveFile = storageFile;
         this.schematicFile = schematicFile;
     }
 
-    protected SchematicPlacementUnloaded(@Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled)
+    protected SchematicPlacementUnloaded(@Nullable String storageFile,
+                                         @Nullable Path schematicFile,
+                                         BlockPos origin,
+                                         String name,
+                                         boolean enabled)
     {
         this.placementSaveFile = storageFile;
         this.schematicFile = schematicFile;
@@ -135,7 +143,7 @@ public class SchematicPlacementUnloaded
     }
 
     @Nullable
-    public File getSchematicFile()
+    public Path getSchematicFile()
     {
         return this.schematicFile;
     }
@@ -178,7 +186,7 @@ public class SchematicPlacementUnloaded
         }
     }
 
-    public void setSchematicFile(@Nullable File schematicFile)
+    public void setSchematicFile(@Nullable Path schematicFile)
     {
         this.schematicFile = schematicFile;
     }
@@ -261,7 +269,8 @@ public class SchematicPlacementUnloaded
             }
             else
             {
-                MessageDispatcher.error().translate("litematica.error.schematic_load.failed", this.schematicFile.getAbsolutePath());
+                MessageDispatcher.error().translate("litematica.error.schematic_load.failed",
+                                                    this.schematicFile.toAbsolutePath().toString());
             }
         }
 
@@ -277,7 +286,7 @@ public class SchematicPlacementUnloaded
             if (origin == null)
             {
                 MessageDispatcher.error().translate("litematica.error.schematic_placements.settings_load.missing_data");
-                String name = this.schematicFile != null ? this.schematicFile.getAbsolutePath() : "<null>";
+                String name = this.schematicFile != null ? this.schematicFile.toAbsolutePath().toString() : "<null>";
                 Litematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", name);
                 return false;
             }
@@ -419,7 +428,7 @@ public class SchematicPlacementUnloaded
         {
             JsonObject obj = this.baseSettingsToJson(false);
 
-            obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
+            obj.add("schematic", new JsonPrimitive(this.schematicFile.toAbsolutePath().toString()));
             obj.add("enabled", new JsonPrimitive(this.isEnabled()));
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
             obj.add("locked", new JsonPrimitive(this.isLocked()));
@@ -459,7 +468,7 @@ public class SchematicPlacementUnloaded
     {
         if (JsonUtils.hasString(obj, "schematic") && hasBaseSettings(obj))
         {
-            File schematicFile = new File(obj.get("schematic").getAsString());
+            Path schematicFile = Paths.get(obj.get("schematic").getAsString());
             SchematicPlacementUnloaded schematicPlacement = new SchematicPlacementUnloaded(null, schematicFile);
 
             if (schematicPlacement.readBaseSettingsFromJson(obj) == false)
@@ -506,7 +515,7 @@ public class SchematicPlacementUnloaded
     }
 
     @Nullable
-    public static SchematicPlacementUnloaded fromFile(File file)
+    public static SchematicPlacementUnloaded fromFile(Path file)
     {
         JsonElement el = JsonUtils.parseJsonFile(file);
 
@@ -516,7 +525,7 @@ public class SchematicPlacementUnloaded
 
             if (placement != null)
             {
-                placement.placementSaveFile = file.getName();
+                placement.placementSaveFile = file.getFileName().toString();
             }
 
             return placement;
@@ -533,11 +542,11 @@ public class SchematicPlacementUnloaded
             return false;
         }
 
-        File file;
+        Path file;
 
         if (this.placementSaveFile != null)
         {
-            file = new File(getSaveDirectory(), this.placementSaveFile);
+            file = getSaveDirectory().resolve(this.placementSaveFile);
         }
         else
         {
@@ -550,7 +559,7 @@ public class SchematicPlacementUnloaded
             return false;
         }
 
-        if (this.placementSaveFile == null || file.exists() == false || this.wasModifiedSinceSaved())
+        if (this.placementSaveFile == null || Files.exists(file) == false || this.wasModifiedSinceSaved())
         {
             JsonObject obj = this.toJson();
 
@@ -576,7 +585,7 @@ public class SchematicPlacementUnloaded
     {
         if (this.placementSaveFile != null)
         {
-            File file = new File(getSaveDirectory(), this.placementSaveFile);
+            Path file = getSaveDirectory().resolve(this.placementSaveFile);
             JsonElement el = JsonUtils.parseJsonFile(file);
 
             if (el != null && el.isJsonObject())
@@ -603,7 +612,7 @@ public class SchematicPlacementUnloaded
         return false;
     }
 
-    protected boolean saveToFile(File file, JsonObject obj)
+    protected boolean saveToFile(Path file, JsonObject obj)
     {
         obj.add("last_save_time", new JsonPrimitive(System.currentTimeMillis()));
 
@@ -613,48 +622,50 @@ public class SchematicPlacementUnloaded
         {
             if (this.placementSaveFile == null)
             {
-                this.placementSaveFile = file.getName();
+                this.placementSaveFile = file.getFileName().toString();
             }
 
-            MessageDispatcher.generic("litematica.gui.label.schematic_placement.saved_to_file", file.getName());
+            MessageDispatcher.generic("litematica.gui.label.schematic_placement.saved_to_file",
+                                      file.getFileName().toString());
         }
 
         return success;
     }
 
-    public static File getSaveDirectory()
+    public static Path getSaveDirectory()
     {
         String worldName = StringUtils.getWorldOrServerNameOrDefault("__fallback");
-        File dir = new File(DataManager.getDataBaseDirectory("placements"), worldName);
+        Path dir = DataManager.getDataBaseDirectory("placements").resolve(worldName);
 
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (FileUtils.createDirectoriesIfMissing(dir) == false)
         {
-            MessageDispatcher.error().translate("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
+            String key = "litematica.message.error.schematic_placement.failed_to_create_directory";
+            MessageDispatcher.error().translate(key, dir.toAbsolutePath().toString());
         }
 
         return dir;
     }
 
     @Nullable
-    protected File getAvailableFileName()
+    protected Path getAvailableFileName()
     {
         if (this.getSchematicFile() == null)
         {
             return null;
         }
 
-        File dir = getSaveDirectory();
-        String schName = FileNameUtils.getFileNameWithoutExtension(this.getSchematicFile().getName());
+        Path dir = getSaveDirectory();
+        String schName = FileNameUtils.getFileNameWithoutExtension(this.getSchematicFile().getFileName().toString());
         String nameBase = FileNameUtils.generateSafeFileName(schName);
         int id = 1;
         String name = String.format("%s_%03d.json", nameBase, id);
-        File file = new File(dir, name);
+        Path file = dir.resolve(name);
 
-        while (file.exists())
+        while (Files.exists(file))
         {
             ++id;
             name = String.format("%s_%03d.json", nameBase, id);
-            file = new File(dir, name);
+            file = dir.resolve(name);
         }
 
         return file;
