@@ -40,7 +40,6 @@ public class FileMigrationUtils
             if (matcher.matches())
             {
                 worldName = matcher.group("world");
-                newDataDir = newDataDirBase.resolve(worldName);
 
                 String dim = matcher.group("dim");
                 newName = "data_dim_" + dim + ".json";
@@ -49,9 +48,10 @@ public class FileMigrationUtils
             else
             {
                 worldName = name.substring(11, name.length() - 5);
-                newDataDir = newDataDirBase.resolve(worldName);
                 newName = "data_common.json";
             }
+
+            newDataDir = newDataDirBase.resolve(worldName.trim());
 
             if (FileUtils.createDirectoriesIfMissing(newDataDir) == false)
             {
@@ -60,7 +60,7 @@ public class FileMigrationUtils
                 continue;
             }
 
-            Path newFile = newDataDir.resolve(newName);
+            Path newFile = newDataDir.resolve(newName.trim());
 
             try
             {
@@ -97,7 +97,7 @@ public class FileMigrationUtils
 
                     if (Files.isDirectory(oldDir) && Files.isReadable(oldDir))
                     {
-                        Path newDir = newDirPerWorldBase.resolve(file.getFileName().toString());
+                        Path newDir = newDirPerWorldBase.resolve(file.getFileName().toString().trim());
 
                         if (Files.exists(newDir) == false)
                         {
