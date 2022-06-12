@@ -64,6 +64,7 @@ public class Configs
         public static final BooleanConfig PLACEMENTS_INFRONT                        = new BooleanConfig("placementInfrontOfPlayer", false);
         public static final BooleanConfig RENDER_MATERIALS_IN_GUI                   = new BooleanConfig("renderMaterialListInGuis", true);
         public static final BooleanConfig RENDER_THREAD_NO_TIMEOUT                  = new BooleanConfig("renderThreadNoTimeout", true);
+        public static final BooleanConfig REQUIRE_ADJACENT_CHUNKS                   = new BooleanConfig("requireAdjacentChunks", true);
         public static final StringConfig  TOOL_ITEM                                 = new StringConfig( "toolItem", "minecraft:stick");
 
         public static final OptionListConfig<SelectionMode> DEFAULT_AREA_SELECTION_MODE   = new OptionListConfig<>("defaultAreaSelectionMode", SelectionMode.SIMPLE, SelectionMode.VALUES);
@@ -100,6 +101,7 @@ public class Configs
                 PLACEMENTS_INFRONT,
                 RENDER_MATERIALS_IN_GUI,
                 RENDER_THREAD_NO_TIMEOUT,
+                REQUIRE_ADJACENT_CHUNKS,
                 SCHEMATIC_BROWSER_COLUMNS,
                 SELECTION_CORNERS_MODE,
                 SIGN_TEXT_PASTE,

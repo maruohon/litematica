@@ -10,6 +10,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.PositionUtils;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.scheduler.tasks.TaskProcessChunkBase;
 import fi.dy.masa.litematica.schematic.verifier.BlockStatePair;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
@@ -60,7 +61,8 @@ public class SchematicVerifierTask extends TaskProcessChunkBase
     @Override
     protected boolean canProcessChunk(ChunkPos pos)
     {
-        return this.areSurroundingChunksLoaded(pos, this.worldClient, 1) &&
+        int radius = Configs.Generic.REQUIRE_ADJACENT_CHUNKS.getBooleanValue() ? 1 : 0;
+        return this.areSurroundingChunksLoaded(pos, this.worldClient, radius) &&
                this.schematicWorld.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z);
     }
 
