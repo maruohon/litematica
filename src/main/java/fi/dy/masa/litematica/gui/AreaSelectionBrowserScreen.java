@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.nio.file.Path;
+import javax.annotation.Nullable;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
@@ -189,12 +190,16 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         this.getListWidget().updateEntryWidgetStates();
     }
 
-    protected void onSelectionChange(BaseFileBrowserWidget.DirectoryEntry entry)
+    protected void onSelectionChange(@Nullable BaseFileBrowserWidget.DirectoryEntry entry)
     {
-        if (entry.getType() == BaseFileBrowserWidget.DirectoryEntryType.FILE &&
-            FileType.fromFileName(entry.getFullPath()) == FileType.JSON)
+        if (entry == null)
         {
-            String selectionId = entry.getFullPath().toAbsolutePath().toString();
+            this.selectionManager.setCurrentSelection(null);
+        }
+        else if (entry.getType() == BaseFileBrowserWidget.DirectoryEntryType.FILE &&
+                 FileType.fromFileName(entry.getFullPath()) == FileType.JSON)
+        {
+            String selectionId = entry.getFullPath().toString();
 
             if (selectionId.equals(this.selectionManager.getCurrentNormalSelectionId()))
             {

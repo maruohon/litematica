@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.nio.file.Path;
+import javax.annotation.Nullable;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
@@ -96,7 +97,7 @@ public class SavedSchematicPlacementsBrowserScreen extends BaseListScreen<BaseFi
         return listWidget;
     }
 
-    public void onSelectionChange(DirectoryEntry entry)
+    public void onSelectionChange(@Nullable DirectoryEntry entry)
     {
         this.placementInfoWidget.onSelectionChange(entry);
 
