@@ -127,13 +127,6 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
     @Nullable
     public static Path getSchematicFileIfCanSave(Path dir, String name, SchematicType<?> outputType, boolean overwrite)
     {
-        if (Files.isDirectory(dir) == false)
-        {
-            String key = "litematica.message.error.save_schematic.invalid_directory";
-            MessageDispatcher.error(key, dir.toAbsolutePath());
-            return null;
-        }
-
         if (StringUtils.isBlank(name))
         {
             MessageDispatcher.error("litematica.message.error.save_schematic.no_file_name");
@@ -143,6 +136,13 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
         if (FileNameUtils.doesFileNameContainIllegalCharacters(name))
         {
             MessageDispatcher.error("malilib.message.error.illegal_characters_in_file_name", name);
+            return null;
+        }
+
+        if (Files.isDirectory(dir) == false && FileUtils.createDirectoriesIfMissing(dir) == false)
+        {
+            String key = "litematica.message.error.save_schematic.invalid_directory";
+            MessageDispatcher.error(key, dir.toAbsolutePath());
             return null;
         }
 
@@ -162,6 +162,7 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
             return null;
         }
 
+        /*
         try
         {
             if (Files.exists(file) == false && FileUtils.createFile(file) == false)
@@ -172,6 +173,7 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
             }
         }
         catch (Exception ignore) {}
+        */
 
         return file;
     }
