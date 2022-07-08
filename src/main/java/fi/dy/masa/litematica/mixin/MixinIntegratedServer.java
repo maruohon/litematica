@@ -2,21 +2,18 @@ package fi.dy.masa.litematica.mixin;
 
 import java.net.Proxy;
 import java.util.function.BooleanSupplier;
-import javax.annotation.Nullable;
+import com.mojang.datafixers.DataFixer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.mojang.authlib.GameProfileRepository;
-import com.mojang.authlib.minecraft.MinecraftSessionService;
-import com.mojang.datafixers.DataFixer;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.SaveLoader;
 import net.minecraft.server.WorldGenerationProgressListenerFactory;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.UserCache;
+import net.minecraft.util.ApiServices;
 import net.minecraft.world.level.storage.LevelStorage;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 
@@ -29,12 +26,10 @@ public abstract class MixinIntegratedServer extends MinecraftServer
                                   SaveLoader saveLoader,
                                   Proxy proxy,
                                   DataFixer dataFixer,
-                                  @Nullable MinecraftSessionService sessionService,
-                                  @Nullable GameProfileRepository gameProfileRepo,
-                                  @Nullable UserCache userCache,
+                                  ApiServices apiServices,
                                   WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory)
     {
-        super(serverThread, session, dataPackManager, saveLoader, proxy, dataFixer, sessionService, gameProfileRepo, userCache, worldGenerationProgressListenerFactory);
+        super(serverThread, session, dataPackManager, saveLoader, proxy, dataFixer, apiServices, worldGenerationProgressListenerFactory);
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", shift = Shift.AFTER,

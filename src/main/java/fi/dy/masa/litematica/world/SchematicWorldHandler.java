@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.tag.BlockTags;
-import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
@@ -15,12 +15,16 @@ import fi.dy.masa.litematica.render.LitematicaRenderer;
 
 public class SchematicWorldHandler
 {
-    public static final DimensionType DIMENSIONTYPE = new DimensionType(OptionalLong.of(6000L),
-                                                                        false, false, false, false,
-                                                                        1.0,
-                                                                        false, false, false, false,
-                                                                        -64, 384, 384,
-                                                                        BlockTags.INFINIBURN_END, DimensionTypes.OVERWORLD_ID, 0.0F);
+    private static final DimensionType END = BuiltinRegistries.DIMENSION_TYPE.entryOf(DimensionTypes.THE_END).value();
+    private static final DimensionType DIMENSIONTYPE = new DimensionType(OptionalLong.of(6000L),
+                                                                         false, false, false, false,
+                                                                         1.0,
+                                                                         false, false,
+                                                                         -64, 384, 384,
+                                                                         BlockTags.INFINIBURN_END,
+                                                                         DimensionTypes.OVERWORLD_ID,
+                                                                         0.0F,
+                                                                         END.monsterSettings());
 
     @Nullable private static WorldSchematic world;
 
@@ -38,7 +42,7 @@ public class SchematicWorldHandler
     public static WorldSchematic createSchematicWorld()
     {
         ClientWorld.Properties levelInfo = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
-        return new WorldSchematic(levelInfo, RegistryEntry.of(DIMENSIONTYPE), MinecraftClient.getInstance()::getProfiler);
+        return new WorldSchematic(levelInfo, BuiltinRegistries.DIMENSION_TYPE.entryOf(DimensionTypes.OVERWORLD), MinecraftClient.getInstance()::getProfiler);
     }
 
     public static void recreateSchematicWorld(boolean remove)

@@ -6,14 +6,13 @@ import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadFactory;
-import org.apache.logging.log4j.Logger;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.primitives.Doubles;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.logging.log4j.Logger;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -27,7 +26,7 @@ public class ChunkRenderDispatcherLitematica
     private static final Logger LOGGER = Litematica.logger;
     private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setNameFormat("Litematica Chunk Batcher %d").setDaemon(true).build();
 
-    private final List<Thread> listWorkerThreads = Lists.<Thread>newArrayList();
+    private final List<Thread> listWorkerThreads = new ArrayList<>();
     private final List<ChunkRenderWorkerLitematica> listThreadedWorkers = new ArrayList<>();
     private final PriorityBlockingQueue<ChunkRenderTaskSchematic> queueChunkUpdates = Queues.newPriorityBlockingQueue();
     private final BlockingQueue<BufferBuilderCache> queueFreeRenderBuilders;
@@ -325,7 +324,29 @@ public class ChunkRenderDispatcherLitematica
 
     private void uploadVertexBuffer(BufferBuilder buffer, VertexBuffer vertexBuffer)
     {
-        vertexBuffer.submitUpload(buffer);
+        BufferBuilder.BuiltBuffer renderBuffer = buffer.end();
+
+        /*
+        if (buffer instanceof CompatBuffer compatBuffer)
+        {
+            if (compatBuffer.lastRenderBuildBuffer != null)
+            {
+                renderBuffer = compatBuffer.lastRenderBuildBuffer;
+            }
+            else
+            {
+                renderBuffer = compatBuffer.end();
+            }
+        }
+        else
+        {
+            renderBuffer = buffer.end();
+        }
+        */
+
+        vertexBuffer.bind();
+        vertexBuffer.upload(renderBuffer);
+        VertexBuffer.unbind();
     }
 
     public void clearChunkUpdates()

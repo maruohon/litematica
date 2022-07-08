@@ -9,7 +9,7 @@ import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayR
 public class BufferBuilderCache
 {
     private final Map<RenderLayer, BufferBuilder> blockBufferBuilders = new HashMap<>();
-    private BufferBuilder[] overlayBufferBuilders;
+    private final BufferBuilder[] overlayBufferBuilders;
 
     public BufferBuilderCache()
     {

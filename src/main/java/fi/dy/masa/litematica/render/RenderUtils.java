@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.random.AbstractRandom;
+import net.minecraft.util.math.random.LocalRandom;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
@@ -30,7 +30,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 
 public class RenderUtils
 {
-    private static final AbstractRandom RAND = AbstractRandom.create();
+    private static final LocalRandom RAND = new LocalRandom(0);
 
     public static int getMaxStringRenderLength(List<String> list)
     {

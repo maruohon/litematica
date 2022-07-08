@@ -6,8 +6,9 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -126,7 +127,7 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
         if (Configs.Generic.COMMAND_DISABLE_FEEDBACK.getBooleanValue())
         {
             DataManager.addChatListener(this.gameRuleListener);
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback");
+            this.sendCommandToServer("gamerule sendCommandFeedback", this.mc.player);
             this.gameRuleProbeTimeout = Util.getMeasuringTimeNano() + this.maxGameRuleProbeTime;
             this.phase = TaskPhase.GAME_RULE_PROBE;
         }
@@ -148,17 +149,18 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
 
     protected boolean checkCommandFeedbackGameRuleState(Text message)
     {
-        if (message instanceof TranslatableText translatableText)
+        if (message instanceof MutableText mutableText &&
+            mutableText.getContent() instanceof TranslatableTextContent text)
         {
-            if ("commands.gamerule.query".equals(translatableText.getKey()))
+            if ("commands.gamerule.query".equals(text.getKey()))
             {
-                Object[] args = translatableText.getArgs();
+                Object[] args = text.getArgs();
                 this.shouldEnableFeedback = args.length == 1 && args[0].equals("true");
                 this.phase = TaskPhase.WAIT_FOR_CHUNKS;
 
                 if (this.shouldEnableFeedback)
                 {
-                    this.mc.player.sendChatMessage("/gamerule sendCommandFeedback false");
+                    this.sendCommandToServer("gamerule sendCommandFeedback false", this.mc.player);
                 }
 
                 return true;
@@ -254,11 +256,11 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
     {
         if (command.length() > 0 && command.charAt(0) != '/')
         {
-            player.sendChatMessage("/" + command);
+            player.sendCommand("/" + command);
         }
         else
         {
-            player.sendChatMessage(command);
+            player.sendCommand(command);
         }
     }
 }

@@ -16,7 +16,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.AbstractRandom;
+import net.minecraft.util.math.random.BaseRandom;
+import net.minecraft.util.math.random.LocalRandom;
 import net.minecraft.world.BlockRenderView;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.litematica.config.Configs;
@@ -24,7 +25,7 @@ import fi.dy.masa.litematica.data.DataManager;
 
 public class BlockModelRendererSchematic
 {
-    private final AbstractRandom random = AbstractRandom.create();
+    private final LocalRandom random = new LocalRandom(0);
     private final BlockColors colorMap;
 
     public BlockModelRendererSchematic(BlockColors blockColorsIn)
@@ -67,7 +68,7 @@ public class BlockModelRendererSchematic
     }
 
     public boolean renderModelSmooth(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
-                                     VertexConsumer vertexConsumer, AbstractRandom random, long seedIn, int overlay)
+                                     VertexConsumer vertexConsumer, BaseRandom random, long seedIn, int overlay)
     {
         boolean renderedSomething = false;
         float[] quadBounds = new float[PositionUtils.ALL_DIRECTIONS.length * 2];
@@ -103,7 +104,7 @@ public class BlockModelRendererSchematic
 
     public boolean renderModelFlat(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn,
                                    BlockPos posIn, MatrixStack matrices,
-                                   VertexConsumer vertexConsumer, AbstractRandom random, long seedIn, int overlay)
+                                   VertexConsumer vertexConsumer, BaseRandom random, long seedIn, int overlay)
     {
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);

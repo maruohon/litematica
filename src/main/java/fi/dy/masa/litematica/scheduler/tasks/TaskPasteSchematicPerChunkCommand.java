@@ -111,7 +111,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (this.useWorldEdit && this.mc.player != null)
         {
-            this.mc.player.sendChatMessage("//perf neighbors off");
+            this.sendCommandToServer("/perf neighbors off", this.mc.player);
         }
     }
 
@@ -802,12 +802,12 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (this.useWorldEdit)
         {
-            this.mc.player.sendChatMessage("//perf neighbors on");
+            this.sendCommandToServer("/perf neighbors on", this.mc.player);
         }
 
-        if (this.mc.player != null && this.shouldEnableFeedback)
+        if (this.shouldEnableFeedback)
         {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback true");
+            this.sendCommandToServer("gamerule sendCommandFeedback true", this.mc.player);
         }
 
         DataManager.removeChatListener(this.gameRuleListener);

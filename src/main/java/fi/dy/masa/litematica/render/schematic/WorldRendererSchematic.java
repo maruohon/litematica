@@ -501,6 +501,7 @@ public class WorldRendererSchematic
 
                 buffer.bind();
                 buffer.drawElements();
+                VertexBuffer.unbind();
                 startedDrawing = true;
                 ++count;
             }
@@ -520,7 +521,7 @@ public class WorldRendererSchematic
 
         if (startedDrawing)
         {
-            renderLayer.getVertexFormat().endDrawing();
+            renderLayer.getVertexFormat().clearState();
         }
 
         VertexBuffer.unbind();
@@ -601,13 +602,13 @@ public class WorldRendererSchematic
                     matrixStack.push();
                     matrixStack.translate(chunkOrigin.getX() - x, chunkOrigin.getY() - y, chunkOrigin.getZ() - z);
                     buffer.bind();
-                    buffer.setShader(matrixStack.peek().getPositionMatrix(), projMatrix, shader);
+                    buffer.draw(matrixStack.peek().getPositionMatrix(), projMatrix, shader);
+                    VertexBuffer.unbind();
                     matrixStack.pop();
                 }
             }
         }
 
-        VertexBuffer.unbind();
         renderLayer.endDrawing();
 
         RenderSystem.setShader(() -> originalShader);
@@ -641,9 +642,9 @@ public class WorldRendererSchematic
         }
     }
 
-    public boolean renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
+    public void renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
     {
-        return this.blockRenderManager.renderFluid(pos, world, bufferBuilderIn, state.getBlockState(), state);
+        this.blockRenderManager.renderFluid(pos, world, bufferBuilderIn, state.getBlockState(), state);
     }
 
     public BakedModel getModelForState(BlockState state)

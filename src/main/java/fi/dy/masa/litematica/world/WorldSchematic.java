@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -64,7 +64,7 @@ public class WorldSchematic extends World
                           RegistryEntry<DimensionType> dimension,
                           Supplier<Profiler> supplier)
     {
-        super(properties, REGISTRY_KEY, dimension, supplier, true, false, 0L, 64);
+        super(properties, REGISTRY_KEY, dimension, supplier, true, false, 0L, 0);
 
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
@@ -449,7 +449,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public void emitGameEvent(@org.jetbrains.annotations.Nullable Entity entity, GameEvent event, BlockPos pos)
+    public void emitGameEvent(@Nullable Entity entity, GameEvent event, BlockPos pos)
     {
         // NO-OP
     }
