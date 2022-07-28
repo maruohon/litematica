@@ -254,13 +254,6 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
 
     protected void sendCommandToServer(String command, ClientPlayerEntity player)
     {
-        if (command.length() > 0 && command.charAt(0) != '/')
-        {
-            player.sendCommand("/" + command);
-        }
-        else
-        {
-            player.sendCommand(command);
-        }
+        player.sendCommand(command);
     }
 }
