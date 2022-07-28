@@ -324,10 +324,9 @@ public class ChunkRenderDispatcherLitematica
 
     private void uploadVertexBuffer(BufferBuilder buffer, VertexBuffer vertexBuffer)
     {
-        BufferBuilder.BuiltBuffer renderBuffer = buffer.end();
+        BufferBuilder.BuiltBuffer renderBuffer;
 
-        /*
-        if (buffer instanceof CompatBuffer compatBuffer)
+        if (buffer instanceof OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder compatBuffer)
         {
             if (compatBuffer.lastRenderBuildBuffer != null)
             {
@@ -342,7 +341,6 @@ public class ChunkRenderDispatcherLitematica
         {
             renderBuffer = buffer.end();
         }
-        */
 
         vertexBuffer.bind();
         vertexBuffer.upload(renderBuffer);
