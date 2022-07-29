@@ -15,14 +15,14 @@ public class BufferBuilderCache
     {
         for (RenderLayer layer : RenderLayer.getBlockLayers())
         {
-            this.blockBufferBuilders.put(layer, new BufferBuilder(layer.getExpectedBufferSize()));
+            this.blockBufferBuilders.put(layer, new OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder(layer.getExpectedBufferSize()));
         }
 
-        this.overlayBufferBuilders = new BufferBuilder[OverlayRenderType.values().length];
+        this.overlayBufferBuilders = new OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder[OverlayRenderType.values().length];
 
         for (int i = 0; i < this.overlayBufferBuilders.length; ++i)
         {
-            this.overlayBufferBuilders[i] = new BufferBuilder(262144);
+            this.overlayBufferBuilders[i] = new OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder(262144);
         }
     }
 
