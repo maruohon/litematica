@@ -73,8 +73,8 @@ public class SetSchematicPreviewTask extends TaskBase
         }
         catch (Exception e)
         {
-            MessageDispatcher.error().console().translate("litematica.message.error.schematic_preview_set_failed",
-                                                          this.schematic.getMetadata().getName());
+            MessageDispatcher.error().console(e).translate("litematica.message.error.schematic_preview_set_failed",
+                                                           this.schematic.getMetadata().getName());
         }
 
         this.finished = true;

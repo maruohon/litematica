@@ -264,9 +264,8 @@ public class SelectionManager
                     }
                     catch (Exception e)
                     {
-                        MessageDispatcher.error().console().type(output)
+                        MessageDispatcher.error().console(e).type(output)
                                 .translate("litematica.error.area_selection.copy_failed");
-                        Litematica.logger.warn("Copy failed", e);
                         return false;
                     }
 
