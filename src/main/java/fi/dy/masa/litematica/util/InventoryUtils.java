@@ -14,8 +14,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.litematica.config.Configs;
 
 public class InventoryUtils
 {
@@ -31,16 +31,15 @@ public class InventoryUtils
         {
             try
             {
-                int slotNum = Integer.parseInt(str);
+                int slotNum = Integer.parseInt(str) - 1;
 
-                if (PlayerInventory.isValidHotbarIndex(slotNum) && PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
+                if (PlayerInventory.isValidHotbarIndex(slotNum) &&
+                    PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
                 {
                     PICK_BLOCKABLE_SLOTS.add(slotNum);
                 }
             }
-            catch (NumberFormatException e)
-            {
-            }
+            catch (NumberFormatException ignore) {}
         }
     }
 
@@ -146,41 +145,63 @@ public class InventoryUtils
         }
     }
 
+    private static boolean canPickToSlot(PlayerInventory inventory, int slotNum)
+    {
+        if (PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
+        {
+            return false;
+        }
+
+        ItemStack stack = inventory.getStack(slotNum);
+        return (stack.isEmpty() || stack.getItem().isDamageable() == false);
+    }
+
     private static int getPickBlockTargetSlot(PlayerEntity player)
     {
-        int slotNum;
-
-        if (PICK_BLOCKABLE_SLOTS.contains(player.getInventory().selectedSlot + 1))
+        if (PICK_BLOCKABLE_SLOTS.isEmpty())
         {
-            slotNum = player.getInventory().selectedSlot;
+            return -1;
         }
-        else
-        {
-            if (nextPickSlotIndex >= PICK_BLOCKABLE_SLOTS.size())
-            {
-                nextPickSlotIndex = 0;
-            }
 
-            slotNum = PICK_BLOCKABLE_SLOTS.get(nextPickSlotIndex) - 1;
+        int slotNum = player.getInventory().selectedSlot;
+
+        if (canPickToSlot(player.getInventory(), slotNum))
+        {
+            return slotNum;
+        }
+
+        if (nextPickSlotIndex >= PICK_BLOCKABLE_SLOTS.size())
+        {
+            nextPickSlotIndex = 0;
+        }
+
+        for (int i = 0; i < PICK_BLOCKABLE_SLOTS.size(); ++i)
+        {
+            slotNum = PICK_BLOCKABLE_SLOTS.get(nextPickSlotIndex);
 
             if (++nextPickSlotIndex >= PICK_BLOCKABLE_SLOTS.size())
             {
                 nextPickSlotIndex = 0;
             }
+
+            if (canPickToSlot(player.getInventory(), slotNum))
+            {
+                return slotNum;
+            }
         }
 
-        return slotNum;
+        return -1;
     }
 
     private static int getEmptyPickBlockableHotbarSlot(PlayerInventory inventory)
     {
         for (int i = 0; i < PICK_BLOCKABLE_SLOTS.size(); ++i)
         {
-            int slotNum = PICK_BLOCKABLE_SLOTS.get(i) - 1;
+            int slotNum = PICK_BLOCKABLE_SLOTS.get(i);
 
-            if (slotNum >= 0 && slotNum < inventory.main.size())
+            if (PlayerInventory.isValidHotbarIndex(slotNum))
             {
-                ItemStack stack = inventory.main.get(slotNum);
+                ItemStack stack = inventory.getStack(slotNum);
 
                 if (stack.isEmpty())
                 {
