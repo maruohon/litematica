@@ -25,8 +25,14 @@ public class SchematicWorldHandler
         return world;
     }
 
+    @Nullable
     public static WorldSchematic createSchematicWorld()
     {
+        if (MinecraftClient.getInstance().world == null)
+        {
+            return null;
+        }
+
         ClientWorld.Properties levelInfo = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
         return new WorldSchematic(levelInfo, RegistryEntry.of(DIMENSIONTYPE), MinecraftClient.getInstance()::getProfiler);
     }
