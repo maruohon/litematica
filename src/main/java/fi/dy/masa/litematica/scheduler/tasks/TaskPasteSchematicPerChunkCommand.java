@@ -351,9 +351,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (this.useWorldEdit)
         {
-            commandHandler.accept(String.format("//pos1 %d,%d,%d", x, y, z));
-            commandHandler.accept(String.format("//pos2 %d,%d,%d", x, y, z));
-            commandHandler.accept("//set " + blockString);
+            commandHandler.accept(String.format("/pos1 %d,%d,%d", x, y, z));
+            commandHandler.accept(String.format("/pos2 %d,%d,%d", x, y, z));
+            commandHandler.accept("/set " + blockString);
         }
         else
         {
@@ -403,9 +403,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (this.useWorldEdit)
         {
-            this.queuedCommands.offer(String.format("//pos1 %d,%d,%d", minX, minY, minZ));
-            this.queuedCommands.offer(String.format("//pos2 %d,%d,%d", maxX, maxY, maxZ));
-            this.queuedCommands.offer("//set " + blockString);
+            this.queuedCommands.offer(String.format("/pos1 %d,%d,%d", minX, minY, minZ));
+            this.queuedCommands.offer(String.format("/pos2 %d,%d,%d", maxX, maxY, maxZ));
+            this.queuedCommands.offer("/set " + blockString);
         }
         else
         {
