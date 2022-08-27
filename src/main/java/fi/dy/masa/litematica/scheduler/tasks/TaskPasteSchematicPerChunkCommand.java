@@ -109,9 +109,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     {
         super.init();
 
-        if (this.useWorldEdit && this.mc.player != null)
+        if (this.useWorldEdit && this.isInWorld())
         {
-            this.sendCommandToServer("/perf neighbors off", this.mc.player);
+            this.sendCommand("/perf neighbors off");
         }
     }
 
@@ -160,13 +160,8 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     {
         while (this.sentCommandsThisTick < this.maxCommandsPerTick && this.queuedCommands.isEmpty() == false)
         {
-            this.sendCommand(this.queuedCommands.poll(), this.mc.player);
+            this.sendCommand(this.queuedCommands.poll());
         }
-    }
-
-    protected void sendCommand(String cmd)
-    {
-        this.sendCommand(cmd, this.mc.player);
     }
 
     protected void processBlocksInCurrentBoxUsingSetBlockOnly()
@@ -800,16 +795,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
         }
 
-        if (this.useWorldEdit)
-        {
-            this.sendCommandToServer("/perf neighbors on", this.mc.player);
-        }
-
-        if (this.shouldEnableFeedback)
-        {
-            this.sendCommandToServer("gamerule sendCommandFeedback true", this.mc.player);
-        }
-
+        this.sendTaskEndCommands();
         DataManager.removeChatListener(this.gameRuleListener);
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
 
