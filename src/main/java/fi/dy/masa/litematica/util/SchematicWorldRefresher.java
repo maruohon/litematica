@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.ChunkSchematic;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -156,6 +157,7 @@ public class SchematicWorldRefresher implements IRangeChangeListener
         {
             int chunkX = pos.getX() >> 4;
             int chunkZ = pos.getZ() >> 4;
+            Litematica.debugLog("SchematicWorldRefresher#markSchematicChunkForRenderUpdate({}, {})", chunkX, chunkZ);
 
             if (world.getChunkProvider().isChunkLoaded(chunkX, chunkZ) &&
                 WorldUtils.isClientChunkLoaded(this.mc.world, chunkX, chunkZ))
