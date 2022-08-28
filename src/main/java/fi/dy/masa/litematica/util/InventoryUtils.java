@@ -16,6 +16,8 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.litematica.config.Configs;
 
 public class InventoryUtils
@@ -63,6 +65,7 @@ public class InventoryUtils
         {
             if (PICK_BLOCKABLE_SLOTS.size() == 0)
             {
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.warn.pickblock.no_valid_slots_configured");
                 return;
             }
 
@@ -92,6 +95,10 @@ public class InventoryUtils
                 }
 
                 WorldUtils.setEasyPlaceLastPickBlockTime();
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.warn.pickblock.no_suitable_slot_found");
             }
         }
     }
