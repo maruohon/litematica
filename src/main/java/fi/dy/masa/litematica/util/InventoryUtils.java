@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolItem;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -153,7 +154,16 @@ public class InventoryUtils
         }
 
         ItemStack stack = inventory.getStack(slotNum);
-        return (stack.isEmpty() || stack.getItem().isDamageable() == false);
+
+        if (stack.isEmpty())
+        {
+            return true;
+        }
+
+        return (Configs.Generic.PICK_BLOCK_AVOID_DAMAGEABLE.getBooleanValue() == false ||
+                stack.getItem().isDamageable() == false) &&
+               (Configs.Generic.PICK_BLOCK_AVOID_TOOLS.getBooleanValue() == false ||
+                (stack.getItem() instanceof ToolItem) == false);
     }
 
     private static int getPickBlockTargetSlot(PlayerEntity player)
