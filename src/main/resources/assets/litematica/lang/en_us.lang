@@ -271,6 +271,7 @@ litematica.label.schematic_info.dimensions_value=§b%s<c=aaa> x §b%s<c=aaa> x �
 litematica.label.schematic_info.enclosing_size=<c=aaa>Enclosing size:
 litematica.label.schematic_info.enclosing_size.value=  §a%s
 litematica.label.schematic_info.enclosing_size_and_value=<c=aaa>Enclosing size: %s
+litematica.label.schematic_info.generic_value=<c=eee>%s
 litematica.label.schematic_info.name=<c=aaa>Name:
 litematica.label.schematic_info.name.value=  <c=7f7>%s
 litematica.label.schematic_info.region_count=<c=aaa>Regions: §6%s
@@ -279,7 +280,7 @@ litematica.label.schematic_info.time_created=<c=aaa>Created: <c=77f>%s
 litematica.label.schematic_info.time_modified=<c=aaa>Modified: <c=77f>%s
 litematica.label.schematic_info.total_blocks=<c=aaa>Total blocks: §6%d
 litematica.label.schematic_info.total_blocks_and_volume=<c=aaa>Blocks/Volume: §6%s<c=aaa> / §6%s
-litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s <c=bbb>blocks
+litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s
 litematica.label.schematic_placement_browser.placements=placements
 litematica.label.schematic_placement_settings.placement_origin=Placement Origin:
 litematica.label.schematic_placement_settings.schematic_name=Schematic: §a%s§r\nFile: §3%s

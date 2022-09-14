@@ -13,7 +13,9 @@ import fi.dy.masa.malilib.gui.widget.IconWidget;
 import fi.dy.masa.malilib.gui.widget.LabelWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import fi.dy.masa.malilib.render.text.StyledText;
 import fi.dy.masa.malilib.render.text.StyledTextLine;
+import fi.dy.masa.malilib.render.text.StyledTextUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.litematica.gui.util.SchematicInfoCache;
 import fi.dy.masa.litematica.gui.util.SchematicInfoCache.SchematicInfo;
@@ -62,7 +64,7 @@ public class SchematicInfoWidget extends ContainerWidget
         if (this.currentInfo.texture != null)
         {
             IconWidget iconWidget = this.createPreviewIconWidget(x, label.getBottom() + 4);
-            this.addWidget(iconWidget);
+            this.addWidgetIfNotNull(iconWidget);
         }
     }
 
@@ -93,6 +95,7 @@ public class SchematicInfoWidget extends ContainerWidget
         this.reCreateSubWidgets();
     }
 
+    @Nullable
     protected IconWidget createPreviewIconWidget(int x, int y)
     {
         int iconSize = (int) Math.sqrt(this.currentInfo.texture.getTextureData().length);
@@ -102,6 +105,12 @@ public class SchematicInfoWidget extends ContainerWidget
         if (usableHeight < iconSize)
         {
             iconSize = usableHeight;
+        }
+
+        // No point showing so small previews that you can't see anything from it
+        if (iconSize < 10)
+        {
+            return null;
         }
 
         Icon icon = new BaseIcon(0, 0, iconSize, iconSize, textureSize, textureSize, this.currentInfo.iconName);
@@ -153,7 +162,9 @@ public class SchematicInfoWidget extends ContainerWidget
         if (org.apache.commons.lang3.StringUtils.isBlank(meta.getDescription()) == false)
         {
             StyledTextLine.translate(lines, "litematica.label.schematic_info.description");
-            StyledTextLine.translate(lines, "litematica.label.schematic_info.generic_value", meta.getDescription());
+            StyledText text = StyledText.translate("litematica.label.schematic_info.generic_value", meta.getDescription());
+            text = StyledTextUtils.wrapStyledTextToMaxWidth(text, this.getWidth() - 6);
+            lines.addAll(text.getLines());
         }
 
         LabelWidget label = new LabelWidget();
