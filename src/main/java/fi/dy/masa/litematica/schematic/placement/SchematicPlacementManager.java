@@ -164,7 +164,7 @@ public class SchematicPlacementManager
                         {
                             if (placement.isEnabled())
                             {
-                                SchematicPlacingUtils.placeToWorldWithinChunk(worldSchematic, pos, placement, ReplaceBehavior.ALL, false);
+                                SchematicPlacingUtils.placeToWorldWithinChunk(worldSchematic, pos, placement, ReplaceBehavior.WITH_NON_AIR, false);
                             }
                         }
 
