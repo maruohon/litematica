@@ -19,7 +19,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
@@ -617,15 +616,6 @@ public class LitematicaSchematic
                     {
                         Vec3d posVec = new Vec3d(entity.getX() - regionPosAbs.getX(), entity.getY() - regionPosAbs.getY(), entity.getZ() - regionPosAbs.getZ());
                         NBTUtils.writeEntityPositionToTag(posVec, tag);
-
-                        // Make the sleeping position relative as well
-                        if (entity instanceof LivingEntity living && living.isSleeping())
-                        {
-                            tag.putInt("SleepingX", MathHelper.floor(posVec.x));
-                            tag.putInt("SleepingY", MathHelper.floor(posVec.y));
-                            tag.putInt("SleepingZ", MathHelper.floor(posVec.z));
-                        }
-
                         list.add(new EntityInfo(posVec, tag));
                         existingEntities.add(uuid);
                     }
@@ -1890,6 +1880,11 @@ public class LitematicaSchematic
         public EntityInfo(Vec3d posVec, NbtCompound nbt)
         {
             this.posVec = posVec;
+
+            if (nbt.contains("SleepingX", Constants.NBT.TAG_INT)) { nbt.putInt("SleepingX", MathHelper.floor(posVec.x)); }
+            if (nbt.contains("SleepingY", Constants.NBT.TAG_INT)) { nbt.putInt("SleepingY", MathHelper.floor(posVec.y)); }
+            if (nbt.contains("SleepingZ", Constants.NBT.TAG_INT)) { nbt.putInt("SleepingZ", MathHelper.floor(posVec.z)); }
+
             this.nbt = nbt;
         }
     }
