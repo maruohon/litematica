@@ -79,8 +79,11 @@ public class LitematicaSchematic
     public static final int SCHEMATIC_VERSION_1_13_2 = 5;
     public static final int MINECRAFT_DATA_VERSION_1_13_2 = 1631; // MC 1.13.2
 
-    public static final int SCHEMATIC_VERSION = 6;
     public static final int MINECRAFT_DATA_VERSION = SharedConstants.getGameVersion().getSaveVersion().getId();
+    public static final int SCHEMATIC_VERSION = 6;
+    // This is basically a "sub-version" for the schematic version,
+    // intended to help with possible data fix needs that are discovered.
+    public static final int SCHEMATIC_VERSION_SUB = 1; // Bump to one after the sleeping entity position fix
 
     private final Map<String, LitematicaBlockStateContainer> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, NbtCompound>> tileEntities = new HashMap<>();
@@ -918,8 +921,9 @@ public class LitematicaSchematic
     {
         NbtCompound nbt = new NbtCompound();
 
-        nbt.putInt("Version", SCHEMATIC_VERSION);
         nbt.putInt("MinecraftDataVersion", MINECRAFT_DATA_VERSION);
+        nbt.putInt("Version", SCHEMATIC_VERSION);
+        nbt.putInt("SubVersion", SCHEMATIC_VERSION_SUB);
         nbt.put("Metadata", this.metadata.writeToNBT());
         nbt.put("Regions", this.writeSubRegionsToNBT());
 
