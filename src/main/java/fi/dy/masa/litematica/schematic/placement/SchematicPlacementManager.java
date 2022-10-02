@@ -781,7 +781,7 @@ public class SchematicPlacementManager
 
     public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, boolean printMessage, MinecraftClient mc)
     {
-        if (mc.player != null && EntityUtils.isCreativeMode(mc.player))
+        if (mc.player != null && (EntityUtils.isCreativeMode(mc.player) || Configs.Generic.PASTE_IGNORE_GAMEMODE.getBooleanValue()))
         {
             if (schematicPlacement != null)
             {

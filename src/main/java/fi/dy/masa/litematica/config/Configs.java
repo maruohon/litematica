@@ -68,6 +68,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       PASTE_IGNORE_BE_IN_FILL = new ConfigBoolean(    "pasteIgnoreBlockEntitiesFromFill", true, "If enabled, then all block entities are ignored from the fill\ncommands when pasting. This allows them to get pasted individually,\nwhich is required if the NBT restore option is being used.");
         public static final ConfigBoolean       PASTE_IGNORE_CMD_LIMIT  = new ConfigBoolean(    "pasteIgnoreCommandLimitWithNbtRestore", true, "If enabled, then the command limit is ignored when pasting\nblocks with a block entity with the NBT restore option enabled.\nThis seems to somehow fix an issue where the NBT restore\nwould otherwise fail for many blocks with a low command rate.");
         public static final ConfigBoolean       PASTE_IGNORE_ENTITIES   = new ConfigBoolean(    "pasteIgnoreEntities", false, "If enabled, then the Paste feature will not paste any entities");
+        public static final ConfigBoolean       PASTE_IGNORE_GAMEMODE   = new ConfigBoolean(   "pasteIgnoreGamemode", false, "Only allow pasting in creative mode");
         public static final ConfigBoolean       PASTE_IGNORE_INVENTORY  = new ConfigBoolean(    "pasteIgnoreInventories", false, "Don't paste inventory contents when pasting a schematic");
         public static final ConfigOptionList    PASTE_NBT_BEHAVIOR      = new ConfigOptionList( "pasteNbtRestoreBehavior", PasteNbtBehavior.NONE, "Whether or not the NBT data of blocks is attempted to be restored,\nand which method is used for that.\n- Place & Data Modify will try to place the \"NBT-picked\" block\n  near the player, and then use the data modify\n  command to transfer the NBT data to the setblock'ed block\n- Place & Clone will try to place the \"NBT-picked\" block\n  near the player, and then clone it to the final location.\n- Teleport & Place will try to teleport the player nearby and then\n  directly place the NBT-picked item in the correct position.\nNote that the teleport & place method doesn't currently work correctly/at all.\nThe recommended method is §ePlace & Data Modify§r, however for that to work\nyou will probably need to lower the pasteCommandLimit to 1 per tick and increase\nthe pasteCommandInterval to 1-4 ticks or something.\nThus you should only use this for pasting important blocks that need the data,\nfor example by making a schematic of just the inventories,\nand then paste that with replace behavior set to None.");
         public static final ConfigOptionList    PASTE_REPLACE_BEHAVIOR  = new ConfigOptionList( "pasteReplaceBehavior", ReplaceBehavior.NONE, "The behavior of replacing existing blocks\nin the Paste schematic tool mode");
@@ -113,6 +114,7 @@ public class Configs implements IConfigHandler
                 PASTE_IGNORE_BE_IN_FILL,
                 PASTE_IGNORE_CMD_LIMIT,
                 PASTE_IGNORE_ENTITIES,
+                PASTE_IGNORE_GAMEMODE,
                 PASTE_IGNORE_INVENTORY,
                 PASTE_NBT_BEHAVIOR,
                 PASTE_TO_MCFUNCTION,

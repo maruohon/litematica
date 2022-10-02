@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
@@ -235,7 +236,7 @@ public class SchematicProject
         {
             MinecraftClient mc = MinecraftClient.getInstance();
 
-            if (mc.player == null || EntityUtils.isCreativeMode(mc.player) == false)
+            if (mc.player == null || (EntityUtils.isCreativeMode(mc.player) || Configs.Generic.PASTE_IGNORE_GAMEMODE.getBooleanValue()) == false)
             {
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
                 return;
