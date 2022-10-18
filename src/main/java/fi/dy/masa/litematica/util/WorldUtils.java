@@ -389,7 +389,7 @@ public class WorldUtils
         {
             BlockEntity beSchem = worldSchematic.getBlockEntity(beClient.getPos());
 
-            if (beSchem != null)
+            if (beSchem instanceof SignBlockEntity)
             {
                 Text[] textSchematic = ((IMixinSignBlockEntity) beSchem).litematica_getText();
 
