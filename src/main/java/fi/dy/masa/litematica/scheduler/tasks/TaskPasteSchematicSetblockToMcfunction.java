@@ -8,10 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import net.minecraft.client.network.ClientPlayerEntity;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.malilib.util.LayerRange;
 
 public class TaskPasteSchematicSetblockToMcfunction extends TaskPasteSchematicPerChunkCommand
 {
@@ -33,7 +33,7 @@ public class TaskPasteSchematicSetblockToMcfunction extends TaskPasteSchematicPe
     }
 
     @Override
-    protected void sendCommandToServer(String command, ClientPlayerEntity player)
+    protected void sendCommand(String command, ClientPlayerEntity player)
     {
         if (this.writer == null || this.commandsInCurrentFile > this.maxCommandsPerFile)
         {
@@ -45,6 +45,7 @@ public class TaskPasteSchematicSetblockToMcfunction extends TaskPasteSchematicPe
             this.writer.write(command);
             this.writer.newLine();
             ++this.commandsInCurrentFile;
+            ++this.sentCommandsThisTick;
         }
         catch (IOException e)
         {

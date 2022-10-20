@@ -1,10 +1,13 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.List;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.materials.IMaterialList;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
@@ -12,9 +15,6 @@ import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
 {
@@ -87,7 +87,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
     @Override
     protected void onStop()
     {
-        if (this.finished && this.mc.player != null)
+        if (this.finished && this.isInWorld())
         {
             List<MaterialListEntry> list = MaterialListUtils.getMaterialList(
                     this.countsTotal, this.countsMissing, this.countsMismatch, this.mc.player);

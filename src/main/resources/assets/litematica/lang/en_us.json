@@ -437,6 +437,8 @@
     "litematica.message.error.schematic_save_failed": "Failed to save schematic to file '%s'",
     "litematica.message.error.schematic_save_interrupted": "Schematic saving interrupted or stopped",
     "litematica.message.error.schematic_save_no_area_selected": "§cSchematic saving failed - no area selected§r",
+    "litematica.message.warn.pickblock.no_suitable_slot_found": "No suitable hotbar slot found for pick block!\\nCheck the config Generic -> §epickBlockableSlots§r.\\nAlso depending on the §epickBlockAvoid*§6 configs, the pick block feature may refuse to replace any tools or other damageable items in those slots.",
+    "litematica.message.warn.pickblock.no_valid_slots_configured": "No hotbar slots set in the Generic -> §epickBlockableSlots§6 config!",
 
     "litematica.message.added_selection_box": "Added a new selection box at %s",
     "litematica.message.area_clear_fail": "§cFailed to clear the area(s)§r",

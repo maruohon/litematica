@@ -8,6 +8,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.interfaces.ICompletionListener;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
@@ -15,9 +18,6 @@ import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskTimer;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.interfaces.ICompletionListener;
-import fi.dy.masa.malilib.util.StringUtils;
 
 public abstract class TaskBase implements ITask, IInfoHudRenderer
 {
@@ -65,7 +65,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     @Override
     public boolean canExecute()
     {
-        return this.mc.world != null && this.mc.player != null;
+        return this.isInWorld();
     }
 
     @Override
@@ -83,6 +83,11 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     public void stop()
     {
         this.notifyListener();
+    }
+
+    protected boolean isInWorld()
+    {
+        return this.mc.world != null && this.mc.player != null;
     }
 
     protected void notifyListener()
