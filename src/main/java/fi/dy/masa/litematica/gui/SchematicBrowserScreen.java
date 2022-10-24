@@ -1,12 +1,13 @@
 package fi.dy.masa.litematica.gui;
 
 import java.nio.file.Path;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+
+import malilib.gui.BaseScreen;
+import malilib.gui.widget.CheckBoxWidget;
+import malilib.gui.widget.button.GenericButton;
+import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
+import malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;

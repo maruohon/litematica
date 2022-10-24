@@ -3,11 +3,13 @@ package fi.dy.masa.litematica.gui.util;
 import java.nio.file.Path;
 import java.util.HashMap;
 import javax.annotation.Nullable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.nbt.NBTTagCompound;
-import fi.dy.masa.malilib.util.data.Identifier;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+
+import malilib.util.data.Identifier;
+import malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;

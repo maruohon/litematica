@@ -10,12 +10,14 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
+
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import fi.dy.masa.malilib.util.position.Coordinate;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
+
+import malilib.util.position.Coordinate;
+import malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListPlacement;
@@ -174,7 +176,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         for (SelectionBox box : boxes.values())
         {
             BlockPos tmp;
-            tmp = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            tmp = malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
 
             if (pos1 == null)
             {
@@ -182,10 +184,10 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
             }
             else if (tmp.getX() < pos1.getX() || tmp.getY() < pos1.getY() || tmp.getZ() < pos1.getZ())
             {
-                pos1 = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(tmp, pos1);
+                pos1 = malilib.util.position.PositionUtils.getMinCorner(tmp, pos1);
             }
 
-            tmp = fi.dy.masa.malilib.util.position.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+            tmp = malilib.util.position.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
 
             if (pos2 == null)
             {
@@ -193,7 +195,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
             }
             else if (tmp.getX() > pos2.getX() || tmp.getY() > pos2.getY() || tmp.getZ() > pos2.getZ())
             {
-                pos2 = fi.dy.masa.malilib.util.position.PositionUtils.getMaxCorner(tmp, pos2);
+                pos2 = malilib.util.position.PositionUtils.getMaxCorner(tmp, pos2);
             }
         }
 

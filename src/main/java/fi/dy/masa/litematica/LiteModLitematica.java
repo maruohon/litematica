@@ -4,7 +4,8 @@ import java.io.File;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
-import fi.dy.masa.malilib.registry.Registry;
+
+import malilib.registry.Registry;
 import fi.dy.masa.litematica.gui.LitematicaConfigPanel;
 
 public class LiteModLitematica implements LiteMod, Configurable

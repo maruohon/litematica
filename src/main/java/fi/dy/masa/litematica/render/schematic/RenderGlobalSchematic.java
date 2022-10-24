@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -46,11 +47,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.position.ChunkSectionPos;
-import fi.dy.masa.malilib.util.position.LayerRange;
+
+import malilib.render.RenderUtils;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.ChunkSectionPos;
+import malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
@@ -823,7 +825,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             */
 
             GameUtils.profilerSwap("block_entities");
-            fi.dy.masa.malilib.render.RenderUtils.enableItemLighting();
+            RenderUtils.enableItemLighting();
 
             for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
             {

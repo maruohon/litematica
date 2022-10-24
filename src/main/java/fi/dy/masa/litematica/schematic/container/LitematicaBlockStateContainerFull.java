@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import io.netty.buffer.Unpooled;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.network.PacketBuffer;

@@ -1,7 +1,9 @@
 package fi.dy.masa.litematica.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+
 import net.minecraft.world.World;
+
 import fi.dy.masa.litematica.interfaces.IWorldUpdateSuppressor;
 
 @Mixin(World.class)

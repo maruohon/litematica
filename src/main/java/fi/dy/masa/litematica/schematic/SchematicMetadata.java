@@ -1,11 +1,13 @@
 package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+
+import malilib.util.data.Constants;
+import malilib.util.game.wrap.NbtWrap;
+import malilib.util.nbt.NbtUtils;
 
 public class SchematicMetadata
 {

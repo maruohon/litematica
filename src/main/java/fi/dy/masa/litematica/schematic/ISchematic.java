@@ -7,12 +7,14 @@ import java.nio.file.Path;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.FileUtils;
+import malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.Litematica;
 
 public interface ISchematic

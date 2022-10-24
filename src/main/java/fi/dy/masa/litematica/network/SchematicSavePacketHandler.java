@@ -6,16 +6,18 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import com.google.common.collect.ImmutableList;
 import io.netty.buffer.Unpooled;
+
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import fi.dy.masa.malilib.network.PacketSplitter;
-import fi.dy.masa.malilib.network.message.BasePacketHandler;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+
+import malilib.network.PacketSplitter;
+import malilib.network.message.BasePacketHandler;
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.NbtWrap;
+import malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.util.SchematicSaveSettings;

@@ -2,10 +2,12 @@ package fi.dy.masa.litematica.schematic;
 
 import java.util.List;
 import java.util.Map;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
+
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 
 public interface ISchematicRegion

@@ -2,11 +2,13 @@ package fi.dy.masa.litematica.selection;
 
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.util.data.json.JsonUtils;
-import fi.dy.masa.malilib.util.position.Coordinate;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
+
+import malilib.util.data.json.JsonUtils;
+import malilib.util.position.Coordinate;
+import malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 

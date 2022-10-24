@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 

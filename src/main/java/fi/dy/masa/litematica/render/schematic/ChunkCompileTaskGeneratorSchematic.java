@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
+
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 
 public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompileTaskGeneratorSchematic>

@@ -5,7 +5,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import net.minecraft.client.gui.GuiOverlayDebug;
+
 import fi.dy.masa.litematica.render.DebugScreenMessages;
 
 @Mixin(GuiOverlayDebug.class)

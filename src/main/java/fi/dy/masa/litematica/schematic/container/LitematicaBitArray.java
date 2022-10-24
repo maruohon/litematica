@@ -2,7 +2,8 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
-import fi.dy.masa.malilib.util.MathUtils;
+
+import malilib.util.MathUtils;
 
 public class LitematicaBitArray
 {

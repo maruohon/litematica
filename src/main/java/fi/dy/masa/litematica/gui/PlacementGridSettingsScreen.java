@@ -1,11 +1,12 @@
 package fi.dy.masa.litematica.gui;
 
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.LabelWidget;
-import fi.dy.masa.malilib.gui.widget.Vec3iEditWidget;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+
+import malilib.gui.BaseScreen;
+import malilib.gui.widget.LabelWidget;
+import malilib.gui.widget.Vec3iEditWidget;
+import malilib.gui.widget.button.GenericButton;
+import malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.GridSettings;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;

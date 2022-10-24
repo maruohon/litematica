@@ -1,13 +1,14 @@
 package fi.dy.masa.litematica.config;
 
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
-import fi.dy.masa.malilib.input.ActionResult;
-import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.input.KeyBind;
-import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+
+import malilib.gui.BaseScreen;
+import malilib.gui.config.BaseConfigScreen;
+import malilib.input.ActionResult;
+import malilib.input.KeyAction;
+import malilib.input.KeyBind;
+import malilib.input.callback.HotkeyCallback;
+import malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.AreaSelectionBrowserScreen;

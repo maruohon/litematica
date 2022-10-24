@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
-import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
-import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
-import fi.dy.masa.malilib.gui.widget.LabelWidget;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import malilib.gui.BaseScreen;
+import malilib.gui.widget.BaseTextFieldWidget;
+import malilib.gui.widget.BlockPosEditWidget;
+import malilib.gui.widget.CheckBoxWidget;
+import malilib.gui.widget.LabelWidget;
+import malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;

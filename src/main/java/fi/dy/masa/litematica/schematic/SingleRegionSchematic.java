@@ -9,14 +9,16 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
@@ -275,7 +277,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         BlockPos regionPos = region.getPosition();
         Vec3i endRel = PositionUtils.getRelativeEndPositionFromAreaSize(region.getSize());
         BlockPos regionEnd = regionPos.add(endRel);
-        BlockPos regionMin = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(regionPos, regionEnd);
+        BlockPos regionMin = malilib.util.position.PositionUtils.getMinCorner(regionPos, regionEnd);
         BlockPos regionOffset = regionMin.subtract(minCorner);
 
         return regionOffset;

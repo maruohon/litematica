@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.schematic.util;
 
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
@@ -9,7 +10,8 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.util.position.LayerRange;
+
+import malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
@@ -67,7 +69,7 @@ public class SchematicUtils
 
         // These are the untransformed relative positions
         BlockPos posEndRel = (new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize))).add(regionPos);
-        BlockPos posMinRel = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(regionPos, posEndRel);
+        BlockPos posMinRel = malilib.util.position.PositionUtils.getMinCorner(regionPos, posEndRel);
 
         // The transformed sub-region origin position
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
@@ -111,8 +113,8 @@ public class SchematicUtils
             return null;
         }
 
-        BlockPos posMinReversed = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(pos1, pos2);
-        BlockPos posMaxReversed = fi.dy.masa.malilib.util.position.PositionUtils.getMaxCorner(pos1, pos2);
+        BlockPos posMinReversed = malilib.util.position.PositionUtils.getMinCorner(pos1, pos2);
+        BlockPos posMaxReversed = malilib.util.position.PositionUtils.getMaxCorner(pos1, pos2);
 
         final int startX = Math.max(posMinReversed.getX(), 0);
         final int startY = Math.max(posMinReversed.getY(), 0);

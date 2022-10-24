@@ -2,6 +2,7 @@ package fi.dy.masa.litematica;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import fi.dy.masa.litematica.config.Configs;
 
 public class Litematica

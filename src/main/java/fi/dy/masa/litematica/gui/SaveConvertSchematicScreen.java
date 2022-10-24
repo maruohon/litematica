@@ -2,9 +2,11 @@ package fi.dy.masa.litematica.gui;
 
 import java.nio.file.Path;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.RadioButtonWidget;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+
+import malilib.gui.BaseScreen;
+import malilib.gui.widget.RadioButtonWidget;
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.StringUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicType;
@@ -162,7 +164,7 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
 
         public String getDisplayString()
         {
-            return fi.dy.masa.malilib.util.StringUtils.translate(this.translationKey);
+            return StringUtils.translate(this.translationKey);
         }
     }
 }

@@ -2,9 +2,10 @@ package fi.dy.masa.litematica.input;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.input.Hotkey;
-import fi.dy.masa.malilib.input.HotkeyCategory;
-import fi.dy.masa.malilib.input.HotkeyProvider;
+
+import malilib.input.Hotkey;
+import malilib.input.HotkeyCategory;
+import malilib.input.HotkeyProvider;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;

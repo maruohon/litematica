@@ -1,11 +1,12 @@
 package fi.dy.masa.litematica;
 
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.malilib.config.JsonModConfig;
-import fi.dy.masa.malilib.config.JsonModConfig.ConfigDataUpdater;
-import fi.dy.masa.malilib.config.util.ConfigUpdateUtils.KeyBindSettingsResetter;
-import fi.dy.masa.malilib.event.InitializationHandler;
-import fi.dy.masa.malilib.registry.Registry;
+
+import malilib.config.JsonModConfig;
+import malilib.config.JsonModConfig.ConfigDataUpdater;
+import malilib.config.util.ConfigUpdateUtils.KeyBindSettingsResetter;
+import malilib.event.InitializationHandler;
+import malilib.registry.Registry;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.HotkeyCallbacks;
 import fi.dy.masa.litematica.data.DataManager;

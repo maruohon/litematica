@@ -1,10 +1,11 @@
 package fi.dy.masa.litematica.event;
 
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
-import fi.dy.masa.malilib.event.PostWorldRenderer;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.event.PostGameOverlayRenderer;
+import malilib.event.PostWorldRenderer;
+import malilib.gui.util.GuiUtils;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;

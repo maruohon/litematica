@@ -9,10 +9,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.nbt.NBTTagCompound;
-import fi.dy.masa.malilib.gui.icon.MultiIcon;
-import fi.dy.masa.malilib.util.FileNameUtils;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+
+import malilib.gui.icon.MultiIcon;
+import malilib.util.FileNameUtils;
+import malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;
 
 public class SchematicType<S extends ISchematic>

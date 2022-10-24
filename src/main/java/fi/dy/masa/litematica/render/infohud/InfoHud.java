@@ -2,12 +2,14 @@ package fi.dy.masa.litematica.render.infohud;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.malilib.config.value.HorizontalAlignment;
-import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.ScreenContext;
-import fi.dy.masa.malilib.render.text.StringListRenderer;
+
+import malilib.config.value.HorizontalAlignment;
+import malilib.config.value.HudAlignment;
+import malilib.gui.util.GuiUtils;
+import malilib.gui.util.ScreenContext;
+import malilib.render.text.StringListRenderer;
 import fi.dy.masa.litematica.config.Configs;
 
 public class InfoHud

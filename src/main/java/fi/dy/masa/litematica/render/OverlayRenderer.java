@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -22,19 +23,20 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.config.value.HorizontalAlignment;
-import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.ScreenContext;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.game.BlockUtils;
-import fi.dy.masa.malilib.util.game.WorldUtils;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.position.Vec2i;
+
+import malilib.config.value.HorizontalAlignment;
+import malilib.config.value.HudAlignment;
+import malilib.gui.util.GuiUtils;
+import malilib.gui.util.ScreenContext;
+import malilib.render.ShapeRenderUtils;
+import malilib.render.TextRenderUtils;
+import malilib.util.StringUtils;
+import malilib.util.data.Color4f;
+import malilib.util.game.BlockUtils;
+import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.Vec2i;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Configs.Visuals;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -124,7 +126,7 @@ public class OverlayRenderer
             GlStateManager.disableTexture2D();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
             GlStateManager.pushMatrix();
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            malilib.render.RenderUtils.setupBlend();
 
             if (renderAreas)
             {
@@ -685,16 +687,16 @@ public class OverlayRenderer
             GlStateManager.disableLighting();
             GlStateManager.disableCull();
             GlStateManager.disableTexture2D();
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            malilib.render.RenderUtils.setupBlend();
 
             if (direction)
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
+                malilib.render.RenderUtils.renderBlockTargetingOverlay(
                         entity, pos, trace.sideHit, trace.hitVec, color, partialTicks);
             }
             else
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlaySimple(
+                malilib.render.RenderUtils.renderBlockTargetingOverlaySimple(
                         entity, pos, trace.sideHit, color, partialTicks);
             }
 
@@ -729,7 +731,7 @@ public class OverlayRenderer
                 GlStateManager.translate(-dx, -dy, -dz);
                 GlStateManager.enablePolygonOffset();
                 GlStateManager.doPolygonOffset(-0.8f, -0.4f);
-                fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+                malilib.render.RenderUtils.setupBlend();
                 GlStateManager.disableDepth();
                 GlStateManager.depthMask(false);
 

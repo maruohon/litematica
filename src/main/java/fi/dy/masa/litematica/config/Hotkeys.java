@@ -2,8 +2,9 @@ package fi.dy.masa.litematica.config;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.option.HotkeyConfig;
-import fi.dy.masa.malilib.input.KeyBindSettings;
+
+import malilib.config.option.HotkeyConfig;
+import malilib.input.KeyBindSettings;
 
 public class Hotkeys
 {

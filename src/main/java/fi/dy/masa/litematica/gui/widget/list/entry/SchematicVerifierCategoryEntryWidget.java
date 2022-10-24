@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui.widget.list.entry;
 
-import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
-import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
-import fi.dy.masa.malilib.render.text.StyledTextLine;
+import malilib.gui.widget.list.entry.BaseListEntryWidget;
+import malilib.gui.widget.list.entry.DataListEntryWidgetData;
+import malilib.render.text.StyledTextLine;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.schematic.verifier.VerifierResultType;
 

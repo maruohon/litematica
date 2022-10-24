@@ -1,8 +1,10 @@
 package fi.dy.masa.litematica.schematic.verifier;
 
 import java.util.Comparator;
+
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.malilib.util.position.PositionUtils;
+
+import malilib.util.position.PositionUtils;
 
 class BlockPairTypePositionComparator implements Comparator<BlockPairTypePosition>
 {

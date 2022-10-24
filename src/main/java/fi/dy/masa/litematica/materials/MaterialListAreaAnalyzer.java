@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.materials;
 
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.StringUtils;
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.StringUtils;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksArea;
 import fi.dy.masa.litematica.selection.AreaSelection;

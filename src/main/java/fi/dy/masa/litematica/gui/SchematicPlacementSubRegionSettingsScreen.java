@@ -2,19 +2,21 @@ package fi.dy.masa.litematica.gui;
 
 import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
+
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.BlockPosEditWidget;
-import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
-import fi.dy.masa.malilib.gui.widget.LabelWidget;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.position.Coordinate;
-import fi.dy.masa.malilib.util.position.PositionUtils;
+
+import malilib.gui.BaseScreen;
+import malilib.gui.util.GuiUtils;
+import malilib.gui.widget.BlockPosEditWidget;
+import malilib.gui.widget.CheckBoxWidget;
+import malilib.gui.widget.LabelWidget;
+import malilib.gui.widget.button.GenericButton;
+import malilib.gui.widget.button.OnOffButton;
+import malilib.util.StringUtils;
+import malilib.util.position.Coordinate;
+import malilib.util.position.PositionUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;

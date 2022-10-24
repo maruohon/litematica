@@ -1,7 +1,8 @@
 package fi.dy.masa.litematica.materials;
 
 import net.minecraft.item.ItemStack;
-import fi.dy.masa.malilib.util.data.ItemType;
+
+import malilib.util.data.ItemType;
 
 public class MaterialListEntry
 {

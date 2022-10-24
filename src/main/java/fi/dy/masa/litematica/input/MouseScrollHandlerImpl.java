@@ -4,10 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.input.MouseScrollHandler;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.gui.util.GuiUtils;
+import malilib.input.MouseScrollHandler;
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -42,7 +43,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
         final int amount = deltaY > 0 ? 1 : -1;
         ToolMode mode = DataManager.getToolMode();
         Entity cameraEntity = GameUtils.getCameraEntity();
-        EnumFacing direction = fi.dy.masa.malilib.util.position.PositionUtils.getClosestLookingDirection(cameraEntity);
+        EnumFacing direction = malilib.util.position.PositionUtils.getClosestLookingDirection(cameraEntity);
 
         if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())
         {

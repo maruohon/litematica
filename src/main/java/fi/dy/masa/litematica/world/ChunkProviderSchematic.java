@@ -4,6 +4,7 @@ import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+
 import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 
 public class ChunkProviderSchematic extends ChunkProviderClient

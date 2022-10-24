@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.schematic.container;
 
 import java.util.List;
 import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
 
 public interface ILitematicaBlockStatePalette

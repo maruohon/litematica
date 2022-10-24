@@ -2,15 +2,16 @@ package fi.dy.masa.litematica.gui;
 
 import java.nio.file.Path;
 import javax.annotation.Nullable;
-import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
-import fi.dy.masa.malilib.gui.widget.LabelWidget;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
-import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import fi.dy.masa.malilib.render.text.StyledText;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.StringUtils;
+
+import malilib.gui.BaseListScreen;
+import malilib.gui.icon.FileBrowserIconProvider;
+import malilib.gui.widget.LabelWidget;
+import malilib.gui.widget.button.GenericButton;
+import malilib.gui.widget.list.BaseFileBrowserWidget;
+import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import malilib.render.text.StyledText;
+import malilib.util.FileUtils;
+import malilib.util.StringUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;

@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.schematic.verifier;
 
-import fi.dy.masa.malilib.util.data.RunStatus;
+import malilib.util.data.RunStatus;
 
 public class VerifierStatus
 {

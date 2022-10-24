@@ -7,17 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.game.BlockUtils;
-import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.data.Constants;
+import malilib.util.game.BlockUtils;
+import malilib.util.game.wrap.NbtWrap;
+import malilib.util.nbt.NbtUtils;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 

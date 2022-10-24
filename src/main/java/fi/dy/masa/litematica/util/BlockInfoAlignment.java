@@ -1,8 +1,9 @@
 package fi.dy.masa.litematica.util;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
-import fi.dy.masa.malilib.config.value.VerticalAlignment;
+
+import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.VerticalAlignment;
 
 public class BlockInfoAlignment extends BaseOptionListConfigValue
 {

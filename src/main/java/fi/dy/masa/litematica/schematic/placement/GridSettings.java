@@ -3,10 +3,12 @@ package fi.dy.masa.litematica.schematic.placement;
 import java.util.Objects;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.util.data.json.JsonUtils;
-import fi.dy.masa.malilib.util.position.Coordinate;
+
+import malilib.util.data.json.JsonUtils;
+import malilib.util.position.Coordinate;
 
 public class GridSettings
 {

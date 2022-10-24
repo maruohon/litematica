@@ -1,9 +1,11 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.client.gui.GuiScreen;
-import fi.dy.masa.malilib.gui.edit.BaseRenderLayerEditScreen;
-import fi.dy.masa.malilib.util.position.LayerRange;
+
+import malilib.gui.edit.BaseRenderLayerEditScreen;
+import malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 

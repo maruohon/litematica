@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui.util;
 import java.nio.file.Path;
 import java.util.HashMap;
 import javax.annotation.Nullable;
+
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 
 public class SchematicPlacementInfoCache

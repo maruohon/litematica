@@ -6,11 +6,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;

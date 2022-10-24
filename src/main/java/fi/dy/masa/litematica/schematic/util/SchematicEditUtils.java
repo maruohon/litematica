@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -18,13 +19,14 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
-import fi.dy.masa.malilib.util.position.ChunkSectionPos;
-import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.position.PositionUtils;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.ItemWrap;
+import malilib.util.position.ChunkSectionPos;
+import malilib.util.position.LayerRange;
+import malilib.util.position.PositionUtils;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinItemBlockSpecial;
@@ -165,7 +167,7 @@ public class SchematicEditUtils
     {
         WorldSchematic schematicWorld = SchematicWorldHandler.getSchematicWorld();
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceResult trace = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.ANY, false, 5);
+        RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.ANY, false, 5);
 
         if (schematicWorld != null && trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {

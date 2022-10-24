@@ -4,10 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.util.StringUtils;
+
+import malilib.gui.BaseListScreen;
+import malilib.gui.widget.button.GenericButton;
+import malilib.gui.widget.list.DataListWidget;
+import malilib.util.StringUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;

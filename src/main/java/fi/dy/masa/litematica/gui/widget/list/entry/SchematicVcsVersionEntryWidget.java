@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui.widget.list.entry;
 
-import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
-import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
-import fi.dy.masa.malilib.render.text.StyledTextLine;
+import malilib.gui.widget.list.entry.BaseDataListEntryWidget;
+import malilib.gui.widget.list.entry.DataListEntryWidgetData;
+import malilib.render.text.StyledTextLine;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 
 public class SchematicVcsVersionEntryWidget extends BaseDataListEntryWidget<SchematicVersion>

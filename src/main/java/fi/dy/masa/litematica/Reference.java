@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica;
 
-import fi.dy.masa.malilib.util.data.ModInfo;
+import malilib.util.data.ModInfo;
 
 public class Reference
 {

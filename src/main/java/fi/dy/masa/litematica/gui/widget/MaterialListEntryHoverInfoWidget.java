@@ -1,12 +1,14 @@
 package fi.dy.masa.litematica.gui.widget;
 
 import java.text.DecimalFormat;
+
 import net.minecraft.item.ItemStack;
-import fi.dy.masa.malilib.gui.widget.ContainerWidget;
-import fi.dy.masa.malilib.gui.widget.ItemStackWidget;
-import fi.dy.masa.malilib.gui.widget.LabelWidget;
-import fi.dy.masa.malilib.render.text.StyledTextLine;
-import fi.dy.masa.malilib.util.StringUtils;
+
+import malilib.gui.widget.ContainerWidget;
+import malilib.gui.widget.ItemStackWidget;
+import malilib.gui.widget.LabelWidget;
+import malilib.render.text.StyledTextLine;
+import malilib.util.StringUtils;
 
 public class MaterialListEntryHoverInfoWidget extends ContainerWidget
 {

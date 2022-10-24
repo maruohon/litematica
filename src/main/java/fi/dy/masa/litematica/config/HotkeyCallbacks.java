@@ -1,9 +1,10 @@
 package fi.dy.masa.litematica.config;
 
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
-import fi.dy.masa.malilib.listener.EventListener;
+
+import malilib.input.callback.HotkeyCallback;
+import malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
+import malilib.listener.EventListener;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;

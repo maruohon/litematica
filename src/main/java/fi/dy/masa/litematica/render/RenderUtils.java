@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.render;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -19,16 +20,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.config.value.HorizontalAlignment;
-import fi.dy.masa.malilib.config.value.VerticalAlignment;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.render.inventory.InventoryRenderDefinition;
-import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.inventory.InventoryView;
+
+import malilib.config.value.HorizontalAlignment;
+import malilib.config.value.VerticalAlignment;
+import malilib.gui.util.GuiUtils;
+import malilib.render.ShapeRenderUtils;
+import malilib.render.inventory.InventoryRenderDefinition;
+import malilib.render.inventory.InventoryRenderUtils;
+import malilib.util.StringUtils;
+import malilib.util.data.Color4f;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.inventory.InventoryView;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
@@ -94,12 +96,12 @@ public class RenderUtils
         double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
         double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
         double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
-        double minX = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(posLong) - dx - expand;
-        double minY = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(posLong) - dy - expand;
-        double minZ = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(posLong) - dz - expand;
-        double maxX = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(posLong) - dx + expand + 1;
-        double maxY = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(posLong) - dy + expand + 1;
-        double maxZ = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(posLong) - dz + expand + 1;
+        double minX = malilib.util.position.PositionUtils.unpackX(posLong) - dx - expand;
+        double minY = malilib.util.position.PositionUtils.unpackY(posLong) - dy - expand;
+        double minZ = malilib.util.position.PositionUtils.unpackZ(posLong) - dz - expand;
+        double maxX = malilib.util.position.PositionUtils.unpackX(posLong) - dx + expand + 1;
+        double maxY = malilib.util.position.PositionUtils.unpackY(posLong) - dy + expand + 1;
+        double maxZ = malilib.util.position.PositionUtils.unpackZ(posLong) - dz + expand + 1;
 
         ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
@@ -115,12 +117,12 @@ public class RenderUtils
         double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
         double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
         double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
-        double x1 = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(pos1) - dx;
-        double y1 = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(pos1) - dy;
-        double z1 = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(pos1) - dz;
-        double x2 = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(pos2) - dx;
-        double y2 = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(pos2) - dy;
-        double z2 = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(pos2) - dz;
+        double x1 = malilib.util.position.PositionUtils.unpackX(pos1) - dx;
+        double y1 = malilib.util.position.PositionUtils.unpackY(pos1) - dy;
+        double z1 = malilib.util.position.PositionUtils.unpackZ(pos1) - dz;
+        double x2 = malilib.util.position.PositionUtils.unpackX(pos2) - dx;
+        double y2 = malilib.util.position.PositionUtils.unpackY(pos2) - dy;
+        double z2 = malilib.util.position.PositionUtils.unpackZ(pos2) - dz;
 
         if (center)
         {
@@ -333,12 +335,12 @@ public class RenderUtils
         double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
         double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
         double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
-        int x1 = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(pos1);
-        int y1 = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(pos1);
-        int z1 = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(pos1);
-        int x2 = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(pos2);
-        int y2 = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(pos2);
-        int z2 = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(pos2);
+        int x1 = malilib.util.position.PositionUtils.unpackX(pos1);
+        int y1 = malilib.util.position.PositionUtils.unpackY(pos1);
+        int z1 = malilib.util.position.PositionUtils.unpackZ(pos1);
+        int x2 = malilib.util.position.PositionUtils.unpackX(pos2);
+        int y2 = malilib.util.position.PositionUtils.unpackY(pos2);
+        int z2 = malilib.util.position.PositionUtils.unpackZ(pos2);
         double minX = Math.min(x1, x2) - dx - expand;
         double minY = Math.min(y1, y2) - dy - expand;
         double minZ = Math.min(z1, z2) - dz - expand;

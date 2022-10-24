@@ -2,11 +2,12 @@ package fi.dy.masa.litematica.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.InteractableWidget;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.util.StringUtils;
+
+import malilib.gui.BaseScreen;
+import malilib.gui.util.GuiUtils;
+import malilib.gui.widget.InteractableWidget;
+import malilib.gui.widget.button.GenericButton;
+import malilib.util.StringUtils;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.util.LitematicaIcons;

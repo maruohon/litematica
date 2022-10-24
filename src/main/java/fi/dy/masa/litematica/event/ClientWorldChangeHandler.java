@@ -1,11 +1,13 @@
 package fi.dy.masa.litematica.event;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.client.multiplayer.WorldClient;
+
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 
-public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.ClientWorldChangeHandler
+public class ClientWorldChangeHandler implements malilib.event.ClientWorldChangeHandler
 {
     @Override
     public void onPreClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter)

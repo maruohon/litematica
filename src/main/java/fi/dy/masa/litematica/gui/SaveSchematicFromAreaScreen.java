@@ -2,16 +2,17 @@ package fi.dy.masa.litematica.gui;
 
 import java.nio.file.Path;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.option.BooleanConfig;
-import fi.dy.masa.malilib.config.option.OptionListConfig;
-import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.BooleanEditWidget;
-import fi.dy.masa.malilib.gui.widget.button.BooleanConfigButton;
-import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.gui.widget.button.OptionListConfigButton;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.config.option.BooleanConfig;
+import malilib.config.option.OptionListConfig;
+import malilib.config.value.BaseOptionListConfigValue;
+import malilib.gui.BaseScreen;
+import malilib.gui.widget.BooleanEditWidget;
+import malilib.gui.widget.button.BooleanConfigButton;
+import malilib.gui.widget.button.OnOffButton;
+import malilib.gui.widget.button.OptionListConfigButton;
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.network.SchematicSavePacketHandler;

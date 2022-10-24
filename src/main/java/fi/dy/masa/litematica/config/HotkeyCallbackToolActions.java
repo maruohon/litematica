@@ -3,11 +3,12 @@ package fi.dy.masa.litematica.config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.malilib.input.ActionResult;
-import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.input.KeyBind;
-import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.input.ActionResult;
+import malilib.input.KeyAction;
+import malilib.input.KeyBind;
+import malilib.input.callback.HotkeyCallback;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;

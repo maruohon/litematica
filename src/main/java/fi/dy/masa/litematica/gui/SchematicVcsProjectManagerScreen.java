@@ -2,15 +2,16 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.ConfirmActionScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.LabelWidget;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
+
+import malilib.gui.BaseListScreen;
+import malilib.gui.BaseScreen;
+import malilib.gui.ConfirmActionScreen;
+import malilib.gui.util.GuiUtils;
+import malilib.gui.widget.LabelWidget;
+import malilib.gui.widget.button.GenericButton;
+import malilib.gui.widget.list.DataListWidget;
+import malilib.util.StringUtils;
+import malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widget.SchematicVcsProjectInfoWidget;

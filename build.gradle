@@ -61,7 +61,7 @@ minecraft {
 }
 
 dependencies {
-    deobfCompile "fi.dy.masa.malilib:malilib-liteloader-" + config.minecraft_version_out + ":" + config.malilib_version + ":deobf"
+    deobfCompile "malilib:malilib-liteloader-" + config.minecraft_version_out + ":" + config.malilib_version + ":deobf"
 }
 
 sourceSets {

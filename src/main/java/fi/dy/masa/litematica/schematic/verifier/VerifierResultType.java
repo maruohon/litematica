@@ -1,10 +1,12 @@
 package fi.dy.masa.litematica.schematic.verifier;
 
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.block.state.IBlockState;
-import fi.dy.masa.malilib.config.option.DualColorConfig;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
+
+import malilib.config.option.DualColorConfig;
+import malilib.util.StringUtils;
+import malilib.util.data.Color4f;
 import fi.dy.masa.litematica.config.Configs;
 
 public enum VerifierResultType

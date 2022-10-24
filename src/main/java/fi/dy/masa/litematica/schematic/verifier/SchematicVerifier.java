@@ -13,17 +13,19 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import fi.dy.masa.malilib.listener.EventListener;
-import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.RunStatus;
-import fi.dy.masa.malilib.util.game.BlockUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.LayerRange;
+
+import malilib.listener.EventListener;
+import malilib.listener.TaskCompletionListener;
+import malilib.util.StringUtils;
+import malilib.util.data.RunStatus;
+import malilib.util.game.BlockUtils;
+import malilib.util.position.IntBoundingBox;
+import malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
@@ -360,7 +362,7 @@ public class SchematicVerifier implements IInfoHudRenderer
             {
                 if (this.completedChunks.contains(posLong))
                 {
-                    ChunkPos pos = fi.dy.masa.malilib.util.position.PositionUtils.chunkPosFromLong(posLong);
+                    ChunkPos pos = malilib.util.position.PositionUtils.chunkPosFromLong(posLong);
                     boxes.putAll(pos, this.boxesInChunks.get(pos));
                 }
             }
@@ -604,9 +606,9 @@ public class SchematicVerifier implements IInfoHudRenderer
         for (int i = 0; i < endIndex; ++i)
         {
             BlockPairTypePosition pair = this.closestSelectedPositions.get(i);
-            int x = fi.dy.masa.malilib.util.position.PositionUtils.unpackX(pair.posLong);
-            int y = fi.dy.masa.malilib.util.position.PositionUtils.unpackY(pair.posLong);
-            int z = fi.dy.masa.malilib.util.position.PositionUtils.unpackZ(pair.posLong);
+            int x = malilib.util.position.PositionUtils.unpackX(pair.posLong);
+            int y = malilib.util.position.PositionUtils.unpackY(pair.posLong);
+            int z = malilib.util.position.PositionUtils.unpackZ(pair.posLong);
             String name;
 
             if (pair.type == VerifierResultType.EXTRA)

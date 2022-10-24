@@ -15,6 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
@@ -25,15 +26,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.config.value.LayerMode;
-import fi.dy.masa.malilib.input.Hotkey;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.data.json.JsonUtils;
-import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.position.ChunkSectionPos;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
+
+import malilib.config.value.LayerMode;
+import malilib.input.Hotkey;
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.data.json.JsonUtils;
+import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.ChunkSectionPos;
+import malilib.util.position.IntBoundingBox;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -1004,7 +1006,7 @@ public class SchematicPlacementManager
         if (schematicPlacement != null)
         {
             Entity entity = GameUtils.getCameraEntity();
-            RayTraceResult trace = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, maxDistance);
+            RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, maxDistance);
 
             if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
             {

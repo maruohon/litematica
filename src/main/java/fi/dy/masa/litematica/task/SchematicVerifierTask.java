@@ -3,13 +3,15 @@ package fi.dy.masa.litematica.task;
 import com.google.common.collect.ArrayListMultimap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.PositionUtils;
+
+import malilib.util.position.IntBoundingBox;
+import malilib.util.position.PositionUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.scheduler.tasks.TaskProcessChunkBase;
 import fi.dy.masa.litematica.schematic.verifier.BlockStatePair;

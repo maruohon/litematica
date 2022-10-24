@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -24,12 +25,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.LayerRange;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.nbt.NbtUtils;
+import malilib.util.position.IntBoundingBox;
+import malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -196,7 +198,7 @@ public class SchematicPlacingUtils
         // These are the untransformed relative positions
         BlockPos posEndRelSub = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize));
         BlockPos posEndRel = posEndRelSub.add(regionPos);
-        BlockPos posMinRel = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(regionPos, posEndRel);
+        BlockPos posMinRel = malilib.util.position.PositionUtils.getMinCorner(regionPos, posEndRel);
 
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         BlockPos posEndAbs = PositionUtils.getTransformedBlockPos(posEndRelSub, placement.getMirror(), placement.getRotation()).add(regionPosTransformed).add(origin);
@@ -455,7 +457,7 @@ public class SchematicPlacingUtils
 
         // These are the untransformed relative positions
         BlockPos posEndRel = (new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize))).add(regionPos);
-        BlockPos posMinRel = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(regionPos, posEndRel);
+        BlockPos posMinRel = malilib.util.position.PositionUtils.getMinCorner(regionPos, posEndRel);
 
         // The transformed sub-region origin position
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
@@ -475,8 +477,8 @@ public class SchematicPlacingUtils
         boxMinRel = boxMinRel.subtract(posMinRel.subtract(regionPos));
         boxMaxRel = boxMaxRel.subtract(posMinRel.subtract(regionPos));
 
-        BlockPos posMin = fi.dy.masa.malilib.util.position.PositionUtils.getMinCorner(boxMinRel, boxMaxRel);
-        BlockPos posMax = fi.dy.masa.malilib.util.position.PositionUtils.getMaxCorner(boxMinRel, boxMaxRel);
+        BlockPos posMin = malilib.util.position.PositionUtils.getMinCorner(boxMinRel, boxMaxRel);
+        BlockPos posMax = malilib.util.position.PositionUtils.getMaxCorner(boxMinRel, boxMaxRel);
 
         final int startX = posMin.getX();
         final int startZ = posMin.getZ();

@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.gui.util;
 
-import fi.dy.masa.malilib.gui.icon.BaseMultiIcon;
-import fi.dy.masa.malilib.util.data.Identifier;
+import malilib.gui.icon.BaseMultiIcon;
+import malilib.util.data.Identifier;
 import fi.dy.masa.litematica.Reference;
 
 public class LitematicaIcons extends BaseMultiIcon

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -18,10 +19,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
-import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
-import fi.dy.masa.malilib.util.inventory.InventoryUtils;
+
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.ItemWrap;
+import malilib.util.game.wrap.NbtWrap;
+import malilib.util.inventory.InventoryUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.RenderUtils;

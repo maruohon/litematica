@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.schematic.util;
 
-import fi.dy.masa.malilib.util.data.BooleanStorageWithDefault;
-import fi.dy.masa.malilib.util.data.SimpleBooleanStorageWithDefault;
+import malilib.util.data.BooleanStorageWithDefault;
+import malilib.util.data.SimpleBooleanStorageWithDefault;
 
 public class SchematicSaveSettings
 {

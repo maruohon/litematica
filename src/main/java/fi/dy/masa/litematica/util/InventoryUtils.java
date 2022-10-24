@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -17,10 +18,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.registry.Registry;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
+
+import malilib.gui.BaseScreen;
+import malilib.registry.Registry;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.ItemWrap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -85,7 +87,7 @@ public class InventoryUtils
         EntityPlayer player = mc.player;
         InventoryPlayer inventory = player.inventory;
         boolean isCreativeMode = GameUtils.isCreativeMode();
-        int slotWithItem = fi.dy.masa.malilib.util.inventory.InventoryUtils.findSlotWithItemToPickBlock(player.openContainer, stack, ignoreNbt);
+        int slotWithItem = malilib.util.inventory.InventoryUtils.findSlotWithItemToPickBlock(player.openContainer, stack, ignoreNbt);
 
         // No item or no place to put it
         if (slotWithItem == -1 && isCreativeMode == false)
@@ -108,7 +110,7 @@ public class InventoryUtils
 
         if (slotWithItem != -1)
         {
-            fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotWithItem, hotbarSlot);
+            malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotWithItem, hotbarSlot);
             inventory.currentItem = hotbarSlot;
             return true;
         }
@@ -130,9 +132,9 @@ public class InventoryUtils
                     // The off-hand slot is empty, move the current stack to it
                     if (ItemWrap.isEmpty(player.getHeldItemOffhand()))
                     {
-                        fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
-                        fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, 45, 0);
-                        fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                        malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                        malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, 45, 0);
+                        malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
                     }
                 }
             }
@@ -244,7 +246,7 @@ public class InventoryUtils
 
         if (hand != null)
         {
-            fi.dy.masa.malilib.util.inventory.InventoryUtils.preRestockHand(player, hand, 6, true);
+            malilib.util.inventory.InventoryUtils.preRestockHand(player, hand, 6, true);
         }
 
         return hand;

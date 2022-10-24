@@ -1,12 +1,13 @@
 package fi.dy.masa.litematica.scheduler;
 
 import net.minecraft.client.Minecraft;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.input.MouseScrollHandlerImpl;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifierManager;
 
-public class ClientTickHandler implements fi.dy.masa.malilib.event.ClientTickHandler
+public class ClientTickHandler implements malilib.event.ClientTickHandler
 {
     protected int tickCounter;
 

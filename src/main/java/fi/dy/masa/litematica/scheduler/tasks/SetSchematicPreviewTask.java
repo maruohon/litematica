@@ -4,10 +4,12 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ScreenShotHelper;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.StringUtils;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.StringUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.ISchematic;
 

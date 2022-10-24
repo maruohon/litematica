@@ -1,7 +1,8 @@
 package fi.dy.masa.litematica.render.infohud;
 
 import java.util.List;
-import fi.dy.masa.malilib.config.value.HudAlignment;
+
+import malilib.config.value.HudAlignment;
 
 public interface IInfoHudRenderer
 {

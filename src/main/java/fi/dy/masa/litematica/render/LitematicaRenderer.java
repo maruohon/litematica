@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.render;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
@@ -12,9 +13,11 @@ import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
-import fi.dy.masa.malilib.render.shader.ShaderProgram;
-import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+
+import malilib.render.RenderUtils;
+import malilib.render.shader.ShaderProgram;
+import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
@@ -122,7 +125,7 @@ public class LitematicaRenderer
 
         GameUtils.profilerSwap("prepare_terrain");
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        fi.dy.masa.malilib.render.RenderUtils.disableItemLighting();
+        RenderUtils.disableItemLighting();
 
         RenderGlobalSchematic renderGlobal = this.getWorldRenderer();
 
@@ -148,7 +151,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            RenderUtils.setupBlend();
 
             renderGlobal.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, entity);
 
@@ -175,14 +178,14 @@ public class LitematicaRenderer
 
             GlStateManager.pushMatrix();
 
-            fi.dy.masa.malilib.render.RenderUtils.enableItemLighting();
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            RenderUtils.enableItemLighting();
+            RenderUtils.setupBlend();
 
             renderGlobal.renderEntities(entity, icamera, partialTicks);
 
             GlStateManager.disableFog(); // Fixes Structure Blocks breaking all rendering
             GlStateManager.disableBlend();
-            fi.dy.masa.malilib.render.RenderUtils.disableItemLighting();
+            RenderUtils.disableItemLighting();
 
             GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.popMatrix();
@@ -197,7 +200,7 @@ public class LitematicaRenderer
 
             GlStateManager.pushMatrix();
 
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            RenderUtils.setupBlend();
 
             renderGlobal.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, entity);
 
@@ -233,9 +236,9 @@ public class LitematicaRenderer
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.001F);
             GlStateManager.enablePolygonOffset();
             GlStateManager.doPolygonOffset(-0.4f, -0.8f);
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            RenderUtils.setupBlend();
             GlStateManager.glLineWidth(lineWidth);
-            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+            RenderUtils.color(1f, 1f, 1f, 1f);
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 
             if (renderThrough)
@@ -454,7 +457,7 @@ public class LitematicaRenderer
         {
             GameUtils.profilerPush("litematica_entities");
 
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            RenderUtils.setupBlend();
 
             this.startShaderIfEnabled();
 

@@ -1,9 +1,10 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import net.minecraft.world.WorldServer;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.game.WorldUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.WorldUtils;
+import malilib.util.position.LayerRange;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 

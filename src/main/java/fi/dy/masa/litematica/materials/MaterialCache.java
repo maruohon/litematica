@@ -8,6 +8,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockDoor;
@@ -33,11 +34,12 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
-import fi.dy.masa.malilib.config.util.ConfigUtils;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
-import fi.dy.masa.malilib.util.game.wrap.NbtWrap;
+
+import malilib.config.util.ConfigUtils;
+import malilib.util.FileUtils;
+import malilib.util.data.Constants;
+import malilib.util.game.wrap.ItemWrap;
+import malilib.util.game.wrap.NbtWrap;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.WorldUtils;

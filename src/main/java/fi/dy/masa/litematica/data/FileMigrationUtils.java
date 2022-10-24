@@ -5,8 +5,9 @@ import java.nio.file.Path;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.FileUtils;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.FileUtils;
 import fi.dy.masa.litematica.Litematica;
 
 public class FileMigrationUtils

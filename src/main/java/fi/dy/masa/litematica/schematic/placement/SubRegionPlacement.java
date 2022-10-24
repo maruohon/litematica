@@ -3,12 +3,14 @@ package fi.dy.masa.litematica.schematic.placement;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.util.data.json.JsonUtils;
-import fi.dy.masa.malilib.util.position.Coordinate;
+
+import malilib.overlay.message.MessageDispatcher;
+import malilib.util.data.json.JsonUtils;
+import malilib.util.position.Coordinate;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.util.PositionUtils;
 

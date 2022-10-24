@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
@@ -27,20 +28,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.input.Keys;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.registry.Registry;
-import fi.dy.masa.malilib.util.game.BlockUtils;
-import fi.dy.masa.malilib.util.game.PlacementUtils;
-import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.game.wrap.GameUtils;
-import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
-import fi.dy.masa.malilib.util.position.ChunkSectionPos;
-import fi.dy.masa.malilib.util.position.HitPosition;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.position.PositionUtils;
+
+import malilib.input.Keys;
+import malilib.overlay.message.MessageDispatcher;
+import malilib.overlay.message.MessageOutput;
+import malilib.registry.Registry;
+import malilib.util.game.BlockUtils;
+import malilib.util.game.PlacementUtils;
+import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.ItemWrap;
+import malilib.util.position.ChunkSectionPos;
+import malilib.util.position.HitPosition;
+import malilib.util.position.IntBoundingBox;
+import malilib.util.position.LayerRange;
+import malilib.util.position.PositionUtils;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -203,7 +205,7 @@ public class EasyPlaceUtils
         World world = mc.world;
         double reach = Math.max(6, mc.playerController.getBlockReachDistance());
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceResult traceVanilla = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
+        RayTraceResult traceVanilla = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (traceVanilla != null && traceVanilla.typeOfHit == RayTraceResult.Type.BLOCK)
         {
@@ -587,7 +589,7 @@ public class EasyPlaceUtils
     {
         Entity entity = GameUtils.getCameraEntity();
         double reach = mc.playerController.getBlockReachDistance();
-        RayTraceResult trace = fi.dy.masa.malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
+        RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
