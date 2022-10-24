@@ -36,11 +36,11 @@ import fi.dy.masa.malilib.util.game.PlacementUtils;
 import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
+import fi.dy.masa.malilib.util.position.ChunkSectionPos;
 import fi.dy.masa.malilib.util.position.HitPosition;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.PositionUtils;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -651,7 +651,7 @@ public class EasyPlaceUtils
             {
                 for (int cx = minCX; cx <= maxCX; ++cx)
                 {
-                    List<IntBoundingBox> boxes = manager.getTouchedBoxesInSubChunk(new SubChunkPos(cx, cy, cz));
+                    List<IntBoundingBox> boxes = manager.getTouchedBoxesInSubChunk(new ChunkSectionPos(cx, cy, cz));
 
                     for (int i = 0; i < boxes.size(); ++i)
                     {

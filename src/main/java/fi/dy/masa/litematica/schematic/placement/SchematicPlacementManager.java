@@ -32,8 +32,8 @@ import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+import fi.dy.masa.malilib.util.position.ChunkSectionPos;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -61,7 +61,7 @@ public class SchematicPlacementManager
     private final Set<SchematicPlacement> allVisibleSchematicPlacements = new HashSet<>();
 
     private final HashMultimap<ChunkPos, SchematicPlacement> schematicsTouchingChunk = HashMultimap.create();
-    private final ArrayListMultimap<SubChunkPos, PlacementPart> touchedVolumesInSubChunk = ArrayListMultimap.create();
+    private final ArrayListMultimap<ChunkSectionPos, PlacementPart> touchedVolumesInSubChunk = ArrayListMultimap.create();
 
     private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
     private final Set<ChunkPos> chunksToUnload = new HashSet<>();
@@ -230,7 +230,7 @@ public class SchematicPlacementManager
         return list;
     }
 
-    public List<IntBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
+    public List<IntBoundingBox> getTouchedBoxesInSubChunk(ChunkSectionPos subChunk)
     {
         List<IntBoundingBox> list = new ArrayList<>();
 
@@ -242,12 +242,12 @@ public class SchematicPlacementManager
         return list;
     }
 
-    public List<PlacementPart> getAllPlacementsTouchingSubChunk(SubChunkPos pos)
+    public List<PlacementPart> getAllPlacementsTouchingSubChunk(ChunkSectionPos pos)
     {
         return this.touchedVolumesInSubChunk.get(pos);
     }
 
-    public Set<SubChunkPos> getAllTouchedSubChunks()
+    public Set<ChunkSectionPos> getAllTouchedSubChunks()
     {
         return this.touchedVolumesInSubChunk.keySet();
     }
@@ -893,7 +893,7 @@ public class SchematicPlacementManager
     {
         for (int y = 0; y < 16; ++y)
         {
-            SubChunkPos subChunk = new SubChunkPos(pos.x, y, pos.z);
+            ChunkSectionPos subChunk = new ChunkSectionPos(pos.x, y, pos.z);
             this.touchedVolumesInSubChunk.removeAll(subChunk);
         }
 
@@ -920,7 +920,7 @@ public class SchematicPlacementManager
 
                             IntBoundingBox bbSub = new IntBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
                             PlacementPart part = new PlacementPart(placement, entry.getKey(), bbSub);
-                            this.touchedVolumesInSubChunk.put(new SubChunkPos(pos.x, cy, pos.z), part);
+                            this.touchedVolumesInSubChunk.put(new ChunkSectionPos(pos.x, cy, pos.z), part);
                             //System.out.printf("updateTouchedBoxesInChunk box at %d, %d, %d: %s\n", pos.x, cy, pos.z, bbSub);
                         }
                     }

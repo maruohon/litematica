@@ -49,8 +49,8 @@ import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.game.wrap.EntityWrap;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
+import fi.dy.masa.malilib.util.position.ChunkSectionPos;
 import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
@@ -66,7 +66,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
     private final BlockFluidRenderer fluidRenderer;
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private final List<RenderChunkSchematicVbo> renderInfos = new ArrayList<>(1024);
-    private final List<SubChunkPos> subChunksWithinRenderRange = new ArrayList<>();
+    private final List<ChunkSectionPos> subChunksWithinRenderRange = new ArrayList<>();
     private Set<RenderChunkSchematicVbo> chunksToUpdate = new LinkedHashSet<>();
     private WorldClient world;
     private ViewFrustum viewFrustum;
@@ -320,7 +320,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         final int centerChunkY = MathHelper.floor(y) >> 4;
         final int centerChunkZ = MathHelper.floor(z) >> 4;
         final int renderDistance = GameUtils.getRenderDistanceChunks();
-        SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, centerChunkY, centerChunkZ);
+        ChunkSectionPos viewSubChunk = new ChunkSectionPos(centerChunkX, centerChunkY, centerChunkZ);
         this.viewPosSubChunk.setPos(centerChunkX << 4, centerChunkY << 4, centerChunkZ << 4);
 
         this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false ||
@@ -350,12 +350,12 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                 Math.abs(this.viewPosSubChunk.getX() - this.lastSubChunkUpdatePos.getX()) > 32 ||
                 Math.abs(this.viewPosSubChunk.getZ() - this.lastSubChunkUpdatePos.getZ()) > 32)
             {
-                Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
+                Set<ChunkSectionPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
                 int maxChunkDist = renderDistance + 2;
 
                 this.subChunksWithinRenderRange.clear();
 
-                for (SubChunkPos p : set)
+                for (ChunkSectionPos p : set)
                 {
                     if (Math.abs(p.getX() - centerChunkX) <= maxChunkDist &&
                         Math.abs(p.getZ() - centerChunkZ) <= maxChunkDist)
@@ -364,7 +364,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                     }
                 }
 
-                Collections.sort(this.subChunksWithinRenderRange, new SubChunkPos.DistanceComparator(viewSubChunk));
+                Collections.sort(this.subChunksWithinRenderRange, new ChunkSectionPos.DistanceComparator(viewSubChunk));
                 this.lastSubChunkUpdatePos = this.viewPosSubChunk.toImmutable();
             }
 
@@ -376,7 +376,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             for (int i = 0; i < this.subChunksWithinRenderRange.size(); ++i)
             {
                 //SubChunkPos subChunk = queuePositions.poll();
-                SubChunkPos subChunk = this.subChunksWithinRenderRange.get(i);
+                ChunkSectionPos subChunk = this.subChunksWithinRenderRange.get(i);
 
                 // Only render sub-chunks that are within the client's render distance, and that
                 // have been already properly loaded on the client

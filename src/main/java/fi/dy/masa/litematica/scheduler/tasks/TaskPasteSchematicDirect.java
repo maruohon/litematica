@@ -30,7 +30,7 @@ public class TaskPasteSchematicDirect extends TaskBase
     @Override
     public boolean execute()
     {
-        WorldServer world = WorldUtils.getServerWorldForClientWorld(this.mc);
+        WorldServer world = WorldUtils.getServerWorldForClientWorld();
 
         if (world != null && SchematicPlacingUtils.placeToWorld(this.placement, world, this.range, false))
         {

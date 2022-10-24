@@ -34,9 +34,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.position.ChunkSectionPos;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
@@ -226,7 +226,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         {
             if (this.boxes.isEmpty() == false &&
                 (this.schematicWorldView.isEmpty() == false || this.clientWorldView.isEmpty() == false) &&
-                 range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
+                 range.intersects(new ChunkSectionPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
             {
                 ++schematicRenderChunksUpdated;
 
@@ -798,7 +798,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
             this.clientWorldView    = new ChunkCacheSchematic(Minecraft.getMinecraft().world, this.getPosition(), 2);
 
             BlockPos pos = this.getPosition();
-            SubChunkPos subChunk = new SubChunkPos(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+            ChunkSectionPos subChunk = new ChunkSectionPos(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
             this.boxes.clear();
             this.boxes.addAll(DataManager.getSchematicPlacementManager().getTouchedBoxesInSubChunk(subChunk));
         }

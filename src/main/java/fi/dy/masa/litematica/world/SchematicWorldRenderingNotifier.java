@@ -8,8 +8,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.malilib.listener.LayerRangeChangeListener;
+import fi.dy.masa.malilib.util.position.ChunkSectionPos;
 import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 
@@ -103,7 +103,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
         }
     }
 
-    public static void markSchematicChunkForRenderUpdate(SubChunkPos chunkPos)
+    public static void markSchematicChunkForRenderUpdate(ChunkSectionPos chunkPos)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
 

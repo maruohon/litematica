@@ -22,9 +22,9 @@ import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.game.wrap.GameUtils;
 import fi.dy.masa.malilib.util.game.wrap.ItemWrap;
+import fi.dy.masa.malilib.util.position.ChunkSectionPos;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.PositionUtils;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinItemBlockSpecial;
@@ -362,7 +362,7 @@ public class SchematicEditUtils
     {
         if (pos != null)
         {
-            SubChunkPos cpos = new SubChunkPos(pos);
+            ChunkSectionPos cpos = new ChunkSectionPos(pos);
             List<PlacementPart> list = DataManager.getSchematicPlacementManager().getAllPlacementsTouchingSubChunk(cpos);
 
             if (list.isEmpty() == false)
@@ -430,7 +430,7 @@ public class SchematicEditUtils
     {
         if (posStart != null && posEnd != null)
         {
-            SubChunkPos cpos = new SubChunkPos(posStart);
+            ChunkSectionPos cpos = new ChunkSectionPos(posStart);
             List<PlacementPart> list = DataManager.getSchematicPlacementManager().getAllPlacementsTouchingSubChunk(cpos);
 
             if (list.isEmpty() == false)
@@ -518,7 +518,7 @@ public class SchematicEditUtils
     {
         if (posStart != null)
         {
-            SubChunkPos cpos = new SubChunkPos(posStart);
+            ChunkSectionPos cpos = new ChunkSectionPos(posStart);
             SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             List<PlacementPart> list = manager.getAllPlacementsTouchingSubChunk(cpos);
 

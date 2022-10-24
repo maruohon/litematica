@@ -487,7 +487,7 @@ public class DataManager implements DirectoryCache
     private static String getStorageFileName(boolean globalData)
     {
         Minecraft mc = GameUtils.getClient();
-        return globalData ? "data_common.json" : "data_dim_" + WorldUtils.getDimensionAsString(mc.world) + ".json";
+        return globalData ? "data_common.json" : "data_dim_" + WorldUtils.getDimensionIdAsString(mc.world) + ".json";
     }
 
     public static void setToolItem(String itemNameIn)
