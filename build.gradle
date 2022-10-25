@@ -1,96 +1,79 @@
 
 buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            url = "https://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = 'sponge'
-            url = 'https://repo.spongepowered.org/repository/maven-public'
-        }
-    }
+	repositories {
+		maven {
+			name = 'forge'
+			url = 'https://files.minecraftforge.net/maven'
+		}
 
-    dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
-    }
+		maven {
+			name = 'sponge'
+			url = 'https://repo.spongepowered.org/repository/maven-public'
+		}
+	}
+
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+		classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+	}
 }
 
 repositories {
-    maven {
-        url 'https://masa.dy.fi/maven'
-    }
+	maven {
+		url 'https://masa.dy.fi/maven'
+	}
 }
 
 apply plugin: 'net.minecraftforge.gradle.liteloader'
 apply plugin: 'org.spongepowered.mixin'
 
-ext.configFile = file "build.properties"
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-    options.encoding = 'UTF-8'
-}
-
-configFile.withReader {
-    def prop = new Properties()
-    prop.load(it)
-    project.ext.config = new ConfigSlurper().parse prop
-}
-
 minecraft {
-    version = config.minecraft_version
-    mappings = config.mappings_version
-    runDir = 'minecraft'
-    makeObfSourceJar = false
+	version = project.minecraft_version
+	mappings = project.mappings_version
+	runDir = 'minecraft'
+	makeObfSourceJar = false
 
-    ext.mod_version = config.mod_version
+	ext.mod_version = project.mod_version
 
-    if (mod_version.endsWith('-dev')) {
-        mod_version = mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
-    }
+	if (mod_version.endsWith('-dev')) {
+		mod_version = mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
+	}
 
-    replaceIn "Reference.java"
-    replace "@MOD_VERSION@", mod_version
+	replaceIn 'Reference.java'
+	replace '@MOD_VERSION@', mod_version
 }
 
 dependencies {
-    deobfCompile "malilib:malilib-liteloader-" + config.minecraft_version_out + ":" + config.malilib_version + ":deobf"
+	deobfCompile "malilib:malilib-liteloader-${project.minecraft_version_out}:${project.malilib_version}:deobf"
 }
 
 sourceSets {
-    main {
-        ext.refMap = 'mixins.' + config.mod_id + '.refmap.json'
-    }
+	main {
+		ext.refMap = "mixins.${project.mod_id}.refmap.json"
+	}
 }
 
-group = config.group + "." + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = config.mod_file_name + '-' + config.minecraft_version_out
+group = project.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "${project.mod_file_name}-${project.minecraft_version_out}"
 version = project.minecraft.mod_version
 
 /**
  * This section allows you to customise the generated litemod.json file
  */
 litemod {
-    json {
-        name = config.mod_id
-        displayName = config.mod_name
-        mcversion = config.minecraft_version
-        version = config.mod_version
-        author = config.author
+	json {
+		name = project.mod_id
+		displayName = project.mod_name
+		mcversion = project.minecraft_version
+		version = project.minecraft.mod_version
+		author = project.author
 
-        // Uncomment any of the following lines and fill in your own details as required
-        //requiredAPIs = [ 'someapi' ]
-        //tweakClass = 'name.of.tweaker.here'
-        dependsOn = [ 'malilib' ]
-        mixinConfigs = [ 'mixins.' + config.mod_id + '.json' ]
-    }
+		// Uncomment any of the following lines and fill in your own details as required
+		//requiredAPIs = [ 'someapi' ]
+		//tweakClass = 'name.of.tweaker.here'
+		dependsOn = [ 'malilib' ]
+		mixinConfigs = [ "mixins.${project.mod_id}.json" ]
+	}
 }
 
 /**
@@ -99,49 +82,49 @@ litemod {
  * include your own file from resources, simply remove the line below.
  */
 jar {
-    // Remove the "-mc1.12" suffix from the file name
-    classifier = ""
-    // Don't append a 'mod-' filename prefix >_>
-    baseName = archivesBaseName
+	// Remove the "-mc1.12" suffix from the file name
+	classifier = ""
+	// Don't append a 'mod-' filename prefix >_>
+	baseName = archivesBaseName
 
-    from litemod.outputs
+	from litemod.outputs
 
-    /*
-    manifest.mainAttributes (
-        'Built-By': System.properties['user.name'],
-        'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
-        'Implementation-Title': config.mod_id,
-        'Implementation-Version': project.version
-    )
-    */
+	/*
+	manifest.mainAttributes (
+		'Built-By': System.properties['user.name'],
+		'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+		'Implementation-Title': project.mod_id,
+		'Implementation-Version': project.version
+	)
+	*/
 }
 
 mixin {
-    defaultObfuscationEnv notch
+	defaultObfuscationEnv notch
 }
 
 //tasks.withType(Jar)*.baseName = archivesBaseName
 
 processResources
 {
-    // Exclude the GIMP image files
-    exclude '**/*.xcf'
-    exclude '**/xcf'
+	// Exclude the GIMP image files
+	exclude '**/*.xcf'
+	exclude '**/xcf'
 
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "mod_version", project.minecraft.mod_version
-    inputs.property "minecraft_version", project.config.minecraft_version
+	// this will ensure that this task is redone when the versions change.
+	inputs.property 'mod_version', project.minecraft.mod_version
+	inputs.property 'minecraft_version', project.minecraft_version
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'mod_version': project.minecraft.mod_version, 'minecraft_version': project.config.minecraft_version
-    }
-      
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+	// replace stuff in mcmod.info, nothing else
+	from(sourceSets.main.resources.srcDirs) {
+		include 'mcmod.info'
+
+		// replace version and mcversion
+		expand 'mod_version': project.minecraft.mod_version, 'minecraft_version': project.minecraft_version
+	}
+
+	// copy everything else, thats not the mcmod.info
+	from(sourceSets.main.resources.srcDirs) {
+		exclude 'mcmod.info'
+	}
 }

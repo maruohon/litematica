@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "fi.dy.masa.litematica.mixin",
+	"package": "litematica.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"refmap": "mixins.litematica.refmap.json",
 	"minVersion": "0.7",
