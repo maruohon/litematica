@@ -28,6 +28,9 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtLongArray;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -39,11 +42,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 import net.minecraft.world.tick.ChunkTickScheduler;
 import net.minecraft.world.tick.OrderedTick;
+import net.minecraft.world.tick.TickPriority;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
@@ -952,12 +954,12 @@ public class LitematicaSchematic
 
                 if (pendingBlockTicks != null)
                 {
-                    tag.put("PendingBlockTicks", this.writePendingTicksToNBT(pendingBlockTicks, Registry.BLOCK, "Block"));
+                    tag.put("PendingBlockTicks", this.writePendingTicksToNBT(pendingBlockTicks, Registries.BLOCK, "Block"));
                 }
 
                 if (pendingFluidTicks != null)
                 {
-                    tag.put("PendingFluidTicks", this.writePendingTicksToNBT(pendingFluidTicks, Registry.FLUID, "Fluid"));
+                    tag.put("PendingFluidTicks", this.writePendingTicksToNBT(pendingFluidTicks, Registries.FLUID, "Fluid"));
                 }
 
                 // The entity list will not exist, if takeEntities is false when creating the schematic
@@ -1104,13 +1106,13 @@ public class LitematicaSchematic
                     if (version >= 3)
                     {
                         NbtList list = regionTag.getList("PendingBlockTicks", Constants.NBT.TAG_COMPOUND);
-                        this.pendingBlockTicks.put(regionName, this.readPendingTicksFromNBT(list, Registry.BLOCK, "Block", Blocks.AIR));
+                        this.pendingBlockTicks.put(regionName, this.readPendingTicksFromNBT(list, Registries.BLOCK, "Block", Blocks.AIR));
                     }
 
                     if (version >= 5)
                     {
                         NbtList list = regionTag.getList("PendingFluidTicks", Constants.NBT.TAG_COMPOUND);
-                        this.pendingFluidTicks.put(regionName, this.readPendingTicksFromNBT(list, Registry.FLUID, "Fluid", Fluids.EMPTY));
+                        this.pendingFluidTicks.put(regionName, this.readPendingTicksFromNBT(list, Registries.FLUID, "Fluid", Fluids.EMPTY));
                     }
 
                     NbtElement nbtBase = regionTag.get("BlockStates");
@@ -1183,11 +1185,12 @@ public class LitematicaSchematic
     {
         final int size = tagList.size();
         List<BlockState> list = new ArrayList<>(size);
+        RegistryEntryLookup<Block> lookup = Registries.BLOCK.getReadOnlyWrapper();
 
         for (int id = 0; id < size; ++id)
         {
             NbtCompound tag = tagList.getCompound(id);
-            BlockState state = NbtHelper.toBlockState(tag);
+            BlockState state = NbtHelper.toBlockState(lookup, tag);
             list.add(state);
         }
 
@@ -1392,11 +1395,12 @@ public class LitematicaSchematic
             BlockState air = Blocks.AIR.getDefaultState();
             int paletteSize = paletteTag.size();
             List<BlockState> list = new ArrayList<>(paletteSize);
+            RegistryEntryLookup<Block> lookup = Registries.BLOCK.getReadOnlyWrapper();
 
             for (int id = 0; id < paletteSize; ++id)
             {
                 NbtCompound t = paletteTag.getCompound(id);
-                BlockState state = NbtHelper.toBlockState(t);
+                BlockState state = NbtHelper.toBlockState(lookup, t);
                 list.add(state);
             }
 
@@ -1570,12 +1574,13 @@ public class LitematicaSchematic
     public static List<BlockState> getStatesFromPaletteTag(NbtList palette)
     {
         List<BlockState> states = new ArrayList<>();
+        RegistryEntryLookup<Block> lookup = Registries.BLOCK.getReadOnlyWrapper();
         final int size = palette.size();
 
         for (int i = 0; i < size; ++i)
         {
             NbtCompound tag = palette.getCompound(i);
-            BlockState state = NbtHelper.toBlockState(tag);
+            BlockState state = NbtHelper.toBlockState(lookup, tag);
 
             if (i > 0 || state != LitematicaBlockStateContainer.AIR_BLOCK_STATE)
             {

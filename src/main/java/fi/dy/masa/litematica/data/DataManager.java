@@ -16,9 +16,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
@@ -36,11 +41,6 @@ import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.util.ToBooleanFunction;
-import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.StringUtils;
 
 public class DataManager implements IDirectoryCache
 {
@@ -537,7 +537,7 @@ public class DataManager implements IDirectoryCache
 
             if (itemName != null)
             {
-                Item item = Registry.ITEM.get(new Identifier(itemName));
+                Item item = Registries.ITEM.get(new Identifier(itemName));
 
                 if (item != null && item != Items.AIR)
                 {
@@ -553,6 +553,6 @@ public class DataManager implements IDirectoryCache
 
         // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
-        Configs.Generic.TOOL_ITEM.setValueFromString(Registry.ITEM.getId(Items.STICK).toString());
+        Configs.Generic.TOOL_ITEM.setValueFromString(Registries.ITEM.getId(Items.STICK).toString());
     }
 }

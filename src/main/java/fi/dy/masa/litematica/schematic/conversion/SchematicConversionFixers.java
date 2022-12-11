@@ -40,11 +40,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
+import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.litematica.mixin.IMixinFenceGateBlock;
 import fi.dy.masa.litematica.mixin.IMixinRedstoneWireBlock;
 import fi.dy.masa.litematica.mixin.IMixinStairsBlock;
 import fi.dy.masa.litematica.mixin.IMixinVineBlock;
-import fi.dy.masa.malilib.util.Constants;
 
 public class SchematicConversionFixers
 {
@@ -314,9 +314,9 @@ public class SchematicConversionFixers
         if (tag != null)
         {
             state = state
-                        .with(NoteBlock.POWERED, Boolean.valueOf(tag.getBoolean("powered")))
-                        .with(NoteBlock.NOTE, Integer.valueOf(MathHelper.clamp(tag.getByte("note"), 0, 24)))
-                        .with(NoteBlock.INSTRUMENT, Instrument.fromBlockState(reader.getBlockState(pos.down())));
+                        .with(NoteBlock.POWERED, tag.getBoolean("powered"))
+                        .with(NoteBlock.NOTE, MathHelper.clamp(tag.getByte("note"), 0, 24))
+                        .with(NoteBlock.INSTRUMENT, Instrument.fromBelowState(reader.getBlockState(pos.down())));
         }
 
         return state;

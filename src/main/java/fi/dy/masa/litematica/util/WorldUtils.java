@@ -2,14 +2,11 @@ package fi.dy.masa.litematica.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
-import com.mojang.datafixers.DataFixer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -277,16 +274,6 @@ public class WorldUtils
         }
 
         return false;
-    }
-
-    private static StructureTemplate readTemplateFromStream(InputStream stream, DataFixer fixer) throws IOException
-    {
-        NbtCompound nbt = NbtIo.readCompressed(stream);
-        StructureTemplate template = new StructureTemplate();
-        //template.read(fixer.process(FixTypes.STRUCTURE, nbt));
-        template.readNbt(nbt);
-
-        return template;
     }
 
     public static boolean isClientChunkLoaded(ClientWorld world, int chunkX, int chunkZ)

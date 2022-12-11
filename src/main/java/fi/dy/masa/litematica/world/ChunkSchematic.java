@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.world;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -11,15 +12,10 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BuiltinBiomes;
-import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class ChunkSchematic extends WorldChunk
 {

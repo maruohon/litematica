@@ -12,11 +12,11 @@ import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.ColorResolver;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkProvider;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
-import net.minecraft.world.level.ColorResolver;
 import fi.dy.masa.litematica.world.FakeLightingProvider;
 
 public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider

@@ -201,7 +201,7 @@ public class ChunkRendererSchematicVbo
         RenderLayer layerTranslucent = RenderLayer.getTranslucent();
         ChunkRenderDataSchematic data = task.getChunkRenderData();
         BufferBuilderCache buffers = task.getBufferCache();
-        BufferBuilder.State bufferState = data.getBlockBufferState(layerTranslucent);
+        BufferBuilder.TransparentSortingData bufferState = data.getBlockBufferState(layerTranslucent);
         Vec3d cameraPos = task.getCameraPosSupplier().get();
         float x = (float) cameraPos.x - this.position.getX();
         float y = (float) cameraPos.y - this.position.getY();
@@ -213,9 +213,9 @@ public class ChunkRendererSchematicVbo
             {
                 BufferBuilder buffer = buffers.getBlockBufferByLayer(layerTranslucent);
 
-                RenderSystem.setShader(GameRenderer::getRenderTypeTranslucentShader);
+                RenderSystem.setShader(GameRenderer::getRenderTypeTranslucentProgram);
                 this.preRenderBlocks(buffer, layerTranslucent);
-                buffer.restoreState(bufferState);
+                buffer.beginSortedIndexBuffer(bufferState);
                 this.postRenderBlocks(layerTranslucent, x, y, z, buffer, data);
             }
         }
@@ -231,7 +231,7 @@ public class ChunkRendererSchematicVbo
                 BufferBuilder buffer = buffers.getOverlayBuffer(type);
 
                 this.preRenderOverlay(buffer, type.getDrawMode());
-                buffer.restoreState(bufferState);
+                buffer.beginSortedIndexBuffer(bufferState);
                 this.postRenderOverlay(type, x, y, z, buffer, data);
             }
         }
@@ -433,7 +433,7 @@ public class ChunkRendererSchematicVbo
 
     protected void renderOverlay(OverlayType type, BlockPos pos, BlockState stateSchematic, boolean missing, ChunkRenderDataSchematic data, BufferBuilderCache buffers)
     {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         BlockPos.Mutable relPos = this.getChunkRelativePosition(pos);
 
         if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue())
@@ -753,7 +753,7 @@ public class ChunkRendererSchematicVbo
         if (layer == RenderLayer.getTranslucent() && chunkRenderData.isBlockLayerEmpty(layer) == false)
         {
             buffer.sortFrom(x, y, z);
-            chunkRenderData.setBlockBufferState(layer, buffer.popState());
+            chunkRenderData.setBlockBufferState(layer, buffer.getSortingData());
         }
 
         buffer.end();
@@ -764,13 +764,13 @@ public class ChunkRendererSchematicVbo
         this.existingOverlays.add(type);
         this.hasOverlay = true;
 
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         buffer.begin(type.getDrawMode(), VertexFormats.POSITION_COLOR);
     }
 
     private void preRenderOverlay(BufferBuilder buffer, VertexFormat.DrawMode drawMode)
     {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         buffer.begin(drawMode, VertexFormats.POSITION_COLOR);
     }
 
@@ -780,7 +780,7 @@ public class ChunkRendererSchematicVbo
         if (type == OverlayRenderType.QUAD && chunkRenderData.isOverlayTypeEmpty(type) == false)
         {
             buffer.sortFrom(x, y, z);
-            chunkRenderData.setOverlayBufferState(type, buffer.popState());
+            chunkRenderData.setOverlayBufferState(type, buffer.getSortingData());
         }
 
         buffer.end();

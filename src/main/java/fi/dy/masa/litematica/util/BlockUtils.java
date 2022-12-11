@@ -6,10 +6,10 @@ import javax.annotation.Nullable;
 import com.google.common.base.Splitter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.registry.Registries;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class BlockUtils
 {
@@ -30,9 +30,9 @@ public class BlockUtils
         {
             Identifier id = new Identifier(blockName);
 
-            if (Registry.BLOCK.containsId(id))
+            if (Registries.BLOCK.containsId(id))
             {
-                Block block = Registry.BLOCK.get(id);
+                Block block = Registries.BLOCK.get(id);
                 BlockState state = block.getDefaultState();
 
                 if (index != -1 && str.length() > (index + 4) && str.charAt(str.length() - 1) == ']')

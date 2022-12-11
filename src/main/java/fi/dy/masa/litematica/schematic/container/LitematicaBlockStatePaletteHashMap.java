@@ -2,10 +2,13 @@ package fi.dy.masa.litematica.schematic.container;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.util.collection.Int2ObjectBiMap;
 
 public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockStatePalette
@@ -70,12 +73,13 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     @Override
     public void readFromNBT(NbtList tagList)
     {
+        RegistryEntryLookup<Block> lookup = Registries.BLOCK.getReadOnlyWrapper();
         final int size = tagList.size();
 
         for (int i = 0; i < size; ++i)
         {
             NbtCompound tag = tagList.getCompound(i);
-            BlockState state = NbtHelper.toBlockState(tag);
+            BlockState state = NbtHelper.toBlockState(lookup, tag);
 
             if (i > 0 || state != LitematicaBlockStateContainer.AIR_BLOCK_STATE)
             {

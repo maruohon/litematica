@@ -5,6 +5,9 @@ import java.util.HashMap;
 import javax.annotation.Nullable;
 import com.mojang.datafixers.DataFixUtils;
 import com.mojang.serialization.Dynamic;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PillarBlock;
@@ -13,13 +16,13 @@ import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.util.math.Direction;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public class SchematicConversionMaps
 {
@@ -173,8 +176,9 @@ public class SchematicConversionMaps
                 newStateTag.putString("Name", newName);
             }
 
+            RegistryEntryLookup<Block> lookup = Registries.BLOCK.getReadOnlyWrapper();
             // Store the id + meta => state maps before renaming the block for the state <=> state maps
-            BlockState state = NbtHelper.toBlockState(newStateTag);
+            BlockState state = NbtHelper.toBlockState(lookup, newStateTag);
             //System.out.printf("id: %5d, state: %s, tag: %s\n", idMeta, state, newStateTag);
             ID_META_TO_BLOCKSTATE.putIfAbsent(idMeta, state);
 

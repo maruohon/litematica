@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.mixin;
 
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -9,7 +10,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 
 @Mixin(net.minecraft.client.render.WorldRenderer.class)
@@ -66,7 +66,7 @@ public abstract class MixinWorldRenderer
             net.minecraft.client.render.Camera camera,
             net.minecraft.client.render.GameRenderer gameRenderer,
             net.minecraft.client.render.LightmapTextureManager lightmapTextureManager,
-            net.minecraft.util.math.Matrix4f matrix4f,
+            Matrix4f matrix4f,
             CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewiseRenderEntities(matrices, tickDelta);
