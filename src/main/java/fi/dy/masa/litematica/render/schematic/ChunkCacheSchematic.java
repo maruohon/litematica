@@ -37,6 +37,8 @@ public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
         this.lightingProvider = new FakeLightingProvider(this);
 
         this.worldClient = clientWorld;
+        int chunkX = pos.getX() >> 4;
+        int chunkZ = pos.getZ() >> 4;
         this.chunkStartX = (pos.getX() - expand) >> 4;
         this.chunkStartZ = (pos.getZ() - expand) >> 4;
         int chunkEndX = (pos.getX() + expand + 15) >> 4;
@@ -48,20 +50,13 @@ public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
         {
             for (int cz = this.chunkStartZ; cz <= chunkEndZ; ++cz)
             {
-                this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = worldIn.getChunk(cx, cz);
-            }
-        }
+                WorldChunk chunk = worldIn.getChunk(cx, cz);
+                this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = chunk;
 
-        for (int cx = pos.getX() >> 4; cx <= (pos.getX() + 15) >> 4; ++cx)
-        {
-            for (int cz = pos.getZ() >> 4; cz <= (pos.getZ() + 15) >> 4; ++cz)
-            {
-                WorldChunk chunk = this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ];
-
-                if (chunk != null && chunk.areSectionsEmptyBetween(pos.getY(), pos.getY() + 15) == false)
+                if (cx == chunkX && cz == chunkZ &&
+                    chunk.areSectionsEmptyBetween(worldIn.getBottomY(), worldIn.getTopY() - 1) == false)
                 {
                     this.empty = false;
-                    break;
                 }
             }
         }

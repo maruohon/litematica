@@ -40,6 +40,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.RenderUtils;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager.PlacementPart;
 import fi.dy.masa.litematica.util.OverlayType;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
@@ -47,7 +48,6 @@ import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class ChunkRendererSchematicVbo
 {
@@ -145,7 +145,7 @@ public class ChunkRendererSchematicVbo
             int x = this.position.getX();
             int y = this.position.getY();
             int z = this.position.getZ();
-            this.boundingBox = new net.minecraft.util.math.Box(x, y, z, x + 16, y + 16, z + 16);
+            this.boundingBox = new net.minecraft.util.math.Box(x, y, z, x + 16, y + this.world.getHeight(), z + 16);
         }
 
         return this.boundingBox;
@@ -153,11 +153,13 @@ public class ChunkRendererSchematicVbo
 
     public void setPosition(int x, int y, int z)
     {
-        if (x != this.position.getX() || y != this.position.getY() || z != this.position.getZ())
+        if (x != this.position.getX() ||
+            y != this.position.getY() ||
+            z != this.position.getZ())
         {
             this.clear();
+            this.boundingBox = null;
             this.position.set(x, y, z);
-            this.boundingBox = new net.minecraft.util.math.Box(x, y, z, x + 16, y + 16, z + 16);
         }
     }
 
@@ -166,10 +168,9 @@ public class ChunkRendererSchematicVbo
         Entity entity = EntityUtils.getCameraEntity();
 
         double x = this.position.getX() + 8.0D - entity.getX();
-        double y = this.position.getY() + 8.0D - entity.getY();
         double z = this.position.getZ() + 8.0D - entity.getZ();
 
-        return x * x + y * y + z * z;
+        return x * x + z * z;
     }
 
     public void deleteGlResources()
@@ -250,9 +251,16 @@ public class ChunkRendererSchematicVbo
 
         synchronized (this.boxes)
         {
+            int minX = posChunk.getX();
+            int minY = posChunk.getY();
+            int minZ = posChunk.getZ();
+            int maxX = minX + 15;
+            int maxY = minY + this.world.getHeight();
+            int maxZ = minZ + 15;
+
             if (this.boxes.isEmpty() == false &&
                 (this.schematicWorldView.isEmpty() == false || this.clientWorldView.isEmpty() == false) &&
-                 range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
+                 range.intersectsBox(minX, minY, minZ, maxX, maxY, maxZ))
             {
                 ++schematicRenderChunksUpdated;
 
@@ -263,6 +271,7 @@ public class ChunkRendererSchematicVbo
                 Set<RenderLayer> usedLayers = new HashSet<>();
                 BufferBuilderCache buffers = task.getBufferCache();
                 MatrixStack matrices = new MatrixStack();
+                int bottomY = this.position.getY();
 
                 for (IntBoundingBox box : this.boxes)
                 {
@@ -280,7 +289,7 @@ public class ChunkRendererSchematicVbo
                     for (BlockPos posMutable : BlockPos.Mutable.iterate(posFrom, posTo))
                     {
                         matrices.push();
-                        matrices.translate(posMutable.getX() & 0xF, posMutable.getY() & 0xF, posMutable.getZ() & 0xF);
+                        matrices.translate(posMutable.getX() & 0xF, posMutable.getY() - bottomY, posMutable.getZ() & 0xF);
 
                         this.renderBlocksAndOverlay(posMutable, data, tileEntities, usedLayers, matrices, buffers);
 
@@ -555,7 +564,7 @@ public class ChunkRendererSchematicVbo
 
     protected BlockPos.Mutable getChunkRelativePosition(BlockPos pos)
     {
-        return this.chunkRelativePos.set(pos.getX() & 0xF, pos.getY() & 0xF, pos.getZ() & 0xF);
+        return this.chunkRelativePos.set(pos.getX() & 0xF, pos.getY() - this.position.getY(), pos.getZ() & 0xF);
     }
 
     protected void renderOverlayReducedEdges(BlockPos pos, OverlayType[][][] adjTypes, OverlayType typeSelf, BufferBuilder bufferOverlayOutlines)
@@ -885,11 +894,15 @@ public class ChunkRendererSchematicVbo
             ClientWorld worldClient = MinecraftClient.getInstance().world;
             this.schematicWorldView = new ChunkCacheSchematic(this.world, worldClient, this.position, 2);
             this.clientWorldView    = new ChunkCacheSchematic(worldClient, worldClient, this.position, 2);
-
-            BlockPos pos = this.position;
-            SubChunkPos subChunk = new SubChunkPos(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
             this.boxes.clear();
-            this.boxes.addAll(DataManager.getSchematicPlacementManager().getTouchedBoxesInSubChunk(subChunk));
+
+            int chunkX = this.position.getX() >> 4;
+            int chunkZ = this.position.getZ() >> 4;
+
+            for (PlacementPart part : DataManager.getSchematicPlacementManager().getPlacementPartsInChunk(chunkX, chunkZ))
+            {
+                this.boxes.add(part.bb);
+            }
         }
     }
 

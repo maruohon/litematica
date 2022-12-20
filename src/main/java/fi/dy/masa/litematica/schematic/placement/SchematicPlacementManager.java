@@ -14,6 +14,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -23,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -39,6 +43,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.PositionUtils.ChunkPosDistanceComparator;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
@@ -58,23 +63,19 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.SubChunkPos;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class SchematicPlacementManager
 {
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
     private final ArrayListMultimap<ChunkPos, SchematicPlacement> schematicsTouchingChunk = ArrayListMultimap.create();
-    private final ArrayListMultimap<SubChunkPos, PlacementPart> touchedVolumesInSubChunk = ArrayListMultimap.create();
-    private final Long2ObjectOpenHashMap<Set<SubChunkPos>> touchedSubChunksInChunks = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<List<PlacementPart>> touchedVolumesInChunk = new Long2ObjectOpenHashMap<>();
     private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
     private final Set<ChunkPos> chunkRebuildQueue = new HashSet<>();
     private final LongOpenHashSet chunksToUnload = new LongOpenHashSet();
     private final Set<ChunkPos> chunksPreChange = new HashSet<>();
-    private final List<SubChunkPos> visibleSubChunks = new ArrayList<>();
-    private SubChunkPos lastVisibleSubChunksSortPos = new SubChunkPos(0, 0, 0);
-    private boolean visibleSubChunksNeedsUpdate;
+    private final List<ChunkPos> visibleChunks = new ArrayList<>();
+    private ChunkPos lastVisibleChunksSortPos = new ChunkPos(0, 0);
+    private boolean visibleChunksNeedsUpdate;
 
     @Nullable
     private SchematicPlacement selectedPlacement;
@@ -91,7 +92,7 @@ public class SchematicPlacementManager
 
     public void setVisibleSubChunksNeedsUpdate()
     {
-        this.visibleSubChunksNeedsUpdate = true;
+        this.visibleChunksNeedsUpdate = true;
     }
 
     public void processQueuedChunks()
@@ -150,7 +151,7 @@ public class SchematicPlacementManager
 
                     //System.out.printf("loading chunk at %s\n", pos);
                     worldSchematic.getChunkProvider().loadChunk(pos.x, pos.z);
-                    this.visibleSubChunksNeedsUpdate = true;
+                    this.visibleChunksNeedsUpdate = true;
                 }
 
                 if (worldSchematic.getChunkProvider().isChunkLoaded(pos.x, pos.z))
@@ -202,54 +203,54 @@ public class SchematicPlacementManager
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
             worldSchematic.getChunkProvider().unloadChunk(chunkX, chunkZ);
             worldSchematic.scheduleChunkRenders(chunkX, chunkZ);
-            this.visibleSubChunksNeedsUpdate = true;
+            this.visibleChunksNeedsUpdate = true;
         }
     }
 
-    public List<SubChunkPos> getLastVisibleSubChunks()
+    public int getLastVisibleChunksCount()
     {
-        return this.visibleSubChunks;
+        return this.visibleChunks.size();
     }
 
-    public List<SubChunkPos> getAndUpdateVisibleSubChunks(SubChunkPos viewSubChunk)
+    public List<ChunkPos> getAndUpdateVisibleChunks(ChunkPos viewChunk)
     {
-        if (this.visibleSubChunksNeedsUpdate)
+        if (this.visibleChunksNeedsUpdate)
         {
-            this.visibleSubChunks.clear();
+            this.visibleChunks.clear();
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             LayerRange range = DataManager.getRenderLayerRange();
 
             if (worldSchematic != null)
             {
+                int minY = worldSchematic.getBottomY();
+                int maxY = worldSchematic.getTopY() - 1;
+
                 for (long posLong : worldSchematic.getChunkManager().getLoadedChunks().keySet())
                 {
-                    Set<SubChunkPos> subChunks = this.touchedSubChunksInChunks.get(posLong);
+                    int minX = ChunkPos.getPackedX(posLong) << 4;
+                    int minZ = ChunkPos.getPackedZ(posLong) << 4;
+                    int maxX = minX + 15;
+                    int maxZ = minZ + 15;
 
-                    if (subChunks != null)
+                    if (range.intersectsBox(minX, minY, minZ, maxX, maxY, maxZ))
                     {
-                        for (SubChunkPos subChunk : subChunks)
-                        {
-                            if (range.intersects(subChunk))
-                            {
-                                this.visibleSubChunks.add(subChunk);
-                            }
-                        }
+                        this.visibleChunks.add(new ChunkPos(posLong));
                     }
                 }
 
-                this.visibleSubChunks.sort(new SubChunkPos.DistanceComparator(viewSubChunk));
-                this.lastVisibleSubChunksSortPos = viewSubChunk;
+                this.visibleChunks.sort(new ChunkPosDistanceComparator(viewChunk));
+                this.lastVisibleChunksSortPos = viewChunk;
             }
 
-            this.visibleSubChunksNeedsUpdate = false;
+            this.visibleChunksNeedsUpdate = false;
         }
-        else if (viewSubChunk.equals(this.lastVisibleSubChunksSortPos) == false)
+        else if (viewChunk.equals(this.lastVisibleChunksSortPos) == false)
         {
-            this.visibleSubChunks.sort(new SubChunkPos.DistanceComparator(viewSubChunk));
-            this.lastVisibleSubChunksSortPos = viewSubChunk;
+            this.visibleChunks.sort(new ChunkPosDistanceComparator(viewChunk));
+            this.lastVisibleChunksSortPos = viewChunk;
         }
 
-        return this.visibleSubChunks;
+        return this.visibleChunks;
     }
 
     public List<SchematicPlacement> getAllSchematicsPlacements()
@@ -257,26 +258,19 @@ public class SchematicPlacementManager
         return this.schematicPlacements;
     }
 
-    public List<IntBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
+    public List<PlacementPart> getPlacementPartsInChunk(int chunkX, int chunkZ)
     {
-        List<IntBoundingBox> list = new ArrayList<>();
-
-        for (PlacementPart part : this.touchedVolumesInSubChunk.get(subChunk))
-        {
-            list.add(part.getBox());
-        }
-
-        return list;
+        return this.touchedVolumesInChunk.get(ChunkPos.toLong(chunkX, chunkZ));
     }
 
-    public List<PlacementPart> getAllPlacementsTouchingSubChunk(SubChunkPos pos)
+    public List<PlacementPart> getAllPlacementsTouchingChunk(BlockPos pos)
     {
-        return this.touchedVolumesInSubChunk.get(pos);
+        return this.touchedVolumesInChunk.get(ChunkPos.toLong(pos.getX() >> 4, pos.getZ() >> 4));
     }
 
-    public Set<SubChunkPos> getAllTouchedSubChunks()
+    public int getTouchedChunksCount()
     {
-        return this.touchedVolumesInSubChunk.keySet();
+        return this.touchedVolumesInChunk.size();
     }
 
     public void addSchematicPlacement(SchematicPlacement placement, boolean printMessages)
@@ -516,63 +510,39 @@ public class SchematicPlacementManager
 
     private void updateTouchedBoxesInChunk(ChunkPos pos)
     {
-        WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-        int minChunkY = world != null ? world.getBottomSectionCoord() : -4;
-        int maxChunkY = world != null ? world.getTopSectionCoord() : 19;
-
-        for (int y = minChunkY; y < maxChunkY; ++y)
-        {
-            SubChunkPos subChunk = new SubChunkPos(pos.x, y, pos.z);
-            this.touchedVolumesInSubChunk.removeAll(subChunk);
-        }
-
-        long posLong = pos.toLong();
-        this.touchedSubChunksInChunks.remove(posLong);
+        long chunkPosLong = pos.toLong();
+        this.touchedVolumesInChunk.remove(chunkPosLong);
 
         Collection<SchematicPlacement> placements = this.schematicsTouchingChunk.get(pos);
 
         if (placements.isEmpty() == false)
         {
-            Set<SubChunkPos> subChunks = new HashSet<>();
-
             for (SchematicPlacement placement : placements)
             {
-                if (placement.matchesRequirement(RequiredEnabled.RENDERING_ENABLED))
+                if (placement.matchesRequirement(RequiredEnabled.RENDERING_ENABLED) == false)
                 {
-                    Map<String, IntBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
+                    continue;
+                }
+
+                Map<String, IntBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
+
+                if (boxMap.isEmpty() == false)
+                {
+                    List<PlacementPart> list = this.touchedVolumesInChunk.computeIfAbsent(chunkPosLong, p -> new ArrayList<>());
 
                     for (Map.Entry<String, IntBoundingBox> entry : boxMap.entrySet())
                     {
-                        IntBoundingBox bbOrig = entry.getValue();
-                        final int startCY = (bbOrig.minY >> 4);
-                        final int endCY = (bbOrig.maxY >> 4);
-
-                        for (int cy = startCY; cy <= endCY; ++cy)
-                        {
-                            int y1 = Math.max((cy << 4)     , bbOrig.minY);
-                            int y2 = Math.min((cy << 4) + 15, bbOrig.maxY);
-
-                            IntBoundingBox bbSub = new IntBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
-                            PlacementPart part = new PlacementPart(placement, entry.getKey(), bbSub);
-                            SubChunkPos subPos = new SubChunkPos(pos.x, cy, pos.z);
-                            this.touchedVolumesInSubChunk.put(subPos, part);
-                            subChunks.add(subPos);
-                            //System.out.printf("updateTouchedBoxesInChunk box at %d, %d, %d: %s\n", pos.x, cy, pos.z, bbSub);
-                        }
+                        list.add(new PlacementPart(placement, entry.getKey(), entry.getValue()));
                     }
                 }
             }
-
-            this.touchedSubChunksInChunks.put(posLong, subChunks);
         }
     }
 
     public void markAllPlacementsOfSchematicForRebuild(LitematicaSchematic schematic)
     {
-        for (int i = 0; i < this.schematicPlacements.size(); ++i)
+        for (SchematicPlacement placement : this.schematicPlacements)
         {
-            SchematicPlacement placement = this.schematicPlacements.get(i);
-
             if (placement.getSchematic() == schematic)
             {
                 this.markChunksForRebuild(placement);
@@ -837,12 +807,12 @@ public class SchematicPlacementManager
         this.schematicPlacements.clear();
         this.selectedPlacement = null;
         this.schematicsTouchingChunk.clear();
-        this.touchedVolumesInSubChunk.clear();
-        this.touchedSubChunksInChunks.clear();
+        this.touchedVolumesInChunk.clear();
         this.chunksPreChange.clear();
         this.chunksToRebuild.clear();
         this.chunkRebuildQueue.clear();
         this.chunksToUnload.clear();
+        this.visibleChunks.clear();
 
         SchematicHolder.getInstance().clearLoadedSchematics();
     }
@@ -857,10 +827,8 @@ public class SchematicPlacementManager
             int selectedIndex = 0;
             boolean indexValid = false;
 
-            for (int i = 0; i < this.schematicPlacements.size(); ++i)
+            for (SchematicPlacement placement : this.schematicPlacements)
             {
-                SchematicPlacement placement = this.schematicPlacements.get(i);
-
                 if (placement.shouldBeSaved() == false)
                 {
                     continue;
@@ -936,9 +904,9 @@ public class SchematicPlacementManager
 
     public static class PlacementPart
     {
-        private final SchematicPlacement placement;
-        private final String subRegionName;
-        private final IntBoundingBox bb;
+        public final SchematicPlacement placement;
+        public final String subRegionName;
+        public final IntBoundingBox bb;
 
         public PlacementPart(SchematicPlacement placement, String subRegionName, IntBoundingBox bb)
         {
