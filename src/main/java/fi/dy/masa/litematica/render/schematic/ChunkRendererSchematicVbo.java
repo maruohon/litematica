@@ -288,6 +288,9 @@ public class ChunkRendererSchematicVbo
 
                     for (BlockPos posMutable : BlockPos.Mutable.iterate(posFrom, posTo))
                     {
+                        // Fluid models and the overlay use the VertexConsumer#vertex(x, y, z) method.
+                        // Fluid rendering and the overlay do not use the MatrixStack.
+                        // Block models use the VertexConsumer#quad() method, and they use the MatrixStack.
                         matrices.push();
                         matrices.translate(posMutable.getX() & 0xF, posMutable.getY() - bottomY, posMutable.getZ() & 0xF);
 
@@ -377,7 +380,9 @@ public class ChunkRendererSchematicVbo
             if (fluidState.isEmpty() == false)
             {
                 RenderLayer layer = RenderLayers.getFluidLayer(fluidState);
-                BufferBuilder bufferSchematic = buffers.getBlockBufferByLayer(layer);
+                int offsetY = ((pos.getY() >> 4) << 4) - this.position.getY();
+                OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder bufferSchematic = buffers.getBlockBufferByLayer(layer);
+                bufferSchematic.setYOffset(offsetY);
 
                 if (data.isBlockLayerStarted(layer) == false)
                 {
@@ -387,6 +392,7 @@ public class ChunkRendererSchematicVbo
 
                 this.worldRenderer.renderFluid(this.schematicWorldView, fluidState, pos, bufferSchematic);
                 usedLayers.add(layer);
+                bufferSchematic.setYOffset(0.0);
             }
 
             if (stateSchematic.getRenderType() != BlockRenderType.INVISIBLE)
