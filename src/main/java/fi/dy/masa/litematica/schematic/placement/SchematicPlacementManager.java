@@ -260,12 +260,12 @@ public class SchematicPlacementManager
 
     public List<PlacementPart> getPlacementPartsInChunk(int chunkX, int chunkZ)
     {
-        return this.touchedVolumesInChunk.get(ChunkPos.toLong(chunkX, chunkZ));
+        return this.touchedVolumesInChunk.getOrDefault(ChunkPos.toLong(chunkX, chunkZ), Collections.emptyList());
     }
 
     public List<PlacementPart> getAllPlacementsTouchingChunk(BlockPos pos)
     {
-        return this.touchedVolumesInChunk.get(ChunkPos.toLong(pos.getX() >> 4, pos.getZ() >> 4));
+        return this.touchedVolumesInChunk.getOrDefault(ChunkPos.toLong(pos.getX() >> 4, pos.getZ() >> 4), Collections.emptyList());
     }
 
     public int getTouchedChunksCount()
