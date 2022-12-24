@@ -3,16 +3,20 @@ package fi.dy.masa.litematica.materials;
 import java.util.IdentityHashMap;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CandleBlock;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.block.FlowerPotBlock;
 import net.minecraft.block.FluidBlock;
+import net.minecraft.block.SeaPickleBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.SnowBlock;
 import net.minecraft.block.TallPlantBlock;
+import net.minecraft.block.TurtleEggBlock;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.SlabType;
@@ -21,6 +25,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
@@ -201,13 +206,27 @@ public class MaterialCache
 
     protected void overrideStackSize(BlockState state, ItemStack stack)
     {
-        if (state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE) == SlabType.DOUBLE)
+        Block block = state.getBlock();
+
+        if (block instanceof SlabBlock && state.get(SlabBlock.TYPE) == SlabType.DOUBLE)
         {
             stack.setCount(2);
         }
-        else if (state.getBlock() == Blocks.SNOW)
+        else if (block == Blocks.SNOW)
         {
             stack.setCount(state.get(SnowBlock.LAYERS));
+        }
+        else if (block instanceof TurtleEggBlock)
+        {
+            stack.setCount(state.get(TurtleEggBlock.EGGS));
+        }
+        else if (block instanceof SeaPickleBlock)
+        {
+            stack.setCount(state.get(SeaPickleBlock.PICKLES));
+        }
+        else if (block instanceof CandleBlock)
+        {
+            stack.setCount(state.get(CandleBlock.CANDLES));
         }
     }
 }
