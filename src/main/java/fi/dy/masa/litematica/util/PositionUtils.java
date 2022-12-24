@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -23,11 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -35,6 +32,11 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class PositionUtils
 {
@@ -74,6 +76,11 @@ public class PositionUtils
         }
 
         return null;
+    }
+
+    public static long getChunkPosLong(BlockPos blockPos)
+    {
+        return ChunkPos.toLong(blockPos.getX() >> 4, blockPos.getZ() >> 4);
     }
 
     public static BlockPos getMinCorner(BlockPos pos1, BlockPos pos2)
@@ -1207,6 +1214,28 @@ public class PositionUtils
             double dz = (double) (pos.z << 4) - this.posReference.getZ();
 
             return dx * dx + dz * dz;
+        }
+    }
+
+    public static class ChunkPosDistanceComparator implements Comparator<ChunkPos>
+    {
+        private final ChunkPos referencePosition;
+
+        public ChunkPosDistanceComparator(ChunkPos referencePosition)
+        {
+            this.referencePosition = referencePosition;
+        }
+
+        @Override
+        public int compare(ChunkPos pos1, ChunkPos pos2)
+        {
+            int refX = this.referencePosition.x;
+            int refZ = this.referencePosition.z;
+
+            double dist1 = (refX - pos1.x) * (refX - pos1.x) + (refZ - pos1.z) * (refZ - pos1.z);
+            double dist2 = (refX - pos2.x) * (refX - pos2.x) + (refZ - pos2.z) * (refZ - pos2.z);
+
+            return Double.compare(dist1, dist2);
         }
     }
 

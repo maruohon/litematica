@@ -33,11 +33,11 @@ public abstract class MixinDebugHud extends DrawableHelper
             list.add(String.format("%s[Litematica]%s %s",
                                    pre, rst, renderer.getDebugInfoRenders()));
 
-            String str = String.format("E: %d TE: TODO 1.17+ C: %d, CS: %d, VCS: %d",
+            String str = String.format("E: %d TE: TODO 1.17+ C: %d, CT: %d, CV: %d",
                                        world.getRegularEntityCount(),
-                                       world.getChunkProvider().getLoadedChunks().size(),
-                                       DataManager.getSchematicPlacementManager().getAllTouchedSubChunks().size(),
-                                       DataManager.getSchematicPlacementManager().getLastVisibleSubChunks().size());
+                                       world.getChunkProvider().getLoadedChunkCount(),
+                                       DataManager.getSchematicPlacementManager().getTouchedChunksCount(),
+                                       DataManager.getSchematicPlacementManager().getLastVisibleChunksCount());
             list.add(String.format("%s[Litematica]%s %s %s", pre, rst, renderer.getDebugInfoEntities(), str));
         }
     }

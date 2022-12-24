@@ -278,47 +278,15 @@ public class WorldSchematic extends World
     @Override
     public void scheduleBlockRerenderIfNeeded(BlockPos pos, BlockState stateOld, BlockState stateNew)
     {
-        this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
-    }
-
-    public void scheduleBlockRenders(int chunkX, int chunkY, int chunkZ)
-    {
-        this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
+        if (stateNew != stateOld)
+        {
+            this.scheduleChunkRenders(pos.getX() >> 4, pos.getZ() >> 4);
+        }
     }
 
     public void scheduleChunkRenders(int chunkX, int chunkZ)
     {
-        int startChunkY = this.getBottomSectionCoord();
-        int endChunkY = this.getTopSectionCoord() - 1;
-
-        for (int chunkY = startChunkY; chunkY <= endChunkY; ++chunkY)
-        {
-            this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
-        }
-    }
-
-    public void scheduleChunkRenders(int minBlockX, int minBlockY, int minBlockZ, int maxBlockX, int maxBlockY, int maxBlockZ)
-    {
-        minBlockY = Math.max(minBlockY, this.getBottomY());
-        maxBlockY = Math.min(maxBlockY, this.getTopY() - 1);
-
-        final int minChunkX = Math.min(minBlockX, maxBlockX) >> 4;
-        final int minChunkY = Math.min(minBlockY, maxBlockY) >> 4;
-        final int minChunkZ = Math.min(minBlockZ, maxBlockZ) >> 4;
-        final int maxChunkX = Math.max(minBlockX, maxBlockX) >> 4;
-        final int maxChunkY = Math.max(minBlockY, maxBlockY) >> 4;
-        final int maxChunkZ = Math.max(minBlockZ, maxBlockZ) >> 4;
-
-        for (int cz = minChunkZ; cz <= maxChunkZ; ++cz)
-        {
-            for (int cx = minChunkX; cx <= maxChunkX; ++cx)
-            {
-                for (int cy = minChunkY; cy <= maxChunkY; ++cy)
-                {
-                    this.worldRenderer.scheduleChunkRenders(cx, cy, cz);
-                }
-            }
-        }
+        this.worldRenderer.scheduleChunkRenders(chunkX, chunkZ);
     }
 
     @Override
