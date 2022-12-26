@@ -1,7 +1,7 @@
 package litematica.gui.widget;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.icon.BaseIcon;
-import malilib.gui.icon.Icon;
 import malilib.gui.widget.ContainerWidget;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.LabelWidget;
@@ -26,11 +25,26 @@ import litematica.schematic.SchematicMetadata;
 public class SchematicInfoWidget extends ContainerWidget
 {
     protected final SchematicInfoCache infoCache = new SchematicInfoCache();
+    protected final LabelWidget infoTextLabel;
+    protected final LabelWidget descriptionLabel;
+    protected final IconWidget iconWidget;
     @Nullable protected SchematicInfo currentInfo;
+    protected boolean hasDescription;
 
     public SchematicInfoWidget(int width, int height)
     {
         super(width, height);
+
+        this.infoTextLabel = new LabelWidget();
+        this.infoTextLabel.setLineHeight(12);
+
+        this.descriptionLabel = new LabelWidget();
+        this.descriptionLabel.setLineHeight(12);
+
+        this.iconWidget = new IconWidget(null);
+        this.iconWidget.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
+        // FIXME (malilib) this seems silly to have to be enabled for the border to render (see IconWidget#renderAt())
+        this.iconWidget.getBackgroundRenderer().getNormalSettings().setEnabled(true);
 
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
         this.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
@@ -39,19 +53,25 @@ public class SchematicInfoWidget extends ContainerWidget
     @Override
     public void reAddSubWidgets()
     {
-        this.reCreateSubWidgets();
+        super.reAddSubWidgets();
+
+        if (this.currentInfo == null)
+        {
+            return;
+        }
+
+        this.addWidget(this.infoTextLabel);
+        this.addWidgetIf(this.descriptionLabel, this.hasDescription);
+
+        if (this.iconWidget.getIcon() != null)
+        {
+            this.addWidget(this.iconWidget);
+        }
     }
 
     @Override
     public void updateSubWidgetPositions()
     {
-        this.reCreateSubWidgets();
-    }
-
-    protected void reCreateSubWidgets()
-    {
-        this.clearWidgets();
-
         if (this.currentInfo == null)
         {
             return;
@@ -59,15 +79,16 @@ public class SchematicInfoWidget extends ContainerWidget
 
         int x = this.getX() + 4;
         int y = this.getY() + 4;
-        SchematicMetadata meta = this.currentInfo.schematic.getMetadata();
-        LabelWidget label = this.createInfoLabelWidget(x, y, meta);
-        this.addWidget(label);
 
-        if (this.currentInfo.texture != null)
+        this.infoTextLabel.setPosition(x, y);
+
+        if (this.hasDescription)
         {
-            IconWidget iconWidget = this.createPreviewIconWidget(x, label.getBottom() + 4);
-            this.addWidgetIfNotNull(iconWidget);
+            this.descriptionLabel.setPosition(x + 4, this.infoTextLabel.getBottom() + 2);
         }
+
+        int offX = (this.getWidth() - this.iconWidget.getWidth()) / 2;
+        this.iconWidget.setPosition(this.getX() + offX, this.getBottom() - this.iconWidget.getHeight() - 4);
     }
 
     @Nullable
@@ -85,24 +106,41 @@ public class SchematicInfoWidget extends ContainerWidget
     {
         if (entry != null)
         {
-            Path file = entry.getFullPath();
-            this.infoCache.cacheSchematicInfo(file);
-            this.currentInfo = this.infoCache.getSchematicInfo(file);
+            this.currentInfo = this.infoCache.getOrCacheSchematicInfo(entry.getFullPath());
         }
         else
         {
             this.currentInfo = null;
         }
 
-        this.reCreateSubWidgets();
+        this.updateWidgetState();
+        this.updateSubWidgetPositions();
+        this.reAddSubWidgets();
     }
 
-    @Nullable
-    protected IconWidget createPreviewIconWidget(int x, int y)
+    @Override
+    public void updateWidgetState()
     {
+        // Note: the text needs to be updated first, to know the available space left for the icon
+        this.updateInfoLabelText();
+        this.updatePreviewIcon();
+    }
+
+    protected void updatePreviewIcon()
+    {
+        if (this.currentInfo == null || this.currentInfo.texture == null)
+        {
+            this.iconWidget.setIcon(null);
+            return;
+        }
+
         int iconSize = (int) Math.sqrt(this.currentInfo.texture.getTextureData().length);
-        int textureSize = iconSize;
-        int usableHeight = this.getBottom() - y - 4;
+        int usableHeight = this.getHeight() - this.infoTextLabel.getHeight() - 4;
+
+        if (this.hasDescription)
+        {
+            usableHeight -= this.descriptionLabel.getHeight() + 4;
+        }
 
         if (usableHeight < iconSize)
         {
@@ -112,19 +150,25 @@ public class SchematicInfoWidget extends ContainerWidget
         // No point showing so small previews that you can't see anything from it
         if (iconSize < 10)
         {
-            return null;
+            this.iconWidget.setIcon(null);
         }
-
-        Icon icon = new BaseIcon(0, 0, iconSize, iconSize, textureSize, textureSize, this.currentInfo.iconName);
-        IconWidget iconWidget = new IconWidget(icon);
-        iconWidget.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
-        iconWidget.setPosition(x, y);
-
-        return iconWidget;
+        else
+        {
+            this.iconWidget.setIcon(new BaseIcon(0, 0, iconSize, iconSize, iconSize, iconSize, this.currentInfo.iconName));
+        }
     }
 
-    protected LabelWidget createInfoLabelWidget(int x, int y, SchematicMetadata meta)
+    protected void updateInfoLabelText()
     {
+        if (this.currentInfo == null)
+        {
+            this.infoTextLabel.setLabelStyledTextLines(Collections.emptyList());
+            this.descriptionLabel.setLabelStyledTextLines(Collections.emptyList());
+            this.descriptionLabel.getHoverInfoFactory().setTextLines("desc", Collections.emptyList());
+            return;
+        }
+
+        SchematicMetadata meta = this.currentInfo.schematic.getMetadata();
         List<StyledTextLine> lines = new ArrayList<>();
 
         StyledTextLine.translate(lines, "litematica.label.schematic_info.name");
@@ -161,19 +205,51 @@ public class SchematicInfoWidget extends ContainerWidget
             StyledTextLine.translate(lines, "litematica.label.schematic_info.enclosing_size_and_value", areaSizeStr);
         }
 
-        if (org.apache.commons.lang3.StringUtils.isBlank(meta.getDescription()) == false)
+        this.hasDescription = org.apache.commons.lang3.StringUtils.isBlank(meta.getDescription()) == false;
+
+        if (this.hasDescription)
         {
+            int usableHeight = this.getBottom() - this.getY() - 12;
+            int maxLines = usableHeight / 12;
+            int maxDescLines = maxLines - lines.size();
+
             StyledTextLine.translate(lines, "litematica.label.schematic_info.description");
-            StyledText text = StyledText.translate("litematica.label.schematic_info.generic_value", meta.getDescription());
-            text = StyledTextUtils.wrapStyledTextToMaxWidth(text, this.getWidth() - 6);
-            lines.addAll(text.getLines());
+            StyledText nonWrappedText = StyledText.translate("litematica.label.schematic_info.generic_value", meta.getDescription());
+            boolean fitAll = false;
+
+            if (maxDescLines > 1)
+            {
+                StyledText wrappedText = StyledTextUtils.wrapStyledTextToMaxWidth(nonWrappedText, this.getWidth() - 8);
+                List<StyledTextLine> wrappedLines = wrappedText.getLines();
+                List<StyledTextLine> descriptionLines;
+
+                if (wrappedLines.size() <= maxDescLines)
+                {
+                    descriptionLines = wrappedLines;
+                    fitAll = true;
+                }
+                else
+                {
+                    descriptionLines = new ArrayList<>();
+
+                    if (maxDescLines >= 2)
+                    {
+                        descriptionLines.addAll(wrappedLines.subList(0, maxDescLines - 1));
+                    }
+
+                    int more = wrappedLines.size() - maxDescLines - 1;
+                    descriptionLines.add(StyledTextLine.translate("litematica.label.schematic_info.description.more", more));
+                }
+
+                this.descriptionLabel.setLabelStyledTextLines(descriptionLines);
+            }
+
+            if (fitAll == false)
+            {
+                this.descriptionLabel.getHoverInfoFactory().setTextLines("desc", nonWrappedText.getLines());
+            }
         }
 
-        LabelWidget label = new LabelWidget();
-        label.setPosition(x, y);
-        label.setLineHeight(12);
-        label.setLabelStyledTextLines(lines);
-
-        return label;
+        this.infoTextLabel.setLabelStyledTextLines(lines);
     }
 }

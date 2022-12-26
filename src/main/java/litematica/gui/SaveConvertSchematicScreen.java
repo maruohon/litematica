@@ -121,9 +121,7 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
     protected void onSchematicSaved(Path newSchematicFile)
     {
         this.schematic.getMetadata().clearModifiedSinceSaved();
-        this.schematicInfoWidget.clearCache();
-        this.getListWidget().clearSelection();
-        this.getListWidget().refreshEntries();
+        this.onSchematicChange();
 
         String key = "litematica.message.success.save_schematic_convert";
         MessageDispatcher.success(key, newSchematicFile.getFileName().toString());

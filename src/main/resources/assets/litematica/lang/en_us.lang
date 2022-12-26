@@ -267,17 +267,18 @@ litematica.label.saved_placement.info_widget.rotation=<c=aaa>Rotation: §3%s
 litematica.label.saved_placement.names=Placement: §a%s§r\nSchematic: §3%s§r\nSchematic path: §3%s§r\nPlacement file: §3%s
 litematica.label.schematic_browser.schematics=schematics
 litematica.label.schematic_info.description=<c=aaa>Description:
-litematica.label.schematic_info.dimensions_value=§b%s<c=aaa> x §b%s<c=aaa> x §b%s
+litematica.label.schematic_info.description.more=<c=777>[+ §b%s<c=777> lines]
+litematica.label.schematic_info.dimensions_value=§6%s<c=aaa> x §6%s<c=aaa> x §6%s
 litematica.label.schematic_info.enclosing_size=<c=aaa>Enclosing size:
 litematica.label.schematic_info.enclosing_size.value=  §a%s
 litematica.label.schematic_info.enclosing_size_and_value=<c=aaa>Enclosing size: %s
-litematica.label.schematic_info.generic_value=<c=eee>%s
+litematica.label.schematic_info.generic_value=<c=ccc>%s
 litematica.label.schematic_info.name=<c=aaa>Name:
 litematica.label.schematic_info.name.value=  <c=7f7>%s
 litematica.label.schematic_info.region_count=<c=aaa>Regions: §6%s
 litematica.label.schematic_info.schematic_author=<c=aaa>Schematic by: <c=eee>%s
-litematica.label.schematic_info.time_created=<c=aaa>Created: <c=77f>%s
-litematica.label.schematic_info.time_modified=<c=aaa>Modified: <c=77f>%s
+litematica.label.schematic_info.time_created=<c=aaa>Created: <c=7af>%s
+litematica.label.schematic_info.time_modified=<c=aaa>Modified: <c=7af>%s
 litematica.label.schematic_info.total_blocks=<c=aaa>Total blocks: §6%d
 litematica.label.schematic_info.total_blocks_and_volume=<c=aaa>Blocks/Volume: §6%s<c=aaa> / §6%s
 litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s

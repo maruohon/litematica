@@ -37,7 +37,7 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     @Override
     protected void initScreen()
     {
-        this.schematicInfoWidget.clearCache();
+        this.clearSchematicInfoCache();
         super.initScreen();
         this.getListWidget().clearSelection();
     }
@@ -45,8 +45,8 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     @Override
     protected void onScreenClosed()
     {
+        this.clearSchematicInfoCache();
         super.onScreenClosed();
-        this.schematicInfoWidget.clearCache();
     }
 
     @Override
@@ -99,6 +99,18 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         {
             listWidget.setShowFileSize(true);
         }
+    }
+
+    protected void clearSchematicInfoCache()
+    {
+        this.schematicInfoWidget.clearCache();
+    }
+
+    protected void onSchematicChange()
+    {
+        this.clearSchematicInfoCache();
+        this.getListWidget().clearSelection();
+        this.getListWidget().refreshEntries();
     }
 
     public void onSelectionChange(@Nullable DirectoryEntry entry)

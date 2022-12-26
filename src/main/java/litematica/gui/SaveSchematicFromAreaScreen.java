@@ -208,9 +208,7 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
 
     protected void onSchematicSaved(String fileName)
     {
-        this.schematicInfoWidget.clearCache();
-        this.getListWidget().clearSelection();
-        this.getListWidget().refreshEntries();
+        this.onSchematicChange();
         MessageDispatcher.success("litematica.message.success.save_schematic_new", fileName);
     }
 

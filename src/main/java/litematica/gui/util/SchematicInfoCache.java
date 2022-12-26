@@ -39,13 +39,18 @@ public class SchematicInfoCache
         this.cachedData.clear();
     }
 
-    public void cacheSchematicInfo(Path file)
+    @Nullable
+    public SchematicInfo getOrCacheSchematicInfo(Path file)
     {
-        if (this.cachedData.containsKey(file))
+        SchematicInfo info = this.cachedData.get(file);
+
+        if (info != null)
         {
-            return;
+            return info;
         }
 
+        // TODO Use a partial NBT read method to only read the metadata tag
+        // TODO (that's only beneficial if it's stored before the bulk schematic data in the stream)
         NBTTagCompound tag = NbtUtils.readNbtFromFile(file);
         SchematicInfo data = null;
 
@@ -63,6 +68,8 @@ public class SchematicInfoCache
         }
 
         this.cachedData.put(file, data);
+
+        return data;
     }
 
     @Nullable

@@ -158,11 +158,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
             try
             {
                 boolean success = FileUtils.delete(file);
-
-                this.schematicInfoWidget.clearCache();
-                this.getListWidget().clearSelection();
-                this.getListWidget().refreshEntries();
-
+                this.onSchematicChange();
                 return success;
             }
             catch (Exception e)
@@ -193,11 +189,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
     protected boolean renameFileToName(Path oldFile, String newName)
     {
         boolean success = FileUtils.renameFileToName(oldFile, newName, MessageDispatcher::error);
-
-        this.schematicInfoWidget.clearCache();
-        this.getListWidget().clearSelection();
-        this.getListWidget().refreshEntries();
-
+        this.onSchematicChange();
         return success;
     }
 
@@ -253,8 +245,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
                     }
                 }
 
-                this.schematicInfoWidget.clearCache();
-                this.getListWidget().refreshEntries();
+                this.onSchematicChange();
 
                 return true;
             }
@@ -316,7 +307,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
                     MessageDispatcher.error("litematica.message.error.schematic_manager.failed_to_save_schematic");
                 }
 
-                this.schematicInfoWidget.clearCache();
+                this.clearSchematicInfoCache();
             }
         }
     }
