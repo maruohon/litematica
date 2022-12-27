@@ -20,7 +20,7 @@ public class SaveConvertSchematicScreen extends BaseSaveSchematicScreen
     public SaveConvertSchematicScreen(ISchematic schematic,
                                       boolean addUpdatePlacementsElement)
     {
-        this(schematic, addUpdatePlacementsElement, "convert_save_schematic");
+        this(schematic, addUpdatePlacementsElement, "schematic_manager");
     }
 
     public SaveConvertSchematicScreen(ISchematic schematic,
