@@ -266,17 +266,22 @@ litematica.label.saved_placement.info_widget.region_count=<c=aaa>Regions: §6%s
 litematica.label.saved_placement.info_widget.rotation=<c=aaa>Rotation: §3%s
 litematica.label.saved_placement.names=Placement: §a%s§r\nSchematic: §3%s§r\nSchematic path: §3%s§r\nPlacement file: §3%s
 litematica.label.schematic_browser.schematics=schematics
+litematica.label.schematic_info.block_entity_count=<c=aaa>Block Entities: §6%s
 litematica.label.schematic_info.description=<c=aaa>Description:
+litematica.label.schematic_info.description.hover=<c=888>[hover]
 litematica.label.schematic_info.description.more=<c=777>[+ §b%s<c=777> lines]
 litematica.label.schematic_info.dimensions_value=§6%s<c=aaa> x §6%s<c=aaa> x §6%s
 litematica.label.schematic_info.enclosing_size=<c=aaa>Enclosing size:
 litematica.label.schematic_info.enclosing_size.value=  §a%s
 litematica.label.schematic_info.enclosing_size_and_value=<c=aaa>Enclosing size: %s
+litematica.label.schematic_info.entity_count=<c=aaa>Entities: §6%s
 litematica.label.schematic_info.generic_value=<c=ccc>%s
+litematica.label.schematic_info.mc_version=<c=aaa>MC ver: <c=eee>%s<c=aaa> [DV: §6%s<c=aaa>]
 litematica.label.schematic_info.name=<c=aaa>Name:
 litematica.label.schematic_info.name.value=  <c=7f7>%s
 litematica.label.schematic_info.region_count=<c=aaa>Regions: §6%s
 litematica.label.schematic_info.schematic_author=<c=aaa>Schematic by: <c=eee>%s
+litematica.label.schematic_info.schematic_version=<c=aaa>Schematic ver: §6%s
 litematica.label.schematic_info.time_created=<c=aaa>Created: <c=7af>%s
 litematica.label.schematic_info.time_modified=<c=aaa>Modified: <c=7af>%s
 litematica.label.schematic_info.total_blocks=<c=aaa>Total blocks: §6%d
@@ -375,6 +380,7 @@ litematica.title.screen.save_schematic_from_area=Save Schematic from selection �
 litematica.title.screen.saved_placements=Litematica %s - Saved Schematic Placements
 litematica.title.screen.save_or_convert_schematic=Save or Convert Schematic §e%s§r
 litematica.title.screen.schematic_browser=Litematica %s - Schematic Browser
+litematica.title.screen.schematic_info_options=Schematic Info Options
 litematica.title.screen.schematic_manager=Litematica %s - Schematic Manager
 litematica.title.screen.schematic_manager.confirm_file_deletion=Confirm File Deletion
 litematica.title.screen.schematic_manager.confirm_preview_removal=Confirm Preview Image Removal
@@ -928,6 +934,21 @@ litematica.config.name.verifierextra=Schematic Verifier (Extra)
 litematica.config.name.verifiermissing=Schematic Verifier (Missing)
 litematica.config.name.verifierwrongblock=Schematic Verifier (Wrong Blocks)
 litematica.config.name.verifierwrongstate=Schematic Verifier (Wrong States)
+
+litematica.config.name.schematicinfoshowauthor=Author (Schematic creator)
+litematica.config.name.schematicinfoshowblockentitycount=Block Entity Count
+litematica.config.name.schematicinfoshowcreationtime=Creation Time
+litematica.config.name.schematicinfoshowdescription=Description
+litematica.config.name.schematicinfoshowenclosingsize=Enclosing Size
+litematica.config.name.schematicinfoshowentitycount=Entity Count
+litematica.config.name.schematicinfoshowmcversion=MC Version
+litematica.config.name.schematicinfoshowmodificationtime=Modification Time
+litematica.config.name.schematicinfoshowname=Name
+litematica.config.name.schematicinfoshowregioncount=Region Count
+litematica.config.name.schematicinfoshowschematicversion=Schematic Version
+litematica.config.name.schematicinfoshowthumbnail=Thumbnail / Preview
+litematica.config.name.schematicinfoshowtotalblocks=Total Blocks
+litematica.config.name.schematicinfoshowtotalvolume=Total Volume
 
 litematica.hotkey.comment.addselectionbox=Add a new area selection sub-region box to the player's current position.\n\n§6Note 1:§r This is only for the §fMulti-Region§r Area Selection mode. The §fSimple§r mode always just has one constant box, you can't remove it or add more.\n\n§6Note 2:§r This hotkey shouldn't normally be needed, as the §fArea Editor§r menu should normally be preferred for creating and renaming and managing the sub-regions in a selection.
 litematica.hotkey.comment.cloneselection=Quickly clone the current area selection. This basically just creates an in-memory-only schematic, and then creates a placement of that schematic and selects it, and also switches the tool mode to the §aPaste Schematic in World§r mode. You can then easily paste that "cloned selection" somewhere.\n\nAlso see the Generic -> §eClone at Original Position§r option, which controls if the created placement will be placed overlapping the original selection, or at the player's current location. Furthermore, the Generic -> §ePlacement Infront of Player§r option controls if the placement (in case it's created at the player's position) will be created "fully infront of the player" or if the origin point will be placed at the player's position.

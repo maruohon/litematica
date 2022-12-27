@@ -8,16 +8,21 @@ import javax.annotation.Nullable;
 
 import net.minecraft.util.math.Vec3i;
 
+import malilib.gui.BaseScreen;
 import malilib.gui.icon.BaseIcon;
+import malilib.gui.icon.DefaultIcons;
 import malilib.gui.widget.ContainerWidget;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.LabelWidget;
+import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.BaseFileBrowserWidget;
 import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import malilib.render.text.StyledText;
 import malilib.render.text.StyledTextLine;
 import malilib.render.text.StyledTextUtils;
 import malilib.util.StringUtils;
+import litematica.config.Configs;
+import litematica.gui.SchematicInfoConfigScreen;
 import litematica.gui.util.SchematicInfoCache;
 import litematica.gui.util.SchematicInfoCache.SchematicInfo;
 import litematica.schematic.SchematicMetadata;
@@ -28,6 +33,7 @@ public class SchematicInfoWidget extends ContainerWidget
     protected final LabelWidget infoTextLabel;
     protected final LabelWidget descriptionLabel;
     protected final IconWidget iconWidget;
+    protected final GenericButton configButton;
     @Nullable protected SchematicInfo currentInfo;
     protected boolean hasDescription;
 
@@ -46,6 +52,8 @@ public class SchematicInfoWidget extends ContainerWidget
         // FIXME (malilib) this seems silly to have to be enabled for the border to render (see IconWidget#renderAt())
         this.iconWidget.getBackgroundRenderer().getNormalSettings().setEnabled(true);
 
+        this.configButton = GenericButton.create(DefaultIcons.INFO_ICON_11, this::openConfigScreen);
+
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
         this.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
     }
@@ -60,6 +68,7 @@ public class SchematicInfoWidget extends ContainerWidget
             return;
         }
 
+        this.addWidget(this.configButton);
         this.addWidget(this.infoTextLabel);
         this.addWidgetIf(this.descriptionLabel, this.hasDescription);
 
@@ -89,6 +98,12 @@ public class SchematicInfoWidget extends ContainerWidget
 
         int offX = (this.getWidth() - this.iconWidget.getWidth()) / 2;
         this.iconWidget.setPosition(this.getX() + offX, this.getBottom() - this.iconWidget.getHeight() - 4);
+        this.configButton.setPosition(this.getRight() - 14, this.getY() + 3);
+    }
+
+    protected void openConfigScreen()
+    {
+        BaseScreen.openPopupScreenWithCurrentScreenAsParent(new SchematicInfoConfigScreen());
     }
 
     @Nullable
@@ -128,18 +143,19 @@ public class SchematicInfoWidget extends ContainerWidget
 
     protected void updatePreviewIcon()
     {
-        if (this.currentInfo == null || this.currentInfo.texture == null)
+        if (this.currentInfo == null || this.currentInfo.texture == null ||
+            Configs.Internal.SCHEMATIC_INFO_SHOW_THUMBNAIL.getBooleanValue() == false)
         {
             this.iconWidget.setIcon(null);
             return;
         }
 
         int iconSize = (int) Math.sqrt(this.currentInfo.texture.getTextureData().length);
-        int usableHeight = this.getHeight() - this.infoTextLabel.getHeight() - 4;
+        int usableHeight = this.getHeight() - this.infoTextLabel.getHeight() - 12;
 
         if (this.hasDescription)
         {
-            usableHeight -= this.descriptionLabel.getHeight() + 4;
+            usableHeight -= this.descriptionLabel.getHeight() + 6;
         }
 
         if (usableHeight < iconSize)
@@ -171,21 +187,54 @@ public class SchematicInfoWidget extends ContainerWidget
         SchematicMetadata meta = this.currentInfo.schematic.getMetadata();
         List<StyledTextLine> lines = new ArrayList<>();
 
-        StyledTextLine.translate(lines, "litematica.label.schematic_info.name");
-        StyledTextLine.translate(lines, "litematica.label.schematic_info.name.value", meta.getName());
+        if (Configs.Internal.SCHEMATIC_INFO_SHOW_NAME.getBooleanValue())
+        {
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.name");
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.name.value", meta.getName());
+        }
 
-        StyledTextLine.translate(lines, "litematica.label.schematic_info.schematic_author", meta.getAuthor());
+        if (Configs.Internal.SCHEMATIC_INFO_SHOW_AUTHOR.getBooleanValue())
+        {
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.schematic_author", meta.getAuthor());
+        }
 
-        StyledTextLine.translate(lines, "litematica.label.schematic_info.time_created",
-                                 BaseFileBrowserWidget.DATE_FORMAT.format(new Date(meta.getTimeCreated())));
+        if (Configs.Internal.SCHEMATIC_INFO_SHOW_CREATION_TIME.getBooleanValue())
+        {
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.time_created",
+                                     BaseFileBrowserWidget.DATE_FORMAT.format(new Date(meta.getTimeCreated())));
+        }
 
-        if (meta.hasBeenModified())
+        if (meta.hasBeenModified() && Configs.Internal.SCHEMATIC_INFO_SHOW_MODIFICATION_TIME.getBooleanValue())
         {
             StyledTextLine.translate(lines, "litematica.label.schematic_info.time_modified",
                                      BaseFileBrowserWidget.DATE_FORMAT.format(new Date(meta.getTimeModified())));
         }
 
-        StyledTextLine.translate(lines, "litematica.label.schematic_info.region_count", meta.getRegionCount());
+        if (Configs.Internal.SCHEMATIC_INFO_SHOW_MC_VERSION.getBooleanValue())
+        {
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.mc_version",
+                                     meta.getMinecraftVersion(), meta.getMinecraftDataVersion());
+        }
+
+        if (Configs.Internal.SCHEMATIC_INFO_SHOW_SCHEMATIC_VERSION.getBooleanValue())
+        {
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.schematic_version", meta.getSchematicVersion());
+        }
+
+        if (Configs.Internal.SCHEMATIC_INFO_SHOW_REGION_COUNT.getBooleanValue())
+        {
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.region_count", meta.getRegionCount());
+        }
+
+        if (Configs.Internal.SCHEMATIC_INFO_SHOW_ENTITY_COUNT.getBooleanValue())
+        {
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.entity_count", meta.getEntityCount());
+        }
+
+        if (Configs.Internal.SCHEMATIC_INFO_SHOW_BLOCKENTITY_COUNT.getBooleanValue())
+        {
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.block_entity_count", meta.getBlockEntityCount());
+        }
 
         Vec3i areaSize = meta.getEnclosingSize();
         String areaSizeStr = StringUtils.translate("litematica.label.schematic_info.dimensions_value",
@@ -193,35 +242,51 @@ public class SchematicInfoWidget extends ContainerWidget
 
         if (this.getHeight() >= 240)
         {
-            StyledTextLine.translate(lines, "litematica.label.schematic_info.total_volume", meta.getTotalVolume());
-            StyledTextLine.translate(lines, "litematica.label.schematic_info.total_blocks", meta.getTotalBlocks());
-            StyledTextLine.translate(lines, "litematica.label.schematic_info.enclosing_size");
-            StyledTextLine.translate(lines, "litematica.label.schematic_info.enclosing_size.value", areaSizeStr);
+            if (Configs.Internal.SCHEMATIC_INFO_SHOW_TOTAL_BLOCKS.getBooleanValue())
+            {
+                StyledTextLine.translate(lines, "litematica.label.schematic_info.total_blocks", meta.getTotalBlocks());
+            }
+
+            if (Configs.Internal.SCHEMATIC_INFO_SHOW_TOTAL_VOLUME.getBooleanValue())
+            {
+                StyledTextLine.translate(lines, "litematica.label.schematic_info.total_volume", meta.getTotalVolume());
+            }
+
+            if (Configs.Internal.SCHEMATIC_INFO_SHOW_ENCLOSING_SIZE.getBooleanValue())
+            {
+                StyledTextLine.translate(lines, "litematica.label.schematic_info.enclosing_size");
+                StyledTextLine.translate(lines, "litematica.label.schematic_info.enclosing_size.value", areaSizeStr);
+            }
         }
         else
         {
-            StyledTextLine.translate(lines, "litematica.label.schematic_info.total_blocks_and_volume",
-                                     meta.getTotalBlocks(), meta.getTotalVolume());
-            StyledTextLine.translate(lines, "litematica.label.schematic_info.enclosing_size_and_value", areaSizeStr);
+            if (Configs.Internal.SCHEMATIC_INFO_SHOW_TOTAL_VOLUME.getBooleanValue() ||
+                Configs.Internal.SCHEMATIC_INFO_SHOW_TOTAL_BLOCKS.getBooleanValue())
+            {
+                StyledTextLine.translate(lines, "litematica.label.schematic_info.total_blocks_and_volume",
+                                         meta.getTotalBlocks(), meta.getTotalVolume());
+                StyledTextLine.translate(lines, "litematica.label.schematic_info.enclosing_size_and_value", areaSizeStr);
+            }
         }
 
         this.hasDescription = org.apache.commons.lang3.StringUtils.isBlank(meta.getDescription()) == false;
 
         if (this.hasDescription)
         {
-            int usableHeight = this.getBottom() - this.getY() - 12;
+            StyledTextLine.translate(lines, "litematica.label.schematic_info.description");
+
+            int usableHeight = this.getHeight() - 12;
             int maxLines = usableHeight / 12;
             int maxDescLines = maxLines - lines.size();
 
-            StyledTextLine.translate(lines, "litematica.label.schematic_info.description");
             StyledText nonWrappedText = StyledText.translate("litematica.label.schematic_info.generic_value", meta.getDescription());
             boolean fitAll = false;
+            List<StyledTextLine> descriptionLines;
 
-            if (maxDescLines > 1)
+            if (maxDescLines > 0 && Configs.Internal.SCHEMATIC_INFO_SHOW_DESCRIPTION.getBooleanValue())
             {
                 StyledText wrappedText = StyledTextUtils.wrapStyledTextToMaxWidth(nonWrappedText, this.getWidth() - 8);
                 List<StyledTextLine> wrappedLines = wrappedText.getLines();
-                List<StyledTextLine> descriptionLines;
 
                 if (wrappedLines.size() <= maxDescLines)
                 {
@@ -238,11 +303,18 @@ public class SchematicInfoWidget extends ContainerWidget
                     }
 
                     int more = wrappedLines.size() - maxDescLines - 1;
-                    descriptionLines.add(StyledTextLine.translate("litematica.label.schematic_info.description.more", more));
+                    StyledTextLine.translate(descriptionLines, "litematica.label.schematic_info.description.more", more);
                 }
 
-                this.descriptionLabel.setLabelStyledTextLines(descriptionLines);
             }
+            // Has a description, but showing it is not enabled, add a line that can be hovered
+            else
+            {
+                descriptionLines = new ArrayList<>();
+                StyledTextLine.translate(descriptionLines, "litematica.label.schematic_info.description.hover");
+            }
+
+            this.descriptionLabel.setLabelStyledTextLines(descriptionLines);
 
             if (fitAll == false)
             {

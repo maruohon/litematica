@@ -11,17 +11,21 @@ import malilib.util.nbt.NbtUtils;
 
 public class SchematicMetadata
 {
-    private String name = "?";
-    private String author = "?";
-    private String description = "";
-    private Vec3i enclosingSize = Vec3i.NULL_VECTOR;
-    private long timeCreated;
-    private long timeModified;
-    private int regionCount;
-    private long totalVolume = -1;
-    private long totalBlocks = -1;
-    private boolean modifiedSinceSaved;
-    @Nullable private int[] thumbnailPixelData;
+    protected String name = "?";
+    protected String author = "?";
+    protected String description = "";
+    protected Vec3i enclosingSize = Vec3i.NULL_VECTOR;
+    protected long timeCreated;
+    protected long timeModified;
+    protected long minecraftDataVersion;
+    protected int schematicVersion;
+    protected int regionCount;
+    protected int entityCount;
+    protected int blockEntityCount;
+    protected long totalVolume = -1;
+    protected long totalBlocks = -1;
+    protected boolean modifiedSinceSaved;
+    @Nullable protected int[] thumbnailPixelData;
 
     public String getName()
     {
@@ -59,6 +63,16 @@ public class SchematicMetadata
         return this.totalBlocks;
     }
 
+    public int getEntityCount()
+    {
+        return this.entityCount;
+    }
+
+    public int getBlockEntityCount()
+    {
+        return this.blockEntityCount;
+    }
+
     public Vec3i getEnclosingSize()
     {
         return this.enclosingSize;
@@ -72,6 +86,22 @@ public class SchematicMetadata
     public long getTimeModified()
     {
         return this.timeModified;
+    }
+
+    public int getSchematicVersion()
+    {
+        return this.schematicVersion;
+    }
+
+    public long getMinecraftDataVersion()
+    {
+        return this.minecraftDataVersion;
+    }
+
+    // TODO
+    public String getMinecraftVersion()
+    {
+        return "???";
     }
 
     public boolean hasBeenModified()

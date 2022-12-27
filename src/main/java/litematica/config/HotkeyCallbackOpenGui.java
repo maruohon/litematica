@@ -53,6 +53,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_CONFIG_SCREEN.getKeyBind())
         {
+            // TODO Shouldn't this be handled by the tabbed screen now?
             BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.RENDER_LAYERS ? new RenderLayerEditScreen() : ConfigScreen.create();
             BaseScreen.openScreen(screen);
             return ActionResult.SUCCESS;
