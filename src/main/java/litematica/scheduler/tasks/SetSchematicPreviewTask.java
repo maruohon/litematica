@@ -12,6 +12,7 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
 import litematica.render.infohud.InfoHud;
 import litematica.schematic.ISchematic;
+import litematica.schematic.SchematicMetadata;
 
 /**
  * This task doesn't actually do/run anything on its own.
@@ -65,13 +66,13 @@ public class SetSchematicPreviewTask extends TaskBase
 
             int[] pixels = scaled.getRGB(0, 0, previewDimensions, previewDimensions, null, 0, scaled.getWidth());
 
-            this.schematic.getMetadata().setPreviewImagePixelData(pixels);
-            this.schematic.getMetadata().setTimeModifiedToNow();
+            SchematicMetadata meta = this.schematic.getMetadata();
+            meta.setPreviewImagePixelData(pixels);
+            meta.setTimeModifiedToNowIfNotRecentlyCreated();
 
             this.schematic.writeToFile(this.schematic.getFile(), true);
 
-            MessageDispatcher.success("litematica.message.info.schematic_manager.set_preview.success",
-                                      this.schematic.getMetadata().getName());
+            MessageDispatcher.success("litematica.message.info.schematic_manager.set_preview.success", meta.getName());
         }
         catch (Exception e)
         {

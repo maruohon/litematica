@@ -179,6 +179,18 @@ public class SchematicMetadata
         this.timeModified = System.currentTimeMillis();
     }
 
+    public void setTimeModifiedToNowIfNotRecentlyCreated()
+    {
+        long currentTime = System.currentTimeMillis();
+
+        // Allow 10 minutes to set the description and thumbnail image etc.
+        // without marking the schematic as modified
+        if (currentTime - this.timeCreated > 10L * 60L * 1000L)
+        {
+            this.timeModified = currentTime;
+        }
+    }
+
     public void copyFrom(SchematicMetadata other)
     {
         this.name = other.name;

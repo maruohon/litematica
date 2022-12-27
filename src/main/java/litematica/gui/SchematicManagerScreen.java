@@ -2,6 +2,7 @@ package litematica.gui;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 
 import malilib.gui.ConfirmActionScreen;
@@ -29,10 +30,12 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
 {
     protected final GenericButton convertSchematicButton;
     protected final GenericButton deleteFileButton;
+    protected final GenericButton editDescriptionButton;
     protected final GenericButton removePreviewButton;
     protected final GenericButton renameFileButton;
     protected final GenericButton renameSchematicButton;
     protected final GenericButton setPreviewButton;
+    @Nullable protected SchematicInfo selectedSchematic;
 
     public SchematicManagerScreen()
     {
@@ -40,6 +43,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
 
         this.convertSchematicButton = GenericButton.create("litematica.button.schematic_manager.convert_format", this::convertSchematic);
         this.deleteFileButton       = GenericButton.create("litematica.button.schematic_manager.delete", this::deleteFile);
+        this.editDescriptionButton  = GenericButton.create("litematica.button.schematic_manager.edit_description", this::editDescription);
         this.removePreviewButton    = GenericButton.create("litematica.button.schematic_manager.remove_preview", this::removePreview);
         this.renameFileButton       = GenericButton.create("litematica.button.schematic_manager.rename_file", this::renameFile);
         this.renameSchematicButton  = GenericButton.create("litematica.button.schematic_manager.rename_schematic", this::renameSchematic);
@@ -61,6 +65,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
         {
             this.addWidget(this.convertSchematicButton);
             this.addWidget(this.deleteFileButton);
+            this.addWidget(this.editDescriptionButton);
             this.addWidget(this.renameFileButton);
             this.addWidget(this.renameSchematicButton);
             this.addWidget(this.setPreviewButton);
@@ -83,6 +88,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
         this.renameSchematicButton.setPosition(this.x + 10, y);
         this.convertSchematicButton.setPosition(this.renameSchematicButton.getRight() + 2, y);
         this.setPreviewButton.setPosition(this.convertSchematicButton.getRight() + 2, y);
+        this.editDescriptionButton.setPosition(this.setPreviewButton.getRight() + 2, y);
 
         y += 21;
         this.renameFileButton.setPosition(this.x + 10, y);
@@ -130,6 +136,56 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
             screen.setParent(this);
             openPopupScreen(screen);
         }
+    }
+
+    protected void editDescription()
+    {
+        SchematicInfo info = this.schematicInfoWidget.getSelectedSchematicInfo();
+
+        if (info != null)
+        {
+            SchematicMetadata meta = info.schematic.getMetadata();
+            String title = "litematica.title.screen.schematic_manager.edit_description";
+            // TODO use a TextAreaWidget once one has been implemented in malilib
+            TextInputScreen screen = new TextInputScreen(title, meta.getDescription(), this::setDescription);
+            screen.setParent(this);
+
+            // Opening the popup-screen will remove the current entry
+            // from the info widget, so cache it to this field
+            this.selectedSchematic = info;
+            openPopupScreen(screen);
+        }
+    }
+
+    protected boolean setDescription(String description)
+    {
+        if (this.selectedSchematic != null)
+        {
+            ISchematic schematic = this.selectedSchematic.schematic;
+            SchematicMetadata meta = schematic.getMetadata();
+            this.selectedSchematic = null;
+
+            if (Objects.equals(description, meta.getDescription()) == false)
+            {
+                meta.setDescription(description);
+                meta.setTimeModifiedToNowIfNotRecentlyCreated();
+
+                if (schematic.writeToFile(schematic.getFile(), true))
+                {
+                    MessageDispatcher.success("litematica.message.info.schematic_manager.description_set");
+                }
+                else
+                {
+                    MessageDispatcher.error("litematica.message.error.schematic_manager.failed_to_save_schematic");
+                }
+
+                this.onSchematicChange();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     protected void removePreview()
@@ -209,22 +265,27 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
             String title = "litematica.title.screen.schematic_manager.rename_schematic";
             TextInputScreen screen = new TextInputScreen(title, oldName, this::renameSchematicToName);
             screen.setParent(this);
+
+            // Opening the popup-screen will remove the current entry
+            // from the info widget, so cache it to this field
+            this.selectedSchematic = info;
             openPopupScreen(screen);
         }
     }
 
     protected boolean renameSchematicToName(String newName)
     {
-        SchematicInfo info = this.schematicInfoWidget.getSelectedSchematicInfo();
-
-        if (info != null)
+        if (this.selectedSchematic != null)
         {
             SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            ISchematic schematic = info.schematic;
-            String oldName = schematic.getMetadata().getName();
-            schematic.getMetadata().setName(newName);
-            schematic.getMetadata().setTimeModifiedToNow();
+            ISchematic schematic = this.selectedSchematic.schematic;
+            SchematicMetadata meta = schematic.getMetadata();
+            String oldName = meta.getName();
             Path file = schematic.getFile();
+
+            this.selectedSchematic = null;
+            meta.setName(newName);
+            meta.setTimeModifiedToNowIfNotRecentlyCreated();
 
             if (schematic.writeToFile(file, true))
             {
@@ -233,7 +294,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
                 for (ISchematic schematicTmp : list)
                 {
                     schematicTmp.getMetadata().setName(newName);
-                    schematicTmp.getMetadata().setTimeModifiedToNow();
+                    schematicTmp.getMetadata().setTimeModifiedToNowIfNotRecentlyCreated();
 
                     // Rename all placements that used the old schematic name (ie. were not manually renamed)
                     for (SchematicPlacement placement : manager.getAllPlacementsOfSchematic(schematicTmp))
@@ -245,6 +306,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
                     }
                 }
 
+                MessageDispatcher.success("litematica.message.info.schematic_manager.schematic_renamed");
                 this.onSchematicChange();
 
                 return true;
@@ -296,7 +358,7 @@ public class SchematicManagerScreen extends BaseSchematicBrowserScreen
             if (meta.getPreviewImagePixelData() != null)
             {
                 meta.setPreviewImagePixelData(null);
-                meta.setTimeModifiedToNow();
+                meta.setTimeModifiedToNowIfNotRecentlyCreated();
 
                 if (schematic.writeToFile(schematic.getFile(), true))
                 {
