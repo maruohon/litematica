@@ -21,7 +21,7 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.overlay.message.MessageOutput;
 import malilib.util.StringUtils;
 import malilib.util.data.ResultingStringConsumer;
-import litematica.gui.NormalModeAreaEditorScreen;
+import litematica.gui.MultiRegionModeAreaEditorScreen;
 import litematica.selection.AreaSelection;
 import litematica.selection.SelectionManager;
 import litematica.selection.SelectionMode;
@@ -184,7 +184,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
     {
         if (this.selection != null)
         {
-            NormalModeAreaEditorScreen gui = new NormalModeAreaEditorScreen(this.selection);
+            MultiRegionModeAreaEditorScreen gui = new MultiRegionModeAreaEditorScreen(this.selection);
             gui.setParent(GuiUtils.getCurrentScreen());
             BaseScreen.openScreen(gui);
         }

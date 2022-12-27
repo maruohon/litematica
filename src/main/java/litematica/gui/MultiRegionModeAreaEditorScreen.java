@@ -25,7 +25,7 @@ import litematica.selection.AreaSelection;
 import litematica.selection.Box;
 import litematica.selection.SelectionManager;
 
-public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<String>>
+public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidget<String>>
 {
     protected final AreaSelection selection;
     protected final LabelWidget areaNameLabel;
@@ -42,7 +42,7 @@ public class NormalModeAreaEditorScreen extends BaseListScreen<DataListWidget<St
     protected final BlockPosEditWidget originEditWidget;
     protected final CheckBoxWidget originCheckbox;
 
-    public NormalModeAreaEditorScreen(AreaSelection selection)
+    public MultiRegionModeAreaEditorScreen(AreaSelection selection)
     {
         super(10, 106, 20, 129);
 

@@ -32,7 +32,7 @@ import malilib.util.position.PositionUtils;
 import litematica.Litematica;
 import litematica.config.Configs;
 import litematica.data.DataManager;
-import litematica.gui.NormalModeAreaEditorScreen;
+import litematica.gui.MultiRegionModeAreaEditorScreen;
 import litematica.gui.SimpleModeAreaEditorScreen;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.projects.SchematicProject;
@@ -729,7 +729,7 @@ public class SelectionManager
 
         if (this.getSelectionMode() == SelectionMode.MULTI_REGION)
         {
-            return new NormalModeAreaEditorScreen(selection);
+            return new MultiRegionModeAreaEditorScreen(selection);
         }
         else if (this.getSelectionMode() == SelectionMode.SIMPLE)
         {
