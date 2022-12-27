@@ -51,7 +51,7 @@ public class SchematicVerifierTask extends TaskProcessChunkBase
         }
 
         this.boxesInChunks.putAll(boxesInChunks);
-        this.requiredChunks.addAll(this.boxesInChunks.keySet());
+        this.requiredChunks.addAll(boxesInChunks.keySet());
     }
 
     @Override

@@ -67,7 +67,7 @@ public class SchematicVerifier implements IInfoHudRenderer
     @Nullable protected TaskCompletionListener completionListener;
     @Nullable protected EventListener statusChangeListener;
     @Nullable BlockPos lastSortPosition;
-    protected boolean autoRefresh = true;
+    protected boolean autoRefresh;
     protected boolean countsDirty;
     protected boolean infoHudEnabled;
     protected boolean selectedClosestPositionsDirty;
