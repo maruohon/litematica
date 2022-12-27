@@ -8,7 +8,6 @@ import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.BaseScreen;
 import malilib.gui.TextInputScreen;
-import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import malilib.gui.widget.list.entry.DataListEntryWidgetData;
@@ -122,9 +121,7 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
 
     protected void openConfigurationMenu()
     {
-        AreaSubRegionEditScreen screen = new AreaSubRegionEditScreen(this.selection);
-        screen.setParent(GuiUtils.getCurrentScreen());
-        BaseScreen.openScreen(screen);
+        BaseScreen.openScreenWithParent(new AreaSubRegionEditScreen(this.selection));
     }
 
     protected void removeRegion()
@@ -143,9 +140,7 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
         {
             String title = "litematica.title.screen.area_editor.rename_sub_region";
             String name = box.getName();
-            TextInputScreen screen = new TextInputScreen(title, name, this::renameRegionTo);
-            screen.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openPopupScreen(screen);
+            BaseScreen.openPopupScreenWithCurrentScreenAsParent(new TextInputScreen(title, name, this::renameRegionTo));
         }
     }
 

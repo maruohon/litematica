@@ -8,7 +8,6 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.BaseScreen;
-import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.BlockPosEditWidget;
 import malilib.gui.widget.CheckBoxWidget;
 import malilib.gui.widget.LabelWidget;
@@ -161,9 +160,7 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
 
     protected void openPlacementSettings()
     {
-        SchematicPlacementSettingsScreen screen = new SchematicPlacementSettingsScreen(this.placement);
-        screen.setParent(GuiUtils.getCurrentScreen());
-        BaseScreen.openScreen(screen);
+        BaseScreen.openScreenWithParent(new SchematicPlacementSettingsScreen(this.placement));
     }
 
     protected void setOrigin(BlockPos origin)

@@ -200,7 +200,6 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
 
     protected void openSaveSchematicScreen()
     {
-        SaveSchematicFromAreaScreen screen = new SaveSchematicFromAreaScreen(this.selection);
-        openScreen(screen);
+        openScreen(new SaveSchematicFromAreaScreen(this.selection));
     }
 }

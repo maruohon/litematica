@@ -224,7 +224,6 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
 
     protected void openSaveSchematicScreen()
     {
-        SaveSchematicFromAreaScreen screen = new SaveSchematicFromAreaScreen(this.selection);
-        BaseScreen.openScreen(screen);
+        BaseScreen.openScreen(new SaveSchematicFromAreaScreen(this.selection));
     }
 }

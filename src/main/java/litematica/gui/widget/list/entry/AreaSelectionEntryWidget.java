@@ -184,9 +184,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
     {
         if (this.selection != null)
         {
-            MultiRegionModeAreaEditorScreen gui = new MultiRegionModeAreaEditorScreen(this.selection);
-            gui.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(gui);
+            BaseScreen.openScreenWithParent(new MultiRegionModeAreaEditorScreen(this.selection));
         }
     }
 
@@ -198,9 +196,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
             String selectionName = this.selection.getName();
             String title = StringUtils.translate(titleKey, selectionName);
             ResultingStringConsumer callback = (str) -> this.renameSelectionUsingName(str, true);
-            TextInputScreen screen = new TextInputScreen(title, selectionName, callback);
-            screen.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openPopupScreen(screen);
+            BaseScreen.openPopupScreenWithCurrentScreenAsParent(new TextInputScreen(title, selectionName, callback));
         }
         else
         {
@@ -213,9 +209,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         String title = "litematica.title.screen.area_selection_browser.rename_selection";
         String name = this.selection != null ? this.selection.getName() : "<error>";
         ResultingStringConsumer callback = (str) -> this.renameSelectionUsingName(str, false);
-        TextInputScreen screen = new TextInputScreen(title, name, callback);
-        screen.setParent(GuiUtils.getCurrentScreen());
-        BaseScreen.openPopupScreen(screen);
+        BaseScreen.openPopupScreenWithCurrentScreenAsParent(new TextInputScreen(title, name, callback));
     }
 
     protected boolean renameSelectionUsingName(String name, boolean copy)

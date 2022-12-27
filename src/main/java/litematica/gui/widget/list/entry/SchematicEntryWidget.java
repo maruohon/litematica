@@ -11,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import malilib.gui.BaseScreen;
 import malilib.gui.icon.Icon;
 import malilib.gui.icon.MultiIcon;
-import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.BaseFileBrowserWidget;
@@ -186,10 +185,7 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
 
     protected void saveToFile()
     {
-        ISchematic schematic = this.getData();
-        SaveConvertSchematicScreen screen = new SaveConvertSchematicScreen(schematic, true);
-        screen.setParent(GuiUtils.getCurrentScreen());
-        BaseScreen.openScreen(screen);
+        BaseScreen.openScreenWithParent(new SaveConvertSchematicScreen(this.getData(), true));
     }
 
     protected void unloadSchematic()

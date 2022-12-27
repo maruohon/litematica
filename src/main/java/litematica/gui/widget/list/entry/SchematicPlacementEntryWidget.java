@@ -11,7 +11,6 @@ import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.BaseScreen;
 import malilib.gui.icon.Icon;
-import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
@@ -236,9 +235,7 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
     {
         if (this.loadedPlacement != null)
         {
-            SchematicPlacementSettingsScreen screen = new SchematicPlacementSettingsScreen(this.loadedPlacement);
-            screen.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(screen);
+            BaseScreen.openScreenWithParent(new SchematicPlacementSettingsScreen(this.loadedPlacement));
         }
     }
 

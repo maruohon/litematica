@@ -150,8 +150,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
         {
             DataManager.getSchematicProjectsManager().createAndOpenProject(dir, projectName);
             SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-            SchematicVcsProjectManagerScreen screen = new SchematicVcsProjectManagerScreen(project);
-            BaseScreen.openScreen(screen);
+            BaseScreen.openScreen(new SchematicVcsProjectManagerScreen(project));
             MessageDispatcher.generic("litematica.message.info.schematic_vcs.project_created", projectName);
 
             return true;
@@ -202,8 +201,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
 
             if (project != null)
             {
-                SchematicVcsProjectManagerScreen screen = new SchematicVcsProjectManagerScreen(project);
-                BaseScreen.openScreen(screen);
+                BaseScreen.openScreen(new SchematicVcsProjectManagerScreen(project));
                 MessageDispatcher.success("litematica.message.info.schematic_vcs.project_loaded", project.getName());
             }
             else
@@ -219,8 +217,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
 
         if (project != null)
         {
-            SchematicVcsProjectManagerScreen screen = new SchematicVcsProjectManagerScreen(project);
-            BaseScreen.openScreen(screen);
+            BaseScreen.openScreen(new SchematicVcsProjectManagerScreen(project));
         }
     }
 }

@@ -7,7 +7,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.BaseScreen;
-import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
@@ -101,9 +100,7 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
 
     protected void openConfigurationMenu()
     {
-        SchematicPlacementSubRegionSettingsScreen screen = new SchematicPlacementSubRegionSettingsScreen(this.placement, this.data);
-        screen.setParent(GuiUtils.getCurrentScreen());
-        BaseScreen.openScreen(screen);
+        BaseScreen.openScreenWithParent(new SchematicPlacementSubRegionSettingsScreen(this.placement, this.data));
     }
 
     protected void toggleEnabled()

@@ -26,7 +26,6 @@ import net.minecraft.world.WorldServer;
 
 import malilib.gui.BaseScreen;
 import malilib.gui.TextInputScreen;
-import malilib.gui.util.GuiUtils;
 import malilib.input.ActionResult;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
@@ -91,22 +90,18 @@ public class SchematicCreationUtils
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
                 TextInputScreen screen = new TextInputScreen(title, project.getCurrentVersionName(),
                                                              DataManager.getSchematicProjectsManager()::commitNewVersion);
-                screen.setParent(GuiUtils.getCurrentScreen());
-                BaseScreen.openPopupScreen(screen);
+                BaseScreen.openPopupScreenWithCurrentScreenAsParent(screen);
             }
             else if (inMemoryOnly)
             {
                 String title = "litematica.title.screen.save_in_memory_schematic";
                 TextInputScreen screen = new TextInputScreen(title, area.getName(),
                                                              (str) -> saveInMemorySchematic(str, area));
-                screen.setParent(GuiUtils.getCurrentScreen());
-                BaseScreen.openPopupScreen(screen);
+                BaseScreen.openPopupScreenWithCurrentScreenAsParent(screen);
             }
             else
             {
-                SaveSchematicFromAreaScreen screen = new SaveSchematicFromAreaScreen(area);
-                screen.setParent(GuiUtils.getCurrentScreen());
-                BaseScreen.openScreen(screen);
+                BaseScreen.openScreenWithParent(new SaveSchematicFromAreaScreen(area));
             }
 
             return ActionResult.SUCCESS;

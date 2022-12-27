@@ -15,7 +15,6 @@ import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.BaseScreen;
 import malilib.gui.StringListSelectionScreen;
-import malilib.gui.util.GuiUtils;
 import malilib.util.data.ItemType;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.inventory.InventoryUtils;
@@ -166,8 +165,7 @@ public class MaterialListUtils
             StringListSelectionScreen screen = new StringListSelectionScreen(schematic.getRegionNames(),
                                                     (strings) -> createMaterialListOfRegions(schematic, strings));
             screen.setTitle("litematica.title.screen.material_list.select_schematic_regions", schematic.getMetadata().getName());
-            screen.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(screen);
+            BaseScreen.openScreenWithParent(screen);
         }
         else
         {

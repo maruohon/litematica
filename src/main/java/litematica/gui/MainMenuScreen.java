@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import malilib.gui.BaseScreen;
-import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.InteractableWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.util.StringUtils;
@@ -157,9 +156,7 @@ public class MainMenuScreen extends BaseScreen
 
     public static void openMainMenuScreen()
     {
-        MainMenuScreen screen = new MainMenuScreen();
-        //screen.setParent(GuiUtils.getCurrentScreen());
-        BaseScreen.openScreen(screen);
+        BaseScreen.openScreen(new MainMenuScreen());
     }
 
     public static void openSchematicProjectsScreen()
@@ -168,15 +165,11 @@ public class MainMenuScreen extends BaseScreen
 
         if (project != null)
         {
-            SchematicVcsProjectManagerScreen screen = new SchematicVcsProjectManagerScreen(project);
-            screen.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(screen);
+            BaseScreen.openScreenWithParent(new SchematicVcsProjectManagerScreen(project));
         }
         else
         {
-            SchematicVcsProjectBrowserScreen screen = new SchematicVcsProjectBrowserScreen();
-            screen.setParent(GuiUtils.getCurrentScreen());
-            BaseScreen.openScreen(screen);
+            BaseScreen.openScreenWithParent(new SchematicVcsProjectBrowserScreen());
         }
     }
 
