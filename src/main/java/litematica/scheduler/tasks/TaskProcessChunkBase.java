@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 import malilib.config.value.LayerMode;
 import malilib.util.StringUtils;
 import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
 import litematica.render.infohud.InfoHud;
@@ -32,8 +33,8 @@ public abstract class TaskProcessChunkBase extends TaskBase
     {
         super();
 
-        this.worldClient = this.mc.world;
-        this.world = WorldUtils.getBestWorld(this.mc);
+        this.worldClient = GameUtils.getClientWorld();
+        this.world = WorldUtils.getBestWorld();
         this.isClientWorld = (this.world == this.mc.world);
         this.name = StringUtils.translate(nameOnHud);
 

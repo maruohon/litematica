@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -20,6 +19,7 @@ import malilib.render.ShapeRenderUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.ItemType;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.inventory.InventoryScreenUtils;
 import litematica.config.Configs;
 import litematica.data.DataManager;
@@ -28,7 +28,6 @@ import litematica.render.infohud.RenderPhase;
 
 public class MaterialListHudRenderer implements IInfoHudRenderer
 {
-    protected final Minecraft mc = Minecraft.getMinecraft();
     protected final MaterialListBase materialList;
     protected final MaterialListSorter sorter;
     protected boolean shouldRender;
@@ -73,9 +72,9 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     {
         long currentTime = System.currentTimeMillis();
 
-        if (currentTime - this.lastUpdateTime > refreshInterval && this.mc.player != null)
+        if (currentTime - this.lastUpdateTime > refreshInterval && GameUtils.getClientPlayer() != null)
         {
-            MaterialListUtils.updateAvailableCounts(this.materialList.getAllMaterials(), this.mc.player);
+            MaterialListUtils.updateAvailableCounts(this.materialList.getAllMaterials());
             List<MaterialListEntry> list = this.materialList.getMissingMaterials(true);
             list.sort(this.sorter);
             this.lastUpdateTime = currentTime;
@@ -94,7 +93,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             return 0;
         }
 
-        FontRenderer font = this.mc.fontRenderer;
+        FontRenderer font = GameUtils.getClient().fontRenderer;
         final double scale = Configs.InfoOverlays.MATERIAL_LIST_HUD_SCALE.getDoubleValue();
         final int maxLines = Configs.InfoOverlays.MATERIAL_LIST_HUD_MAX_LINES.getIntegerValue();
         int bgMargin = 2;
@@ -144,7 +143,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         }
 
         posY = GuiUtils.getHudPosY(posY, yOffset, contentHeight, scale, alignment);
-        posY += GuiUtils.getHudOffsetForPotions(alignment, scale, this.mc.player);
+        posY += GuiUtils.getHudOffsetForPotions(alignment, scale, GameUtils.getClientPlayer());
 
         if (scale != 1d)
         {
@@ -208,7 +207,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         for (int i = 0; i < size; ++i)
         {
-            this.mc.getRenderItem().renderItemAndEffectIntoGUI(this.mc.player, list.get(i).getStack(), x, y);
+            GameUtils.getClient().getRenderItem().renderItemAndEffectIntoGUI(GameUtils.getClientPlayer(), list.get(i).getStack(), x, y);
             y += lineHeight;
         }
 

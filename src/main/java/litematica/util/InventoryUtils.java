@@ -7,11 +7,11 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.tileentity.TileEntity;
@@ -77,17 +77,18 @@ public class InventoryUtils
         }
     }
 
-    public static boolean switchItemToHand(ItemStack stack, boolean ignoreNbt, Minecraft mc)
+    public static boolean switchItemToHand(ItemStack stack, boolean ignoreNbt)
     {
         if (PICK_BLOCKABLE_SLOTS.size() == 0)
         {
             return false;
         }
 
-        EntityPlayer player = mc.player;
-        InventoryPlayer inventory = player.inventory;
+        EntityPlayer player = GameUtils.getClientPlayer();
+        InventoryPlayer inventory = GameUtils.getPlayerInventory();
+        Container container = GameUtils.getCurrentInventoryContainer();
         boolean isCreativeMode = GameUtils.isCreativeMode();
-        int slotWithItem = malilib.util.inventory.InventoryUtils.findSlotWithItemToPickBlock(player.openContainer, stack, ignoreNbt);
+        int slotWithItem = malilib.util.inventory.InventoryUtils.findSlotWithItemToPickBlock(container, stack, ignoreNbt);
 
         // No item or no place to put it
         if (slotWithItem == -1 && isCreativeMode == false)
@@ -110,7 +111,7 @@ public class InventoryUtils
 
         if (slotWithItem != -1)
         {
-            malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotWithItem, hotbarSlot);
+            malilib.util.inventory.InventoryUtils.swapSlots(container, slotWithItem, hotbarSlot);
             inventory.currentItem = hotbarSlot;
             return true;
         }
@@ -122,7 +123,7 @@ public class InventoryUtils
             if (ItemWrap.notEmpty(inventory.getStackInSlot(hotbarSlot)))
             {
                 // Shift click the stack
-                mc.playerController.windowClick(player.openContainer.windowId, slotNum, 0, ClickType.QUICK_MOVE, player);
+                GameUtils.getInteractionManager().windowClick(container.windowId, slotNum, 0, ClickType.QUICK_MOVE, player);
 
                 // Wasn't able to move the items out
                 if (ItemWrap.notEmpty(inventory.getStackInSlot(hotbarSlot)))
@@ -132,17 +133,17 @@ public class InventoryUtils
                     // The off-hand slot is empty, move the current stack to it
                     if (ItemWrap.isEmpty(player.getHeldItemOffhand()))
                     {
-                        malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
-                        malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, 45, 0);
-                        malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                        malilib.util.inventory.InventoryUtils.swapSlots(container, slotNum, 0);
+                        malilib.util.inventory.InventoryUtils.swapSlots(container, 45, 0);
+                        malilib.util.inventory.InventoryUtils.swapSlots(container, slotNum, 0);
                     }
                 }
             }
 
             inventory.currentItem = hotbarSlot;
-
             inventory.mainInventory.set(hotbarSlot, stack.copy());
-            mc.playerController.sendSlotPacket(stack.copy(), slotNum);
+            GameUtils.getInteractionManager().sendSlotPacket(stack.copy(), slotNum);
+
             return true;
         }
 
@@ -153,15 +154,15 @@ public class InventoryUtils
      * Does a ray trace to the schematic world, and returns either the closest or the furthest hit block.
      * @return true if the correct item was or is in the player's hand after the pick block
      */
-    public static boolean pickBlockFirst(Minecraft mc)
+    public static boolean pickBlockFirst()
     {
-        double reach = mc.playerController.getBlockReachDistance();
+        double reach = GameUtils.getInteractionManager().getBlockReachDistance();
         Entity entity = GameUtils.getCameraEntity();
-        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, entity, reach);
+        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(GameUtils.getClientWorld(), entity, reach);
 
         if (pos != null)
         {
-            doPickBlockForPosition(pos, mc);
+            doPickBlockForPosition(pos);
             return true;
         }
 
@@ -169,25 +170,26 @@ public class InventoryUtils
     }
 
     @Nullable
-    public static EnumHand pickBlockLast(boolean adjacentOnly, Minecraft mc)
+    public static EnumHand pickBlockLast(boolean adjacentOnly)
     {
+        World world = GameUtils.getClientWorld();
         BlockPos pos = Registry.BLOCK_PLACEMENT_POSITION_HANDLER.getCurrentPlacementPosition();
 
         // No overrides by other mods
         if (pos == null)
         {
-            double reach = mc.playerController.getBlockReachDistance();
+            double reach = GameUtils.getInteractionManager().getBlockReachDistance();
             Entity entity = GameUtils.getCameraEntity();
-            pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, reach, adjacentOnly);
+            pos = RayTraceUtils.getPickBlockLastTrace(world, entity, reach, adjacentOnly);
         }
 
         if (pos != null)
         {
-            IBlockState state = mc.world.getBlockState(pos);
+            IBlockState state = world.getBlockState(pos);
 
-            if (state.getBlock().isReplaceable(mc.world, pos) || state.getMaterial().isReplaceable())
+            if (state.getBlock().isReplaceable(world, pos) || state.getMaterial().isReplaceable())
             {
-                return doPickBlockForPosition(pos, mc);
+                return doPickBlockForPosition(pos);
             }
         }
 
@@ -195,7 +197,7 @@ public class InventoryUtils
     }
 
     @Nullable
-    public static EnumHand doPickBlockForPosition(BlockPos pos, Minecraft mc)
+    public static EnumHand doPickBlockForPosition(BlockPos pos)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
         IBlockState state = world.getBlockState(pos);
@@ -215,14 +217,14 @@ public class InventoryUtils
                     // The creative mode pick block with NBT only works correctly
                     // if the server world doesn't have a TileEntity in that position.
                     // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (BaseScreen.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
+                    if (BaseScreen.isCtrlDown() && te != null && GameUtils.getClientWorld().isAirBlock(pos))
                     {
                         stack = stack.copy();
                         ItemUtils.storeBlockEntityInStack(stack, te);
                     }
                 }
 
-                return doPickBlockForStack(stack, mc);
+                return doPickBlockForStack(stack);
             }
 
             return hand;
@@ -232,15 +234,15 @@ public class InventoryUtils
     }
 
     @Nullable
-    public static EnumHand doPickBlockForStack(ItemStack stack, Minecraft mc)
+    public static EnumHand doPickBlockForStack(ItemStack stack)
     {
-        EntityPlayer player = mc.player;
+        EntityPlayer player = GameUtils.getClientPlayer();
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
         EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
 
         if (ItemWrap.notEmpty(stack) && hand == null)
         {
-            switchItemToHand(stack, ignoreNbt, mc);
+            switchItemToHand(stack, ignoreNbt);
             hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
         }
 

@@ -8,14 +8,14 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.BaseScreen;
 import malilib.gui.StringListSelectionScreen;
 import malilib.util.data.ItemType;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.inventory.InventoryUtils;
 import litematica.config.Configs;
@@ -78,16 +78,13 @@ public class MaterialListUtils
             }
         }
 
-        Minecraft mc = Minecraft.getMinecraft();
-
-        return getMaterialList(countsTotal, countsTotal, new Object2LongOpenHashMap<>(), mc.player);
+        return getMaterialList(countsTotal, countsTotal, new Object2LongOpenHashMap<>());
     }
 
     public static List<MaterialListEntry> getMaterialList(
             Object2LongOpenHashMap<IBlockState> countsTotal,
             Object2LongOpenHashMap<IBlockState> countsMissing,
-            Object2LongOpenHashMap<IBlockState> countsMismatch,
-            EntityPlayer player)
+            Object2LongOpenHashMap<IBlockState> countsMismatch)
     {
         List<MaterialListEntry> list = new ArrayList<>();
 
@@ -102,7 +99,8 @@ public class MaterialListUtils
             convertStatesToStacks(countsMissing, itemTypesMissing, cache);
             convertStatesToStacks(countsMismatch, itemTypesMismatch, cache);
 
-            Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.inventory);
+            IInventory playerInv = GameUtils.getPlayerInventory();
+            Object2IntOpenHashMap<ItemType> playerInvItems = playerInv != null ? InventoryUtils.getInventoryItemCounts(playerInv) : new Object2IntOpenHashMap<>();
 
             for (ItemType type : itemTypesTotal.keySet())
             {
@@ -146,9 +144,9 @@ public class MaterialListUtils
         }
     }
 
-    public static void updateAvailableCounts(List<MaterialListEntry> list, EntityPlayer player)
+    public static void updateAvailableCounts(List<MaterialListEntry> list)
     {
-        Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.inventory);
+        Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(GameUtils.getClientPlayer().inventory);
 
         for (MaterialListEntry entry : list)
         {

@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
@@ -14,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.IntBoundingBox;
 import litematica.render.infohud.InfoHud;
@@ -84,7 +84,8 @@ public class TaskFillArea extends TaskProcessChunkBase
     @Override
     protected boolean canProcessChunk(ChunkPos pos)
     {
-        return this.mc.player != null && this.areSurroundingChunksLoaded(pos, this.worldClient, 1);
+        return GameUtils.getClientPlayer() != null &&
+               this.areSurroundingChunksLoaded(pos, this.worldClient, 1);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (this.isClientWorld && this.chunkCount == 0)
         {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback false");
+            GameUtils.sendCommand("/gamerule sendCommandFeedback false");
         }
 
         for (IntBoundingBox box : this.getBoxesInChunk(pos))
@@ -117,15 +118,8 @@ public class TaskFillArea extends TaskProcessChunkBase
         if (removeEntities)
         {
             AxisAlignedBB aabb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
-            List<Entity> entities = this.world.getEntitiesInAABBexcluding(this.mc.player, aabb, EntityUtils.NOT_PLAYER);
-
-            for (Entity entity : entities)
-            {
-                if ((entity instanceof EntityPlayer) == false)
-                {
-                    entity.setDead();
-                }
-            }
+            List<Entity> entities = this.world.getEntitiesInAABBexcluding(null, aabb, EntityUtils.NOT_PLAYER);
+            entities.forEach(Entity::setDead);
         }
 
         try
@@ -172,20 +166,20 @@ public class TaskFillArea extends TaskProcessChunkBase
         {
             AxisAlignedBB aabb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
 
-            if (this.world.getEntitiesInAABBexcluding(this.mc.player, aabb, EntityUtils.NOT_PLAYER).size() > 0)
+            if (this.world.getEntitiesInAABBexcluding(null, aabb, EntityUtils.NOT_PLAYER).size() > 0)
             {
                 String killCmd = String.format("/kill @e[type=!player,x=%d,y=%d,z=%d,dx=%d,dy=%d,dz=%d]",
                         box.minX               , box.minY               , box.minZ,
                         box.maxX - box.minX + 1, box.maxY - box.minY + 1, box.maxZ - box.minZ + 1);
 
-                this.mc.player.sendChatMessage(killCmd);
+                GameUtils.sendCommand(killCmd);
             }
         }
 
         String fillCmd = String.format("/fill %d %d %d %d %d %d %s",
                 box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, this.blockString);
 
-        this.mc.player.sendChatMessage(fillCmd);
+        GameUtils.sendCommand(fillCmd);
     }
 
     @Override
@@ -193,9 +187,9 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         this.printCompletionMessage();
 
-        if (this.isClientWorld && this.mc.player != null)
+        if (this.isClientWorld)
         {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback true");
+            GameUtils.sendCommand("/gamerule sendCommandFeedback true");
         }
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);

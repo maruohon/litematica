@@ -1,6 +1,5 @@
 package litematica.config;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
@@ -35,18 +34,10 @@ import litematica.world.SchematicWorldRenderingNotifier;
 
 public class HotkeyCallbackMisc implements HotkeyCallback
 {
-    private final Minecraft mc;
-
-    public HotkeyCallbackMisc(Minecraft mc)
-    {
-        this.mc = mc;
-    }
-
     @Override
     public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
-        if (this.mc.player == null || this.mc.world == null ||
-            GameUtils.getCameraEntity() == null)
+        if (GameUtils.getCameraEntity() == null || GameUtils.getClientWorld() == null)
         {
             return ActionResult.FAIL;
         }
@@ -57,7 +48,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         {
             if (mode.getUsesAreaSelection())
             {
-                DataManager.getSelectionManager().createNewSubRegion(this.mc, true);
+                DataManager.getSelectionManager().createNewSubRegion(true);
                 return ActionResult.SUCCESS;
             }
         }
@@ -115,7 +106,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             boolean toolEnabled = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
             if (Configs.Generic.EXECUTE_REQUIRE_TOOL.getBooleanValue()
-                && (EntityUtils.hasToolItem(this.mc.player) == false || toolEnabled == false))
+                && (EntityUtils.hasToolItem() == false || toolEnabled == false))
             {
                 String keyRenderToggle = Configs.Visuals.MAIN_RENDERING_TOGGLE.getKeyBind().getKeysDisplayString();
                 String keyToolToggle = Configs.Generic.TOOL_ITEM_ENABLED.getKeyBind().getKeysDisplayString();
@@ -140,12 +131,12 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             }
             else if (mode == ToolMode.FILL && mode.getPrimaryBlock() != null)
             {
-                ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), null);
+                ToolUtils.fillSelectionVolumes(mode.getPrimaryBlock(), null);
                 return ActionResult.SUCCESS;
             }
             else if (mode == ToolMode.REPLACE_BLOCK && mode.getPrimaryBlock() != null && mode.getSecondaryBlock() != null)
             {
-                ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), mode.getSecondaryBlock());
+                ToolUtils.fillSelectionVolumes(mode.getPrimaryBlock(), mode.getSecondaryBlock());
                 return ActionResult.SUCCESS;
             }
             else if (mode == ToolMode.DELETE)
@@ -224,8 +215,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeyBind())
         {
-            if (EntityUtils.shouldPickBlock(this.mc.player) &&
-                InventoryUtils.pickBlockFirst(this.mc))
+            if (EntityUtils.shouldPickBlock() && InventoryUtils.pickBlockFirst())
             {
                 return ActionResult.SUCCESS;
             }
@@ -240,9 +230,9 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             // since in that case it's done from the vanilla right click handling code.
             if (DataManager.getToolMode() != ToolMode.SCHEMATIC_EDIT &&
                 Configs.Generic.PICK_BLOCK_AUTO.getBooleanValue() == false &&
-                EntityUtils.shouldPickBlock(this.mc.player))
+                EntityUtils.shouldPickBlock())
             {
-                InventoryUtils.pickBlockLast(true, this.mc);
+                InventoryUtils.pickBlockLast(true);
                 return ActionResult.SUCCESS;
             }
 
@@ -293,7 +283,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.SCHEMATIC_EDIT_ACCEPT_REPLACEMENT.getKeyBind())
         {
-            SchematicEditUtils.rebuildAcceptReplacement(this.mc);
+            SchematicEditUtils.rebuildAcceptReplacement();
             return ActionResult.SUCCESS;
         }
         else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeyBind())

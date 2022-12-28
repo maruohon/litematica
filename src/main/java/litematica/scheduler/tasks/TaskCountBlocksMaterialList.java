@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.ChunkPos;
 
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.LayerRange;
 import litematica.data.DataManager;
 import litematica.materials.IMaterialList;
@@ -48,10 +49,10 @@ public abstract class TaskCountBlocksMaterialList extends TaskCountBlocksBase
     @Override
     protected void onStop()
     {
-        if (this.finished && this.mc.player != null)
+        if (this.finished && GameUtils.getClientPlayer() != null)
         {
             List<MaterialListEntry> list = MaterialListUtils.getMaterialList(
-                    this.countsTotal, this.countsMissing, this.countsMismatch, this.mc.player);
+                    this.countsTotal, this.countsMissing, this.countsMismatch);
             this.materialList.setMaterialListEntries(list);
         }
 

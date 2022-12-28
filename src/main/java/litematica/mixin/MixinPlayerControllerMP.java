@@ -1,8 +1,6 @@
 package litematica.mixin;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -15,8 +13,6 @@ import litematica.util.InventoryUtils;
 @Mixin(net.minecraft.client.multiplayer.PlayerControllerMP.class)
 public abstract class MixinPlayerControllerMP
 {
-    @Shadow @Final private net.minecraft.client.Minecraft mc;
-
     @Inject(method = "processRightClickBlock", at = @At("HEAD"), cancellable = true)
     private void onProcessRightlickBlock(
             net.minecraft.client.entity.EntityPlayerSP player,
@@ -32,7 +28,7 @@ public abstract class MixinPlayerControllerMP
         {
             if (EasyPlaceUtils.shouldDoEasyPlaceActions())
             {
-                if (EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc))
+                if (EasyPlaceUtils.handleEasyPlaceWithMessage())
                 {
                     cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
                 }
@@ -40,14 +36,14 @@ public abstract class MixinPlayerControllerMP
             else
             {
                 if (Configs.Generic.PICK_BLOCK_AUTO.getBooleanValue() &&
-                    EntityUtils.shouldPickBlock(player))
+                    EntityUtils.shouldPickBlock())
                 {
-                    InventoryUtils.pickBlockLast(true, this.mc);
+                    InventoryUtils.pickBlockLast(true);
                 }
 
                 if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
                 {
-                    if (EasyPlaceUtils.handlePlacementRestriction(this.mc))
+                    if (EasyPlaceUtils.handlePlacementRestriction())
                     {
                         cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
                     }
@@ -69,7 +65,7 @@ public abstract class MixinPlayerControllerMP
         if (EasyPlaceUtils.isHandling() == false)
         {
             if (EasyPlaceUtils.shouldDoEasyPlaceActions() &&
-                EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc))
+                EasyPlaceUtils.handleEasyPlaceWithMessage())
             {
                 cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
             }

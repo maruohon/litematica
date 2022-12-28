@@ -7,12 +7,12 @@ import javax.annotation.Nullable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.ChunkPos;
 
 import malilib.listener.TaskCompletionListener;
 import malilib.util.StringUtils;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import litematica.config.Configs;
 import litematica.render.infohud.IInfoHudRenderer;
 import litematica.render.infohud.InfoHud;
@@ -134,9 +134,8 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     protected void updateInfoHudLinesMissingChunks(Set<ChunkPos> requiredChunks)
     {
         List<String> hudLines = new ArrayList<>();
-        EntityPlayer player = this.mc.player;
 
-        if (player != null && requiredChunks.isEmpty() == false)
+        if (GameUtils.getClientPlayer() != null && requiredChunks.isEmpty() == false)
         {
             List<ChunkPos> list = new ArrayList<>(requiredChunks);
             PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(EntityWrap.getPlayerBlockPos());

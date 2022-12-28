@@ -1,7 +1,5 @@
 package litematica.scheduler;
 
-import net.minecraft.client.Minecraft;
-
 import malilib.util.game.wrap.GameUtils;
 import litematica.data.DataManager;
 import litematica.input.MouseScrollHandlerImpl;
@@ -14,9 +12,8 @@ public class ClientTickHandler implements malilib.event.ClientTickHandler
     @Override
     public void onClientTick()
     {
-        Minecraft mc = GameUtils.getClient();
-        MouseScrollHandlerImpl.onTick(mc);
-        DataManager.getRenderLayerRange().followPlayerIfEnabled(mc.player);
+        MouseScrollHandlerImpl.onTick();
+        DataManager.getRenderLayerRange().followPlayerIfEnabled(GameUtils.getClientPlayer());
         DataManager.getSchematicPlacementManager().processQueuedChunks();
         TaskScheduler.getInstanceClient().runTasks();
 

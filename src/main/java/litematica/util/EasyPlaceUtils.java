@@ -17,7 +17,8 @@ import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -116,20 +117,20 @@ public class EasyPlaceUtils
                Hotkeys.EASY_PLACE_ACTIVATION.getKeyBind().isKeyBindHeld();
     }
 
-    public static void easyPlaceOnUseTick(Minecraft mc)
+    public static void easyPlaceOnUseTick()
     {
-        if (mc.player != null && isHandling == false &&
+        if (GameUtils.getClientPlayer() != null && isHandling == false &&
             shouldDoEasyPlaceActions() &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
-            Keys.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
+            Keys.isKeyDown(GameUtils.getOptions().keyBindUseItem.getKeyCode()))
         {
             isHandling = true;
-            handleEasyPlace(mc);
+            handleEasyPlace();
             isHandling = false;
         }
     }
 
-    public static boolean handleEasyPlaceWithMessage(Minecraft mc)
+    public static boolean handleEasyPlaceWithMessage()
     {
         if (isHandling)
         {
@@ -137,7 +138,7 @@ public class EasyPlaceUtils
         }
 
         isHandling = true;
-        EnumActionResult result = handleEasyPlace(mc);
+        EnumActionResult result = handleEasyPlace();
         isHandling = false;
 
         // Only print the warning message once per right click
@@ -152,25 +153,25 @@ public class EasyPlaceUtils
         return result != EnumActionResult.PASS;
     }
 
-    public static void onRightClickTail(Minecraft mc)
+    public static void onRightClickTail()
     {
         // If the click wasn't handled yet, handle it now.
         // This is only called when right clicking on air with an empty hand,
         // as in that case neither the processRightClickBlock nor the processRightClick method get called.
         if (isFirstClickEasyPlace)
         {
-            handleEasyPlaceWithMessage(mc);
+            handleEasyPlaceWithMessage();
         }
     }
 
     @Nullable
-    private static HitPosition getTargetPosition(@Nullable RayTraceWrapper traceWrapper, Minecraft mc)
+    private static HitPosition getTargetPosition(@Nullable RayTraceWrapper traceWrapper)
     {
         BlockPos overriddenPos = Registry.BLOCK_PLACEMENT_POSITION_HANDLER.getCurrentPlacementPosition();
 
         if (overriddenPos != null)
         {
-            double reach = Math.max(6, mc.playerController.getBlockReachDistance());
+            double reach = Math.max(6, GameUtils.getInteractionManager().getBlockReachDistance());
             Entity entity = GameUtils.getCameraEntity();
             RayTraceResult trace = RayTraceUtils.traceToPositions(Collections.singletonList(overriddenPos), entity, reach);
             BlockPos pos = overriddenPos;
@@ -200,10 +201,10 @@ public class EasyPlaceUtils
     }
 
     @Nullable
-    private static HitPosition getAdjacentClickPosition(final BlockPos targetPos, Minecraft mc)
+    private static HitPosition getAdjacentClickPosition(final BlockPos targetPos)
     {
-        World world = mc.world;
-        double reach = Math.max(6, mc.playerController.getBlockReachDistance());
+        World world = GameUtils.getClientWorld();
+        double reach = Math.max(6, GameUtils.getInteractionManager().getBlockReachDistance());
         Entity entity = GameUtils.getCameraEntity();
         RayTraceResult traceVanilla = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
 
@@ -245,27 +246,31 @@ public class EasyPlaceUtils
     }
 
     @Nullable
-    private static HitPosition getClickPosition(HitPosition targetPosition, IBlockState stateSchematic, IBlockState stateClient, Minecraft mc)
+    private static HitPosition getClickPosition(HitPosition targetPosition,
+                                                IBlockState stateSchematic,
+                                                IBlockState stateClient)
     {
         boolean isSlab = stateSchematic.getBlock() instanceof BlockSlab;
 
         if (isSlab)
         {
-            return getClickPositionForSlab(targetPosition, stateSchematic, stateClient, mc);
+            return getClickPositionForSlab(targetPosition, stateSchematic, stateClient);
         }
 
         BlockPos targetBlockPos = targetPosition.getBlockPos();
         boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue();
 
-        return requireAdjacent ? getAdjacentClickPosition(targetBlockPos, mc) : targetPosition;
+        return requireAdjacent ? getAdjacentClickPosition(targetBlockPos) : targetPosition;
     }
 
     @Nullable
-    private static HitPosition getClickPositionForSlab(HitPosition targetPosition, IBlockState stateSchematic, IBlockState stateClient, Minecraft mc)
+    private static HitPosition getClickPositionForSlab(HitPosition targetPosition,
+                                                       IBlockState stateSchematic,
+                                                       IBlockState stateClient)
     {
         BlockSlab slab = (BlockSlab) stateSchematic.getBlock();
         BlockPos targetBlockPos = targetPosition.getBlockPos();
-        World worldClient = mc.world;
+        World worldClient = GameUtils.getClientWorld();
         boolean isDouble = slab.isDouble();
 
         if (isDouble)
@@ -376,19 +381,20 @@ public class EasyPlaceUtils
                 || stateSide.getValue(BlockSlab.HALF) != targetState.getValue(BlockSlab.HALF));
     }
 
-    private static EnumActionResult handleEasyPlace(Minecraft mc)
+    private static EnumActionResult handleEasyPlace()
     {
-        double reach = Math.max(6, mc.playerController.getBlockReachDistance());
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true, RayTraceFluidHandling.ANY);
-        HitPosition targetPosition = getTargetPosition(traceWrapper, mc);
+        WorldClient world = GameUtils.getClientWorld();
+        double reach = Math.max(6, GameUtils.getInteractionManager().getBlockReachDistance());
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(world, entity, reach, true, RayTraceFluidHandling.ANY);
+        HitPosition targetPosition = getTargetPosition(traceWrapper);
 
         // No position override, and didn't ray trace to a schematic block
         if (targetPosition == null)
         {
             if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
             {
-                return placementRestrictionInEffect(mc) ? EnumActionResult.FAIL : EnumActionResult.PASS;
+                return placementRestrictionInEffect() ? EnumActionResult.FAIL : EnumActionResult.PASS;
             }
 
             return EnumActionResult.PASS;
@@ -397,19 +403,19 @@ public class EasyPlaceUtils
         final BlockPos targetBlockPos = targetPosition.getBlockPos();
         World schematicWorld = SchematicWorldHandler.getSchematicWorld();
         IBlockState stateSchematic = schematicWorld.getBlockState(targetBlockPos);
-        IBlockState stateClient = mc.world.getBlockState(targetBlockPos).getActualState(mc.world, targetBlockPos);
+        IBlockState stateClient = world.getBlockState(targetBlockPos).getActualState(world, targetBlockPos);
         ItemStack requiredStack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
         // The block is correct already, or it was recently placed, or some of the checks failed
         if (stateSchematic == stateClient || ItemWrap.isEmpty(requiredStack) ||
             easyPlaceIsPositionCached(targetBlockPos) ||
-            canPlaceBlock(targetBlockPos, mc.world, stateSchematic, stateClient) == false)
+            canPlaceBlock(targetBlockPos, world, stateSchematic, stateClient) == false)
         {
             return EnumActionResult.FAIL;
         }
 
-        HitPosition clickPosition = getClickPosition(targetPosition, stateSchematic, stateClient, mc);
-        EnumHand hand = InventoryUtils.doPickBlockForStack(requiredStack, mc);
+        HitPosition clickPosition = getClickPosition(targetPosition, stateSchematic, stateClient);
+        EnumHand hand = InventoryUtils.doPickBlockForStack(requiredStack);
 
         // Didn't find a valid or safe click position, or was unable to pick block
         if (clickPosition == null || hand == null)
@@ -428,7 +434,7 @@ public class EasyPlaceUtils
             side = applyPlacementFacing(stateSchematic, side, stateClient);
 
             // Fluid _blocks_ are not replaceable... >_>
-            if (stateClient.getBlock().isReplaceable(mc.world, targetBlockPos) == false &&
+            if (stateClient.getBlock().isReplaceable(world, targetBlockPos) == false &&
                 stateClient.getMaterial().isLiquid())
             {
                 clickPos = clickPos.offset(side, -1);
@@ -441,35 +447,36 @@ public class EasyPlaceUtils
         }
 
         //System.out.printf("targetPos: %s, clickPos: %s side: %s, hit: %s\n", targetBlockPos, clickPos, side, hitPos);
-        stateClient = mc.world.getBlockState(clickPos);
+        stateClient = world.getBlockState(clickPos);
         boolean needsSneak = hasUseAction(stateClient.getBlock());
-        boolean didFakeSneak = needsSneak && EntityUtils.setFakedSneakingState(mc, true);
+        boolean didFakeSneak = needsSneak && EntityUtils.setFakedSneakingState(true);
+        EntityPlayerSP player = GameUtils.getClientPlayer();
 
-        if (mc.playerController.processRightClickBlock(mc.player, mc.world, clickPos, side, hitPos, hand) == EnumActionResult.SUCCESS)
+        if (GameUtils.getInteractionManager().processRightClickBlock(player, world, clickPos, side, hitPos, hand) == EnumActionResult.SUCCESS)
         {
             // Mark that this position has been handled (use the non-offset position that is checked above)
             cacheEasyPlacePosition(targetBlockPos);
 
-            mc.player.swingArm(hand);
-            mc.entityRenderer.itemRenderer.resetEquippedProgress(hand);
+            player.swingArm(hand);
+            GameUtils.getClient().entityRenderer.itemRenderer.resetEquippedProgress(hand);
 
             if (isSlab && ((BlockSlab) stateSchematic.getBlock()).isDouble())
             {
-                stateClient = mc.world.getBlockState(targetBlockPos).getActualState(mc.world, targetBlockPos);
+                stateClient = world.getBlockState(targetBlockPos).getActualState(world, targetBlockPos);
 
                 if (stateClient.getBlock() instanceof BlockSlab && ((BlockSlab) stateClient.getBlock()).isDouble() == false)
                 {
                     side = stateClient.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP ? EnumFacing.DOWN : EnumFacing.UP;
                     hitPos = new Vec3d(targetBlockPos.getX(), targetBlockPos.getY() + 0.5, targetBlockPos.getZ());
                     //System.out.printf("slab - pos: %s side: %s, hit: %s\n", pos, side, hitPos);
-                    mc.playerController.processRightClickBlock(mc.player, mc.world, targetBlockPos, side, hitPos, hand);
+                    GameUtils.getInteractionManager().processRightClickBlock(player, world, targetBlockPos, side, hitPos, hand);
                 }
             }
         }
 
         if (didFakeSneak)
         {
-            EntityUtils.setFakedSneakingState(mc, false);
+            EntityUtils.setFakedSneakingState(false);
         }
 
         return EnumActionResult.SUCCESS;
@@ -563,9 +570,9 @@ public class EasyPlaceUtils
      * in the schematic, or the player is holding the wrong item in hand, then true is returned
      * to indicate that the use action should be cancelled.
      */
-    public static boolean handlePlacementRestriction(Minecraft mc)
+    public static boolean handlePlacementRestriction()
     {
-        boolean cancel = placementRestrictionInEffect(mc);
+        boolean cancel = placementRestrictionInEffect();
 
         if (cancel && isFirstClickPlacementRestriction)
         {
@@ -585,21 +592,22 @@ public class EasyPlaceUtils
      * to indicate that the use action should be cancelled.
      * @return true if the use action should be cancelled
      */
-    private static boolean placementRestrictionInEffect(Minecraft mc)
+    private static boolean placementRestrictionInEffect()
     {
         Entity entity = GameUtils.getCameraEntity();
-        double reach = mc.playerController.getBlockReachDistance();
-        RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
+        World world = GameUtils.getClientWorld();
+        double reach = GameUtils.getInteractionManager().getBlockReachDistance();
+        RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
             BlockPos pos = trace.getBlockPos();
-            IBlockState stateClient = mc.world.getBlockState(pos);
+            IBlockState stateClient = world.getBlockState(pos);
 
-            if (stateClient.getBlock().isReplaceable(mc.world, pos) == false)
+            if (stateClient.getBlock().isReplaceable(world, pos) == false)
             {
                 pos = pos.offset(trace.sideHit);
-                stateClient = mc.world.getBlockState(pos);
+                stateClient = world.getBlockState(pos);
             }
 
             // The targeted position is far enough from any schematic sub-regions to not need handling
@@ -609,7 +617,7 @@ public class EasyPlaceUtils
             }
 
             // Placement position is already occupied
-            if (stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
+            if (stateClient.getBlock().isReplaceable(world, pos) == false &&
                 stateClient.getMaterial().isLiquid() == false)
             {
                 return true;
@@ -628,7 +636,7 @@ public class EasyPlaceUtils
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
-            return ItemWrap.isEmpty(stack) || EntityUtils.getUsedHandForItem(mc.player, stack, true) == null;
+            return ItemWrap.isEmpty(stack) || EntityUtils.getUsedHandForItem(GameUtils.getClientPlayer(), stack, true) == null;
         }
 
         return false;

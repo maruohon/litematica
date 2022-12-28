@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
@@ -741,7 +740,7 @@ public class PositionUtils
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
-        World world = Minecraft.getMinecraft().world;
+        World world = GameUtils.getClientWorld();
 
         if (area == null || world == null)
         {

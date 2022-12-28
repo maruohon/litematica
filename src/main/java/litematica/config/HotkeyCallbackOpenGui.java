@@ -1,7 +1,5 @@
 package litematica.config;
 
-import net.minecraft.client.Minecraft;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.config.BaseConfigScreen;
 import malilib.input.ActionResult;
@@ -9,6 +7,7 @@ import malilib.input.KeyAction;
 import malilib.input.KeyBind;
 import malilib.input.callback.HotkeyCallback;
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.GameUtils;
 import litematica.Reference;
 import litematica.data.DataManager;
 import litematica.gui.AreaSelectionBrowserScreen;
@@ -32,17 +31,10 @@ import litematica.selection.SelectionManager;
 
 public class HotkeyCallbackOpenGui implements HotkeyCallback
 {
-    private final Minecraft mc;
-
-    public HotkeyCallbackOpenGui(Minecraft mc)
-    {
-        this.mc = mc;
-    }
-
     @Override
     public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
-        if (this.mc.player == null || this.mc.world == null)
+        if (GameUtils.getClientPlayer() == null || GameUtils.getClientWorld() == null)
         {
             return ActionResult.FAIL;
         }

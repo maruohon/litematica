@@ -80,7 +80,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
         this.exportButton.translateAndAddHoverString("litematica.hover.button.material_list.export_shift_for_csv");
         this.multiplierEditor.getTextField().translateAndAddHoverString("litematica.hover.material_list.multiplier");
 
-        MaterialListUtils.updateAvailableCounts(this.materialList.getAllMaterials(), this.mc.player);
+        MaterialListUtils.updateAvailableCounts(this.materialList.getAllMaterials());
 
         // Remember the last opened material list, for the hotkey
         if (DataManager.getMaterialList() == null)
@@ -222,7 +222,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
         {
             String key = "litematica.message.info.material_list.written_to_file";
             MessageDispatcher.generic(key, file.getFileName().toString());
-            StringUtils.sendOpenFileChatMessage(this.mc.player, key, file);
+            StringUtils.sendOpenFileChatMessage(key, file);
         }
     }
 

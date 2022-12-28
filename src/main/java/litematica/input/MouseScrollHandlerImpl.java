@@ -1,6 +1,5 @@
 package litematica.input;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -146,17 +145,17 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
         return true;
     }
 
-    public static void onTick(Minecraft mc)
+    public static void onTick()
     {
         SelectionManager sm = DataManager.getSelectionManager();
 
         if (sm.hasGrabbedElement())
         {
-            sm.moveGrabbedElement(mc.player);
+            sm.moveGrabbedElement(GameUtils.getClientPlayer());
         }
         else if (GuiUtils.getCurrentScreen() == null)
         {
-            EasyPlaceUtils.easyPlaceOnUseTick(mc);
+            EasyPlaceUtils.easyPlaceOnUseTick();
         }
     }
 

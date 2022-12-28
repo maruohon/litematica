@@ -1,7 +1,5 @@
 package litematica;
 
-import net.minecraft.client.Minecraft;
-
 import malilib.config.JsonModConfig;
 import malilib.config.JsonModConfig.ConfigDataUpdater;
 import malilib.config.util.ConfigUpdateUtils.KeyBindSettingsResetter;
@@ -47,7 +45,7 @@ public class InitHandler implements InitializationHandler
         FileMigrationUtils.tryMigrateOldPerWorldData();
         FileMigrationUtils.tryMigrateOldAreaSelections();
 
-        HotkeyCallbacks.init(Minecraft.getMinecraft());
+        HotkeyCallbacks.init();
         StatusInfoRenderer.init();
 
         DataManager.getAreaSelectionsBaseDirectory();

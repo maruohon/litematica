@@ -16,7 +16,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
@@ -125,9 +124,9 @@ public class SchematicPlacementManager
         //System.out.printf("processQueuedChunks, size: %d\n", this.chunksToRebuild.size());
         if (this.chunksToRebuild.isEmpty() == false)
         {
-            WorldClient worldClient = Minecraft.getMinecraft().world;
+            WorldClient clientWorld = GameUtils.getClientWorld();
 
-            if (worldClient == null)
+            if (clientWorld == null)
             {
                 this.chunksToRebuild.clear();
                 return true;
@@ -152,7 +151,7 @@ public class SchematicPlacementManager
                 }
 
                 if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() ||
-                    worldClient.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                    clientWorld.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
                 {
                     // Wipe the old chunk if it exists
                     if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
@@ -999,14 +998,14 @@ public class SchematicPlacementManager
         return false;
     }
 
-    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, double maxDistance)
+    public void setPositionOfCurrentSelectionToRayTrace(double maxDistance)
     {
         SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
         if (schematicPlacement != null)
         {
             Entity entity = GameUtils.getCameraEntity();
-            RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, maxDistance);
+            RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(GameUtils.getClientWorld(), entity, RayTraceFluidHandling.NONE, false, maxDistance);
 
             if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
             {
@@ -1016,7 +1015,7 @@ public class SchematicPlacementManager
             BlockPos pos = trace.getBlockPos();
 
             // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
-            if (mc.player.isSneaking() == false)
+            if (GameUtils.getClientPlayer().isSneaking() == false)
             {
                 pos = pos.offset(trace.sideHit);
             }

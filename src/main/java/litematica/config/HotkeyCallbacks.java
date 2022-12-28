@@ -1,7 +1,5 @@
 package litematica.config;
 
-import net.minecraft.client.Minecraft;
-
 import malilib.input.callback.HotkeyCallback;
 import malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import malilib.listener.EventListener;
@@ -11,11 +9,11 @@ import litematica.world.SchematicWorldRenderingNotifier;
 
 public class HotkeyCallbacks
 {
-    public static void init(Minecraft mc)
+    public static void init()
     {
-        HotkeyCallback hotkeyCallbackMisc = new HotkeyCallbackMisc(mc);
-        HotkeyCallback hotkeyCallbackOpenGui = new HotkeyCallbackOpenGui(mc);
-        HotkeyCallback hotkeyCallbackToolActions = new HotkeyCallbackToolActions(mc);
+        HotkeyCallback hotkeyCallbackMisc = new HotkeyCallbackMisc();
+        HotkeyCallback hotkeyCallbackOpenGui = new HotkeyCallbackOpenGui();
+        HotkeyCallback hotkeyCallbackToolActions = new HotkeyCallbackToolActions();
 
         Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((newValue, oldValue) -> InventoryUtils.setPickBlockableSlots(newValue));
         Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueLoadCallback(InventoryUtils::setPickBlockableSlots);

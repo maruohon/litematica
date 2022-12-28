@@ -15,6 +15,7 @@ import malilib.config.value.HudAlignment;
 import malilib.overlay.message.MessageHelpers;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import litematica.config.Configs;
@@ -59,7 +60,7 @@ public class ToolHud extends InfoHud
     protected boolean hasEnabledTool()
     {
         return Configs.InfoOverlays.TOOL_HUD_ALWAYS_VISIBLE.getBooleanValue() ||
-               (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() && EntityUtils.hasToolItem(this.mc.player));
+               (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() && EntityUtils.hasToolItem());
     }
 
     @Override
@@ -230,10 +231,10 @@ public class ToolHud extends InfoHud
                                             or.getX(), or.getY(), or.getZ()));
 
             IBlockState state = mode.getPrimaryBlock();
-            ItemStack stack = this.mc.player.getHeldItemMainhand();
+            ItemStack stack = GameUtils.getClientPlayer().getHeldItemMainhand();
 
             if (state != null && mode == ToolMode.SCHEMATIC_EDIT &&
-                (ItemWrap.isEmpty(stack) || EntityUtils.hasToolItem(this.mc.player)))
+                (ItemWrap.isEmpty(stack) || EntityUtils.hasToolItem()))
             {
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.used_block", this.getBlockStateString(state)));
                 this.getBlockStateProperties(state, lines);

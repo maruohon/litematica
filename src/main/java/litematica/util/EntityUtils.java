@@ -5,7 +5,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,6 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.inventory.InventoryUtils;
@@ -32,14 +33,12 @@ import litematica.schematic.placement.SubRegionPlacement;
 
 public class EntityUtils
 {
-    public static final Predicate<Entity> NOT_PLAYER = new Predicate<Entity>()
+    public static final Predicate<Entity> NOT_PLAYER = entity -> (entity instanceof EntityPlayer) == false;
+
+    public static boolean hasToolItem()
     {
-        @Override
-        public boolean apply(@Nullable Entity entity)
-        {
-            return (entity instanceof EntityPlayer) == false;
-        }
-    };
+        return hasToolItem(GameUtils.getClientPlayer());
+    }
 
     public static boolean hasToolItem(EntityLivingBase entity)
     {
@@ -71,10 +70,7 @@ public class EntityUtils
     /**
      * Checks if the requested item is currently in the player's hand such that it would be used for using/placing.
      * This means, that it must either be in the main hand, or the main hand must be empty and the item is in the offhand.
-     * @param player
-     * @param stack
      * @param lenient if true, then NBT tags and also damage of damageable items are ignored
-     * @return
      */
     @Nullable
     public static EnumHand getUsedHandForItem(EntityPlayer player, ItemStack stack, boolean lenient)
@@ -138,13 +134,15 @@ public class EntityUtils
         return getHorizontalLookingDirection(entity);
     }
 
-    public static boolean setFakedSneakingState(Minecraft mc, boolean sneaking)
+    public static boolean setFakedSneakingState(boolean sneaking)
     {
-        if (mc.player != null && mc.player.isSneaking() != sneaking)
+        EntityPlayerSP player = GameUtils.getClientPlayer();
+
+        if (player != null && player.isSneaking() != sneaking)
         {
             CPacketEntityAction.Action action = sneaking ? CPacketEntityAction.Action.START_SNEAKING : CPacketEntityAction.Action.STOP_SNEAKING;
-            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, action));
-            mc.player.movementInput.sneak = sneaking;
+            player.connection.sendPacket(new CPacketEntityAction(player, action));
+            player.movementInput.sneak = sneaking;
             return true;
         }
 
@@ -192,9 +190,6 @@ public class EntityUtils
 
     /**
      * Note: This does NOT spawn any of the entities in the world!
-     * @param nbt
-     * @param world
-     * @return
      */
     @Nullable
     public static Entity createEntityAndPassengersFromNBT(NBTTagCompound nbt, World world)
@@ -253,10 +248,10 @@ public class EntityUtils
         return world.getEntitiesInAABBexcluding(null, bb, null);
     }
 
-    public static boolean shouldPickBlock(EntityPlayer player)
+    public static boolean shouldPickBlock()
     {
         return Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() &&
                 RenderUtils.areSchematicBlocksCurrentlyRendered() &&
-                (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() == false || hasToolItem(player) == false);
+                (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() == false || hasToolItem() == false);
     }
 }

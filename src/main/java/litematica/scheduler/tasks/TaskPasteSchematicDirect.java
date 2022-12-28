@@ -4,6 +4,7 @@ import net.minecraft.world.WorldServer;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.LayerRange;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.util.SchematicPlacingUtils;
@@ -23,9 +24,9 @@ public class TaskPasteSchematicDirect extends TaskBase
     public boolean canExecute()
     {
         return this.placement.isInvalidated() == false &&
-               this.mc.world != null &&
-               this.mc.player != null &&
-               this.mc.isSingleplayer();
+               GameUtils.getClientWorld() != null &&
+               GameUtils.getClientPlayer() != null &&
+               GameUtils.isSinglePlayer();
     }
 
     @Override

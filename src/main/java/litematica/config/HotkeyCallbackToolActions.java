@@ -1,8 +1,8 @@
 package litematica.config;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import malilib.input.ActionResult;
 import malilib.input.KeyAction;
@@ -20,24 +20,19 @@ import litematica.util.ToolUtils;
 
 public class HotkeyCallbackToolActions implements HotkeyCallback
 {
-    private final Minecraft mc;
-
-    public HotkeyCallbackToolActions(Minecraft mc)
-    {
-        this.mc = mc;
-    }
-
     @Override
     public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
-        if (this.mc.player == null || this.mc.world == null)
+        World world = GameUtils.getClientWorld();
+
+        if (GameUtils.getClientPlayer() == null || world == null)
         {
             return ActionResult.FAIL;
         }
 
         ToolMode mode = DataManager.getToolMode();
         boolean toolEnabled = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
-        boolean hasTool = EntityUtils.hasToolItem(this.mc.player);
+        boolean hasTool = EntityUtils.hasToolItem();
         boolean isToolPrimary = key == Hotkeys.TOOL_PLACE_CORNER_1.getKeyBind();
         boolean isToolSecondary = key == Hotkeys.TOOL_PLACE_CORNER_2.getKeyBind();
         boolean isToolSelect = key == Hotkeys.TOOL_SELECT_ELEMENTS.getKeyBind();
@@ -46,12 +41,12 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
         {
             if (mode.getUsesBlockPrimary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeyBind().isKeyBindHeld())
             {
-                ToolUtils.setToolModeBlockState(mode, true, this.mc);
+                ToolUtils.setToolModeBlockState(mode, true);
                 return ActionResult.SUCCESS;
             }
             else if (mode.getUsesBlockSecondary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeyBind().isKeyBindHeld())
             {
-                ToolUtils.setToolModeBlockState(mode, false, this.mc);
+                ToolUtils.setToolModeBlockState(mode, false);
                 return ActionResult.SUCCESS;
             }
         }
@@ -72,7 +67,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
                     if (grabModifier && mode == ToolMode.MOVE)
                     {
                         Entity entity = GameUtils.getCameraEntity();
-                        BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, entity, maxDistance, false);
+                        BlockPos pos = RayTraceUtils.getTargetedPosition(world, entity, maxDistance, false);
 
                         if (pos != null)
                         {
@@ -82,16 +77,16 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
                     else if (Configs.Generic.SELECTION_CORNERS_MODE.getValue() == CornerSelectionMode.CORNERS)
                     {
                         Corner corner = isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2;
-                        sm.setPositionOfCurrentSelectionToRayTrace(this.mc, corner, moveEverything, maxDistance);
+                        sm.setPositionOfCurrentSelectionToRayTrace(corner, moveEverything, maxDistance);
                     }
                     else if (Configs.Generic.SELECTION_CORNERS_MODE.getValue() == CornerSelectionMode.EXPAND)
                     {
-                        sm.handleCuboidModeMouseClick(this.mc, maxDistance, isToolSecondary, moveEverything);
+                        sm.handleCuboidModeMouseClick(maxDistance, isToolSecondary, moveEverything);
                     }
                 }
                 else if (mode.getUsesSchematic())
                 {
-                    DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionToRayTrace(this.mc, maxDistance);
+                    DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionToRayTrace(maxDistance);
                 }
 
                 return ActionResult.SUCCESS;
@@ -112,17 +107,17 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
                         }
                         else
                         {
-                            sm.grabElement(this.mc, maxDistance);
+                            sm.grabElement(maxDistance);
                         }
                     }
                     else
                     {
-                        sm.changeSelection(this.mc.world, entity, maxDistance);
+                        sm.changeSelection(world, entity, maxDistance);
                     }
                 }
                 else if (mode.getUsesSchematic())
                 {
-                    DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, entity, maxDistance);
+                    DataManager.getSchematicPlacementManager().changeSelection(world, entity, maxDistance);
                 }
 
                 return ActionResult.SUCCESS;

@@ -1,11 +1,8 @@
 package litematica.event;
 
-import net.minecraft.client.Minecraft;
-
 import malilib.event.PostGameOverlayRenderer;
 import malilib.event.PostWorldRenderer;
 import malilib.gui.util.GuiUtils;
-import malilib.util.game.wrap.GameUtils;
 import litematica.config.Configs;
 import litematica.config.Hotkeys;
 import litematica.data.DataManager;
@@ -67,9 +64,8 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 
             if (GuiUtils.getCurrentScreen() == null)
             {
-                Minecraft mc = GameUtils.getClient();
                 ToolHud.getInstance().renderHud();
-                OverlayRenderer.getInstance().renderHoverInfo(mc);
+                OverlayRenderer.getInstance().renderHoverInfo();
 
                 SetSchematicPreviewTask task = TaskScheduler.getInstanceClient().getFirstTaskOfType(SetSchematicPreviewTask.class);
 

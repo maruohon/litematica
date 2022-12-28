@@ -437,9 +437,11 @@ public class OverlayRenderer
         GlStateManager.enableDepth();
     }
 
-    public void renderHoverInfo(Minecraft mc)
+    public void renderHoverInfo()
     {
-        if (mc.world != null && mc.player != null)
+        World world = GameUtils.getClientWorld();
+
+        if (world != null && GameUtils.getClientPlayer() != null)
         {
             boolean infoOverlayKeyActive = Hotkeys.RENDER_BLOCK_INFO_OVERLAY.getKeyBind().isKeyBindHeld();
             boolean verifierOverlayRendered = false;
@@ -448,7 +450,7 @@ public class OverlayRenderer
                 Configs.InfoOverlays.VERIFIER_OVERLAY_RENDERING.getBooleanValue() &&
                 Configs.InfoOverlays.BLOCK_INFO_OVERLAY_RENDERING.getBooleanValue())
             {
-                verifierOverlayRendered = this.renderVerifierOverlay(mc);
+                verifierOverlayRendered = this.renderVerifierOverlay();
             }
 
             boolean renderBlockInfoLines = Configs.InfoOverlays.BLOCK_INFO_LINES_RENDERING.getBooleanValue();
@@ -458,32 +460,32 @@ public class OverlayRenderer
             if (renderBlockInfoLines || renderInfoOverlay)
             {
                 Entity entity = GameUtils.getCameraEntity();
-                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10, true);
+                traceWrapper = RayTraceUtils.getGenericTrace(world, entity, 10, true);
             }
 
             if (traceWrapper != null)
             {
                 if (renderBlockInfoLines)
                 {
-                    this.renderBlockInfoLines(traceWrapper, mc);
+                    this.renderBlockInfoLines(traceWrapper);
                 }
 
                 if (renderInfoOverlay)
                 {
-                    this.renderBlockInfoOverlay(traceWrapper, mc);
+                    this.renderBlockInfoOverlay(traceWrapper);
                 }
             }
         }
     }
 
-    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, Minecraft mc)
+    private void renderBlockInfoLines(RayTraceWrapper traceWrapper)
     {
         long currentTime = System.currentTimeMillis();
 
         // Only update the text once per game tick
         if (currentTime - this.infoUpdateTime >= 50)
         {
-            this.updateBlockInfoLines(traceWrapper, mc);
+            this.updateBlockInfoLines(traceWrapper);
             this.infoUpdateTime = currentTime;
         }
 
@@ -500,7 +502,7 @@ public class OverlayRenderer
         TextRenderUtils.renderText(x, y, 0, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
     }
 
-    private boolean renderVerifierOverlay(Minecraft mc)
+    private boolean renderVerifierOverlay()
     {
         List<SchematicVerifier> activeVerifiers = SchematicVerifierManager.INSTANCE.getActiveVerifiers();
 
@@ -523,10 +525,10 @@ public class OverlayRenderer
                     widget.renderAt(this.blockInfoX, this.blockInfoY, 0, new ScreenContext(0, 0, 0, false));
 
                     World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-                    World worldClient = WorldUtils.getBestWorld(mc);
+                    World worldClient = WorldUtils.getBestWorld();
                     BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
                     RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic,
-                                                        worldClient, lookPos.getBlockPos(), mc);
+                                                        worldClient, lookPos.getBlockPos());
 
                     return true;
                 }
@@ -536,24 +538,25 @@ public class OverlayRenderer
         return false;
     }
 
-    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, Minecraft mc)
+    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper)
     {
         IBlockState air = Blocks.AIR.getDefaultState();
-        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        World worldClient = WorldUtils.getBestWorld(mc);
+        World schematicWorld = SchematicWorldHandler.getSchematicWorld();
+        World clientWorld = GameUtils.getClientWorld();
+        World bestWorld = WorldUtils.getBestWorld();
         BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
 
-        IBlockState stateClient = mc.world.getBlockState(pos);
-        stateClient = stateClient.getActualState(mc.world, pos);
+        IBlockState stateClient = clientWorld.getBlockState(pos);
+        stateClient = stateClient.getActualState(clientWorld, pos);
 
-        IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-        stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
+        IBlockState stateSchematic = schematicWorld.getBlockState(pos);
+        stateSchematic = stateSchematic.getActualState(schematicWorld, pos);
 
         int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
         BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
 
-        ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
-        ItemUtils.setItemForBlock(mc.world, pos, stateClient);
+        ItemUtils.setItemForBlock(schematicWorld, pos, stateSchematic);
+        ItemUtils.setItemForBlock(clientWorld, pos, stateClient);
 
         // Not just a missing block
         if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
@@ -562,35 +565,35 @@ public class OverlayRenderer
                     VerifierResultType.from(stateSchematic, stateClient), stateSchematic, stateClient);
             this.getOverlayPosition(widget.getWidth(), widget.getHeight(), offY);
             widget.renderAt(this.blockInfoX, this.blockInfoY, 0, new ScreenContext(0, 0, 0, false));
-            RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
+            RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, schematicWorld, bestWorld, pos);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
             BlockInfo info = new BlockInfo(stateClient, "litematica.title.hud.block_info_overlay.state_client");
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
-            info.render(this.blockInfoX, this.blockInfoY, 0, mc);
+            info.render(this.blockInfoX, this.blockInfoY, 0);
 
-            RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldClient, pos);
+            RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, bestWorld, pos);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            TileEntity te = worldClient.getTileEntity(pos);
+            TileEntity te = bestWorld.getTileEntity(pos);
 
             if (te instanceof IInventory)
             {
                 BlockInfo info = new BlockInfo(stateClient, "litematica.title.hud.block_info_overlay.state_client");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
-                info.render(this.blockInfoX, this.blockInfoY, 0, mc);
+                info.render(this.blockInfoX, this.blockInfoY, 0);
 
-                RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
+                RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, schematicWorld, bestWorld, pos);
             }
             else
             {
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.title.hud.block_info_overlay.state_schematic");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
-                info.render(this.blockInfoX, this.blockInfoY, 0, mc);
+                info.render(this.blockInfoX, this.blockInfoY, 0);
 
-                RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldSchematic, pos);
+                RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, schematicWorld, pos);
             }
         }
     }
@@ -613,13 +616,14 @@ public class OverlayRenderer
         }
     }
 
-    private void updateBlockInfoLines(RayTraceWrapper traceWrapper, Minecraft mc)
+    private void updateBlockInfoLines(RayTraceWrapper traceWrapper)
     {
         this.blockInfoLines.clear();
 
+        World world = GameUtils.getClientWorld();
         BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
-        IBlockState stateClient = mc.world.getBlockState(pos);
-        stateClient = stateClient.getActualState(mc.world, pos);
+        IBlockState stateClient = world.getBlockState(pos);
+        stateClient = stateClient.getActualState(world, pos);
 
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
@@ -657,28 +661,29 @@ public class OverlayRenderer
     {
         RayTraceWrapper traceWrapper = null;
         Entity entity = GameUtils.getCameraEntity();
+        World world = GameUtils.getClientWorld();
         Color4f color = null;
         boolean direction = false;
 
         if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeyBind().isKeyBindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(world, entity, 20, true);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY.getColor();
         }
         else if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(world, entity, 20, true);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY.getColor();
             direction = true;
         }
         else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_ALL.getKeyBind().isKeyBindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(world, entity, 20, true);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY.getColor();
         }
         else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_DIRECTION.getKeyBind().isKeyBindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(world, entity, 20, true);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY.getColor();
             direction = true;
         }

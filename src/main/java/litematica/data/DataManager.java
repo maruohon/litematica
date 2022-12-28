@@ -12,7 +12,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -488,8 +487,8 @@ public class DataManager implements DirectoryCache
 
     private static String getStorageFileName(boolean globalData)
     {
-        Minecraft mc = GameUtils.getClient();
-        return globalData ? "data_common.json" : "data_dim_" + WorldUtils.getDimensionIdAsString(mc.world) + ".json";
+        return globalData ? "data_common.json" : "data_dim_" +
+                            WorldUtils.getDimensionIdAsString(GameUtils.getClientWorld()) + ".json";
     }
 
     public static void setToolItem(String itemNameIn)

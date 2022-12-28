@@ -21,6 +21,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
@@ -61,7 +62,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (this.sentCommandsTotal == 0)
         {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback false");
+            GameUtils.getClientPlayer().sendChatMessage("/gamerule sendCommandFeedback false");
         }
 
         while (this.chunks.isEmpty() == false)
@@ -277,10 +278,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             MessageDispatcher.error().screenOrActionbar().translate("litematica.message.error.schematic_paste_failed");
         }
 
-        if (this.mc.player != null)
-        {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback true");
-        }
+        GameUtils.sendCommand("/gamerule sendCommandFeedback true");
 
         super.stop();
     }

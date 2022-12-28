@@ -11,7 +11,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
@@ -348,11 +347,11 @@ public class SelectionManager
         return this.currentSelectionId;
     }
 
-    public boolean createNewSubRegion(Minecraft mc, boolean printMessage)
+    public boolean createNewSubRegion(boolean printMessage)
     {
         AreaSelection selection = this.getCurrentSelection();
 
-        if (selection != null && mc.player != null)
+        if (selection != null)
         {
             BlockPos pos = EntityWrap.getCameraEntityBlockPos();
 
@@ -502,9 +501,9 @@ public class SelectionManager
         return this.grabbedElement != null;
     }
 
-    public boolean grabElement(Minecraft mc, int maxDistance)
+    public boolean grabElement(int maxDistance)
     {
-        World world = mc.world;
+        World world = GameUtils.getClientWorld();
         Entity entity = GameUtils.getCameraEntity();
         AreaSelection area = this.getCurrentSelection();
 
@@ -529,7 +528,7 @@ public class SelectionManager
         return false;
     }
 
-    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, Corner corner, boolean moveEntireSelection, double maxDistance)
+    public void setPositionOfCurrentSelectionToRayTrace(Corner corner, boolean moveEntireSelection, double maxDistance)
     {
         AreaSelection area = this.getCurrentSelection();
 
@@ -541,7 +540,7 @@ public class SelectionManager
             if (movingCorner || movingOrigin)
             {
                 Entity entity = GameUtils.getCameraEntity();
-                BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
+                BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
 
                 if (pos == null)
                 {
@@ -593,7 +592,7 @@ public class SelectionManager
         }
     }
 
-    public void handleCuboidModeMouseClick(Minecraft mc, double maxDistance, boolean isRightClick, boolean moveEntireSelection)
+    public void handleCuboidModeMouseClick(double maxDistance, boolean isRightClick, boolean moveEntireSelection)
     {
         AreaSelection selection = this.getCurrentSelection();
 
@@ -602,7 +601,7 @@ public class SelectionManager
             if (selection.isOriginSelected())
             {
                 Entity entity = GameUtils.getCameraEntity();
-                BlockPos newOrigin = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
+                BlockPos newOrigin = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
 
                 if (newOrigin != null)
                 {
@@ -612,24 +611,24 @@ public class SelectionManager
             // Right click in Cuboid mode: Reset the area to the clicked position
             else if (isRightClick)
             {
-                this.resetSelectionToClickedPosition(mc, maxDistance);
+                this.resetSelectionToClickedPosition(maxDistance);
             }
             // Left click in Cuboid mode: Grow the selection to contain each clicked position
             else
             {
-                this.growSelectionToContainClickedPosition(mc, maxDistance);
+                this.growSelectionToContainClickedPosition(maxDistance);
             }
         }
     }
 
-    private void resetSelectionToClickedPosition(Minecraft mc, double maxDistance)
+    private void resetSelectionToClickedPosition(double maxDistance)
     {
         AreaSelection area = this.getCurrentSelection();
 
         if (area != null && area.getSelectedSubRegionBox() != null)
         {
             Entity entity = GameUtils.getCameraEntity();
-            BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
+            BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
 
             if (pos != null)
             {
@@ -639,14 +638,14 @@ public class SelectionManager
         }
     }
 
-    private void growSelectionToContainClickedPosition(Minecraft mc, double maxDistance)
+    private void growSelectionToContainClickedPosition(double maxDistance)
     {
         AreaSelection sel = this.getCurrentSelection();
 
         if (sel != null && sel.getSelectedSubRegionBox() != null)
         {
             Entity entity = GameUtils.getCameraEntity();
-            BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
+            BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
 
             if (pos != null)
             {

@@ -13,6 +13,7 @@ import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
 import litematica.util.ItemUtils;
 
@@ -56,7 +57,7 @@ public class BlockInfo
         return this.totalHeight;
     }
 
-    public void render(int x, int y, int zLevel, Minecraft mc)
+    public void render(int x, int y, int zLevel)
     {
         if (this.state != null)
         {
@@ -64,6 +65,7 @@ public class BlockInfo
 
             ShapeRenderUtils.renderOutlinedRectangle(x, y, zLevel, this.totalWidth, this.totalHeight, 0xFF000000, 0xFF999999);
 
+            Minecraft mc = GameUtils.getClient();
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;
             y += 4;

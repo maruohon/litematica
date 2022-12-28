@@ -23,7 +23,7 @@ public abstract class MixinMinecraft
             target = "Lnet/minecraft/client/Minecraft;objectMouseOver:Lnet/minecraft/util/math/RayTraceResult;"))
     private void onHandleRightClickPre(CallbackInfo ci)
     {
-        if (SchematicEditUtils.rebuildHandleBlockPlace((net.minecraft.client.Minecraft)(Object) this))
+        if (SchematicEditUtils.rebuildHandleBlockPlace())
         {
             ci.cancel();
         }
@@ -34,7 +34,7 @@ public abstract class MixinMinecraft
     {
         if (EasyPlaceUtils.shouldDoEasyPlaceActions())
         {
-            EasyPlaceUtils.onRightClickTail((net.minecraft.client.Minecraft)(Object) this);
+            EasyPlaceUtils.onRightClickTail();
         }
     }
 
@@ -42,7 +42,7 @@ public abstract class MixinMinecraft
             target = "Lnet/minecraft/util/math/RayTraceResult;typeOfHit:Lnet/minecraft/util/math/RayTraceResult$Type;"))
     private void onLeftClickMouseStart(CallbackInfo ci)
     {
-        if (SchematicEditUtils.rebuildHandleBlockBreak((net.minecraft.client.Minecraft)(Object) this))
+        if (SchematicEditUtils.rebuildHandleBlockBreak())
         {
             ci.cancel();
         }

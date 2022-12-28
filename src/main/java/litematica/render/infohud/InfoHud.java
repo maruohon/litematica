@@ -3,8 +3,6 @@ package litematica.render.infohud;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
-
 import malilib.config.value.HorizontalAlignment;
 import malilib.config.value.HudAlignment;
 import malilib.gui.util.GuiUtils;
@@ -16,7 +14,6 @@ public class InfoHud
 {
     private static final InfoHud INSTANCE = new InfoHud();
 
-    protected final Minecraft mc;
     protected final List<String> lineList = new ArrayList<>();
     protected final List<IInfoHudRenderer> renderers = new ArrayList<>();
     protected final StringListRenderer stringListRenderer = new StringListRenderer();
@@ -29,7 +26,6 @@ public class InfoHud
 
     protected InfoHud()
     {
-        this.mc = Minecraft.getMinecraft();
     }
 
     public boolean isEnabled()
@@ -65,7 +61,7 @@ public class InfoHud
 
     public void renderHud()
     {
-        if (this.mc.player != null && this.shouldRender())
+        if (this.shouldRender())
         {
             this.lineList.clear();
 

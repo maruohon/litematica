@@ -117,12 +117,8 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
     {
         if (this.chunks.size() > 0)
         {
-            if (this.mc.player != null)
-            {
-                this.comparator.setReferencePosition(EntityWrap.getEntityBlockPos(this.mc.player));
-                this.chunks.sort(this.comparator);
-            }
-
+            this.comparator.setReferencePosition(EntityWrap.getPlayerBlockPos());
+            this.chunks.sort(this.comparator);
             this.onChunkListSorted();
         }
     }

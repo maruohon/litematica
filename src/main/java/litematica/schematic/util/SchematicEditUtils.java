@@ -7,8 +7,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBlockSpecial;
@@ -19,6 +19,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
@@ -48,68 +49,68 @@ import litematica.world.WorldSchematic;
 
 public class SchematicEditUtils
 {
-    public static boolean rebuildHandleBlockBreak(Minecraft mc)
+    public static boolean rebuildHandleBlockBreak()
     {
-        if (mc.player != null &&
+        if (GameUtils.getClientPlayer() != null &&
             DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
             if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
             {
-                return breakSchematicBlocks(mc);
+                return breakSchematicBlocks();
             }
             else if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeyBind().isKeyBindHeld())
             {
-                return breakAllIdenticalSchematicBlocks(mc);
+                return breakAllIdenticalSchematicBlocks();
             }
             else
             {
-                return breakSchematicBlock(mc);
+                return breakSchematicBlock();
             }
         }
 
         return false;
     }
 
-    public static boolean rebuildHandleBlockPlace(Minecraft mc)
+    public static boolean rebuildHandleBlockPlace()
     {
-        if (mc.player != null &&
+        if (GameUtils.getClientPlayer() != null &&
             DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
             if (Hotkeys.SCHEMATIC_EDIT_REPLACE_DIRECTION.getKeyBind().isKeyBindHeld())
             {
-                return replaceSchematicBlocksInDirection(mc);
+                return replaceSchematicBlocksInDirection();
             }
             else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_ALL.getKeyBind().isKeyBindHeld())
             {
-                return replaceAllIdenticalSchematicBlocks(mc);
+                return replaceAllIdenticalSchematicBlocks();
             }
             else if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
             {
-                return placeSchematicBlocksInDirection(mc);
+                return placeSchematicBlocksInDirection();
             }
             else if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeyBind().isKeyBindHeld())
             {
-                return fillAirWithBlocks(mc);
+                return fillAirWithBlocks();
             }
             else
             {
-                return placeSchematicBlock(mc);
+                return placeSchematicBlock();
             }
         }
 
         return false;
     }
 
-    private static boolean breakSchematicBlock(Minecraft mc)
+    private static boolean breakSchematicBlock()
     {
-        return setTargetedSchematicBlockState(mc, Blocks.AIR.getDefaultState());
+        return setTargetedSchematicBlockState(Blocks.AIR.getDefaultState());
     }
 
-    private static boolean placeSchematicBlock(Minecraft mc)
+    private static boolean placeSchematicBlock()
     {
-        ReplacementInfo info = getTargetInfo(mc);
+        ReplacementInfo info = getTargetInfo();
 
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
@@ -127,14 +128,14 @@ public class SchematicEditUtils
         return true;
     }
 
-    private static boolean replaceSchematicBlocksInDirection(Minecraft mc)
+    private static boolean replaceSchematicBlocksInDirection()
     {
-        ReplacementInfo info = getTargetInfo(mc);
+        ReplacementInfo info = getTargetInfo();
 
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            EnumFacing playerFacingH = mc.player.getHorizontalFacing();
+            EnumFacing playerFacingH = GameUtils.getClientPlayer().getHorizontalFacing();
             EnumFacing direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
 
             // Center region
@@ -150,9 +151,9 @@ public class SchematicEditUtils
         return false;
     }
 
-    private static boolean replaceAllIdenticalSchematicBlocks(Minecraft mc)
+    private static boolean replaceAllIdenticalSchematicBlocks()
     {
-        ReplacementInfo info = getTargetInfo(mc);
+        ReplacementInfo info = getTargetInfo();
 
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
@@ -163,17 +164,18 @@ public class SchematicEditUtils
         return false;
     }
 
-    public static boolean rebuildAcceptReplacement(Minecraft mc)
+    public static boolean rebuildAcceptReplacement()
     {
         WorldSchematic schematicWorld = SchematicWorldHandler.getSchematicWorld();
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.ANY, false, 5);
+        World world = GameUtils.getClientWorld();
+        RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.ANY, false, 5);
 
         if (schematicWorld != null && trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
             BlockPos pos = trace.getBlockPos();
             IBlockState stateOriginal = schematicWorld.getBlockState(pos);
-            IBlockState stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
+            IBlockState stateClient = world.getBlockState(pos).getActualState(world, pos);
 
             if (stateOriginal != stateClient)
             {
@@ -188,16 +190,16 @@ public class SchematicEditUtils
         return false;
     }
 
-    private static boolean breakSchematicBlocks(Minecraft mc)
+    private static boolean breakSchematicBlocks()
     {
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 20);
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(GameUtils.getClientWorld(), entity, 20);
 
         if (wrapper != null)
         {
             RayTraceResult trace = wrapper.getRayTraceResult();
             BlockPos pos = trace.getBlockPos();
-            EnumFacing playerFacingH = mc.player.getHorizontalFacing();
+            EnumFacing playerFacingH = entity.getHorizontalFacing();
             EnumFacing direction = PositionUtils.getTargetedDirection(trace.sideHit, playerFacingH, pos, trace.hitVec);
 
             // Center region
@@ -214,10 +216,10 @@ public class SchematicEditUtils
         return false;
     }
 
-    private static boolean breakAllIdenticalSchematicBlocks(Minecraft mc)
+    private static boolean breakAllIdenticalSchematicBlocks()
     {
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 20);
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(GameUtils.getClientWorld(), entity, 20);
 
         // The state can be null in 1.13+
         if (wrapper != null)
@@ -232,14 +234,14 @@ public class SchematicEditUtils
         return false;
     }
 
-    private static boolean placeSchematicBlocksInDirection(Minecraft mc)
+    private static boolean placeSchematicBlocksInDirection()
     {
-        ReplacementInfo info = getTargetInfo(mc);
+        ReplacementInfo info = getTargetInfo();
 
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            EnumFacing playerFacingH = mc.player.getHorizontalFacing();
+            EnumFacing playerFacingH = GameUtils.getClientPlayer().getHorizontalFacing();
             EnumFacing direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
             BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
 
@@ -253,9 +255,9 @@ public class SchematicEditUtils
         return false;
     }
 
-    private static boolean fillAirWithBlocks(Minecraft mc)
+    private static boolean fillAirWithBlocks()
     {
-        ReplacementInfo info = getTargetInfo(mc);
+        ReplacementInfo info = getTargetInfo();
 
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
@@ -272,16 +274,18 @@ public class SchematicEditUtils
     }
 
     @Nullable
-    private static ReplacementInfo getTargetInfo(Minecraft mc)
+    private static ReplacementInfo getTargetInfo()
     {
-        ItemStack stack = mc.player.getHeldItemMainhand();
+        World clientWorld = GameUtils.getClientWorld();
+        EntityPlayer player = GameUtils.getClientPlayer();
+        ItemStack stack = player.getHeldItemMainhand();
 
         if ((ItemWrap.notEmpty(stack) && (stack.getItem() instanceof ItemBlock || stack.getItem() instanceof ItemBlockSpecial)) ||
             (ItemWrap.isEmpty(stack) && ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null))
         {
             WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
             Entity entity = GameUtils.getCameraEntity();
-            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 20, true);
+            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(clientWorld, entity, 20, true);
 
             if (world != null && traceWrapper != null &&
                 traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
@@ -297,12 +301,13 @@ public class SchematicEditUtils
                 if (stack.getItem() instanceof ItemBlock)
                 {
                     stateNew = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
-                                    side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, meta, mc.player);
+                                    side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, meta, player);
                 }
                 else if (stack.getItem() instanceof ItemBlockSpecial)
                 {
-                    stateNew = ((IMixinItemBlockSpecial) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
-                                                                                                          side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, 0, mc.player);
+                    stateNew = ((IMixinItemBlockSpecial) stack.getItem()).getBlock()
+                                .getStateForPlacement(world, pos.offset(side), side,
+                                                      (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, 0, player);
                 }
                 else if (ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null)
                 {
@@ -344,11 +349,11 @@ public class SchematicEditUtils
         return posMutable.toImmutable();
     }
 
-    private static boolean setTargetedSchematicBlockState(Minecraft mc, IBlockState state)
+    private static boolean setTargetedSchematicBlockState(IBlockState state)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 20, true);
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(GameUtils.getClientWorld(), entity, 20, true);
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -530,7 +535,7 @@ public class SchematicEditUtils
                 {
                     if (part.getBox().containsPos(posStart))
                     {
-                        if (replaceAllIdenticalBlocks(manager, part, stateOriginal, stateNew))
+                        if (replaceAllIdenticalBlocks(part, stateOriginal, stateNew))
                         {
                             manager.markAllPlacementsOfSchematicForRebuild(part.getPlacement().getSchematic());
                             return true;
@@ -545,8 +550,7 @@ public class SchematicEditUtils
         return false;
     }
 
-    private static boolean replaceAllIdenticalBlocks(SchematicPlacementManager manager, PlacementPart part,
-            IBlockState stateOriginalIn, IBlockState stateNewIn)
+    private static boolean replaceAllIdenticalBlocks(PlacementPart part, IBlockState stateOriginalIn, IBlockState stateNewIn)
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
         ISchematic schematic = schematicPlacement.getSchematic();

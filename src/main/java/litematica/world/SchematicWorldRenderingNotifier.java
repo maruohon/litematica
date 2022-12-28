@@ -2,7 +2,6 @@ package litematica.world;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -10,6 +9,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.listener.LayerRangeChangeListener;
+import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.ChunkSectionPos;
 import malilib.util.position.LayerRange;
 import litematica.interfaces.IMixinChunkProviderClient;
@@ -38,7 +38,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
             final int cxMax = (xMax >> 4);
             RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
 
             for (Chunk chunk : schematicChunks.values())
             {
@@ -63,7 +63,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
         {
             RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
 
             for (Chunk chunk : schematicChunks.values())
             {
@@ -89,7 +89,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
             final int czMax = (zMax >> 4);
             RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
 
             for (Chunk chunk : schematicChunks.values())
             {
@@ -112,7 +112,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
         if (world != null)
         {
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
             long key = ChunkPos.asLong(chunkPos.getX(), chunkPos.getZ());
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
@@ -131,7 +131,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
         if (world != null)
         {
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
             long key = ChunkPos.asLong(chunkX, chunkZ);
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
@@ -150,7 +150,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
         if (world != null)
         {
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
             long key = ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))

@@ -4,12 +4,11 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.World;
 
 import malilib.listener.TaskCompletionListener;
 import malilib.overlay.message.MessageDispatcher;
@@ -46,12 +45,13 @@ public class ToolUtils
 {
     private static long areaMovedTime;
 
-    public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
+    public static void setToolModeBlockState(ToolMode mode, boolean primary)
     {
         IBlockState state = Blocks.AIR.getDefaultState();
-        double reach = mc.playerController.getBlockReachDistance();
         Entity entity = GameUtils.getCameraEntity();
-        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true);
+        World world = GameUtils.getClientWorld();
+        double reach = GameUtils.getInteractionManager().getBlockReachDistance();
+        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(world, entity, reach, true);
 
         if (wrapper != null)
         {
@@ -67,7 +67,7 @@ public class ToolUtils
                 }
                 else if (wrapper.getHitType() == HitType.VANILLA)
                 {
-                    state = mc.world.getBlockState(pos).getActualState(mc.world, pos);
+                    state = world.getBlockState(pos).getActualState(world, pos);
                 }
             }
         }
@@ -82,9 +82,9 @@ public class ToolUtils
         }
     }
 
-    public static void fillSelectionVolumes(Minecraft mc, IBlockState state, @Nullable IBlockState stateToReplace)
+    public static void fillSelectionVolumes(IBlockState state, @Nullable IBlockState stateToReplace)
     {
-        if (mc.player != null && GameUtils.isCreativeMode())
+        if (GameUtils.getClientPlayer() != null && GameUtils.isCreativeMode())
         {
             final AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
 
@@ -144,9 +144,7 @@ public class ToolUtils
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities,
                                               @Nullable TaskCompletionListener listener)
     {
-        EntityPlayer player = GameUtils.getClientPlayer();
-
-        if (player != null && GameUtils.isCreativeMode())
+        if (GameUtils.getClientPlayer() != null && GameUtils.isCreativeMode())
         {
             if (area == null)
             {
