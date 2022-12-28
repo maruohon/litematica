@@ -2,19 +2,18 @@ package litematica.render;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 
 import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
+import malilib.util.game.wrap.RegistryUtils;
 import litematica.util.ItemUtils;
 
 public class BlockInfo
@@ -35,8 +34,8 @@ public class BlockInfo
         this.stack = ItemUtils.getItemForState(this.state);
         this.stackName = this.stack.getDisplayName();
 
-        ResourceLocation rl = Block.REGISTRY.getNameForObject(this.state.getBlock());
-        this.blockRegistryname = rl != null ? rl.toString() : StringUtils.translate("litematica.label.misc.null.brackets");
+        String id = RegistryUtils.getBlockIdStr(this.state.getBlock());
+        this.blockRegistryname = id != null ? id : StringUtils.translate("litematica.label.misc.null.brackets");
 
         int w = StringUtils.getStringWidth(this.stackName) + 20;
         w = Math.max(w, StringUtils.getStringWidth(this.blockRegistryname));

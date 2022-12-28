@@ -19,8 +19,8 @@ import net.minecraft.world.NextTickListEntry;
 import malilib.mixin.access.NBTTagLongArrayMixin;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
-import malilib.util.game.BlockUtils;
 import malilib.util.game.wrap.NbtWrap;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.nbt.NbtUtils;
 import litematica.network.SchematicSavePacketHandler;
 import litematica.render.infohud.InfoHud;
@@ -278,7 +278,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
             {
                 NBTTagCompound tag = NbtWrap.getCompoundAt(listTag, i);
                 BlockPos pos = NbtUtils.readBlockPos(tag);
-                Block block = BlockUtils.getBlockByRegistryName(NbtWrap.getString(tag, "Block"));
+                Block block = RegistryUtils.getBlockByIdStr(NbtWrap.getString(tag, "Block"));
 
                 if (pos != null && block != null)
                 {

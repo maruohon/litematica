@@ -21,6 +21,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
 import litematica.config.Configs;
@@ -247,14 +248,13 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     private void sendSetBlockCommand(int x, int y, int z, IBlockState state, EntityPlayerSP player)
     {
         Block block = state.getBlock();
-        ResourceLocation rl = Block.REGISTRY.getNameForObject(block);
+        String blockName = RegistryUtils.getBlockIdStr(block);
 
-        if (rl == null)
+        if (blockName == null)
         {
             return;
         }
 
-        String blockName = rl.toString();
         String cmdName = Configs.Generic.COMMAND_NAME_SETBLOCK.getValue();
         String strCommand = String.format("/%s %d %d %d %s %d", cmdName, x, y, z, blockName, block.getMetaFromState(state));
 

@@ -1,6 +1,6 @@
 package litematica.schematic.verifier;
 
-import malilib.util.game.BlockUtils;
+import malilib.util.game.wrap.RegistryUtils;
 
 public class BlockStatePairCount
 {
@@ -12,8 +12,8 @@ public class BlockStatePairCount
     public BlockStatePairCount(BlockStatePair pair, int count)
     {
         this.pair = pair;
-        this.expectedBlockDisplayName = BlockUtils.getBlockRegistryName(pair.expectedState);
-        this.foundBlockDisplayName = BlockUtils.getBlockRegistryName(pair.foundState);
+        this.expectedBlockDisplayName = RegistryUtils.getBlockIdStr(pair.expectedState);
+        this.foundBlockDisplayName = RegistryUtils.getBlockIdStr(pair.foundState);
         this.count = count;
     }
 

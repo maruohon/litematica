@@ -3,19 +3,18 @@ package litematica.scheduler.tasks;
 import java.util.List;
 import javax.annotation.Nullable;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.IntBoundingBox;
 import litematica.render.infohud.InfoHud;
 import litematica.selection.SelectionBox;
@@ -43,21 +42,20 @@ public class TaskFillArea extends TaskProcessChunkBase
         this.replaceState = replaceState;
         this.removeEntities = removeEntities;
 
-        ResourceLocation rl = Block.REGISTRY.getNameForObject(fillState.getBlock());
+        String id = RegistryUtils.getBlockIdStr(fillState.getBlock());
         String strName = null;
 
-        if (rl != null)
+        if (id != null)
         {
-            String blockName = rl.toString();
-            strName = blockName + " " + fillState.getBlock().getMetaFromState(fillState);
+            strName = id + " " + fillState.getBlock().getMetaFromState(fillState);
 
             if (replaceState != null)
             {
-                rl = Block.REGISTRY.getNameForObject(replaceState.getBlock());
+                id = RegistryUtils.getBlockIdStr(replaceState.getBlock());
 
-                if (rl != null)
+                if (id != null)
                 {
-                    strName += " replace " + rl;
+                    strName += " replace " + id;
                 }
                 else
                 {

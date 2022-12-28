@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -36,6 +35,7 @@ import malilib.util.game.BlockUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.Vec2i;
 import litematica.config.Configs;
 import litematica.config.Configs.Visuals;
@@ -644,8 +644,13 @@ public class OverlayRenderer
 
     private void addBlockInfoLines(IBlockState state)
     {
-        this.blockInfoLines.add(String.valueOf(Block.REGISTRY.getNameForObject(state.getBlock())));
-        this.blockInfoLines.addAll(BlockUtils.getFormattedBlockStateProperties(state));
+        String id = RegistryUtils.getBlockIdStr(state.getBlock());
+
+        if (id != null)
+        {
+            this.blockInfoLines.add(id);
+            this.blockInfoLines.addAll(BlockUtils.getFormattedBlockStateProperties(state));
+        }
     }
 
     public void renderSchematicRebuildTargetingOverlay(float partialTicks)

@@ -20,6 +20,7 @@ import malilib.gui.widget.ItemStackWidget;
 import malilib.gui.widget.LabelWidget;
 import malilib.render.text.StyledTextLine;
 import malilib.util.game.BlockUtils;
+import malilib.util.game.wrap.RegistryUtils;
 import litematica.config.Configs;
 import litematica.materials.MaterialCache;
 import litematica.schematic.verifier.VerifierResultType;
@@ -60,8 +61,8 @@ public class SchematicVerifierBlockInfoWidget extends ContainerWidget
         this.foundDisplayNameLabel = new LabelWidget(color, foundStack.getDisplayName());
 
         color = 0xFF8080FF;
-        this.expectedRegistryNameLabel = new LabelWidget(color, BlockUtils.getBlockRegistryName(expectedState));
-        this.foundRegistryNameLabel = new LabelWidget(color, BlockUtils.getBlockRegistryName(foundState));
+        this.expectedRegistryNameLabel = new LabelWidget(color, RegistryUtils.getBlockIdStr(expectedState));
+        this.foundRegistryNameLabel = new LabelWidget(color, RegistryUtils.getBlockIdStr(foundState));
         color = 0xFF909090;
         this.expectedPropertiesLabel = new LabelWidget(-1, -1, color);
         this.foundPropertiesLabel = new LabelWidget(-1, -1, color);

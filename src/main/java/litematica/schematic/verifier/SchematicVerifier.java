@@ -23,7 +23,7 @@ import malilib.listener.EventListener;
 import malilib.listener.TaskCompletionListener;
 import malilib.util.StringUtils;
 import malilib.util.data.RunStatus;
-import malilib.util.game.BlockUtils;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
 import litematica.config.Configs;
@@ -613,11 +613,11 @@ public class SchematicVerifier implements IInfoHudRenderer
 
             if (pair.type == VerifierResultType.EXTRA)
             {
-                name = BlockUtils.getBlockIdentifier(pair.pair.foundState).getPath();
+                name = RegistryUtils.getBlockId(pair.pair.foundState).getPath();
             }
             else
             {
-                name = BlockUtils.getBlockIdentifier(pair.pair.expectedState).getPath();
+                name = RegistryUtils.getBlockId(pair.pair.expectedState).getPath();
             }
 
             // TODO switch to StyledTextLine list with a starting style

@@ -15,7 +15,6 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLongArray;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -25,6 +24,7 @@ import malilib.mixin.access.NBTTagLongArrayMixin;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.Constants;
 import malilib.util.game.wrap.NbtWrap;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.nbt.NbtUtils;
 import litematica.Litematica;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
@@ -335,13 +335,13 @@ public class LitematicaSchematic extends SchematicBase
         {
             for (NextTickListEntry entry : tickMap.values())
             {
-                ResourceLocation rl = Block.REGISTRY.getNameForObject(entry.getBlock());
+                String id = RegistryUtils.getBlockIdStr(entry.getBlock());
 
-                if (rl != null)
+                if (id != null)
                 {
                     NBTTagCompound tag = new NBTTagCompound();
 
-                    NbtWrap.putString(tag, "Block", rl.toString());
+                    NbtWrap.putString(tag, "Block", id);
                     NbtWrap.putInt(tag, "Priority", entry.priority);
                     NbtWrap.putInt(tag, "Time", (int) entry.scheduledTime);
                     NbtUtils.putVec3i(tag, entry.position);
@@ -435,7 +435,7 @@ public class LitematicaSchematic extends SchematicBase
             if (NbtWrap.containsString(tag, "Block") &&
                 NbtWrap.contains(tag, "Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
             {
-                Block block = Block.REGISTRY.getObject(new ResourceLocation(NbtWrap.getString(tag, "Block")));
+                Block block = RegistryUtils.getBlockByIdStr(NbtWrap.getString(tag, "Block"));
 
                 if (block != null && block != Blocks.AIR)
                 {

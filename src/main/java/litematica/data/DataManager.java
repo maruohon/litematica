@@ -29,10 +29,10 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.json.JsonUtils;
-import malilib.util.game.ItemUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.LayerRange;
 import litematica.Litematica;
 import litematica.Reference;
@@ -528,7 +528,7 @@ public class DataManager implements DirectoryCache
 
             if (itemName != null)
             {
-                Item item = ItemUtils.getItemByRegistryName(itemName);
+                Item item = RegistryUtils.getItemByIdStr(itemName);
 
                 if (item != null && item != Items.AIR)
                 {
@@ -543,12 +543,12 @@ public class DataManager implements DirectoryCache
         // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
 
-        Configs.Generic.TOOL_ITEM.setValue(ItemUtils.getItemRegistryName(Items.STICK));
+        Configs.Generic.TOOL_ITEM.setValue(RegistryUtils.getItemIdStr(Items.STICK));
     }
 
     public static void setHeldItemAsTool()
     {
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        EntityPlayer player = GameUtils.getClientPlayer();
 
         if (player != null)
         {
@@ -558,7 +558,7 @@ public class DataManager implements DirectoryCache
 
             if (ItemWrap.notEmpty(stack))
             {
-                cfgStr = ItemUtils.getItemRegistryName(stack.getItem());
+                cfgStr = RegistryUtils.getItemIdStr(stack.getItem());
                 NBTTagCompound nbt = ItemWrap.getTag(stack);
 
                 if (stack.isItemStackDamageable() == false || nbt != null)

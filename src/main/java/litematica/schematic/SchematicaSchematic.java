@@ -18,6 +18,7 @@ import net.minecraft.util.math.Vec3i;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.NbtWrap;
+import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.nbt.NbtUtils;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
 import litematica.schematic.container.ILitematicaBlockStatePalette;
@@ -138,7 +139,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
                 continue;
             }
 
-            Block block = Block.REGISTRY.getObject(new ResourceLocation(key));
+            Block block = RegistryUtils.getBlockByIdStr(key);
 
             if (block == null)
             {
@@ -175,7 +176,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
                 continue;
             }
 
-            Block block = Block.REGISTRY.getObject(new ResourceLocation(key));
+            Block block = RegistryUtils.getBlockByIdStr(key);
 
             if (block == null)
             {
@@ -191,9 +192,9 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
     protected void createRegistryBasedPalette()
     {
-        for (ResourceLocation key : Block.REGISTRY.getKeys())
+        for (ResourceLocation key : RegistryUtils.getRegisteredBlockIds())
         {
-            Block block = Block.REGISTRY.getObject(key);
+            Block block = RegistryUtils.getBlockById(key);
 
             if (block != null)
             {
@@ -377,7 +378,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
             if (block != null)
             {
-                ResourceLocation rl = Block.REGISTRY.getNameForObject(block);
+                ResourceLocation rl = RegistryUtils.getBlockId(block);
 
                 if (rl != null)
                 {

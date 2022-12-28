@@ -5,11 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
@@ -18,6 +16,7 @@ import malilib.overlay.message.MessageHelpers;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
 import malilib.util.game.wrap.ItemWrap;
+import malilib.util.game.wrap.RegistryUtils;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.schematic.placement.SchematicPlacement;
@@ -331,8 +330,8 @@ public class ToolHud extends InfoHud
 
     protected String getBlockStateString(IBlockState state)
     {
-        ResourceLocation id = Block.REGISTRY.getNameForObject(state.getBlock());
-        String regName = id != null ? id.toString() : StringUtils.translate("litematica.label.misc.null.brackets");
+        String id = RegistryUtils.getBlockIdStr(state.getBlock());
+        String regName = id != null ? id : StringUtils.translate("litematica.label.misc.null.brackets");
 
         Optional<EnumFacing> facingOptional = BlockUtils.getFirstPropertyFacingValue(state);
         String strBlock;
