@@ -98,7 +98,7 @@ public class RayTraceUtils
 
             if (origin != null)
             {
-                traceToOrigin(origin, eyesPos, lookEndPos, HitType.SELECTION_ORIGIN, null);
+                traceToPosition(origin, eyesPos, lookEndPos, HitType.SELECTION_ORIGIN, null);
             }
         }
 
@@ -109,7 +109,7 @@ public class RayTraceUtils
                 if (placement.isEnabled())
                 {
                     traceToPlacementBox(placement, eyesPos, lookEndPos);
-                    traceToOrigin(placement.getOrigin(), eyesPos, lookEndPos, HitType.PLACEMENT_ORIGIN, placement);
+                    traceToPosition(placement.getOrigin(), eyesPos, lookEndPos, HitType.PLACEMENT_ORIGIN, placement);
                 }
             }
         }
@@ -192,23 +192,20 @@ public class RayTraceUtils
 
     private static boolean traceToSelectionBoxBody(SelectionBox box, Vec3d start, Vec3d end)
     {
-        if (box.getPos1() != null && box.getPos2() != null)
+        AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+        RayTraceResult hit = bb.calculateIntercept(start, end);
+
+        if (hit != null)
         {
-            AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-            RayTraceResult hit = bb.calculateIntercept(start, end);
+            double dist = hit.hitVec.distanceTo(start);
 
-            if (hit != null)
+            if (closestBoxDistance < 0 || dist < closestBoxDistance)
             {
-                double dist = hit.hitVec.distanceTo(start);
-
-                if (closestBoxDistance < 0 || dist < closestBoxDistance)
-                {
-                    closestBoxDistance = dist;
-                    closestBox = new RayTraceWrapper(box, Corner.NONE, hit.hitVec);
-                }
-
-                return true;
+                closestBoxDistance = dist;
+                closestBox = new RayTraceWrapper(box, Corner.NONE, hit.hitVec);
             }
+
+            return true;
         }
 
         return false;
@@ -224,21 +221,18 @@ public class RayTraceUtils
             String boxName = entry.getKey();
             SelectionBox box = entry.getValue();
 
-            if (box.getPos1() != null && box.getPos2() != null)
+            AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+            RayTraceResult trace = bb.calculateIntercept(start, end);
+
+            if (trace != null)
             {
-                AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-                RayTraceResult trace = bb.calculateIntercept(start, end);
+                double dist = trace.hitVec.distanceTo(start);
 
-                if (trace != null)
+                if (closestBoxDistance < 0 || dist < closestBoxDistance)
                 {
-                    double dist = trace.hitVec.distanceTo(start);
-
-                    if (closestBoxDistance < 0 || dist < closestBoxDistance)
-                    {
-                        closestBoxDistance = dist;
-                        closestBox = new RayTraceWrapper(placement, trace.hitVec, boxName);
-                        hitSomething = true;
-                    }
+                    closestBoxDistance = dist;
+                    closestBox = new RayTraceWrapper(placement, trace.hitVec, boxName);
+                    hitSomething = true;
                 }
             }
         }
@@ -246,29 +240,26 @@ public class RayTraceUtils
         return hitSomething;
     }
 
-    private static boolean traceToOrigin(BlockPos pos, Vec3d start, Vec3d end, HitType type, @Nullable SchematicPlacement placement)
+    private static boolean traceToPosition(BlockPos pos, Vec3d start, Vec3d end, HitType type, @Nullable SchematicPlacement placement)
     {
-        if (pos != null)
+        AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
+        RayTraceResult trace = bb.calculateIntercept(start, end);
+
+        if (trace != null)
         {
-            AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
-            RayTraceResult trace = bb.calculateIntercept(start, end);
+            double dist = trace.hitVec.distanceTo(start);
 
-            if (trace != null)
+            if (closestOriginDistance < 0 || dist < closestOriginDistance)
             {
-                double dist = trace.hitVec.distanceTo(start);
+                closestOriginDistance = dist;
+                originType = type;
 
-                if (closestOriginDistance < 0 || dist < closestOriginDistance)
+                if (type == HitType.PLACEMENT_ORIGIN)
                 {
-                    closestOriginDistance = dist;
-                    originType = type;
-
-                    if (type == HitType.PLACEMENT_ORIGIN)
-                    {
-                        closestOrigin = new RayTraceWrapper(placement, trace.hitVec, null);
-                    }
-
-                    return true;
+                    closestOrigin = new RayTraceWrapper(placement, trace.hitVec, null);
                 }
+
+                return true;
             }
         }
 

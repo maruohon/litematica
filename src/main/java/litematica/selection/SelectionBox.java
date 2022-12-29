@@ -19,7 +19,7 @@ public class SelectionBox extends Box
         super();
     }
 
-    public SelectionBox(@Nullable BlockPos pos1, @Nullable BlockPos pos2, String name)
+    public SelectionBox(BlockPos pos1, BlockPos pos2, String name)
     {
         super(pos1, pos2);
 
@@ -73,10 +73,10 @@ public class SelectionBox extends Box
     {
         if (JsonUtils.hasString(obj, "name"))
         {
-            @Nullable BlockPos pos1 = JsonUtils.blockPosFromJson(obj, "pos1");
-            @Nullable BlockPos pos2 = JsonUtils.blockPosFromJson(obj, "pos2");
+            BlockPos pos1 = JsonUtils.blockPosFromJson(obj, "pos1");
+            BlockPos pos2 = JsonUtils.blockPosFromJson(obj, "pos2");
 
-            if (pos1 != null || pos2 != null)
+            if (pos1 != null && pos2 != null)
             {
                 return new SelectionBox(pos1, pos2, obj.get("name").getAsString());
             }

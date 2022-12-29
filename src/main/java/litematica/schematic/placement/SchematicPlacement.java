@@ -88,7 +88,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         return this.subRegionCount;
     }
 
-    public Box getEnclosingBox()
+    public IntBoundingBox getEnclosingBox()
     {
         if (this.enclosingBox == null)
         {
@@ -170,40 +170,34 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     protected void updateEnclosingBox()
     {
         ImmutableMap<String, SelectionBox> boxes = this.getSubRegionBoxes(RequiredEnabled.ANY);
-        BlockPos pos1 = null;
-        BlockPos pos2 = null;
+
+        if (boxes.isEmpty())
+        {
+            this.enclosingBox = IntBoundingBox.ORIGIN;
+            return;
+        }
+
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int maxZ = Integer.MIN_VALUE;
 
         for (SelectionBox box : boxes.values())
         {
-            BlockPos tmp;
-            tmp = malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
-
-            if (pos1 == null)
-            {
-                pos1 = tmp;
-            }
-            else if (tmp.getX() < pos1.getX() || tmp.getY() < pos1.getY() || tmp.getZ() < pos1.getZ())
-            {
-                pos1 = malilib.util.position.PositionUtils.getMinCorner(tmp, pos1);
-            }
-
-            tmp = malilib.util.position.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
-
-            if (pos2 == null)
-            {
-                pos2 = tmp;
-            }
-            else if (tmp.getX() > pos2.getX() || tmp.getY() > pos2.getY() || tmp.getZ() > pos2.getZ())
-            {
-                pos2 = malilib.util.position.PositionUtils.getMaxCorner(tmp, pos2);
-            }
+            BlockPos pos1 = box.getPos1();
+            BlockPos pos2 = box.getPos2();
+            minX = Math.min(minX, Math.min(pos1.getX(), pos2.getX()));
+            minY = Math.min(minY, Math.min(pos1.getY(), pos2.getY()));
+            minZ = Math.min(minZ, Math.min(pos1.getZ(), pos2.getZ()));
+            maxX = Math.max(maxX, Math.max(pos1.getX(), pos2.getX()));
+            maxY = Math.max(maxY, Math.max(pos1.getY(), pos2.getY()));
+            maxZ = Math.max(maxZ, Math.max(pos1.getZ(), pos2.getZ()));
         }
 
-        if (pos1 != null && pos2 != null)
-        {
-            this.enclosingBox = new Box(pos1, pos2);
-            this.gridSettings.setDefaultSize(PositionUtils.getAreaSizeFromRelativeEndPosition(pos2.subtract(pos1)));
-        }
+        this.enclosingBox = new IntBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        this.gridSettings.setDefaultSize(PositionUtils.getAreaSizeFromBox(this.enclosingBox));
     }
 
     public ImmutableMap<String, SelectionBox> getSubRegionBoxes(RequiredEnabled required)
@@ -549,7 +543,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
 
         if (offsetToInfrontOfPlayer)
         {
-            placement.origin = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(origin, placement);
+            placement.origin = PositionUtils.getPlacementPositionOffsetToInFrontOfPlayer(origin, placement);
         }
 
         return placement;

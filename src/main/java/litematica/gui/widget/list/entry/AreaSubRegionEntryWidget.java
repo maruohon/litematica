@@ -96,24 +96,15 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
             BlockPos pos1 = box.getPos1();
             BlockPos pos2 = box.getPos2();
 
-            if (pos1 != null)
-            {
-                lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.pos1",
-                                                pos1.getX(), pos1.getY(), pos1.getZ()));
-            }
+            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.pos1",
+                                            pos1.getX(), pos1.getY(), pos1.getZ()));
 
-            if (pos2 != null)
-            {
-                lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.pos1",
-                                                pos2.getX(), pos2.getY(), pos2.getZ()));
-            }
+            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.pos1",
+                                            pos2.getX(), pos2.getY(), pos2.getZ()));
 
-            if (pos1 != null && pos2 != null)
-            {
-                Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPosition(pos2.subtract(pos1));
-                lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.dimensions",
-                                               Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ())));
-            }
+            Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPosition(pos2.subtract(pos1));
+            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.dimensions",
+                                           Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ())));
 
             this.getHoverInfoFactory().addStrings(lines);
         }

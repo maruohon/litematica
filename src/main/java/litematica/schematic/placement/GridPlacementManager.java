@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,21 +15,21 @@ import net.minecraft.util.math.Vec3i;
 
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.IntBoundingBox;
 import litematica.render.OverlayRenderer;
-import litematica.selection.Box;
 import litematica.util.PositionUtils;
 
 public class GridPlacementManager
 {
     private final SchematicPlacementManager schematicPlacementManager;
-    private final HashMap<SchematicPlacement, HashMap<Vec3i, SchematicPlacement>> gridPlacementsPerPlacement = new HashMap<>();
+    private final Map<SchematicPlacement, Map<Vec3i, SchematicPlacement>> gridPlacementsPerPlacement = new HashMap<>();
 
     // This base placement set is used instead of the keySet of gridPlacementsPerPlacement
     // mostly because when logging in, the client player is at first in a wrong location,
     // and thus the repeat area might not overlap that initial client player's loaded area.
     // That would cause no grid placements to be created when loading the base placement from file,
     // and then the periodic update would not know to handle that base placement at all.
-    private final HashSet<SchematicPlacement> basePlacements = new HashSet<>();
+    private final Set<SchematicPlacement> basePlacements = new HashSet<>();
 
     public GridPlacementManager(SchematicPlacementManager schematicPlacementManager)
     {
@@ -40,10 +42,10 @@ public class GridPlacementManager
         this.basePlacements.clear();
     }
 
-    public ArrayList<SchematicPlacement> getGridPlacementsForBasePlacement(SchematicPlacement basePlacement)
+    public List<SchematicPlacement> getGridPlacementsForBasePlacement(SchematicPlacement basePlacement)
     {
-        ArrayList<SchematicPlacement> gridPlacements = new ArrayList<>();
-        HashMap<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.get(basePlacement);
+        List<SchematicPlacement> gridPlacements = new ArrayList<>();
+        Map<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.get(basePlacement);
 
         if (map != null)
         {
@@ -92,9 +94,9 @@ public class GridPlacementManager
         }
     }
 
-    private HashMap<Vec3i, SchematicPlacement> createGridPlacementsWithinLoadedAreaFor(SchematicPlacement basePlacement)
+    private Map<Vec3i, SchematicPlacement> createGridPlacementsWithinLoadedAreaFor(SchematicPlacement basePlacement)
     {
-        Box currentArea = this.getCurrentLoadedArea(1);
+        IntBoundingBox currentArea = this.getCurrentLoadedArea(1);
 
         if (currentArea != null)
         {
@@ -104,9 +106,9 @@ public class GridPlacementManager
         return new HashMap<>();
     }
 
-    private HashSet<Vec3i> getGridPointsWithinAreaFor(SchematicPlacement basePlacement, Box area)
+    private Set<Vec3i> getGridPointsWithinAreaFor(SchematicPlacement basePlacement, IntBoundingBox area)
     {
-        HashSet<Vec3i> points = new HashSet<>();
+        Set<Vec3i> points = new HashSet<>();
         GridSettings settings = basePlacement.getGridSettings();
         Vec3i size = settings.getSize();
 
@@ -117,30 +119,30 @@ public class GridPlacementManager
             int sizeX = size.getX();
             int sizeY = size.getY();
             int sizeZ = size.getZ();
-            Box baseBox = basePlacement.getEnclosingBox();
-            BlockPos repeatAreaMinCorner = baseBox.getPos1().add(-repeatNeg.getX() * sizeX, -repeatNeg.getY() * sizeY, -repeatNeg.getZ() * sizeZ);
-            BlockPos repeatAreaMaxCorner = baseBox.getPos2().add( repeatPos.getX() * sizeX,  repeatPos.getY() * sizeY,  repeatPos.getZ() * sizeZ);
-            Box repeatEnclosingBox = new Box(repeatAreaMinCorner, repeatAreaMaxCorner);
+            IntBoundingBox baseBox = basePlacement.getEnclosingBox();
+            IntBoundingBox repeatEnclosingBox = IntBoundingBox.createProper(baseBox.minX - repeatNeg.getX() * sizeX,
+                                                                            baseBox.minY - repeatNeg.getY() * sizeY,
+                                                                            baseBox.minZ - repeatNeg.getZ() * sizeZ,
+                                                                            baseBox.maxX + repeatPos.getX() * sizeX,
+                                                                            baseBox.maxY + repeatPos.getY() * sizeY,
+                                                                            baseBox.maxZ + repeatPos.getZ() * sizeZ);
 
             // Get the box where the repeated placements intersect the target area
-            Box intersectingBox = repeatEnclosingBox.createIntersectingBox(area);
+            //Box intersectingBox = repeatEnclosingBox.createIntersectingBox(area);
+            IntBoundingBox intersectingBox = repeatEnclosingBox.createIntersectingBox(area);
             //System.out.printf("plop 2, size: %s, rep encl: %s .. %s\n", size, repeatEnclosingBox.getPos1(), repeatEnclosingBox.getPos2());
 
             if (intersectingBox != null)
             {
                 // Get the minimum and maximum repeat counts of the edge-most repeated placements that
                 // touch the intersection box.
-                BlockPos p1 = intersectingBox.getPos1();
-                BlockPos p2 = intersectingBox.getPos2();
-                BlockPos baseMinCorner = baseBox.getPos1();
-
                 //System.out.printf("inters min: %s, max: %s\n", p1, p2);
-                int minX = (p1.getX() - baseMinCorner.getX()) / sizeX;
-                int minY = (p1.getY() - baseMinCorner.getY()) / sizeY;
-                int minZ = (p1.getZ() - baseMinCorner.getZ()) / sizeZ;
-                int maxX = (p2.getX() - baseMinCorner.getX()) / sizeX;
-                int maxY = (p2.getY() - baseMinCorner.getY()) / sizeY;
-                int maxZ = (p2.getZ() - baseMinCorner.getZ()) / sizeZ;
+                int minX = (intersectingBox.minX - baseBox.minX) / sizeX;
+                int minY = (intersectingBox.minY - baseBox.minY) / sizeY;
+                int minZ = (intersectingBox.minZ - baseBox.minZ) / sizeZ;
+                int maxX = (intersectingBox.maxX - baseBox.minX) / sizeX;
+                int maxY = (intersectingBox.maxY - baseBox.minY) / sizeY;
+                int maxZ = (intersectingBox.maxZ - baseBox.minZ) / sizeZ;
                 //System.out.printf("rep: x: %d .. %d, y: %d .. %d, z: %d .. %s\n", minX, maxX, minY, maxY, minZ, maxZ);
 
                 for (int y = minY; y <= maxY; ++y)
@@ -163,15 +165,15 @@ public class GridPlacementManager
         return points;
     }
 
-    private HashMap<Vec3i, SchematicPlacement> createGridPlacementsWithinAreaFor(SchematicPlacement basePlacement, Box area)
+    private Map<Vec3i, SchematicPlacement> createGridPlacementsWithinAreaFor(SchematicPlacement basePlacement, IntBoundingBox area)
     {
-        HashSet<Vec3i> gridPoints = this.getGridPointsWithinAreaFor(basePlacement, area);
+        Set<Vec3i> gridPoints = this.getGridPointsWithinAreaFor(basePlacement, area);
         return this.createGridPlacementsForPoints(basePlacement, gridPoints);
     }
 
-    private HashMap<Vec3i, SchematicPlacement> createGridPlacementsForPoints(SchematicPlacement basePlacement, HashSet<Vec3i> gridPoints)
+    private Map<Vec3i, SchematicPlacement> createGridPlacementsForPoints(SchematicPlacement basePlacement, Set<Vec3i> gridPoints)
     {
-        HashMap<Vec3i, SchematicPlacement> placements = new HashMap<>();
+        Map<Vec3i, SchematicPlacement> placements = new HashMap<>();
 
         if (gridPoints.isEmpty() == false)
         {
@@ -194,13 +196,13 @@ public class GridPlacementManager
         return placements;
     }
 
-    private HashSet<Vec3i> getExistingOutOfRangeGridPointsFor(SchematicPlacement basePlacement, HashSet<Vec3i> currentGridPoints)
+    private Set<Vec3i> getExistingOutOfRangeGridPointsFor(SchematicPlacement basePlacement, Set<Vec3i> currentGridPoints)
     {
-        HashMap<Vec3i, SchematicPlacement> placements = this.gridPlacementsPerPlacement.get(basePlacement);
+        Map<Vec3i, SchematicPlacement> placements = this.gridPlacementsPerPlacement.get(basePlacement);
 
         if (placements != null)
         {
-            HashSet<Vec3i> outOfRangePoints = new HashSet<>(placements.keySet());
+            Set<Vec3i> outOfRangePoints = new HashSet<>(placements.keySet());
             outOfRangePoints.removeAll(currentGridPoints);
             return outOfRangePoints;
         }
@@ -208,13 +210,13 @@ public class GridPlacementManager
         return new HashSet<>();
     }
 
-    private HashSet<Vec3i> getNewGridPointsFor(SchematicPlacement basePlacement, HashSet<Vec3i> currentGridPoints)
+    private Set<Vec3i> getNewGridPointsFor(SchematicPlacement basePlacement, Set<Vec3i> currentGridPoints)
     {
-        HashMap<Vec3i, SchematicPlacement> placements = this.gridPlacementsPerPlacement.get(basePlacement);
+        Map<Vec3i, SchematicPlacement> placements = this.gridPlacementsPerPlacement.get(basePlacement);
 
         if (placements != null)
         {
-            HashSet<Vec3i> newPoints = new HashSet<>(currentGridPoints);
+            Set<Vec3i> newPoints = new HashSet<>(currentGridPoints);
             newPoints.removeAll(placements.keySet());
             return newPoints;
         }
@@ -231,7 +233,7 @@ public class GridPlacementManager
      */
     private boolean addGridPlacementsWithinLoadedAreaFor(SchematicPlacement basePlacement)
     {
-        HashMap<Vec3i, SchematicPlacement> placements = this.createGridPlacementsWithinLoadedAreaFor(basePlacement);
+        Map<Vec3i, SchematicPlacement> placements = this.createGridPlacementsWithinLoadedAreaFor(basePlacement);
 
         if (placements.isEmpty() == false)
         {
@@ -244,7 +246,6 @@ public class GridPlacementManager
     /**
      * Removes all grid placements of the provided placement, and the base placement itself
      * so that the automatic updating doesn't re-create them.
-     * @param basePlacement
      */
     void onPlacementRemoved(SchematicPlacement basePlacement)
     {
@@ -258,7 +259,7 @@ public class GridPlacementManager
      */
     private boolean removeAllGridPlacementsOf(SchematicPlacement basePlacement)
     {
-        HashMap<Vec3i, SchematicPlacement> placements = this.gridPlacementsPerPlacement.get(basePlacement);
+        Map<Vec3i, SchematicPlacement> placements = this.gridPlacementsPerPlacement.get(basePlacement);
 
         if (placements != null)
         {
@@ -278,16 +279,16 @@ public class GridPlacementManager
      */
     boolean createOrRemoveGridPlacementsForLoadedArea()
     {
-        Box currentArea = this.getCurrentLoadedArea(1);
+        IntBoundingBox currentArea = this.getCurrentLoadedArea(1);
         boolean modified = false;
 
         if (currentArea != null)
         {
             for (SchematicPlacement basePlacement : this.basePlacements)
             {
-                HashSet<Vec3i> currentGridPoints = this.getGridPointsWithinAreaFor(basePlacement, currentArea);
-                HashSet<Vec3i> outOfRangePoints = this.getExistingOutOfRangeGridPointsFor(basePlacement, currentGridPoints);
-                HashSet<Vec3i> newPoints = this.getNewGridPointsFor(basePlacement, currentGridPoints);
+                Set<Vec3i> currentGridPoints = this.getGridPointsWithinAreaFor(basePlacement, currentArea);
+                Set<Vec3i> outOfRangePoints = this.getExistingOutOfRangeGridPointsFor(basePlacement, currentGridPoints);
+                Set<Vec3i> newPoints = this.getNewGridPointsFor(basePlacement, currentGridPoints);
                 //System.out.printf("c: %d, o: %d, n: %d\n", currentGridPoints.size(), outOfRangePoints.size(), newPoints.size());
 
                 if (outOfRangePoints.isEmpty() == false)
@@ -297,7 +298,7 @@ public class GridPlacementManager
 
                 if (newPoints.isEmpty() == false)
                 {
-                    HashMap<Vec3i, SchematicPlacement> placements = this.createGridPlacementsForPoints(basePlacement, newPoints);
+                    Map<Vec3i, SchematicPlacement> placements = this.createGridPlacementsForPoints(basePlacement, newPoints);
                     modified |= this.addGridPlacements(basePlacement, placements);
                 }
             }
@@ -318,13 +319,13 @@ public class GridPlacementManager
      * @param placements
      * @return true if some placements were added
      */
-    private boolean addGridPlacements(SchematicPlacement basePlacement, HashMap<Vec3i, SchematicPlacement> placements)
+    private boolean addGridPlacements(SchematicPlacement basePlacement, Map<Vec3i, SchematicPlacement> placements)
     {
         boolean modified = false;
 
         if (placements.isEmpty() == false)
         {
-            HashMap<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.computeIfAbsent(basePlacement, k -> new HashMap<>());
+            Map<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.computeIfAbsent(basePlacement, k -> new HashMap<>());
 
             for (Map.Entry<Vec3i, SchematicPlacement> entry : placements.entrySet())
             {
@@ -347,13 +348,11 @@ public class GridPlacementManager
     /**
      * Removes the grid placements of the provided normal placement
      * from the requested grid points, if they exist
-     * @param basePlacement
-     * @param gridPoints
      * @return true if some placements were removed
      */
     private boolean removeGridPlacements(SchematicPlacement basePlacement, Collection<Vec3i> gridPoints)
     {
-        HashMap<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.get(basePlacement);
+        Map<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.get(basePlacement);
         boolean modified = false;
 
         if (gridPoints.isEmpty() == false && map != null)
@@ -376,7 +375,7 @@ public class GridPlacementManager
     }
 
     @Nullable
-    private Box getCurrentLoadedArea(int expandChunks)
+    private IntBoundingBox getCurrentLoadedArea(int expandChunks)
     {
         EntityPlayer player = GameUtils.getClientPlayer();
 
@@ -388,9 +387,9 @@ public class GridPlacementManager
         int centerChunkX = EntityWrap.getChunkX(player);
         int centerChunkZ = EntityWrap.getChunkZ(player);
         int chunkRadius = GameUtils.getRenderDistanceChunks() + expandChunks;
-        BlockPos corner1 = new BlockPos( (centerChunkX - chunkRadius) << 4      ,   0,  (centerChunkZ - chunkRadius) << 4      );
-        BlockPos corner2 = new BlockPos(((centerChunkX + chunkRadius) << 4) + 15, 255, ((centerChunkZ + chunkRadius) << 4) + 15);
+        int playerY = (int) EntityWrap.getY(player);
 
-        return new Box(corner1, corner2);
+        return IntBoundingBox.createProper( (centerChunkX - chunkRadius) << 4      , playerY - 512,  (centerChunkZ - chunkRadius) << 4,
+                                           ((centerChunkX + chunkRadius) << 4) + 15, playerY + 512, ((centerChunkZ + chunkRadius) << 4) + 15);
     }
 }

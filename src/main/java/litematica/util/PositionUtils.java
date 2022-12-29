@@ -1,10 +1,8 @@
 package litematica.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -166,12 +164,7 @@ public class PositionUtils
 
     public static boolean isBoxWithinWorld(World world, Box box)
     {
-        if (box.getPos1() != null && box.getPos2() != null)
-        {
-            return arePositionsWithinWorld(world, box.getPos1(), box.getPos2());
-        }
-
-        return false;
+        return arePositionsWithinWorld(world, box.getPos1(), box.getPos2());
     }
 
     public static boolean isPlacementWithinWorld(World world, SchematicPlacement schematicPlacement, boolean respectRenderRange)
@@ -235,6 +228,13 @@ public class PositionUtils
         return new Vec3i(Math.abs(x), Math.abs(y), Math.abs(z));
     }
 
+    public static Vec3i getAreaSizeFromBox(IntBoundingBox box)
+    {
+        return new Vec3i(box.maxX - box.minX + 1,
+                         box.maxY - box.minY + 1,
+                         box.maxZ - box.minZ + 1);
+    }
+
     public static Vec3i getRelativeEndPositionFromAreaSize(Vec3i size)
     {
         int x = size.getX();
@@ -253,27 +253,6 @@ public class PositionUtils
         return (long) size.getX() * (long) size.getY() * (long) size.getZ();
     }
 
-    public static List<SelectionBox> getValidBoxes(AreaSelection area)
-    {
-        List<SelectionBox> boxes = new ArrayList<>();
-        Collection<SelectionBox> originalBoxes = area.getAllSubRegionBoxes();
-
-        for (SelectionBox box : originalBoxes)
-        {
-            if (isBoxValid(box))
-            {
-                boxes.add(box);
-            }
-        }
-
-        return boxes;
-    }
-
-    public static boolean isBoxValid(Box box)
-    {
-        return box.getPos1() != null && box.getPos2() != null;
-    }
-
     public static Vec3i getAbsoluteAreaSize(Vec3i size)
     {
         return new Vec3i(Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ()));
@@ -290,11 +269,15 @@ public class PositionUtils
         return pair.getRight().subtract(pair.getLeft()).add(1, 1, 1);
     }
 
+    public static Box asBox(IntBoundingBox intBox)
+    {
+        return new Box(new BlockPos(intBox.minX, intBox.minY, intBox.minZ),
+                       new BlockPos(intBox.maxX, intBox.maxY, intBox.maxZ));
+    }
+
     /**
      * Returns the min and max corners of the enclosing box around the given collection of boxes.
      * The minimum corner is the left entry and the maximum corner is the right entry of the pair.
-     * @param boxes
-     * @return
      */
     @Nullable
     public static Pair<BlockPos, BlockPos> getEnclosingAreaCorners(Collection<? extends Box> boxes)
@@ -370,12 +353,9 @@ public class PositionUtils
 
         for (Box box : boxes)
         {
-            if (isBoxValid(box))
-            {
-                BlockPos min = malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
-                BlockPos max = malilib.util.position.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
-                volume += (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
-            }
+            BlockPos min = malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            BlockPos max = malilib.util.position.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+            volume += (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
         }
 
         return volume;
@@ -678,23 +658,6 @@ public class PositionUtils
     {
         BlockPos pos1 = box.getPos1();
         BlockPos pos2 = box.getPos2();
-
-        if (pos1 == null || pos2 == null)
-        {
-            if (pos1 == null && pos2 == null)
-            {
-                return box;
-            }
-            else if (pos2 == null)
-            {
-                pos2 = pos1;
-            }
-            else
-            {
-                pos1 = pos2;
-            }
-        }
-
         Pair<Integer, Integer> x = growCoordinatePair(pos1.getX(), pos2.getX(), amount);
         Pair<Integer, Integer> y = growCoordinatePair(pos1.getY(), pos2.getY(), amount);
         Pair<Integer, Integer> z = growCoordinatePair(pos1.getZ(), pos2.getZ(), amount);
@@ -750,16 +713,16 @@ public class PositionUtils
 
         Box box = area.getSelectedSubRegionBox();
 
-        if (box == null || (box.getPos1() == null && box.getPos2() == null))
+        if (box == null)
         {
             MessageDispatcher.error("litematica.error.area_selection.grow.no_sub_region_selected");
             return;
         }
 
-        if (box != null && (box.getPos1() != null || box.getPos2() != null))
+        if (box != null)
         {
-            int amount = 1;
             Box boxNew = box.copy();
+            int amount = 1;
 
             for (int i = 0; i < 256; ++i)
             {
@@ -835,56 +798,53 @@ public class PositionUtils
         }
     }
 
-    public static BlockPos getPlacementPositionOffsetToInfrontOfPlayer(BlockPos origPos)
+    public static BlockPos getPlacementPositionOffsetToInFrontOfPlayer(BlockPos origPos)
     {
         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
         SchematicPlacement placement = manager.getSelectedSchematicPlacement();
 
-        return getPlacementPositionOffsetToInfrontOfPlayer(origPos, placement);
+        return getPlacementPositionOffsetToInFrontOfPlayer(origPos, placement);
     }
 
-    public static BlockPos getPlacementPositionOffsetToInfrontOfPlayer(BlockPos newOrigin, @Nullable SchematicPlacement placement)
+    public static BlockPos getPlacementPositionOffsetToInFrontOfPlayer(BlockPos newOrigin, @Nullable SchematicPlacement placement)
     {
-        if (Configs.Generic.PLACEMENTS_INFRONT.getBooleanValue())
+        Entity entity = GameUtils.getCameraEntity();
+
+        if (Configs.Generic.PLACEMENTS_INFRONT.getBooleanValue() && placement != null && entity != null)
         {
-            Entity entity = GameUtils.getCameraEntity();
+            SubRegionPlacement sub = placement.getSelectedSubRegionPlacement();
+            Box box;
 
-            if (placement != null && entity != null)
+            if (sub != null)
             {
-                SubRegionPlacement sub = placement.getSelectedSubRegionPlacement();
-                Box box;
+                String regionName = placement.getSelectedSubRegionName();
+                ImmutableMap<String, SelectionBox> map = placement.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED);
+                box = map.get(regionName);
+            }
+            else
+            {
+                box = asBox(placement.getEnclosingBox());
+            }
 
-                if (sub != null)
-                {
-                    String regionName = placement.getSelectedSubRegionName();
-                    ImmutableMap<String, SelectionBox> map = placement.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED);
-                    box = map.get(regionName);
-                }
-                else
-                {
-                    box = placement.getEnclosingBox();
-                }
+            if (box != null)
+            {
+                BlockPos originOffset = newOrigin.subtract(placement.getOrigin());
+                BlockPos corner1 = box.getPos1().add(originOffset);
+                BlockPos corner2 = box.getPos2().add(originOffset);
+                BlockPos entityPos = EntityWrap.getEntityBlockPos(entity);
+                EnumFacing entityFrontDirection = entity.getHorizontalFacing();
+                EnumFacing entitySideDirection = malilib.util.position.PositionUtils.getClosestSideDirection(entity);
+                Vec3i alignmentFrontOffset = getOffsetToMoveBoxInFrontOfEntityPos(entityPos, entityFrontDirection, corner1, corner2);
+                Vec3i alignmentSideOffset = getOffsetToMoveBoxInFrontOfEntityPos(entityPos, entitySideDirection, corner1, corner2);
 
-                if (box != null)
-                {
-                    BlockPos originOffset = newOrigin.subtract(placement.getOrigin());
-                    BlockPos corner1 = box.getPos1().add(originOffset);
-                    BlockPos corner2 = box.getPos2().add(originOffset);
-                    BlockPos entityPos = EntityWrap.getEntityBlockPos(entity);
-                    EnumFacing entityFrontDirection = entity.getHorizontalFacing();
-                    EnumFacing entitySideDirection = malilib.util.position.PositionUtils.getClosestSideDirection(entity);
-                    Vec3i alignmentFrontOffset = getOffsetToMoveBoxInfrontOfEntityPos(entityPos, entityFrontDirection, corner1, corner2);
-                    Vec3i alignmentSideOffset = getOffsetToMoveBoxInfrontOfEntityPos(entityPos, entitySideDirection, corner1, corner2);
-
-                    return newOrigin.add(alignmentFrontOffset).add(alignmentSideOffset);
-                }
+                return newOrigin.add(alignmentFrontOffset).add(alignmentSideOffset);
             }
         }
 
         return newOrigin;
     }
 
-    public static Vec3i getOffsetToMoveBoxInfrontOfEntityPos(BlockPos entityPos, EnumFacing entityHorizontalFacing, BlockPos corner1, BlockPos corner2)
+    public static Vec3i getOffsetToMoveBoxInFrontOfEntityPos(BlockPos entityPos, EnumFacing entityHorizontalFacing, BlockPos corner1, BlockPos corner2)
     {
         BlockPos minPos = malilib.util.position.PositionUtils.getMinCorner(corner1, corner2);
         BlockPos maxPos = malilib.util.position.PositionUtils.getMaxCorner(corner1, corner2);

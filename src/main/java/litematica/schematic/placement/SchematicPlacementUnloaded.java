@@ -21,12 +21,12 @@ import malilib.util.FileUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.IntBoundingBox;
 import litematica.Litematica;
 import litematica.data.DataManager;
 import litematica.data.SchematicHolder;
 import litematica.schematic.ISchematic;
 import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
-import litematica.selection.Box;
 
 public class SchematicPlacementUnloaded
 {
@@ -51,7 +51,7 @@ public class SchematicPlacementUnloaded
     protected boolean invalidated;
     protected int coordinateLockMask;
     protected long lastSaveTime;
-    @Nullable protected Box enclosingBox;
+    @Nullable protected IntBoundingBox enclosingBox;
     @Nullable protected String selectedSubRegionName;
     @Nullable protected JsonObject materialListData;
 
@@ -235,7 +235,7 @@ public class SchematicPlacementUnloaded
         this.locked = other.locked;
         this.shouldBeSaved = other.shouldBeSaved;
         this.coordinateLockMask = other.coordinateLockMask;
-        this.enclosingBox = other.enclosingBox != null ? other.enclosingBox.copy() : null;
+        this.enclosingBox = other.enclosingBox;
         this.selectedSubRegionName = other.selectedSubRegionName;
         this.materialListData = other.materialListData != null ? JsonUtils.deepCopy(other.materialListData) : null;
 

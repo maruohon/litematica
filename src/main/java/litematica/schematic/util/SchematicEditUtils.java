@@ -376,7 +376,7 @@ public class SchematicEditUtils
             {
                 for (PlacementPart part : list)
                 {
-                    if (part.getBox().containsPos(pos))
+                    if (part.getBox().contains(pos))
                     {
                         SchematicPlacement placement = part.getPlacement();
                         ISchematic schematic = placement.getSchematic();
@@ -444,7 +444,7 @@ public class SchematicEditUtils
             {
                 for (PlacementPart part : list)
                 {
-                    if (part.getBox().containsPos(posStart))
+                    if (part.getBox().contains(posStart))
                     {
                         String regionName = part.getSubRegionName();
                         SchematicPlacement schematicPlacement = part.getPlacement();
@@ -533,7 +533,7 @@ public class SchematicEditUtils
             {
                 for (PlacementPart part : list)
                 {
-                    if (part.getBox().containsPos(posStart))
+                    if (part.getBox().contains(posStart))
                     {
                         if (replaceAllIdenticalBlocks(part, stateOriginal, stateNew))
                         {

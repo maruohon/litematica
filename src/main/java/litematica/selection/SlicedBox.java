@@ -1,40 +1,44 @@
 package litematica.selection;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.MathHelper;
 
-public class BoxSliced extends Box
+public class SlicedBox extends Box
 {
     private EnumFacing sliceDirection = EnumFacing.EAST;
     private int sliceStart = 0;
     private int sliceEnd = 1;
-    private int sliceCount;
+    private int sliceRepeatCount;
 
     public EnumFacing getSliceDirection()
     {
-        return sliceDirection;
+        return this.sliceDirection;
     }
 
     /**
-     * Returns the inclusive relative start offset from pos1
-     * @return
+     * @return the relative start offset from pos1 along the slice direction axis
      */
     public int getSliceStart()
     {
-        return sliceStart;
+        return this.sliceStart;
     }
 
     /**
-     * Returns the exclusive relative end offset from pos1
-     * @return
+     * @return the relative end offset (inclusive) from pos1 along the slice direction axis
      */
     public int getSliceEnd()
     {
-        return sliceEnd;
+        return this.sliceEnd;
     }
 
-    public int getSliceCount()
+    public int getSliceLength()
     {
-        return sliceCount;
+        return Math.abs(this.sliceEnd - this.sliceStart) + 1;
+    }
+
+    public int getSliceRepeatCount()
+    {
+        return this.sliceRepeatCount;
     }
 
     public int getMaxSliceLength()
@@ -55,16 +59,16 @@ public class BoxSliced extends Box
 
     public void setSliceStart(int sliceStart)
     {
-        this.sliceStart = Math.min(sliceStart, this.getMaxSliceLength() - 1);
+        this.sliceStart = MathHelper.clamp(sliceStart, 0, this.getMaxSliceLength() - 1);
     }
 
     public void setSliceEnd(int sliceEnd)
     {
-        this.sliceEnd = Math.min(sliceEnd, this.getMaxSliceLength());
+        this.sliceEnd = MathHelper.clamp(sliceEnd, 0, this.getMaxSliceLength() - 1);
     }
 
-    public void setSliceCount(int sliceCount)
+    public void setSliceRepeatCount(int sliceRepeatCount)
     {
-        this.sliceCount = sliceCount;
+        this.sliceRepeatCount = sliceRepeatCount;
     }
 }

@@ -36,6 +36,7 @@ import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
+import malilib.util.position.IntBoundingBox;
 import malilib.util.position.Vec2i;
 import litematica.config.Configs;
 import litematica.config.Configs.Visuals;
@@ -185,14 +186,14 @@ public class OverlayRenderer
 
                     if (schematicPlacement.shouldRenderEnclosingBox())
                     {
-                        Box box = schematicPlacement.getEnclosingBox();
-                        RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
+                        IntBoundingBox box = schematicPlacement.getEnclosingBox();
+                        RenderUtils.renderAreaOutline(box, 1f, color, color, color, renderViewEntity, partialTicks);
 
                         if (Configs.Visuals.PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
                         {
                             float alpha = (float) Visuals.PLACEMENT_ENCLOSING_BOX_SIDES.getDoubleValue();
                             color = new Color4f(color.r, color.g, color.b, alpha);
-                            RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, renderViewEntity, partialTicks);
+                            RenderUtils.renderAreaSides(box, color, renderViewEntity, partialTicks);
                         }
                     }
                 }
@@ -220,12 +221,6 @@ public class OverlayRenderer
     {
         BlockPos pos1 = box.getPos1();
         BlockPos pos2 = box.getPos2();
-
-        if (pos1 == null && pos2 == null)
-        {
-            return;
-        }
-
         Color4f color1;
         Color4f color2;
         Color4f colorX;
@@ -282,51 +277,36 @@ public class OverlayRenderer
             sideColor = Color4f.fromColor(Configs.Colors.AREA_SELECTION_BOX_SIDE.getIntegerValue());
         }
 
-        if (pos1 != null && pos2 != null)
+        if (pos1.equals(pos2) == false)
         {
-            if (pos1.equals(pos2) == false)
+            RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
+
+            if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
+                  Configs.Visuals.AREA_SELECTION_BOX_SIDES.getBooleanValue())
+                ||
+                 ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
+                   Configs.Visuals.PLACEMENT_BOX_SIDES.getBooleanValue()))
             {
-                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
-
-                if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
-                      Configs.Visuals.AREA_SELECTION_BOX_SIDES.getBooleanValue())
-                    ||
-                     ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
-                       Configs.Visuals.PLACEMENT_BOX_SIDES.getBooleanValue()))
-                {
-                    RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
-                }
-
-                if (box.getSelectedCorner() == Corner.CORNER_1)
-                {
-                    Color4f color = this.colorPos1.withAlpha(0.4F);
-                    RenderUtils.renderAreaSides(pos1, pos1, color, renderViewEntity, partialTicks);
-                }
-                else if (box.getSelectedCorner() == Corner.CORNER_2)
-                {
-                    Color4f color = this.colorPos2.withAlpha(0.4F);
-                    RenderUtils.renderAreaSides(pos2, pos2, color, renderViewEntity, partialTicks);
-                }
-
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
+                RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
             }
-            else
+
+            if (box.getSelectedCorner() == Corner.CORNER_1)
             {
-                RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, color1, color2, this.colorOverlapping, renderViewEntity, partialTicks);
+                Color4f color = this.colorPos1.withAlpha(0.4F);
+                RenderUtils.renderAreaSides(pos1, pos1, color, renderViewEntity, partialTicks);
             }
+            else if (box.getSelectedCorner() == Corner.CORNER_2)
+            {
+                Color4f color = this.colorPos2.withAlpha(0.4F);
+                RenderUtils.renderAreaSides(pos2, pos2, color, renderViewEntity, partialTicks);
+            }
+
+            RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
+            RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
         }
         else
         {
-            if (pos1 != null)
-            {
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
-            }
-
-            if (pos2 != null)
-            {
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
-            }
+            RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, color1, color2, this.colorOverlapping, renderViewEntity, partialTicks);
         }
     }
 

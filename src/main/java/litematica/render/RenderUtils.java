@@ -30,6 +30,7 @@ import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.inventory.InventoryView;
+import malilib.util.position.IntBoundingBox;
 import litematica.config.Configs;
 import litematica.config.Hotkeys;
 import litematica.util.BlockInfoAlignment;
@@ -205,12 +206,15 @@ public class RenderUtils
         tessellator.draw();
     }
 
-    public static void renderAreaOutline(BlockPos pos1, BlockPos pos2, float lineWidth,
-            Color4f colorX, Color4f colorY, Color4f colorZ, Entity renderViewEntity, float partialTicks)
+    public static void renderAreaOutline(IntBoundingBox box, float lineWidth,
+                                         Color4f colorX, Color4f colorY, Color4f colorZ,
+                                         Entity renderViewEntity, float partialTicks)
     {
         GlStateManager.glLineWidth(lineWidth);
 
-        AxisAlignedBB aabb = createEnclosingAABB(pos1, pos2, renderViewEntity, partialTicks);
+        AxisAlignedBB aabb = createAABB(box.minX, box.minY, box.minZ,
+                                        box.maxX + 1, box.maxY + 1, box.maxZ + 1,
+                                        0.0, partialTicks, renderViewEntity);
         drawBoundingBoxEdges(aabb, colorX, colorY, colorZ);
     }
 
@@ -289,6 +293,34 @@ public class RenderUtils
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
         renderAreaSidesBatched(pos1, pos2, color, 0.002, renderViewEntity, partialTicks, buffer);
+
+        tessellator.draw();
+
+        GlStateManager.enableCull();
+        GlStateManager.disableBlend();
+    }
+
+    public static void renderAreaSides(IntBoundingBox box, Color4f color, Entity renderViewEntity, float partialTicks)
+    {
+        GlStateManager.enableBlend();
+        GlStateManager.disableCull();
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+        double expand = 0.002;
+        double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
+        double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
+        double dz = EntityWrap.lerpZ(renderViewEntity, partialTicks);
+        double minX = box.minX - dx - expand;
+        double minY = box.minY - dy - expand;
+        double minZ = box.minZ - dz - expand;
+        double maxX = box.maxX - dx + expand + 1;
+        double maxY = box.maxY - dy + expand + 1;
+        double maxZ = box.maxZ - dz + expand + 1;
+
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
 
         tessellator.draw();
 
@@ -818,7 +850,8 @@ public class RenderUtils
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static AxisAlignedBB createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, double expand, float partialTicks, Entity entity)
+    public static AxisAlignedBB createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
+                                           double expand, float partialTicks, Entity entity)
     {
         double dx = EntityWrap.lerpX(entity, partialTicks);
         double dy = EntityWrap.lerpY(entity, partialTicks);

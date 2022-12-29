@@ -94,7 +94,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             if (DataManager.getSchematicPlacementManager().duplicateSelectedPlacement())
             {
                 BlockPos pos = EntityWrap.getCameraEntityBlockPos();
-                pos = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(pos);
+                pos = PositionUtils.getPlacementPositionOffsetToInFrontOfPlayer(pos);
                 DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos);
                 MessageDispatcher.generic().customHotbar().translate("litematica.message.duplicated_selected_placement");
             }
@@ -201,7 +201,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             else if (mode.getUsesSchematic())
             {
                 BlockPos pos = EntityWrap.getCameraEntityBlockPos();
-                pos = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(pos);
+                pos = PositionUtils.getPlacementPositionOffsetToInFrontOfPlayer(pos);
                 DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos);
                 return ActionResult.SUCCESS;
             }

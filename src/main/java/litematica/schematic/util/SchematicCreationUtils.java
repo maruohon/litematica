@@ -149,7 +149,7 @@ public class SchematicCreationUtils
      */
     public static LitematicaSchematic createEmptySchematic(AreaSelection area)
     {
-        List<SelectionBox> boxes = PositionUtils.getValidBoxes(area);
+        List<SelectionBox> boxes = area.getAllSubRegionBoxes();
 
         if (boxes.isEmpty())
         {
@@ -175,7 +175,7 @@ public class SchematicCreationUtils
                                                       String author,
                                                       ResultingStringConsumer feedback)
     {
-        List<SelectionBox> boxes = PositionUtils.getValidBoxes(area);
+        List<SelectionBox> boxes = area.getAllSubRegionBoxes();
 
         if (boxes.isEmpty())
         {

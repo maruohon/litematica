@@ -652,17 +652,6 @@ public class SelectionManager
                 Box box = sel.getSelectedSubRegionBox();
                 BlockPos pos1 = box.getPos1();
                 BlockPos pos2 = box.getPos2();
-
-                if (pos1 == null)
-                {
-                    pos1 = pos;
-                }
-
-                if (pos2 == null)
-                {
-                    pos2 = pos;
-                }
-
                 BlockPos posMin = PositionUtils.getMinCorner(PositionUtils.getMinCorner(pos1, pos2), pos);
                 BlockPos posMax = PositionUtils.getMaxCorner(PositionUtils.getMaxCorner(pos1, pos2), pos);
 
@@ -839,13 +828,13 @@ public class SelectionManager
             Vec3d newLookPos = entity.getPositionEyes(1f).add(entity.getLook(1f).scale(this.grabDistance));
             Vec3d change = newLookPos.subtract(this.grabPosition);
 
-            if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_1) && this.grabbedBox.getPos1() != null)
+            if (this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_1)
             {
                 BlockPos pos = this.originalBox.getPos1().add(change.x, change.y, change.z);
                 this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_1, pos);
             }
 
-            if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_2) && this.grabbedBox.getPos2() != null)
+            if (this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_2)
             {
                 BlockPos pos = this.originalBox.getPos2().add(change.x, change.y, change.z);
                 this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_2, pos);

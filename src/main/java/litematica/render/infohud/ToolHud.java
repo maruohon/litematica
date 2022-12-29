@@ -201,14 +201,11 @@ public class ToolHud extends InfoHud
                 BlockPos p1 = box.getPos1();
                 BlockPos p2 = box.getPos2();
 
-                if (p1 != null && p2 != null)
-                {
-                    Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPositionAbs(p2.subtract(p1));
-                    lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.dimensions_positions",
-                                                    size.getX(), size.getY(), size.getZ(),
-                                                    p1.getX(), p1.getY(), p1.getZ(),
-                                                    p2.getX(), p2.getY(), p2.getZ()));
-                }
+                Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPositionAbs(p2.subtract(p1));
+                lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.dimensions_positions",
+                                                size.getX(), size.getY(), size.getZ(),
+                                                p1.getX(), p1.getY(), p1.getZ(),
+                                                p2.getX(), p2.getY(), p2.getZ()));
             }
         }
     }

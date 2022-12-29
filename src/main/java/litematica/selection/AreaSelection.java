@@ -200,12 +200,8 @@ public class AreaSelection
         for (Map.Entry<String, SelectionBox> entry : this.subRegionBoxes.entrySet())
         {
             IntBoundingBox bb = entry.getValue().asIntBoundingBox();
-
-            if (bb != null)
-            {
-                String regionName = entry.getKey();
-                NbtWrap.putTag(tag, regionName, bb.toNbtIntArray());
-            }
+            String regionName = entry.getKey();
+            NbtWrap.putTag(tag, regionName, bb.toNbtIntArray());
         }
 
         return tag;
@@ -338,15 +334,8 @@ public class AreaSelection
 
         for (SelectionBox box : this.subRegionBoxes.values())
         {
-            if (box.getPos1() != null)
-            {
-                this.setSubRegionCornerPos(box, Corner.CORNER_1, box.getPos1().add(diff));
-            }
-
-            if (box.getPos2() != null)
-            {
-                this.setSubRegionCornerPos(box, Corner.CORNER_2, box.getPos2().add(diff));
-            }
+            this.setSubRegionCornerPos(box, Corner.CORNER_1, box.getPos1().add(diff));
+            this.setSubRegionCornerPos(box, Corner.CORNER_2, box.getPos2().add(diff));
         }
 
         if (this.getExplicitOrigin() != null)
@@ -378,13 +367,13 @@ public class AreaSelection
         {
             Corner corner = box.getSelectedCorner();
 
-            if ((corner == Corner.NONE || corner == Corner.CORNER_1) && box.getPos1() != null)
+            if (corner == Corner.NONE || corner == Corner.CORNER_1)
             {
                 BlockPos pos = this.getSubRegionCornerPos(box, Corner.CORNER_1).offset(direction, amount);
                 this.setSubRegionCornerPos(box, Corner.CORNER_1, pos);
             }
 
-            if ((corner == Corner.NONE || corner == Corner.CORNER_2) && box.getPos2() != null)
+            if (corner == Corner.NONE || corner == Corner.CORNER_2)
             {
                 BlockPos pos = this.getSubRegionCornerPos(box, Corner.CORNER_2).offset(direction, amount);
                 this.setSubRegionCornerPos(box, Corner.CORNER_2, pos);
@@ -436,7 +425,7 @@ public class AreaSelection
 
     public BlockPos getSubRegionCornerPos(Box box, Corner corner)
     {
-        return corner == Corner.CORNER_2 ? box.getPos2() : box.getPos1();
+        return box.getPosition(corner);
     }
 
     public AreaSelection copy()
