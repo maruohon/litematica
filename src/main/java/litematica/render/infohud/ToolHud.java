@@ -25,9 +25,9 @@ import litematica.schematic.placement.SubRegionPlacement;
 import litematica.schematic.projects.SchematicProject;
 import litematica.schematic.projects.SchematicVersion;
 import litematica.selection.AreaSelection;
-import litematica.selection.Box;
-import litematica.selection.SelectionManager;
-import litematica.selection.SelectionMode;
+import litematica.selection.CornerDefinedBox;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.AreaSelectionType;
 import litematica.tool.ToolMode;
 import litematica.tool.ToolModeData;
 import litematica.util.EntityUtils;
@@ -106,8 +106,8 @@ public class ToolHud extends InfoHud
             this.addAreaSelectionLines(lines);
             this.addSelectedBlocksLines(lines, mode);
 
-            String str = Configs.Generic.SELECTION_CORNERS_MODE.getValue().getDisplayName();
-            lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.corners_mode", str));
+            String str = Configs.Generic.TOOL_SELECTION_MODE.getValue().getDisplayName();
+            lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.tool_selection_mode", str));
         }
         else if ((hasTool || mode == ToolMode.SCHEMATIC_EDIT) && mode.getUsesSchematic())
         {
@@ -146,12 +146,12 @@ public class ToolHud extends InfoHud
 
     protected void addAreaSelectionLines(List<String> lines)
     {
-        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection selection = sm.getCurrentSelection();
 
         if (selection != null)
         {
-            boolean multiRegionMode = sm.getSelectionMode() == SelectionMode.MULTI_REGION;
+            boolean multiRegionMode = sm.getSelectionMode() == AreaSelectionType.MULTI_REGION;
 
             if (multiRegionMode)
             {
@@ -163,7 +163,7 @@ public class ToolHud extends InfoHud
             }
 
             String originMode;
-            BlockPos o = selection.getExplicitOrigin();
+            BlockPos o = selection.getManualOrigin();
 
             if (o == null)
             {
@@ -177,7 +177,7 @@ public class ToolHud extends InfoHud
 
             if (multiRegionMode)
             {
-                int count = selection.getAllSubRegionBoxes().size();
+                int count = selection.getAllSelectionBoxes().size();
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.origin.multi_region",
                                                 originMode, o.getX(), o.getY(), o.getZ(), count));
             }
@@ -187,23 +187,23 @@ public class ToolHud extends InfoHud
                                                 originMode, o.getX(), o.getY(), o.getZ()));
             }
 
-            String subRegionName = selection.getCurrentSubRegionBoxName();
-            Box box = selection.getSelectedSubRegionBox();
+            String subRegionName = selection.getSelectedSelectionBoxName();
+            CornerDefinedBox box = selection.getSelectedSelectionBox();
 
             if (subRegionName != null && box != null)
             {
-                // Only show the sub-region name for Multi-Region mode selections
+                // Only show the selection box name for Multi-Region mode selections
                 if (multiRegionMode)
                 {
-                    lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.selected_sub_region", subRegionName));
+                    lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.selected_box", subRegionName));
                 }
 
-                BlockPos p1 = box.getPos1();
-                BlockPos p2 = box.getPos2();
+                BlockPos p1 = box.getCorner1();
+                BlockPos p2 = box.getCorner2();
 
-                Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPositionAbs(p2.subtract(p1));
+                Vec3i size = PositionUtils.getAreaSize(p1, p2);
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.dimensions_positions",
-                                                size.getX(), size.getY(), size.getZ(),
+                                                Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ()),
                                                 p1.getX(), p1.getY(), p1.getZ(),
                                                 p2.getX(), p2.getY(), p2.getZ()));
             }
@@ -302,21 +302,21 @@ public class ToolHud extends InfoHud
             lines.add(StringUtils.translate("litematica.hud.tool_hud.schematic_projects.no_versions"));
         }
 
-        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection selection = sm.getCurrentSelection();
 
-        if (selection != null && sm.getSelectionMode() == SelectionMode.MULTI_REGION)
+        if (selection != null && sm.getSelectionMode() == AreaSelectionType.MULTI_REGION)
         {
-            String subRegionName = selection.getCurrentSubRegionBoxName();
+            String subRegionName = selection.getSelectedSelectionBoxName();
 
             if (subRegionName != null)
             {
-                lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.selected_sub_region", subRegionName));
+                lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.selected_box", subRegionName));
             }
         }
 
-        String str = Configs.Generic.SELECTION_CORNERS_MODE.getValue().getDisplayName();
-        lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.corners_mode", str));
+        String str = Configs.Generic.TOOL_SELECTION_MODE.getValue().getDisplayName();
+        lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.tool_selection_mode", str));
 
         // The Projects Mode indicator gets rendered via the status info HUD, if it's enabled.
         // If it's not enabled, then it gets rendered here if the player is currently holding the tool

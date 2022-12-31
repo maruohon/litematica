@@ -1,22 +1,23 @@
 package litematica.selection;
 
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 import malilib.util.data.json.JsonUtils;
-import litematica.util.PositionUtils.Corner;
 
-public class SelectionBox extends Box
+public class SelectionBox extends CornerDefinedBox
 {
-    private String name = "Unnamed";
-    private Corner selectedCorner = Corner.NONE;
+    protected String name;
+    protected BoxCorner selectedCorner = BoxCorner.NONE;
 
     public SelectionBox()
     {
-        super();
+        this(BlockPos.ORIGIN, BlockPos.ORIGIN, "Unnamed");
     }
 
     public SelectionBox(BlockPos pos1, BlockPos pos2, String name)
@@ -26,22 +27,9 @@ public class SelectionBox extends Box
         this.name = name;
     }
 
-    @Override
-    public SelectionBox copy()
-    {
-        SelectionBox box = new SelectionBox(this.pos1, this.pos2, this.name);
-        box.setSelectedCorner(this.selectedCorner);
-        return box;
-    }
-
     public String getName()
     {
         return this.name;
-    }
-
-    public Corner getSelectedCorner()
-    {
-        return this.selectedCorner;
     }
 
     public void setName(String name)
@@ -49,9 +37,42 @@ public class SelectionBox extends Box
         this.name = name;
     }
 
-    public void setSelectedCorner(Corner corner)
+    public boolean isCornerSelected(BoxCorner corner)
+    {
+        return this.selectedCorner == corner;
+    }
+
+    public BoxCorner getSelectedCorner()
+    {
+        return this.selectedCorner;
+    }
+
+    public void setSelectedCorner(BoxCorner corner)
     {
         this.selectedCorner = corner;
+    }
+
+    public void offsetSelectedCorner(EnumFacing direction, int amount)
+    {
+        BoxCorner corner = this.selectedCorner;
+
+        if (corner == BoxCorner.NONE || corner == BoxCorner.CORNER_1)
+        {
+            this.corner1 = this.corner1.offset(direction, amount);
+        }
+
+        if (corner == BoxCorner.NONE || corner == BoxCorner.CORNER_2)
+        {
+            this.corner2 = this.corner2.offset(direction, amount);
+        }
+    }
+
+    @Override
+    public SelectionBox copy()
+    {
+        SelectionBox box = new SelectionBox(this.corner1, this.corner2, this.name);
+        box.setSelectedCorner(this.selectedCorner);
+        return box;
     }
 
     @Override
@@ -83,5 +104,15 @@ public class SelectionBox extends Box
         }
 
         return null;
+    }
+
+    public static void fromJson(JsonObject obj, Consumer<SelectionBox> boxConsumer)
+    {
+        SelectionBox box = fromJson(obj);
+
+        if (box != null)
+        {
+            boxConsumer.accept(box);
+        }
     }
 }

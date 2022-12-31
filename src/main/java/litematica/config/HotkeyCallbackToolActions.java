@@ -10,11 +10,11 @@ import malilib.input.KeyBind;
 import malilib.input.callback.HotkeyCallback;
 import malilib.util.game.wrap.GameUtils;
 import litematica.data.DataManager;
-import litematica.selection.CornerSelectionMode;
-import litematica.selection.SelectionManager;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.BoxCorner;
+import litematica.selection.ToolSelectionMode;
 import litematica.tool.ToolMode;
 import litematica.util.EntityUtils;
-import litematica.util.PositionUtils.Corner;
 import litematica.util.RayTraceUtils;
 import litematica.util.ToolUtils;
 
@@ -60,7 +60,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
             {
                 if (mode.getUsesAreaSelection() || projectMode)
                 {
-                    SelectionManager sm = DataManager.getSelectionManager();
+                    AreaSelectionManager sm = DataManager.getAreaSelectionManager();
                     boolean grabModifier = Hotkeys.SELECTION_GRAB_MODIFIER.getKeyBind().isKeyBindHeld();
                     boolean moveEverything = grabModifier;
 
@@ -74,12 +74,12 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
                             ToolUtils.moveCurrentlySelectedWorldRegionTo(pos);
                         }
                     }
-                    else if (Configs.Generic.SELECTION_CORNERS_MODE.getValue() == CornerSelectionMode.CORNERS)
+                    else if (Configs.Generic.TOOL_SELECTION_MODE.getValue() == ToolSelectionMode.CORNERS)
                     {
-                        Corner corner = isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2;
+                        BoxCorner corner = isToolPrimary ? BoxCorner.CORNER_1 : BoxCorner.CORNER_2;
                         sm.setPositionOfCurrentSelectionToRayTrace(corner, moveEverything, maxDistance);
                     }
-                    else if (Configs.Generic.SELECTION_CORNERS_MODE.getValue() == CornerSelectionMode.EXPAND)
+                    else if (Configs.Generic.TOOL_SELECTION_MODE.getValue() == ToolSelectionMode.EXPAND)
                     {
                         sm.handleCuboidModeMouseClick(maxDistance, isToolSecondary, moveEverything);
                     }
@@ -97,23 +97,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
 
                 if (mode.getUsesAreaSelection() || projectMode)
                 {
-                    SelectionManager sm = DataManager.getSelectionManager();
-
-                    if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeyBind().isKeyBindHeld())
-                    {
-                        if (sm.hasGrabbedElement())
-                        {
-                            sm.releaseGrabbedElement();
-                        }
-                        else
-                        {
-                            sm.grabElement(maxDistance);
-                        }
-                    }
-                    else
-                    {
-                        sm.changeSelection(world, entity, maxDistance);
-                    }
+                    DataManager.getAreaSelectionManager().changeSelection(world, entity, maxDistance);
                 }
                 else if (mode.getUsesSchematic())
                 {

@@ -18,7 +18,7 @@ import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
 import litematica.render.infohud.InfoHud;
-import litematica.selection.Box;
+import litematica.selection.CornerDefinedBox;
 import litematica.util.PositionUtils;
 
 public abstract class TaskProcessChunkBase extends TaskBase
@@ -102,7 +102,7 @@ public abstract class TaskProcessChunkBase extends TaskBase
 
     protected abstract boolean processChunk(ChunkPos pos);
 
-    protected void addPerChunkBoxes(Collection<? extends Box> allBoxes)
+    protected void addPerChunkBoxes(Collection<? extends CornerDefinedBox> allBoxes)
     {
         this.boxesInChunks.clear();
         this.requiredChunks.clear();
@@ -110,7 +110,7 @@ public abstract class TaskProcessChunkBase extends TaskBase
         this.requiredChunks.addAll(this.boxesInChunks.keySet());
     }
 
-    protected void addPerChunkBoxes(Collection<? extends Box> allBoxes, LayerRange range)
+    protected void addPerChunkBoxes(Collection<? extends CornerDefinedBox> allBoxes, LayerRange range)
     {
         if (range.getLayerMode() == LayerMode.ALL)
         {

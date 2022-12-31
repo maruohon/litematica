@@ -52,12 +52,12 @@ import litematica.schematic.verifier.SchematicVerifier;
 import litematica.schematic.verifier.SchematicVerifierManager;
 import litematica.schematic.verifier.VerifierResultType;
 import litematica.selection.AreaSelection;
-import litematica.selection.Box;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.BoxCorner;
+import litematica.selection.CornerDefinedBox;
 import litematica.selection.SelectionBox;
-import litematica.selection.SelectionManager;
 import litematica.util.BlockInfoAlignment;
 import litematica.util.ItemUtils;
-import litematica.util.PositionUtils.Corner;
 import litematica.util.RayTraceUtils;
 import litematica.util.RayTraceUtils.RayTraceWrapper;
 import litematica.world.SchematicWorldHandler;
@@ -111,7 +111,7 @@ public class OverlayRenderer
     public void renderBoxes(float partialTicks)
     {
         Entity renderViewEntity = GameUtils.getCameraEntity();
-        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         boolean renderAreas = currentSelection != null && Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue();
         boolean renderPlacements = this.placements.isEmpty() == false && Configs.Visuals.PLACEMENT_BOX_RENDERING.getBooleanValue();
@@ -135,15 +135,15 @@ public class OverlayRenderer
                 GlStateManager.doPolygonOffset(-1.2f, -0.2f);
                 GlStateManager.depthMask(false);
 
-                Box currentBox = currentSelection.getSelectedSubRegionBox();
+                CornerDefinedBox currentBox = currentSelection.getSelectedSelectionBox();
 
-                for (SelectionBox box : currentSelection.getAllSubRegionBoxes())
+                for (SelectionBox box : currentSelection.getAllSelectionBoxes())
                 {
                     BoxType type = box == currentBox ? BoxType.AREA_SELECTED : BoxType.AREA_UNSELECTED;
                     this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
                 }
 
-                BlockPos origin = currentSelection.getExplicitOrigin();
+                BlockPos origin = currentSelection.getManualOrigin();
 
                 if (origin != null)
                 {
@@ -219,8 +219,8 @@ public class OverlayRenderer
     public void renderSelectionBox(SelectionBox box, BoxType boxType, float expand,
             float lineWidthBlockBox, float lineWidthArea, Entity renderViewEntity, float partialTicks, @Nullable SchematicPlacement placement)
     {
-        BlockPos pos1 = box.getPos1();
-        BlockPos pos2 = box.getPos2();
+        BlockPos pos1 = box.getCorner1();
+        BlockPos pos2 = box.getCorner2();
         Color4f color1;
         Color4f color2;
         Color4f colorX;
@@ -272,8 +272,8 @@ public class OverlayRenderer
         }
         else
         {
-            color1 = box.getSelectedCorner() == Corner.CORNER_1 ? this.colorSelectedCorner : this.colorPos1;
-            color2 = box.getSelectedCorner() == Corner.CORNER_2 ? this.colorSelectedCorner : this.colorPos2;
+            color1 = box.isCornerSelected(BoxCorner.CORNER_1) ? this.colorSelectedCorner : this.colorPos1;
+            color2 = box.isCornerSelected(BoxCorner.CORNER_2) ? this.colorSelectedCorner : this.colorPos2;
             sideColor = Color4f.fromColor(Configs.Colors.AREA_SELECTION_BOX_SIDE.getIntegerValue());
         }
 
@@ -290,12 +290,12 @@ public class OverlayRenderer
                 RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
             }
 
-            if (box.getSelectedCorner() == Corner.CORNER_1)
+            if (box.isCornerSelected(BoxCorner.CORNER_1))
             {
                 Color4f color = this.colorPos1.withAlpha(0.4F);
                 RenderUtils.renderAreaSides(pos1, pos1, color, renderViewEntity, partialTicks);
             }
-            else if (box.getSelectedCorner() == Corner.CORNER_2)
+            else if (box.isCornerSelected(BoxCorner.CORNER_2))
             {
                 Color4f color = this.colorPos2.withAlpha(0.4F);
                 RenderUtils.renderAreaSides(pos2, pos2, color, renderViewEntity, partialTicks);

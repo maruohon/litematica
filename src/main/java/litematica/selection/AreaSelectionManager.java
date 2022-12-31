@@ -9,13 +9,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import malilib.gui.BaseScreen;
@@ -35,27 +33,23 @@ import litematica.gui.MultiRegionModeAreaEditorScreen;
 import litematica.gui.SimpleModeAreaEditorScreen;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.projects.SchematicProject;
-import litematica.util.PositionUtils.Corner;
 import litematica.util.RayTraceUtils;
 import litematica.util.RayTraceUtils.RayTraceWrapper;
 import litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 
-public class SelectionManager
+public class AreaSelectionManager
 {
-    private final Map<String, AreaSelection> selections = new HashMap<>();
-    private final Map<String, AreaSelection> readOnlySelections = new HashMap<>();
-    @Nullable
-    private String currentSelectionId;
-    @Nullable
-    private GrabbedElement grabbedElement;
-    private SelectionMode mode = SelectionMode.SIMPLE;
+    protected final Map<String, AreaSelection> selections = new HashMap<>();
+    protected final Map<String, AreaSelection> readOnlySelections = new HashMap<>();
+    protected AreaSelectionType mode = AreaSelectionType.SIMPLE;
+    @Nullable protected String currentSelectionId;
 
-    public SelectionMode getSelectionMode()
+    public AreaSelectionType getSelectionMode()
     {
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-            return project != null ? project.getSelectionMode() : SelectionMode.SIMPLE;
+            return project != null ? project.getSelectionMode() : AreaSelectionType.SIMPLE;
         }
 
         return this.mode;
@@ -79,23 +73,23 @@ public class SelectionManager
         }
         else
         {
-            this.mode = this.mode == SelectionMode.MULTI_REGION ? SelectionMode.SIMPLE : SelectionMode.MULTI_REGION;
+            this.mode = this.mode == AreaSelectionType.MULTI_REGION ? AreaSelectionType.SIMPLE : AreaSelectionType.MULTI_REGION;
         }
     }
 
     @Nullable
     public String getCurrentSelectionId()
     {
-        return this.mode == SelectionMode.MULTI_REGION ? this.currentSelectionId : null;
+        return this.mode == AreaSelectionType.MULTI_REGION ? this.currentSelectionId : null;
     }
 
     @Nullable
-    public String getCurrentNormalSelectionId()
+    public String getCurrentMultiRegionSelectionId()
     {
         return this.currentSelectionId;
     }
 
-    public boolean hasNormalSelection()
+    public boolean hasMultiRegionSelection()
     {
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
@@ -121,7 +115,7 @@ public class SelectionManager
     @Nullable
     public AreaSelection getSelection(@Nullable String selectionId)
     {
-        if (this.mode == SelectionMode.SIMPLE)
+        if (this.mode == AreaSelectionType.SIMPLE)
         {
             return this.getSimpleSelection();
         }
@@ -182,7 +176,7 @@ public class SelectionManager
     }
 
     @Nullable
-    private AreaSelection tryLoadSelectionFromFile(String selectionId)
+    protected AreaSelection tryLoadSelectionFromFile(String selectionId)
     {
         return tryLoadSelectionFromFile(Paths.get(selectionId));
     }
@@ -314,8 +308,7 @@ public class SelectionManager
     }
 
     /**
-     * Creates a new schematic selection and returns the name of it
-     * @return
+     * Creates a new area selection and returns its selectionId
      */
     public String createNewSelection(Path dir, final String nameIn)
     {
@@ -337,7 +330,7 @@ public class SelectionManager
         AreaSelection selection = new AreaSelection();
         selection.setName(name);
         BlockPos pos = EntityWrap.getCameraEntityBlockPos();
-        selection.createNewSubRegionBox(pos, name);
+        selection.createNewSelectionBox(pos, name);
 
         this.selections.put(selectionId, selection);
         this.currentSelectionId = selectionId;
@@ -355,7 +348,7 @@ public class SelectionManager
         {
             BlockPos pos = EntityWrap.getCameraEntityBlockPos();
 
-            if (selection.createNewSubRegionBox(pos, selection.getName()) != null)
+            if (selection.createNewSelectionBox(pos, selection.getName()) != null)
             {
                 if (printMessage)
                 {
@@ -374,11 +367,10 @@ public class SelectionManager
     public boolean createNewSubRegionIfNotExists(String name)
     {
         AreaSelection selection = this.getCurrentSelection();
-        Entity cameraEntity = GameUtils.getCameraEntity();
 
-        if (selection != null && cameraEntity != null)
+        if (selection != null)
         {
-            if (selection.getSubRegionBox(name) != null)
+            if (selection.getSelectionBox(name) != null)
             {
                 MessageDispatcher.error().translate("litematica.error.area_editor.create_sub_region.exists", name);
                 return false;
@@ -386,7 +378,7 @@ public class SelectionManager
 
             BlockPos pos = EntityWrap.getCameraEntityBlockPos();
 
-            if (selection.createNewSubRegionBox(pos, name) != null)
+            if (selection.createNewSelectionBox(pos, name) != null)
             {
                 String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                 MessageDispatcher.success().translate("litematica.message.added_selection_box", posStr);
@@ -446,8 +438,8 @@ public class SelectionManager
             }
             else if (trace.getHitType() == HitType.MISS)
             {
-                area.clearCurrentSelectedCorner();
-                area.setSelectedSubRegionBox(null);
+                area.clearCornerSelectionOfSelectedBox();
+                area.setSelectedSelectionBox(null);
                 area.setOriginSelected(false);
                 return true;
             }
@@ -456,20 +448,20 @@ public class SelectionManager
         return false;
     }
 
-    private void changeSelection(AreaSelection area, RayTraceWrapper trace)
+    protected void changeSelection(AreaSelection area, RayTraceWrapper trace)
     {
-        area.clearCurrentSelectedCorner();
+        area.clearCornerSelectionOfSelectedBox();
 
         if (trace.getHitType() == HitType.SELECTION_BOX_CORNER || trace.getHitType() == HitType.SELECTION_BOX_BODY)
         {
             SelectionBox box = trace.getHitSelectionBox();
-            area.setSelectedSubRegionBox(box.getName());
+            area.setSelectedSelectionBox(box.getName());
             area.setOriginSelected(false);
             box.setSelectedCorner(trace.getHitCorner());
         }
         else if (trace.getHitType() == HitType.SELECTION_ORIGIN)
         {
-            area.setSelectedSubRegionBox(null);
+            area.setSelectedSelectionBox(null);
             area.setOriginSelected(true);
         }
     }
@@ -477,7 +469,7 @@ public class SelectionManager
     public boolean hasSelectedElement()
     {
         AreaSelection area = this.getCurrentSelection();
-        return area != null && (area.getSelectedSubRegionBox() != null || area.isOriginSelected());
+        return area != null && (area.getSelectedSelectionBox() != null || area.isOriginSelected());
     }
 
     public boolean hasSelectedOrigin()
@@ -496,45 +488,13 @@ public class SelectionManager
         }
     }
 
-    public boolean hasGrabbedElement()
-    {
-        return this.grabbedElement != null;
-    }
-
-    public boolean grabElement(int maxDistance)
-    {
-        World world = GameUtils.getClientWorld();
-        Entity entity = GameUtils.getCameraEntity();
-        AreaSelection area = this.getCurrentSelection();
-
-        if (area != null && area.getAllSubRegionBoxes().size() > 0)
-        {
-            RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
-
-            if (trace.getHitType() == HitType.SELECTION_BOX_CORNER || trace.getHitType() == HitType.SELECTION_BOX_BODY)
-            {
-                this.changeSelection(area, trace);
-                this.grabbedElement = new GrabbedElement(
-                        area,
-                        trace.getHitSelectionBox(),
-                        trace.getHitCorner(),
-                        trace.getHitVec(),
-                        entity.getPositionEyes(1f).distanceTo(trace.getHitVec()));
-                MessageDispatcher.generic().customHotbar().translate("litematica.message.grabbed_element_for_moving");
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void setPositionOfCurrentSelectionToRayTrace(Corner corner, boolean moveEntireSelection, double maxDistance)
+    public void setPositionOfCurrentSelectionToRayTrace(BoxCorner corner, boolean moveEntireSelection, double maxDistance)
     {
         AreaSelection area = this.getCurrentSelection();
 
         if (area != null)
         {
-            boolean movingCorner = area.getSelectedSubRegionBox() != null && corner != Corner.NONE;
+            boolean movingCorner = area.getSelectedSelectionBox() != null && corner != BoxCorner.NONE;
             boolean movingOrigin = area.isOriginSelected();
 
             if (movingCorner || movingOrigin)
@@ -556,14 +516,14 @@ public class SelectionManager
                 {
                     int cornerIndex = corner.ordinal();
 
-                    if (corner == Corner.CORNER_1 || corner == Corner.CORNER_2)
+                    if (corner == BoxCorner.CORNER_1 || corner == BoxCorner.CORNER_2)
                     {
-                        area.setSelectedSubRegionCornerPos(pos, corner);
+                        area.setSelectedSelectionBoxCornerPos(pos, corner);
                     }
 
                     if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
                     {
-                        area.getSelectedSubRegionBox().setSelectedCorner(corner);
+                        area.getSelectedSelectionBox().setSelectedCorner(corner);
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
@@ -578,12 +538,12 @@ public class SelectionManager
     {
         if (moveEntireSelection)
         {
-            area.moveEntireSelectionTo(newOrigin, true);
+            area.moveEntireAreaSelectionTo(newOrigin, true);
         }
         else
         {
             BlockPos old = area.getEffectiveOrigin();
-            area.setExplicitOrigin(newOrigin);
+            area.setManualOrigin(newOrigin);
 
             String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
@@ -621,84 +581,61 @@ public class SelectionManager
         }
     }
 
-    private void resetSelectionToClickedPosition(double maxDistance)
+    protected void resetSelectionToClickedPosition(double maxDistance)
     {
         AreaSelection area = this.getCurrentSelection();
 
-        if (area != null && area.getSelectedSubRegionBox() != null)
+        if (area != null && area.getSelectedSelectionBox() != null)
         {
             Entity entity = GameUtils.getCameraEntity();
             BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
 
             if (pos != null)
             {
-                area.setSelectedSubRegionCornerPos(pos, Corner.CORNER_1);
-                area.setSelectedSubRegionCornerPos(pos, Corner.CORNER_2);
+                area.setSelectedSelectionBoxCornerPos(pos, BoxCorner.CORNER_1);
+                area.setSelectedSelectionBoxCornerPos(pos, BoxCorner.CORNER_2);
             }
         }
     }
 
-    private void growSelectionToContainClickedPosition(double maxDistance)
+    protected void growSelectionToContainClickedPosition(double maxDistance)
     {
         AreaSelection sel = this.getCurrentSelection();
 
-        if (sel != null && sel.getSelectedSubRegionBox() != null)
+        if (sel != null && sel.getSelectedSelectionBox() != null)
         {
             Entity entity = GameUtils.getCameraEntity();
             BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
 
             if (pos != null)
             {
-                Box box = sel.getSelectedSubRegionBox();
-                BlockPos pos1 = box.getPos1();
-                BlockPos pos2 = box.getPos2();
+                CornerDefinedBox box = sel.getSelectedSelectionBox();
+                BlockPos pos1 = box.getCorner1();
+                BlockPos pos2 = box.getCorner2();
                 BlockPos posMin = PositionUtils.getMinCorner(PositionUtils.getMinCorner(pos1, pos2), pos);
                 BlockPos posMax = PositionUtils.getMaxCorner(PositionUtils.getMaxCorner(pos1, pos2), pos);
 
-                sel.setSelectedSubRegionCornerPos(posMin, Corner.CORNER_1);
-                sel.setSelectedSubRegionCornerPos(posMax, Corner.CORNER_2);
+                sel.setSelectedSelectionBoxCornerPos(posMin, BoxCorner.CORNER_1);
+                sel.setSelectedSelectionBoxCornerPos(posMax, BoxCorner.CORNER_2);
             }
         }
     }
 
     public static void renameSubRegionBoxIfSingle(AreaSelection selection, String newName)
     {
-        List<SelectionBox> boxes = selection.getAllSubRegionBoxes();
+        List<SelectionBox> boxes = selection.getAllSelectionBoxes();
 
         // If the selection had only one box with the exact same name as the area selection itself,
         // then also rename that box to the new name.
         if (boxes.size() == 1 && boxes.get(0).getName().equals(selection.getName()))
         {
-            selection.renameSubRegionBox(selection.getName(), newName);
-        }
-    }
-
-    public void releaseGrabbedElement()
-    {
-        this.grabbedElement = null;
-    }
-
-    public void changeGrabDistance(Entity entity, double amount)
-    {
-        if (this.grabbedElement != null)
-        {
-            this.grabbedElement.changeGrabDistance(amount);
-            this.grabbedElement.moveElement(entity);
-        }
-    }
-
-    public void moveGrabbedElement(Entity entity)
-    {
-        if (this.grabbedElement != null)
-        {
-            this.grabbedElement.moveElement(entity);
+            selection.renameSelectionBox(selection.getName(), newName);
         }
     }
 
     public void clear()
     {
         this.mode = Configs.Generic.DEFAULT_AREA_SELECTION_MODE.getValue();
-        this.grabbedElement = null;
         this.currentSelectionId = null;
         this.selections.clear();
         this.readOnlySelections.clear();
@@ -715,11 +652,11 @@ public class SelectionManager
             return null;
         }
 
-        if (this.getSelectionMode() == SelectionMode.MULTI_REGION)
+        if (this.getSelectionMode() == AreaSelectionType.MULTI_REGION)
         {
             return new MultiRegionModeAreaEditorScreen(selection);
         }
-        else if (this.getSelectionMode() == SelectionMode.SIMPLE)
+        else if (this.getSelectionMode() == AreaSelectionType.SIMPLE)
         {
             return new SimpleModeAreaEditorScreen(selection);
         }
@@ -762,7 +699,7 @@ public class SelectionManager
         if (JsonUtils.hasString(obj, "mode"))
         {
             String name = obj.get("mode").getAsString();
-            this.mode = SelectionMode.findValueByName(name, SelectionMode.VALUES);
+            this.mode = AreaSelectionType.findValueByName(name, AreaSelectionType.VALUES);
         }
     }
 
@@ -770,7 +707,7 @@ public class SelectionManager
     {
         JsonObject obj = new JsonObject();
 
-        obj.add("mode", new JsonPrimitive(this.mode.getName()));
+        obj.addProperty("mode", this.mode.getName());
 
         try
         {
@@ -781,7 +718,7 @@ public class SelectionManager
         }
         catch (Exception e)
         {
-            Litematica.logger.warn("Exception while writing area selections to disk", e);
+            Litematica.logger.warn("Exception while writing area selections to file", e);
         }
 
         AreaSelection current = this.currentSelectionId != null ? this.selections.get(this.currentSelectionId) : null;
@@ -792,53 +729,10 @@ public class SelectionManager
 
         if (current != null)
         {
-            obj.add("current", new JsonPrimitive(this.currentSelectionId));
+            obj.addProperty("current", this.currentSelectionId);
             this.selections.put(this.currentSelectionId, current);
         }
 
         return obj;
-    }
-
-    private static class GrabbedElement
-    {
-        private final AreaSelection area;
-        public final SelectionBox grabbedBox;
-        public final SelectionBox originalBox;
-        public final Vec3d grabPosition;
-        public final Corner grabbedCorner;
-        public double grabDistance;
-
-        private GrabbedElement(AreaSelection area, SelectionBox box, Corner corner, Vec3d grabPosition, double grabDistance)
-        {
-            this.area = area;
-            this.grabbedBox = box;
-            this.grabbedCorner = corner;
-            this.grabPosition = grabPosition;
-            this.grabDistance = grabDistance;
-            this.originalBox = new SelectionBox(box.getPos1(), box.getPos2(), "");
-        }
-
-        public void changeGrabDistance(double amount)
-        {
-            this.grabDistance += amount;
-        }
-
-        public void moveElement(Entity entity)
-        {
-            Vec3d newLookPos = entity.getPositionEyes(1f).add(entity.getLook(1f).scale(this.grabDistance));
-            Vec3d change = newLookPos.subtract(this.grabPosition);
-
-            if (this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_1)
-            {
-                BlockPos pos = this.originalBox.getPos1().add(change.x, change.y, change.z);
-                this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_1, pos);
-            }
-
-            if (this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_2)
-            {
-                BlockPos pos = this.originalBox.getPos2().add(change.x, change.y, change.z);
-                this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_2, pos);
-            }
-        }
     }
 }

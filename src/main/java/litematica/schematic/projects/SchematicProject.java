@@ -28,8 +28,8 @@ import litematica.schematic.util.SchematicCreationUtils;
 import litematica.schematic.util.SchematicPlacingUtils;
 import litematica.selection.AreaSelection;
 import litematica.selection.AreaSelectionSimple;
-import litematica.selection.SelectionManager;
-import litematica.selection.SelectionMode;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.AreaSelectionType;
 import litematica.task.CreateSchematicTask;
 import litematica.util.ToolUtils;
 
@@ -43,7 +43,7 @@ public class SchematicProject
     private AreaSelection selection = new AreaSelection();
     private AreaSelection lastSeenArea = new AreaSelection();
     private AreaSelectionSimple selectionSimple = new AreaSelectionSimple(true);
-    private SelectionMode selectionMode = SelectionMode.SIMPLE;
+    private AreaSelectionType areaSelectionType = AreaSelectionType.SIMPLE;
     private int currentVersionId = -1;
     private int lastCheckedOutVersion = -1;
     private boolean saveInProgress;
@@ -100,8 +100,8 @@ public class SchematicProject
                 this.projectFile = newFile;
                 this.selection.setName(name);
                 this.selectionSimple.setName(name);
-                SelectionManager.renameSubRegionBoxIfSingle(this.selection, name);
-                SelectionManager.renameSubRegionBoxIfSingle(this.selectionSimple, name);
+                AreaSelectionManager.renameSubRegionBoxIfSingle(this.selection, name);
+                AreaSelectionManager.renameSubRegionBoxIfSingle(this.selectionSimple, name);
                 this.dirty = true;
             }
             catch (Exception e)
@@ -120,10 +120,10 @@ public class SchematicProject
     public void setOrigin(BlockPos origin)
     {
         BlockPos offset = this.selection.getEffectiveOrigin().subtract(this.origin);
-        this.selection.moveEntireSelectionTo(origin.add(offset), false);
+        this.selection.moveEntireAreaSelectionTo(origin.add(offset), false);
 
         offset = this.selectionSimple.getEffectiveOrigin().subtract(this.origin);
-        this.selectionSimple.moveEntireSelectionTo(origin.add(offset), false);
+        this.selectionSimple.moveEntireAreaSelectionTo(origin.add(offset), false);
 
         // Forget the old last seen area, it will be invalid after moving the entire project
         this.lastSeenArea = new AreaSelection();
@@ -156,7 +156,7 @@ public class SchematicProject
 
     public AreaSelection getSelection()
     {
-        if (this.selectionMode == SelectionMode.SIMPLE)
+        if (this.areaSelectionType == AreaSelectionType.SIMPLE)
         {
             return this.selectionSimple;
         }
@@ -164,14 +164,14 @@ public class SchematicProject
         return this.selection;
     }
 
-    public SelectionMode getSelectionMode()
+    public AreaSelectionType getSelectionMode()
     {
-        return this.selectionMode;
+        return this.areaSelectionType;
     }
 
     public void switchSelectionMode()
     {
-        this.selectionMode = this.selectionMode == SelectionMode.MULTI_REGION ? SelectionMode.SIMPLE : SelectionMode.MULTI_REGION;
+        this.areaSelectionType = this.areaSelectionType == AreaSelectionType.MULTI_REGION ? AreaSelectionType.SIMPLE : AreaSelectionType.MULTI_REGION;
         this.dirty = true;
     }
 
@@ -413,7 +413,7 @@ public class SchematicProject
         obj.add("selection_normal", this.selection.toJson());
         obj.add("selection_simple", this.selectionSimple.toJson());
         obj.add("last_seen_area", this.lastSeenArea.toJson());
-        obj.add("selection_mode", new JsonPrimitive(this.selectionMode.getName()));
+        obj.add("selection_mode", new JsonPrimitive(this.areaSelectionType.getName()));
 
         JsonArray arr = new JsonArray();
 
@@ -460,7 +460,7 @@ public class SchematicProject
             if (JsonUtils.hasString(obj, "selection_mode"))
             {
                 String name = JsonUtils.getString(obj, "selection_mode");
-                project.selectionMode = SelectionMode.findValueByName(name, SelectionMode.VALUES);
+                project.areaSelectionType = AreaSelectionType.findValueByName(name, AreaSelectionType.VALUES);
             }
 
             if (JsonUtils.hasArray(obj, "versions"))
@@ -519,7 +519,7 @@ public class SchematicProject
             return false;
         }
 
-        if (this.getSelection().getAllSubRegionBoxes().size() == 0)
+        if (this.getSelection().getAllSelectionBoxes().size() == 0)
         {
             MessageDispatcher.error().translate("litematica.error.schematic_projects.empty_selection");
             return false;

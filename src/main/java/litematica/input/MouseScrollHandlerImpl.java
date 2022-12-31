@@ -12,13 +12,13 @@ import litematica.config.Configs;
 import litematica.config.Hotkeys;
 import litematica.data.DataManager;
 import litematica.selection.AreaSelection;
-import litematica.selection.Box;
-import litematica.selection.SelectionManager;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.BoxCorner;
+import litematica.selection.CornerDefinedBox;
 import litematica.tool.ToolMode;
 import litematica.util.EasyPlaceUtils;
 import litematica.util.EntityUtils;
 import litematica.util.PositionUtils;
-import litematica.util.PositionUtils.Corner;
 import litematica.util.ToolUtils;
 
 public class MouseScrollHandlerImpl implements MouseScrollHandler
@@ -51,18 +51,13 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
 
         if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())
         {
-            SelectionManager sm = DataManager.getSelectionManager();
+            AreaSelectionManager sm = DataManager.getAreaSelectionManager();
 
-            if (sm.hasGrabbedElement())
-            {
-                sm.changeGrabDistance(cameraEntity, amount);
-                return true;
-            }
-            else if (sm.hasSelectedOrigin())
+            if (sm.hasSelectedOrigin())
             {
                 AreaSelection area = sm.getCurrentSelection();
                 BlockPos old = area.getEffectiveOrigin();
-                area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(cameraEntity), amount), false);
+                area.moveEntireAreaSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(cameraEntity), amount), false);
                 return true;
             }
             else if (mode == ToolMode.MOVE)
@@ -104,7 +99,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
     {
         if (mode.getUsesAreaSelection())
         {
-            DataManager.getSelectionManager().moveSelectedElement(EntityUtils.getClosestLookingDirection(entity), amount);
+            DataManager.getAreaSelectionManager().moveSelectedElement(EntityUtils.getClosestLookingDirection(entity), amount);
             return true;
         }
         else if (mode.getUsesSchematic())
@@ -119,18 +114,18 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
 
     private boolean modifySelectionBox(int amount, ToolMode mode, EnumFacing direction, IBoxEditor editor)
     {
-        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
 
         if (area != null)
         {
-            Box box = area.getSelectedSubRegionBox();
+            CornerDefinedBox box = area.getSelectedSelectionBox();
 
             if (box != null)
             {
-                Box newBox = editor.editBox(box, amount, direction);
-                area.setSelectedSubRegionCornerPos(newBox.getPos1(), Corner.CORNER_1);
-                area.setSelectedSubRegionCornerPos(newBox.getPos2(), Corner.CORNER_2);
+                CornerDefinedBox newBox = editor.editBox(box, amount, direction);
+                area.setSelectedSelectionBoxCornerPos(newBox.getCorner1(), BoxCorner.CORNER_1);
+                area.setSelectedSelectionBoxCornerPos(newBox.getCorner2(), BoxCorner.CORNER_2);
             }
             else
             {
@@ -147,13 +142,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
 
     public static void onTick()
     {
-        SelectionManager sm = DataManager.getSelectionManager();
-
-        if (sm.hasGrabbedElement())
-        {
-            sm.moveGrabbedElement(GameUtils.getClientPlayer());
-        }
-        else if (GuiUtils.getCurrentScreen() == null)
+        if (GuiUtils.getCurrentScreen() == null)
         {
             EasyPlaceUtils.easyPlaceOnUseTick();
         }
@@ -161,6 +150,6 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
 
     private interface IBoxEditor
     {
-        Box editBox(Box boxIn, int amount, EnumFacing side);
+        CornerDefinedBox editBox(CornerDefinedBox boxIn, int amount, EnumFacing side);
     }
 }

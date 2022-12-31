@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -173,14 +172,13 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
     protected void readFrom(ImmutableMap<String, ISchematicRegion> regions)
     {
-        Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCornersForRegions(regions.values());
+        final BlockPos minCorner = PositionUtils.getMinCornerOfEnclosingBoxAroundRegions(regions.values());
 
-        if (pair == null)
+        if (minCorner == null)
         {
             return;
         }
 
-        final BlockPos minCorner = pair.getLeft();
 
         if (regions.size() == 1)
         {

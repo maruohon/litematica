@@ -37,10 +37,10 @@ public class CreateSchematicTask extends TaskProcessChunkBase
         this.ignoreEntities = ignoreEntities;
         this.schematic = schematic;
         this.origin = area.getEffectiveOrigin();
-        this.subRegions = area.getAllSubRegions();
+        this.subRegions = area.getAllSelectionBoxesMap();
         this.setCompletionListener(listener);
 
-        this.addPerChunkBoxes(area.getAllSubRegionBoxes());
+        this.addPerChunkBoxes(area.getAllSelectionBoxes());
         this.updateInfoHudLinesMissingChunks(this.requiredChunks);
     }
 

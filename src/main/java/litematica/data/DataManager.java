@@ -44,7 +44,7 @@ import litematica.scheduler.TaskScheduler;
 import litematica.schematic.placement.SchematicPlacementManager;
 import litematica.schematic.projects.SchematicProjectsManager;
 import litematica.selection.AreaSelectionSimple;
-import litematica.selection.SelectionManager;
+import litematica.selection.AreaSelectionManager;
 import litematica.tool.ToolMode;
 import litematica.tool.ToolModeData;
 import litematica.util.DefaultDirectories;
@@ -65,7 +65,7 @@ public class DataManager implements DirectoryCache
     private static boolean canSave;
     private static long clientTickStart;
 
-    private final SelectionManager selectionManager = new SelectionManager();
+    private final AreaSelectionManager areaSelectionManager = new AreaSelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
     private final SchematicProjectsManager schematicProjectsManager = new SchematicProjectsManager();
     private LayerRange renderRange = new LayerRange(SchematicWorldRenderingNotifier.INSTANCE);
@@ -107,9 +107,9 @@ public class DataManager implements DirectoryCache
         configGuiTab = tab;
     }
 
-    public static SelectionManager getSelectionManager()
+    public static AreaSelectionManager getAreaSelectionManager()
     {
-        return getInstance().selectionManager;
+        return getInstance().areaSelectionManager;
     }
 
     public static SchematicPlacementManager getSchematicPlacementManager()
@@ -194,7 +194,7 @@ public class DataManager implements DirectoryCache
 
     private void clearData(boolean isLogout)
     {
-        this.selectionManager.clear();
+        this.areaSelectionManager.clear();
         this.schematicPlacementManager.clear();
         this.schematicProjectsManager.clear();
         this.areaSimple = new AreaSelectionSimple(true);
@@ -282,7 +282,7 @@ public class DataManager implements DirectoryCache
 
     private void fromJson(JsonObject obj)
     {
-        JsonUtils.readObjectIfExists(obj, "selections", this.selectionManager::loadFromJson);
+        JsonUtils.readObjectIfExists(obj, "selections", this.areaSelectionManager::loadFromJson);
         JsonUtils.readObjectIfExists(obj, "placements", this.schematicPlacementManager::loadFromJson);
         JsonUtils.readObjectIfExists(obj, "schematic_projects_manager", this.schematicProjectsManager::loadFromJson);
 
@@ -345,7 +345,7 @@ public class DataManager implements DirectoryCache
     {
         JsonObject obj = new JsonObject();
 
-        obj.add("selections", this.selectionManager.toJson());
+        obj.add("selections", this.areaSelectionManager.toJson());
         obj.add("placements", this.schematicPlacementManager.toJson());
         obj.add("schematic_projects_manager", this.schematicProjectsManager.toJson());
         obj.add("render_range", this.renderRange.toJson());

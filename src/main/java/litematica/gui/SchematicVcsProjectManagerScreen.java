@@ -19,7 +19,7 @@ import litematica.gui.widget.list.entry.SchematicVcsVersionEntryWidget;
 import litematica.schematic.projects.SchematicProject;
 import litematica.schematic.projects.SchematicVersion;
 import litematica.schematic.util.SchematicCreationUtils;
-import litematica.selection.SelectionManager;
+import litematica.selection.AreaSelectionManager;
 
 public class SchematicVcsProjectManagerScreen extends BaseListScreen<DataListWidget<SchematicVersion>>
 {
@@ -150,7 +150,7 @@ public class SchematicVcsProjectManagerScreen extends BaseListScreen<DataListWid
 
     protected void openAreaEditor()
     {
-        SelectionManager manager = DataManager.getSelectionManager();
+        AreaSelectionManager manager = DataManager.getAreaSelectionManager();
 
         if (manager.getCurrentSelection() != null)
         {

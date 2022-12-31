@@ -38,9 +38,10 @@ import litematica.schematic.placement.SchematicPlacementManager;
 import litematica.schematic.placement.SubRegionPlacement;
 import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.selection.AreaSelection;
-import litematica.selection.Box;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.BoxCorner;
+import litematica.selection.CornerDefinedBox;
 import litematica.selection.SelectionBox;
-import litematica.selection.SelectionManager;
 
 public class PositionUtils
 {
@@ -162,70 +163,17 @@ public class PositionUtils
         return false;
     }
 
-    public static boolean isBoxWithinWorld(World world, Box box)
+    public static Vec3i getAreaSize(Vec3i corner1, Vec3i corner2)
     {
-        return arePositionsWithinWorld(world, box.getPos1(), box.getPos2());
-    }
-
-    public static boolean isPlacementWithinWorld(World world, SchematicPlacement schematicPlacement, boolean respectRenderRange)
-    {
-        LayerRange range = DataManager.getRenderLayerRange();
-        BlockPos.MutableBlockPos posMutable1 = new BlockPos.MutableBlockPos();
-        BlockPos.MutableBlockPos posMutable2 = new BlockPos.MutableBlockPos();
-
-        for (Box box : schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values())
-        {
-            if (respectRenderRange)
-            {
-                if (range.intersectsBox(box.getPos1(), box.getPos2()))
-                {
-                    IntBoundingBox bb = range.getClampedArea(box.getPos1(), box.getPos2());
-
-                    if (bb != null)
-                    {
-                        posMutable1.setPos(bb.minX, bb.minY, bb.minZ);
-                        posMutable2.setPos(bb.maxX, bb.maxY, bb.maxZ);
-
-                        if (arePositionsWithinWorld(world, posMutable1, posMutable2) == false)
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-            else if (isBoxWithinWorld(world, box) == false)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static Vec3i getAreaSizeFromRelativeEndPosition(Vec3i posEndRelative)
-    {
-        int x = posEndRelative.getX();
-        int y = posEndRelative.getY();
-        int z = posEndRelative.getZ();
+        int x = corner2.getX() - corner1.getX();
+        int y = corner2.getY() - corner1.getY();
+        int z = corner2.getZ() - corner1.getZ();
 
         x = x >= 0 ? x + 1 : x - 1;
         y = y >= 0 ? y + 1 : y - 1;
         z = z >= 0 ? z + 1 : z - 1;
 
         return new Vec3i(x, y, z);
-    }
-
-    public static Vec3i getAreaSizeFromRelativeEndPositionAbs(Vec3i posEndRelative)
-    {
-        int x = posEndRelative.getX();
-        int y = posEndRelative.getY();
-        int z = posEndRelative.getZ();
-
-        x = x >= 0 ? x + 1 : x - 1;
-        y = y >= 0 ? y + 1 : y - 1;
-        z = z >= 0 ? z + 1 : z - 1;
-
-        return new Vec3i(Math.abs(x), Math.abs(y), Math.abs(z));
     }
 
     public static Vec3i getAreaSizeFromBox(IntBoundingBox box)
@@ -253,109 +201,184 @@ public class PositionUtils
         return (long) size.getX() * (long) size.getY() * (long) size.getZ();
     }
 
-    public static Vec3i getAbsoluteAreaSize(Vec3i size)
+    public static Vec3i getEnclosingAreaSize(Collection<? extends CornerDefinedBox> boxes)
     {
-        return new Vec3i(Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ()));
+        return getEnclosingAreaSize(getEnclosingBox(boxes));
     }
 
-    public static BlockPos getEnclosingAreaSize(AreaSelection area)
+    public static Vec3i getEnclosingAreaSize(@Nullable IntBoundingBox box)
     {
-        return getEnclosingAreaSize(area.getAllSubRegionBoxes());
+        if (box == null)
+        {
+            return Vec3i.NULL_VECTOR;
+        }
+
+        return new Vec3i(box.maxX - box.minX + 1,
+                         box.maxY - box.minY + 1,
+                         box.maxZ - box.minZ + 1);
     }
 
-    public static BlockPos getEnclosingAreaSize(Collection<? extends Box> boxes)
+    public static CornerDefinedBox asBox(IntBoundingBox intBox)
     {
-        Pair<BlockPos, BlockPos> pair = getEnclosingAreaCorners(boxes);
-        return pair.getRight().subtract(pair.getLeft()).add(1, 1, 1);
+        return new CornerDefinedBox(new BlockPos(intBox.minX, intBox.minY, intBox.minZ),
+                                    new BlockPos(intBox.maxX, intBox.maxY, intBox.maxZ));
     }
 
-    public static Box asBox(IntBoundingBox intBox)
-    {
-        return new Box(new BlockPos(intBox.minX, intBox.minY, intBox.minZ),
-                       new BlockPos(intBox.maxX, intBox.maxY, intBox.maxZ));
-    }
-
-    /**
-     * Returns the min and max corners of the enclosing box around the given collection of boxes.
-     * The minimum corner is the left entry and the maximum corner is the right entry of the pair.
-     */
     @Nullable
-    public static Pair<BlockPos, BlockPos> getEnclosingAreaCorners(Collection<? extends Box> boxes)
+    public static IntBoundingBox getEnclosingBox(Collection<? extends CornerDefinedBox> boxes)
     {
         if (boxes.isEmpty())
         {
             return null;
         }
 
-        BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-        BlockPos.MutableBlockPos posMax = new BlockPos.MutableBlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int maxZ = Integer.MIN_VALUE;
 
-        for (Box box : boxes)
+        for (CornerDefinedBox box : boxes)
         {
-            getMinMaxCoords(posMin, posMax, box.getPos1());
-            getMinMaxCoords(posMin, posMax, box.getPos2());
+            BlockPos pos1 = box.getCorner1();
+            BlockPos pos2 = box.getCorner2();
+
+            minX = Math.min(minX, Math.min(pos1.getX(), pos2.getX()));
+            minY = Math.min(minY, Math.min(pos1.getY(), pos2.getY()));
+            minZ = Math.min(minZ, Math.min(pos1.getZ(), pos2.getZ()));
+
+            maxX = Math.max(maxX, Math.max(pos1.getX(), pos2.getX()));
+            maxY = Math.max(maxY, Math.max(pos1.getY(), pos2.getY()));
+            maxZ = Math.max(maxZ, Math.max(pos1.getZ(), pos2.getZ()));
         }
 
-        return Pair.of(posMin.toImmutable(), posMax.toImmutable());
+        return new IntBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    /**
-     * Returns the min and max corners of the enclosing box around the given collection of boxes.
-     * The minimum corner is the left entry and the maximum corner is the right entry of the pair.
-     */
+    public static BlockPos getMinCornerOfEnclosingBox(Collection<? extends CornerDefinedBox> boxes)
+    {
+        if (boxes.isEmpty())
+        {
+            return BlockPos.ORIGIN;
+        }
+
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+
+        for (CornerDefinedBox box : boxes)
+        {
+            BlockPos pos1 = box.getCorner1();
+            BlockPos pos2 = box.getCorner2();
+
+            minX = Math.min(minX, Math.min(pos1.getX(), pos2.getX()));
+            minY = Math.min(minY, Math.min(pos1.getY(), pos2.getY()));
+            minZ = Math.min(minZ, Math.min(pos1.getZ(), pos2.getZ()));
+        }
+
+        return new BlockPos(minX, minY, minZ);
+    }
+
     @Nullable
-    public static Pair<BlockPos, BlockPos> getEnclosingAreaCornersForRegions(Collection<ISchematicRegion> regions)
+    public static IntBoundingBox getEnclosingBoxAroundRegions(Collection<ISchematicRegion> regions)
     {
         if (regions.isEmpty())
         {
             return null;
         }
 
-        BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-        BlockPos.MutableBlockPos posMax = new BlockPos.MutableBlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-        BlockPos.MutableBlockPos posEnd = new BlockPos.MutableBlockPos();
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int maxZ = Integer.MIN_VALUE;
 
         for (ISchematicRegion region : regions)
         {
+            Vec3i size = region.getSize();
+            int offX = size.getX();
+            int offY = size.getY();
+            int offZ = size.getZ();
+
+            offX = offX >= 0 ? offX - 1 : offX + 1;
+            offY = offY >= 0 ? offY - 1 : offY + 1;
+            offZ = offZ >= 0 ? offZ - 1 : offZ + 1;
+
             BlockPos pos = region.getPosition();
-            Vec3i endRel = getRelativeEndPositionFromAreaSize(region.getSize());
-            posEnd.setPos(pos.getX() + endRel.getX(), pos.getY() + endRel.getY(), pos.getZ() + endRel.getZ());
+            int x1 = pos.getX();
+            int y1 = pos.getY();
+            int z1 = pos.getZ();
+            int x2 = x1 + offX;
+            int y2 = y1 + offY;
+            int z2 = z1 + offZ;
 
-            getMinMaxCoords(posMin, posMax, pos);
-            getMinMaxCoords(posMin, posMax, posEnd);
+            minX = Math.min(minX, Math.min(x1, x2));
+            minY = Math.min(minY, Math.min(y1, y2));
+            minZ = Math.min(minZ, Math.min(z1, z2));
+
+            maxX = Math.max(maxX, Math.max(x1, x2));
+            maxY = Math.max(maxY, Math.max(y1, y2));
+            maxZ = Math.max(maxZ, Math.max(z1, z2));
         }
 
-        return Pair.of(posMin.toImmutable(), posMax.toImmutable());
+        return new IntBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    private static void getMinMaxCoords(BlockPos.MutableBlockPos posMin, BlockPos.MutableBlockPos posMax, @Nullable BlockPos posToCheck)
+    @Nullable
+    public static BlockPos getMinCornerOfEnclosingBoxAroundRegions(Collection<ISchematicRegion> regions)
     {
-        if (posToCheck != null)
+        if (regions.isEmpty())
         {
-            posMin.setPos(  Math.min(posMin.getX(), posToCheck.getX()),
-                            Math.min(posMin.getY(), posToCheck.getY()),
-                            Math.min(posMin.getZ(), posToCheck.getZ()));
-
-            posMax.setPos(  Math.max(posMax.getX(), posToCheck.getX()),
-                            Math.max(posMax.getY(), posToCheck.getY()),
-                            Math.max(posMax.getZ(), posToCheck.getZ()));
+            return null;
         }
+
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+
+        for (ISchematicRegion region : regions)
+        {
+            Vec3i size = region.getSize();
+            int offX = size.getX();
+            int offY = size.getY();
+            int offZ = size.getZ();
+
+            offX = offX >= 0 ? offX - 1 : offX + 1;
+            offY = offY >= 0 ? offY - 1 : offY + 1;
+            offZ = offZ >= 0 ? offZ - 1 : offZ + 1;
+
+            BlockPos pos = region.getPosition();
+            minX = Math.min(minX, Math.min(pos.getX(), pos.getX() + offX));
+            minY = Math.min(minY, Math.min(pos.getY(), pos.getY() + offY));
+            minZ = Math.min(minZ, Math.min(pos.getZ(), pos.getZ() + offZ));
+        }
+
+        return new BlockPos(minX, minY, minZ);
     }
 
-    public static int getTotalVolume(Collection<? extends Box> boxes)
+    public static long getTotalVolume(Collection<? extends CornerDefinedBox> boxes)
     {
         if (boxes.isEmpty())
         {
             return 0;
         }
 
-        int volume = 0;
+        long volume = 0;
 
-        for (Box box : boxes)
+        for (CornerDefinedBox box : boxes)
         {
-            BlockPos min = malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
-            BlockPos max = malilib.util.position.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
-            volume += (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
+            BlockPos pos1 = box.getCorner1();
+            BlockPos pos2 = box.getCorner2();
+            long minX = Math.min(pos1.getX(), pos2.getX());
+            long minY = Math.min(pos1.getY(), pos2.getY());
+            long minZ = Math.min(pos1.getZ(), pos2.getZ());
+            long maxX = Math.max(pos1.getX(), pos2.getX());
+            long maxY = Math.max(pos1.getY(), pos2.getY());
+            long maxZ = Math.max(pos1.getZ(), pos2.getZ());
+
+            volume += (maxX - minX + 1L) * (maxY - minY + 1L) * (maxZ - minZ + 1L);
         }
 
         return volume;
@@ -379,11 +402,11 @@ public class PositionUtils
         return builder.build();
     }
 
-    public static ImmutableList<IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<? extends Box> boxes)
+    public static ImmutableList<IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<? extends CornerDefinedBox> boxes)
     {
         ImmutableList.Builder<IntBoundingBox> builder = new ImmutableList.Builder<>();
 
-        for (Box box : boxes)
+        for (CornerDefinedBox box : boxes)
         {
             IntBoundingBox bb = getBoundsWithinChunkForBox(box, chunkX, chunkZ);
 
@@ -401,16 +424,16 @@ public class PositionUtils
         return getTouchedChunksForBoxes(boxes.values());
     }
 
-    public static Set<ChunkPos> getTouchedChunksForBoxes(Collection<? extends Box> boxes)
+    public static Set<ChunkPos> getTouchedChunksForBoxes(Collection<? extends CornerDefinedBox> boxes)
     {
         Set<ChunkPos> set = new HashSet<>();
 
-        for (Box box : boxes)
+        for (CornerDefinedBox box : boxes)
         {
-            final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX()) >> 4;
-            final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
-            final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX()) >> 4;
-            final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
+            final int boxXMin = Math.min(box.getCorner1().getX(), box.getCorner2().getX()) >> 4;
+            final int boxZMin = Math.min(box.getCorner1().getZ(), box.getCorner2().getZ()) >> 4;
+            final int boxXMax = Math.max(box.getCorner1().getX(), box.getCorner2().getX()) >> 4;
+            final int boxZMax = Math.max(box.getCorner1().getZ(), box.getCorner2().getZ()) >> 4;
 
             for (int cz = boxZMin; cz <= boxZMax; ++cz)
             {
@@ -425,27 +448,27 @@ public class PositionUtils
     }
 
     @Nullable
-    public static IntBoundingBox getBoundsWithinChunkForBox(Box box, int chunkX, int chunkZ)
+    public static IntBoundingBox getBoundsWithinChunkForBox(CornerDefinedBox box, int chunkX, int chunkZ)
     {
         final int chunkXMin = chunkX << 4;
         final int chunkZMin = chunkZ << 4;
         final int chunkXMax = chunkXMin + 15;
         final int chunkZMax = chunkZMin + 15;
 
-        final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX());
-        final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
-        final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX());
-        final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+        final int boxXMin = Math.min(box.getCorner1().getX(), box.getCorner2().getX());
+        final int boxZMin = Math.min(box.getCorner1().getZ(), box.getCorner2().getZ());
+        final int boxXMax = Math.max(box.getCorner1().getX(), box.getCorner2().getX());
+        final int boxZMax = Math.max(box.getCorner1().getZ(), box.getCorner2().getZ());
 
         boolean notOverlapping = boxXMin > chunkXMax || boxZMin > chunkZMax || boxXMax < chunkXMin || boxZMax < chunkZMin;
 
         if (notOverlapping == false)
         {
             final int xMin = Math.max(chunkXMin, boxXMin);
-            final int yMin = Math.min(box.getPos1().getY(), box.getPos2().getY());
+            final int yMin = Math.min(box.getCorner1().getY(), box.getCorner2().getY());
             final int zMin = Math.max(chunkZMin, boxZMin);
             final int xMax = Math.min(chunkXMax, boxXMax);
-            final int yMax = Math.max(box.getPos1().getY(), box.getPos2().getY());
+            final int yMax = Math.max(box.getCorner1().getY(), box.getCorner2().getY());
             final int zMax = Math.min(chunkZMax, boxZMax);
 
             return new IntBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax);
@@ -454,12 +477,12 @@ public class PositionUtils
         return null;
     }
 
-    public static void getPerChunkBoxes(Collection<? extends Box> boxes, BiConsumer<ChunkPos, IntBoundingBox> consumer)
+    public static void getPerChunkBoxes(Collection<? extends CornerDefinedBox> boxes, BiConsumer<ChunkPos, IntBoundingBox> consumer)
     {
-        for (Box box : boxes)
+        for (CornerDefinedBox box : boxes)
         {
-            BlockPos pos1 = box.getPos1();
-            BlockPos pos2 = box.getPos2();
+            BlockPos pos1 = box.getCorner1();
+            BlockPos pos2 = box.getCorner2();
             final int boxMinX = Math.min(pos1.getX(), pos2.getX());
             final int boxMinY = Math.min(pos1.getY(), pos2.getY());
             final int boxMinZ = Math.min(pos1.getZ(), pos2.getZ());
@@ -488,20 +511,20 @@ public class PositionUtils
         }
     }
 
-    public static void getLayerRangeClampedPerChunkBoxes(Collection<? extends Box> boxes,
+    public static void getLayerRangeClampedPerChunkBoxes(Collection<? extends CornerDefinedBox> boxes,
                                                          LayerRange range,
                                                          BiConsumer<ChunkPos, IntBoundingBox> consumer)
     {
-        for (Box box : boxes)
+        for (CornerDefinedBox box : boxes)
         {
             final int rangeMin = range.getMinLayerBoundary();
             final int rangeMax = range.getMaxLayerBoundary();
-            int boxMinX = Math.min(box.getPos1().getX(), box.getPos2().getX());
-            int boxMinY = Math.min(box.getPos1().getY(), box.getPos2().getY());
-            int boxMinZ = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
-            int boxMaxX = Math.max(box.getPos1().getX(), box.getPos2().getX());
-            int boxMaxY = Math.max(box.getPos1().getY(), box.getPos2().getY());
-            int boxMaxZ = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+            int boxMinX = Math.min(box.getCorner1().getX(), box.getCorner2().getX());
+            int boxMinY = Math.min(box.getCorner1().getY(), box.getCorner2().getY());
+            int boxMinZ = Math.min(box.getCorner1().getZ(), box.getCorner2().getZ());
+            int boxMaxX = Math.max(box.getCorner1().getX(), box.getCorner2().getX());
+            int boxMaxY = Math.max(box.getCorner1().getY(), box.getCorner2().getY());
+            int boxMaxZ = Math.max(box.getCorner1().getZ(), box.getCorner2().getZ());
 
             switch (range.getAxis())
             {
@@ -601,10 +624,10 @@ public class PositionUtils
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public static Box expandOrShrinkBox(Box box, int amount, EnumFacing side)
+    public static CornerDefinedBox expandOrShrinkBox(CornerDefinedBox box, int amount, EnumFacing side)
     {
-        BlockPos pos1 = box.getPos1();
-        BlockPos pos2 = box.getPos2();
+        BlockPos pos1 = box.getCorner1();
+        BlockPos pos2 = box.getCorner2();
 
         EnumFacing.Axis axis = side.getAxis();
         boolean positiveSide = side.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE;
@@ -647,24 +670,24 @@ public class PositionUtils
             }
         }
 
-        Box boxNew = box.copy();
-        boxNew.setPos1(pos1);
-        boxNew.setPos2(pos2);
+        CornerDefinedBox boxNew = box.copy();
+        boxNew.setCorner1(pos1);
+        boxNew.setCorner2(pos2);
 
         return boxNew;
     }
 
-    public static Box growOrShrinkBox(Box box, int amount)
+    public static CornerDefinedBox growOrShrinkBox(CornerDefinedBox box, int amount)
     {
-        BlockPos pos1 = box.getPos1();
-        BlockPos pos2 = box.getPos2();
+        BlockPos pos1 = box.getCorner1();
+        BlockPos pos2 = box.getCorner2();
         Pair<Integer, Integer> x = growCoordinatePair(pos1.getX(), pos2.getX(), amount);
         Pair<Integer, Integer> y = growCoordinatePair(pos1.getY(), pos2.getY(), amount);
         Pair<Integer, Integer> z = growCoordinatePair(pos1.getZ(), pos2.getZ(), amount);
 
-        Box boxNew = box.copy();
-        boxNew.setPos1(new BlockPos(x.getLeft(), y.getLeft(), z.getLeft()));
-        boxNew.setPos2(new BlockPos(x.getRight(), y.getRight(), z.getRight()));
+        CornerDefinedBox boxNew = box.copy();
+        boxNew.setCorner1(new BlockPos(x.getLeft(), y.getLeft(), z.getLeft()));
+        boxNew.setCorner2(new BlockPos(x.getRight(), y.getRight(), z.getRight()));
 
         return boxNew;
     }
@@ -701,7 +724,7 @@ public class PositionUtils
 
     public static void growOrShrinkCurrentSelection(boolean grow)
     {
-        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
         World world = GameUtils.getClientWorld();
 
@@ -711,7 +734,7 @@ public class PositionUtils
             return;
         }
 
-        Box box = area.getSelectedSubRegionBox();
+        CornerDefinedBox box = area.getSelectedSelectionBox();
 
         if (box == null)
         {
@@ -721,7 +744,7 @@ public class PositionUtils
 
         if (box != null)
         {
-            Box boxNew = box.copy();
+            CornerDefinedBox boxNew = box.copy();
             int amount = 1;
 
             for (int i = 0; i < 256; ++i)
@@ -731,8 +754,8 @@ public class PositionUtils
                     boxNew = growOrShrinkBox(boxNew, amount);
                 }
 
-                BlockPos pos1 = boxNew.getPos1();
-                BlockPos pos2 = boxNew.getPos2();
+                BlockPos pos1 = boxNew.getCorner1();
+                BlockPos pos2 = boxNew.getCorner2();
                 int xMin = Math.min(pos1.getX(), pos2.getX());
                 int yMin = Math.min(pos1.getY(), pos2.getY());
                 int zMin = Math.min(pos1.getZ(), pos2.getZ());
@@ -780,8 +803,8 @@ public class PositionUtils
                     ++emptySides;
                 }
 
-                boxNew.setPos1(new BlockPos(xMin, yMin, zMin));
-                boxNew.setPos2(new BlockPos(xMax, yMax, zMax));
+                boxNew.setCorner1(new BlockPos(xMin, yMin, zMin));
+                boxNew.setCorner2(new BlockPos(xMax, yMax, zMax));
 
                 if (grow && emptySides >= 6)
                 {
@@ -793,8 +816,8 @@ public class PositionUtils
                 }
             }
 
-            area.setSelectedSubRegionCornerPos(boxNew.getPos1(), Corner.CORNER_1);
-            area.setSelectedSubRegionCornerPos(boxNew.getPos2(), Corner.CORNER_2);
+            area.setSelectedSelectionBoxCornerPos(boxNew.getCorner1(), BoxCorner.CORNER_1);
+            area.setSelectedSelectionBoxCornerPos(boxNew.getCorner2(), BoxCorner.CORNER_2);
         }
     }
 
@@ -813,7 +836,7 @@ public class PositionUtils
         if (Configs.Generic.PLACEMENTS_INFRONT.getBooleanValue() && placement != null && entity != null)
         {
             SubRegionPlacement sub = placement.getSelectedSubRegionPlacement();
-            Box box;
+            CornerDefinedBox box;
 
             if (sub != null)
             {
@@ -829,8 +852,8 @@ public class PositionUtils
             if (box != null)
             {
                 BlockPos originOffset = newOrigin.subtract(placement.getOrigin());
-                BlockPos corner1 = box.getPos1().add(originOffset);
-                BlockPos corner2 = box.getPos2().add(originOffset);
+                BlockPos corner1 = box.getCorner1().add(originOffset);
+                BlockPos corner2 = box.getCorner2().add(originOffset);
                 BlockPos entityPos = EntityWrap.getEntityBlockPos(entity);
                 EnumFacing entityFrontDirection = entity.getHorizontalFacing();
                 EnumFacing entitySideDirection = malilib.util.position.PositionUtils.getClosestSideDirection(entity);
@@ -1271,13 +1294,6 @@ public class PositionUtils
 
             return dx * dx + dz * dz;
         }
-    }
-
-    public enum Corner
-    {
-        NONE,
-        CORNER_1,
-        CORNER_2;
     }
 
     public enum IntBoxCoordType

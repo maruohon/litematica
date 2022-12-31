@@ -11,35 +11,35 @@ import malilib.util.game.wrap.EntityWrap;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.selection.AreaSelection;
-import litematica.selection.Box;
-import litematica.selection.SelectionManager;
-import litematica.selection.SelectionMode;
+import litematica.selection.CornerDefinedBox;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.AreaSelectionType;
 
 public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
 {
     protected final BaseTextFieldWidget areaNameTextField;
     protected final GenericButton areaAnalyzerButton;
-    protected final GenericButton cornersModeButton;
     protected final GenericButton mainMenuButton;
     protected final GenericButton manualOriginButton;
     protected final GenericButton saveSchematicButton;
     protected final GenericButton selectionModeButton;
     protected final GenericButton setAreaNameButton;
+    protected final GenericButton toolBehaviorModeButton;
     protected final LabelWidget areaNameLabel;
     protected final CheckBoxWidget originCheckbox;
     protected final BlockPosEditWidget originEditWidget;
 
     public SimpleModeAreaEditorScreen(AreaSelection selection)
     {
-        super(selection);
+        super(selection, selection.getSelectedSelectionBox());
 
         this.areaNameLabel = new LabelWidget("litematica.label.area_editor.area_selection_name");
         this.areaNameTextField = new BaseTextFieldWidget(200, 16, selection.getName());
 
         this.selectionModeButton    = GenericButton.create(18, SimpleModeAreaEditorScreen::getSelectionModeButtonLabel, SimpleModeAreaEditorScreen::cycleSelectionMode);
-        this.cornersModeButton      = GenericButton.create(18, SimpleModeAreaEditorScreen::getCornersModeButtonLabel, this::cycleCornersMode);
+        this.toolBehaviorModeButton = GenericButton.create(18, SimpleModeAreaEditorScreen::getToolBehaviorModeButtonLabel, this::cycleToolBehaviorMode);
         this.manualOriginButton     = OnOffButton.onOff(18, "litematica.button.area_editor.manual_origin",
-                                                        this.selection::hasManualOrigin, this::toggleManualOrigin);
+                                                        this.areaSelection::hasManualOrigin, this::toggleManualOrigin);
 
         this.setAreaNameButton      = GenericButton.create(18, "litematica.button.misc.set", this::renameAreaSelection);
         this.areaAnalyzerButton     = GenericButton.create(18, "litematica.button.area_editor.area_analyzer", this::openAreaAnalyzer);
@@ -52,8 +52,8 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
                                                  selection::isOriginSelected, selection::setOriginSelected);
         this.originCheckbox.setListener(this::onOriginCheckboxClick);
 
-        Box box = selection.getSelectedSubRegionBox();
-        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, box.getPos1(), selection::setExplicitOrigin);
+        CornerDefinedBox box = selection.getSelectedSelectionBox();
+        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, box.getCorner1(), selection::setManualOrigin);
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
@@ -71,7 +71,7 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
         super.reAddActiveWidgets();
 
         this.addWidget(this.selectionModeButton);
-        this.addWidget(this.cornersModeButton);
+        this.addWidget(this.toolBehaviorModeButton);
         this.addWidget(this.manualOriginButton);
 
         this.addWidget(this.areaNameLabel);
@@ -82,7 +82,7 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
         this.addWidget(this.areaAnalyzerButton);
         this.addWidget(this.mainMenuButton);
         
-        if (this.selection.hasManualOrigin())
+        if (this.areaSelection.hasManualOrigin())
         {
             this.addWidget(this.originEditWidget);
             this.addWidget(this.originCheckbox);
@@ -98,19 +98,19 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
         int y = this.y + 17;
 
         this.selectionModeButton.setPosition(x, y);
-        this.cornersModeButton.setPosition(this.selectionModeButton.getRight() + 4, y);
-        this.manualOriginButton.setPosition(this.cornersModeButton.getRight() + 4, y);
+        this.toolBehaviorModeButton.setPosition(this.selectionModeButton.getRight() + 4, y);
+        this.manualOriginButton.setPosition(this.toolBehaviorModeButton.getRight() + 4, y);
 
         y = this.selectionModeButton.getBottom() + 4;
         this.areaNameLabel.setPosition(x, y);
         this.areaNameTextField.setPosition(x, this.areaNameLabel.getBottom());
-        this.subRegionNameLabel.setPosition(x, this.areaNameTextField.getBottom() + 4);
-        this.subRegionNameTextField.setPosition(x, this.subRegionNameLabel.getBottom());
+        this.selectionBoxNameLabel.setPosition(x, this.areaNameTextField.getBottom() + 4);
+        this.selectionBoxNameTextField.setPosition(x, this.selectionBoxNameLabel.getBottom());
 
         this.setAreaNameButton.setPosition(this.areaNameTextField.getRight() + 2, this.areaNameTextField.getY() - 1);
-        this.setSubRegionNameButton.setPosition(this.subRegionNameTextField.getRight() + 2, this.subRegionNameTextField.getY() - 1);
+        this.setSelectionBoxNameButton.setPosition(this.selectionBoxNameTextField.getRight() + 2, this.selectionBoxNameTextField.getY() - 1);
 
-        y = this.subRegionNameTextField.getBottom() + 4;
+        y = this.selectionBoxNameTextField.getBottom() + 4;
         this.corner1EditWidget.setPosition(x, y + 14);
         this.corner2EditWidget.setPosition(this.corner1EditWidget.getRight() + 8, y + 14);
         this.originEditWidget.setPosition(this.corner2EditWidget.getRight() + 8, y + 14);
@@ -120,7 +120,7 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
 
         x = this.setAreaNameButton.getRight() + 8;
         this.saveSchematicButton.setPosition(x, this.setAreaNameButton.getY());
-        this.areaAnalyzerButton.setPosition(x, this.setSubRegionNameButton.getY());
+        this.areaAnalyzerButton.setPosition(x, this.setSelectionBoxNameButton.getY());
 
         this.mainMenuButton.setRight(this.getRight() - 10);
         this.mainMenuButton.setBottom(this.getBottom() - 3);
@@ -128,15 +128,13 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
 
     protected static String getSelectionModeButtonLabel()
     {
-        SelectionMode mode = DataManager.getSelectionManager().getSelectionMode();
-        String key = mode == SelectionMode.SIMPLE ? "litematica.label.area_selection.mode.simple" :
-                                                    "litematica.label.area_selection.mode.multi_region";
-        return StringUtils.translate("litematica.button.area_editor.selection_mode", StringUtils.translate(key));
+        AreaSelectionType mode = DataManager.getAreaSelectionManager().getSelectionMode();
+        return StringUtils.translate("litematica.button.area_editor.selection_mode", mode.getDisplayName());
     }
 
-    protected static String getCornersModeButtonLabel()
+    protected static String getToolBehaviorModeButtonLabel()
     {
-        String modeName = Configs.Generic.SELECTION_CORNERS_MODE.getValue().getDisplayName();
+        String modeName = Configs.Generic.TOOL_SELECTION_MODE.getValue().getDisplayName();
         return StringUtils.translate("litematica.button.area_editor.corners_mode", modeName);
     }
 
@@ -144,7 +142,7 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
     {
         if (value)
         {
-            this.selection.clearCurrentSelectedCorner();
+            this.areaSelection.clearCornerSelectionOfSelectedBox();
         }
 
         this.updateCheckboxWidgets();
@@ -159,34 +157,34 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
 
     protected static void cycleSelectionMode()
     {
-        DataManager.getSelectionManager().switchSelectionMode();
-        DataManager.getSelectionManager().openEditGui(null);
+        DataManager.getAreaSelectionManager().switchSelectionMode();
+        DataManager.getAreaSelectionManager().openEditGui(null);
     }
 
-    protected void cycleCornersMode()
+    protected void cycleToolBehaviorMode()
     {
-        Configs.Generic.SELECTION_CORNERS_MODE.cycleValue(false);
-        this.cornersModeButton.updateButtonState();
+        Configs.Generic.TOOL_SELECTION_MODE.cycleValue(false);
+        this.toolBehaviorModeButton.updateButtonState();
         this.initScreen();
     }
 
     protected void renameAreaSelection()
     {
         String newName = this.areaNameTextField.getText();
-        SelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
-        this.selection.setName(newName);
-        this.subRegionNameTextField.setText(this.selection.getCurrentSubRegionBoxName());
+        AreaSelectionManager.renameSubRegionBoxIfSingle(this.areaSelection, newName);
+        this.areaSelection.setName(newName);
+        this.selectionBoxNameTextField.setText(this.areaSelection.getSelectedSelectionBoxName());
     }
 
     protected void toggleManualOrigin()
     {
-        if (this.selection.hasManualOrigin())
+        if (this.areaSelection.hasManualOrigin())
         {
-            this.selection.setExplicitOrigin(null);
+            this.areaSelection.setManualOrigin(null);
         }
         else
         {
-            this.selection.setExplicitOrigin(EntityWrap.getCameraEntityBlockPos());
+            this.areaSelection.setManualOrigin(EntityWrap.getCameraEntityBlockPos());
         }
 
         this.manualOriginButton.updateButtonState();
@@ -200,6 +198,6 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
 
     protected void openSaveSchematicScreen()
     {
-        openScreen(new SaveSchematicFromAreaScreen(this.selection));
+        openScreen(new SaveSchematicFromAreaScreen(this.areaSelection));
     }
 }

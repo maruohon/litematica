@@ -22,8 +22,8 @@ import litematica.data.DataManager;
 import litematica.gui.util.LitematicaIcons;
 import litematica.gui.widget.list.entry.AreaSubRegionEntryWidget;
 import litematica.selection.AreaSelection;
-import litematica.selection.Box;
-import litematica.selection.SelectionManager;
+import litematica.selection.CornerDefinedBox;
+import litematica.selection.AreaSelectionManager;
 
 public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidget<String>>
 {
@@ -52,8 +52,8 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
         this.areaNameLabel = new LabelWidget("litematica.label.area_editor.area_selection_name");
 
         this.selectionModeButton    = GenericButton.create(18, SimpleModeAreaEditorScreen::getSelectionModeButtonLabel, SimpleModeAreaEditorScreen::cycleSelectionMode);
-        this.cornersModeButton      = GenericButton.create(18, SimpleModeAreaEditorScreen::getCornersModeButtonLabel, this::cycleCornersMode);
-        this.createSubRegionButton  = GenericButton.create(18, "litematica.button.area_editor.create_sub_region", this::createSubRegion);
+        this.cornersModeButton      = GenericButton.create(18, SimpleModeAreaEditorScreen::getToolBehaviorModeButtonLabel, this::cycleCornersMode);
+        this.createSubRegionButton  = GenericButton.create(18, "litematica.button.area_editor.create_selection_box", this::createSubRegion);
         this.manualOriginButton     = OnOffButton.onOff(18, "litematica.button.area_editor.manual_origin",
                                                         this.selection::hasManualOrigin, this::toggleManualOrigin);
 
@@ -71,9 +71,9 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
         this.originCheckbox.setListener(this::onOriginCheckboxClick);
         this.manualOriginButton.translateAndAddHoverString("litematica.hover.button.area_editor.manual_origin");
 
-        Box box = selection.getSelectedSubRegionBox();
-        BlockPos pos = box != null ? box.getPos1() : BlockPos.ORIGIN;
-        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, pos, selection::setExplicitOrigin);
+        CornerDefinedBox box = selection.getSelectedSelectionBox();
+        BlockPos pos = box != null ? box.getCorner1() : BlockPos.ORIGIN;
+        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, pos, selection::setManualOrigin);
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
@@ -145,7 +145,7 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
     @Override
     protected DataListWidget<String> createListWidget()
     {
-        Supplier<List<String>> supplier = this.selection::getAllSubRegionNames;
+        Supplier<List<String>> supplier = this.selection::getAllSelectionBoxNames;
         DataListWidget<String> listWidget = new DataListWidget<>(supplier, true);
         listWidget.setListEntryWidgetFixedHeight(18);
         listWidget.addDefaultSearchBar();
@@ -157,19 +157,19 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
 
     protected void onSelectionChange(@Nullable String regionName)
     {
-        if (regionName != null && regionName.equals(this.selection.getCurrentSubRegionBoxName()))
+        if (regionName != null && regionName.equals(this.selection.getSelectedSelectionBoxName()))
         {
             regionName = null;
         }
 
-        this.selection.setSelectedSubRegionBox(regionName);
+        this.selection.setSelectedSelectionBox(regionName);
     }
 
     protected void onOriginCheckboxClick(boolean value)
     {
         if (value)
         {
-            this.selection.clearCurrentSelectedCorner();
+            this.selection.clearCornerSelectionOfSelectedBox();
         }
 
         this.originCheckbox.updateWidgetState();
@@ -177,7 +177,7 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
 
     protected void createSubRegion()
     {
-        String title = "litematica.title.screen.area_editor.create_sub_region";
+        String title = "litematica.title.screen.area_editor.create_selection_box";
         TextInputScreen screen = new TextInputScreen(title, "", this::createSubRegionByName);
         screen.setParent(this);
         BaseScreen.openPopupScreen(screen);
@@ -185,12 +185,12 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
 
     protected boolean createSubRegionByName(String name)
     {
-        return DataManager.getSelectionManager().createNewSubRegionIfNotExists(name);
+        return DataManager.getAreaSelectionManager().createNewSubRegionIfNotExists(name);
     }
 
     protected void cycleCornersMode()
     {
-        Configs.Generic.SELECTION_CORNERS_MODE.cycleValue(false);
+        Configs.Generic.TOOL_SELECTION_MODE.cycleValue(false);
         this.cornersModeButton.updateButtonState();
         this.initScreen();
     }
@@ -198,7 +198,7 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
     protected void renameAreaSelection()
     {
         String newName = this.areaNameTextField.getText();
-        SelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
+        AreaSelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
         this.selection.setName(newName);
     }
 
@@ -206,11 +206,11 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
     {
         if (this.selection.hasManualOrigin())
         {
-            this.selection.setExplicitOrigin(null);
+            this.selection.setManualOrigin(null);
         }
         else
         {
-            this.selection.setExplicitOrigin(EntityWrap.getCameraEntityBlockPos());
+            this.selection.setManualOrigin(EntityWrap.getCameraEntityBlockPos());
         }
 
         this.manualOriginButton.updateButtonState();

@@ -121,7 +121,7 @@ public class SchematicSavePacketHandler extends BasePacketHandler
         NbtUtils.writeUUID(tag, taskId);
         NbtWrap.putString(tag, "SaveMethod", saveMethod);
         NbtWrap.putTag(tag, "RequestedData", dataTypesTag);
-        NbtWrap.putTag(tag, "Regions", selection.getSubRegionsAsCompound());
+        NbtWrap.putTag(tag, "Regions", selection.getAllSelectionBoxesAsNbtCompound());
 
         PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
         buf.writeCompoundTag(tag);

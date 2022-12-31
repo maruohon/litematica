@@ -51,7 +51,7 @@ public class MultiplayerCreateSchematicTask extends TaskBase
         this.schematic = SchematicType.LITEMATICA.createSchematic(null);
         this.selectionName = selection.getName();
 
-        List<SelectionBox> boxes = selection.getAllSubRegionBoxes();
+        List<SelectionBox> boxes = selection.getAllSelectionBoxes();
         this.schematic.setSubRegions(boxes, selection.getEffectiveOrigin());
 
         SchematicMetadata metadata = this.schematic.getMetadata();

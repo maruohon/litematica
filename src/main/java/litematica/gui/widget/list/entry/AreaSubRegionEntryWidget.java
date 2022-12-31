@@ -18,13 +18,13 @@ import litematica.data.DataManager;
 import litematica.gui.AreaSubRegionEditScreen;
 import litematica.selection.AreaSelection;
 import litematica.selection.SelectionBox;
-import litematica.selection.SelectionManager;
+import litematica.selection.AreaSelectionManager;
 import litematica.util.PositionUtils;
 
 public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
 {
     protected final AreaSelection selection;
-    protected final SelectionManager manager;
+    protected final AreaSelectionManager manager;
     protected final GenericButton configureButton;
     protected final GenericButton removeButton;
     protected final GenericButton renameButton;
@@ -37,7 +37,7 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
         super(data, constructData);
 
         this.selection = selection;
-        this.manager = DataManager.getSelectionManager();
+        this.manager = DataManager.getAreaSelectionManager();
 
         int h = constructData.height - 2;
         this.configureButton = GenericButton.create(h, "litematica.button.misc.configure", this::openConfigurationMenu);
@@ -77,7 +77,7 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
     @Override
     protected boolean isSelected()
     {
-        return this.data.equals(this.selection.getCurrentSubRegionBoxName());
+        return this.data.equals(this.selection.getSelectedSelectionBoxName());
     }
 
     @Override
@@ -89,21 +89,21 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
     protected void addHoverInfo(AreaSelection selection, String regionName)
     {
         List<String> lines = new ArrayList<>();
-        SelectionBox box = selection.getSubRegionBox(regionName);
+        SelectionBox box = selection.getSelectionBox(regionName);
 
         if (box != null)
         {
-            BlockPos pos1 = box.getPos1();
-            BlockPos pos2 = box.getPos2();
+            BlockPos pos1 = box.getCorner1();
+            BlockPos pos2 = box.getCorner2();
 
-            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.pos1",
+            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.selection_box.pos1",
                                             pos1.getX(), pos1.getY(), pos1.getZ()));
 
-            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.pos1",
+            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.selection_box.pos2",
                                             pos2.getX(), pos2.getY(), pos2.getZ()));
 
-            Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPosition(pos2.subtract(pos1));
-            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.sub_region.dimensions",
+            Vec3i size = PositionUtils.getAreaSize(pos1, pos2);
+            lines.add(StringUtils.translate("litematica.hover.area_editor.multi_region.selection_box.dimensions",
                                            Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ())));
 
             this.getHoverInfoFactory().addStrings(lines);
@@ -112,32 +112,37 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
 
     protected void openConfigurationMenu()
     {
-        BaseScreen.openScreenWithParent(new AreaSubRegionEditScreen(this.selection));
+        SelectionBox selectionBox = this.selection.getSelectionBox(this.data);
+
+        if (selectionBox != null)
+        {
+            BaseScreen.openScreenWithParent(new AreaSubRegionEditScreen(this.selection, selectionBox));
+        }
     }
 
     protected void removeRegion()
     {
         this.scheduleTask(() -> {
-            this.selection.removeSubRegionBox(this.data);
+            this.selection.removeSelectionBox(this.data);
             this.listWidget.refreshEntries();
         });
     }
 
     protected void renameRegion()
     {
-        SelectionBox box = this.selection.getSubRegionBox(this.data);
+        SelectionBox box = this.selection.getSelectionBox(this.data);
 
         if (box != null)
         {
-            String title = "litematica.title.screen.area_editor.rename_sub_region";
+            String title = "litematica.title.screen.area_editor.rename_selection_box";
             String name = box.getName();
-            BaseScreen.openPopupScreenWithCurrentScreenAsParent(new TextInputScreen(title, name, this::renameRegionTo));
+            BaseScreen.openPopupScreenWithCurrentScreenAsParent(new TextInputScreen(title, name, this::renameRegionAs));
         }
     }
 
-    protected boolean renameRegionTo(String newName)
+    protected boolean renameRegionAs(String newName)
     {
-        boolean success = this.selection.renameSubRegionBox(this.data, newName, MessageOutput.MESSAGE_OVERLAY);
+        boolean success = this.selection.renameSelectionBox(this.data, newName, MessageOutput.MESSAGE_OVERLAY);
 
         if (success)
         {

@@ -27,7 +27,7 @@ import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SubRegionPlacement;
 import litematica.schematic.verifier.SchematicVerifier;
 import litematica.schematic.verifier.SchematicVerifierManager;
-import litematica.selection.SelectionManager;
+import litematica.selection.AreaSelectionManager;
 
 public class HotkeyCallbackOpenGui implements HotkeyCallback
 {
@@ -53,7 +53,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
         else if (key == Hotkeys.OPEN_AREA_EDITOR_SCREEN.getKeyBind())
         {
-            SelectionManager manager = DataManager.getSelectionManager();
+            AreaSelectionManager manager = DataManager.getAreaSelectionManager();
 
             if (manager.getCurrentSelection() != null)
             {

@@ -11,7 +11,7 @@ import litematica.Reference;
 import litematica.data.DataManager;
 import litematica.gui.util.LitematicaIcons;
 import litematica.schematic.projects.SchematicProject;
-import litematica.selection.SelectionMode;
+import litematica.selection.AreaSelectionType;
 
 public class MainMenuScreen extends BaseScreen
 {
@@ -49,11 +49,11 @@ public class MainMenuScreen extends BaseScreen
         this.loadedSchematicsListScreenButton.setActionListener(() -> openScreenWithParent(new LoadedSchematicsListScreen()));
         this.loadSchematicsScreenButton.setActionListener(() -> openScreenWithParent(new SchematicBrowserScreen()));
 
-        this.areaEditorScreenButton.setActionListener(DataManager.getSelectionManager()::openAreaEditorScreenWithParent);
+        this.areaEditorScreenButton.setActionListener(DataManager.getAreaSelectionManager()::openAreaEditorScreenWithParent);
         this.areaSelectionBrowserScreenButton.setActionListener(() -> openScreenWithParent(new AreaSelectionBrowserScreen()));
         this.cycleAreaSelectionModeButton.getTextOffset().setCenterHorizontally(false);
         this.cycleAreaSelectionModeButton.setActionListener(() -> {
-            DataManager.getSelectionManager().switchSelectionMode();
+            DataManager.getAreaSelectionManager().switchSelectionMode();
             this.cycleAreaSelectionModeButton.updateButtonState();
         });
 
@@ -99,8 +99,8 @@ public class MainMenuScreen extends BaseScreen
         if (isInitial)
         {
             // FIXME meh what a mess...
-            String modeName1 = SelectionMode.SIMPLE.getDisplayName();
-            String modeName2 = SelectionMode.MULTI_REGION.getDisplayName();
+            String modeName1 = AreaSelectionType.SIMPLE.getDisplayName();
+            String modeName2 = AreaSelectionType.MULTI_REGION.getDisplayName();
             String s1 = StringUtils.translate("litematica.button.area_editor.selection_mode", modeName1);
             String s2 = StringUtils.translate("litematica.button.area_editor.selection_mode", modeName2);
             this.equalWidthWidgetMaxWidth = Math.max(this.equalWidthWidgetMaxWidth, this.getStringWidth(s1) + 10);
@@ -175,7 +175,7 @@ public class MainMenuScreen extends BaseScreen
 
     public static String getAreaSelectionModeButtonLabel()
     {
-        String modeName = DataManager.getSelectionManager().getSelectionMode().getDisplayName();
+        String modeName = DataManager.getAreaSelectionManager().getSelectionMode().getDisplayName();
         return StringUtils.translate("litematica.button.area_editor.selection_mode", modeName);
     }
 

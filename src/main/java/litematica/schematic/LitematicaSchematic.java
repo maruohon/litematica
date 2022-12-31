@@ -29,7 +29,6 @@ import malilib.util.nbt.NbtUtils;
 import litematica.Litematica;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
 import litematica.schematic.container.LitematicaBlockStateContainerFull;
-import litematica.selection.Box;
 import litematica.selection.SelectionBox;
 import litematica.util.PositionUtils;
 
@@ -106,34 +105,7 @@ public class LitematicaSchematic extends SchematicBase
     @Override
     public Vec3i getEnclosingSize()
     {
-        ImmutableMap<String, ISchematicRegion> regions = this.getRegions();
-
-        if (regions.isEmpty() == false)
-        {
-            if (regions.size() == 1)
-            {
-                for (ISchematicRegion region : regions.values())
-                {
-                    return PositionUtils.getAbsoluteAreaSize(region.getSize());
-                }
-            }
-            else
-            {
-                List<Box> boxes = new ArrayList<>();
-
-                for (ISchematicRegion region : regions.values())
-                {
-                    BlockPos pos = region.getPosition();
-                    Vec3i end = PositionUtils.getRelativeEndPositionFromAreaSize(region.getSize());
-                    Box box = new Box(pos, pos.add(end));
-                    boxes.add(box);
-                }
-
-                return PositionUtils.getEnclosingAreaSize(boxes);
-            }
-        }
-
-        return null;
+        return PositionUtils.getEnclosingAreaSize(PositionUtils.getEnclosingBoxAroundRegions(this.getRegions().values()));
     }
 
     /**
@@ -147,7 +119,7 @@ public class LitematicaSchematic extends SchematicBase
         for (SelectionBox box : boxes)
         {
             String regionName = box.getName();
-            BlockPos pos = box.getPos1().subtract(areaOrigin);
+            BlockPos pos = box.getCorner1().subtract(areaOrigin);
             Vec3i size = box.getSize();
 
             this.subRegions.put(regionName, new SubRegion(pos, size));
@@ -171,7 +143,7 @@ public class LitematicaSchematic extends SchematicBase
         for (SelectionBox box : boxes)
         {
             String regionName = box.getName();
-            BlockPos pos = box.getPos1().subtract(areaOrigin);
+            BlockPos pos = box.getCorner1().subtract(areaOrigin);
             Vec3i size = box.getSize();
             final int sizeX = Math.abs(size.getX());
             final int sizeY = Math.abs(size.getY());

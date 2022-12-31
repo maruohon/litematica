@@ -22,13 +22,13 @@ import litematica.schematic.util.SchematicCreationUtils;
 import litematica.schematic.util.SchematicEditUtils;
 import litematica.schematic.util.SchematicPlacingUtils;
 import litematica.selection.AreaSelection;
-import litematica.selection.SelectionManager;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.BoxCorner;
 import litematica.tool.ToolMode;
 import litematica.tool.ToolModeData;
 import litematica.util.EntityUtils;
 import litematica.util.InventoryUtils;
 import litematica.util.PositionUtils;
-import litematica.util.PositionUtils.Corner;
 import litematica.util.ToolUtils;
 import litematica.world.SchematicWorldRenderingNotifier;
 
@@ -48,13 +48,13 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         {
             if (mode.getUsesAreaSelection())
             {
-                DataManager.getSelectionManager().createNewSubRegion(true);
+                DataManager.getAreaSelectionManager().createNewSubRegion(true);
                 return ActionResult.SUCCESS;
             }
         }
         else if (key == Hotkeys.CLONE_SELECTION.getKeyBind())
         {
-            if (DataManager.getSelectionManager().getCurrentSelection() != null)
+            if (DataManager.getAreaSelectionManager().getCurrentSelection() != null)
             {
                 ToolUtils.cloneSelectionArea();
                 return ActionResult.SUCCESS;
@@ -64,23 +64,23 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         {
             if (mode.getUsesAreaSelection())
             {
-                SelectionManager sm = DataManager.getSelectionManager();
+                AreaSelectionManager sm = DataManager.getAreaSelectionManager();
                 AreaSelection selection = sm.getCurrentSelection();
 
                 if (selection != null)
                 {
                     if (selection.isOriginSelected())
                     {
-                        selection.setExplicitOrigin(null);
+                        selection.setManualOrigin(null);
                         selection.setOriginSelected(false);
                         MessageDispatcher.generic().customHotbar().translate("litematica.message.removed_area_origin");
                         return ActionResult.SUCCESS;
                     }
                     else
                     {
-                        String name = selection.getCurrentSubRegionBoxName();
+                        String name = selection.getSelectedSelectionBoxName();
 
-                        if (name != null && selection.removeSelectedSubRegionBox())
+                        if (name != null && selection.removeSelectedBox())
                         {
                             MessageDispatcher.generic().customHotbar().translate("litematica.message.removed_selection_box", name);
                             return ActionResult.SUCCESS;
@@ -179,7 +179,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         {
             if (mode.getUsesAreaSelection())
             {
-                SelectionManager sm = DataManager.getSelectionManager();
+                AreaSelectionManager sm = DataManager.getAreaSelectionManager();
                 AreaSelection selection = sm.getCurrentSelection();
 
                 if (selection != null)
@@ -192,7 +192,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
                     }
                     else
                     {
-                        selection.moveEntireSelectionTo(pos, true);
+                        selection.moveEntireAreaSelectionTo(pos, true);
                     }
 
                     return ActionResult.SUCCESS;
@@ -324,7 +324,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             }
             else if (mode.getUsesAreaSelection())
             {
-                Configs.Generic.SELECTION_CORNERS_MODE.cycleValue(false);
+                Configs.Generic.TOOL_SELECTION_MODE.cycleValue(false);
                 return ActionResult.SUCCESS;
             }
         }
@@ -340,13 +340,13 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         {
             if (mode.getUsesAreaSelection())
             {
-                SelectionManager sm = DataManager.getSelectionManager();
+                AreaSelectionManager sm = DataManager.getAreaSelectionManager();
                 AreaSelection area = sm.getCurrentSelection();
 
                 if (area != null)
                 {
                     BlockPos pos = EntityWrap.getCameraEntityBlockPos();
-                    area.setExplicitOrigin(pos);
+                    area.setManualOrigin(pos);
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                     MessageDispatcher.generic().customHotbar().translate("litematica.message.set_area_origin", posStr);
                     return ActionResult.SUCCESS;
@@ -375,18 +375,18 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         {
             if (mode.getUsesAreaSelection())
             {
-                SelectionManager sm = DataManager.getSelectionManager();
+                AreaSelectionManager sm = DataManager.getAreaSelectionManager();
                 AreaSelection area = sm.getCurrentSelection();
 
-                if (area != null && area.getSelectedSubRegionBox() != null)
+                if (area != null && area.getSelectedSelectionBox() != null)
                 {
                     BlockPos pos = EntityWrap.getCameraEntityBlockPos();
-                    Corner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeyBind() ? Corner.CORNER_1 : Corner.CORNER_2;
-                    area.setSelectedSubRegionCornerPos(pos, corner);
+                    BoxCorner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeyBind() ? BoxCorner.CORNER_1 : BoxCorner.CORNER_2;
+                    area.setSelectedSelectionBoxCornerPos(pos, corner);
 
                     if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
                     {
-                        area.getSelectedSubRegionBox().setSelectedCorner(corner);
+                        area.getSelectedSelectionBox().setSelectedCorner(corner);
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());

@@ -11,11 +11,11 @@ litematica.hotkeys.category.overlays=Info Overlays
 litematica.hotkeys.category.visuals=Visuals
 
 litematica.button.area_editor.area_analyzer=Area Analyzer
-litematica.button.area_editor.corners_mode=Corners Mode: §e%s§r
-litematica.button.area_editor.create_sub_region=New Sub-Region
+litematica.button.area_editor.corners_mode=Tool Behavior: §6%s§r
+litematica.button.area_editor.create_selection_box=New Selection Box
 litematica.button.area_editor.manual_origin=Manual Origin: %s
 litematica.button.area_editor.save_schematic=Save Schematic
-litematica.button.area_editor.selection_mode=Area Mode: §e%s§r
+litematica.button.area_editor.selection_mode=Area Mode: §6%s§r
 litematica.button.area_selection_browser.create_selection=New Selection
 litematica.button.area_selection_browser.from_placement=From Placement
 litematica.button.area_selection_browser.unselect=Unselect
@@ -155,12 +155,12 @@ litematica.hover.button.schematic_vcs.save_new_version=Saves a new Schematic Ver
 litematica.hover.checkmark.area_editor.select_this_element=Select this element
 litematica.hover.checkmark.schematic_placement_settings.lock_coordinate=Lock this coordinate\nThis allows changing the other coordinates (with the tool) without (accidentally) affecting the locked ones
 
-litematica.hover.area_editor.multi_region.sub_region.dimensions=Dimensions: §b%s§r x §b%s§r x §b%s§r
-litematica.hover.area_editor.multi_region.sub_region.pos1=Corner 1: x: §9%s§r, y: §9%s§r, z: §9%s§r
-litematica.hover.area_editor.multi_region.sub_region.pos2=Corner 2: x: §9%s§r, y: §9%s§r, z: §9%s§r
+litematica.hover.area_editor.multi_region.selection_box.dimensions=Dimensions: §b%s§r x §b%s§r x §b%s§r
+litematica.hover.area_editor.multi_region.selection_box.pos1=Corner 1: x: §9%s§r, y: §9%s§r, z: §9%s§r
+litematica.hover.area_editor.multi_region.selection_box.pos2=Corner 2: x: §9%s§r, y: §9%s§r, z: §9%s§r
+litematica.hover.area_selection_browser.box_count=Selection Boxes: §b%d
 litematica.hover.area_selection_browser.origin.auto=Origin [§6Auto§r]: x: §b%s§r y: §b%s§r z: §b%s§r
 litematica.hover.area_selection_browser.origin.manual=Origin [§6Manual§r]: x: §b%s§r y: §b%s§r z: §b%s§r
-litematica.hover.area_selection_browser.region_count=Sub-Regions: §b%d
 litematica.hover.material_list.info_widget=- The Material List hotkey will open the last viewed Material List, if there is one stored\n- To switch to a different Material List, open one via the button on the Placement Settings Screen or the button on the Schematic Browser screen\n- The stored/last viewed Material List is also forgotten if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet, then the selected Placement (if there is one) is used to generate one for
 litematica.hover.material_list.multiplier=Material List multiplier. The total item counts from the generated material list will be multiplied by this number.
 litematica.hover.placement_list.enclosing_size=Enclosing size: <c=77f>%s§r x <c=77f>%s§r x <c=77f>%s§r
@@ -187,8 +187,6 @@ litematica.hover.schematic_verifier.color_config.text_color=Schematic Verifier �
 litematica.hover.schematic_verifier.visible_categories.entry=<c=888>  %s
 litematica.hover.schematic_verifier.visible_categories.title=<c=888>Visible/enabled categories in the list:
 
-litematica.hud.area_selection.mode.corners=Corners
-litematica.hud.area_selection.mode.expand=Expand
 litematica.hud.save_schematic.server_side.waiting=Watiting for the server...
 litematica.hud.schematic_verifier.position=%s%s : %s %s %s
 litematica.hud.status_info.easy_place_enabled=Easy Place: §aON§r
@@ -201,12 +199,12 @@ litematica.hud.task_name.save_schematic=Save Schematic
 litematica.hud.task_name.save_schematic.server_side=Save Schematic (on server)
 litematica.hud.task_name.schematic_verifier=<b>Schematic Verifier Highlights</b>
 litematica.hud.tool_hud.area_selection.dimensions_positions=Size: §b%s§r x §b%s§r x §b%s§r - pos1: §a%s, %s, %s§r pos2: §a%s, %s, %s
-litematica.hud.tool_hud.area_selection.corners_mode=Corners Mode: §6%s
 litematica.hud.tool_hud.area_selection.origin.multi_region=Origin [§6%s§r]: §a%s, %s, %s§r - Boxes: §b%s
 litematica.hud.tool_hud.area_selection.origin.simple=Origin [§6%s§r]: §a%s, %s, %s§r
 litematica.hud.tool_hud.area_selection.selected_area.multi_region=Area [§6Multi-Region§r]: §a%s
 litematica.hud.tool_hud.area_selection.selected_area.simple=Area [§6Simple§r]: §a%s
-litematica.hud.tool_hud.area_selection.selected_sub_region=Sub-region: §a%s
+litematica.hud.tool_hud.area_selection.selected_box=Box: §a%s
+litematica.hud.tool_hud.area_selection.tool_selection_mode=Tool Behavior: §6%s
 litematica.hud.tool_hud.block_state_string_no_facing=§a%s (%s)
 litematica.hud.tool_hud.block_state_string_with_facing=§a%s (%s)§r - Facing: §6%s
 litematica.hud.tool_hud.delete.target_mode=Delete Target: §d%s
@@ -216,9 +214,9 @@ litematica.hud.tool_hud.replaced_block=Replace: §a%s
 litematica.hud.tool_hud.schematic_paste.replace_mode.none=Replace Blocks: §c%s
 litematica.hud.tool_hud.schematic_paste.replace_mode.some=Replace Blocks: §6%s
 litematica.hud.tool_hud.schematic_placement.origin=Origin: §a%s, %s, %s§r
+litematica.hud.tool_hud.schematic_placement.region_count_and_modified=Region Count: §b%s§r - Modified: %s
 litematica.hud.tool_hud.schematic_placement.selected_placement=Placement: §a%s
 litematica.hud.tool_hud.schematic_placement.selected_sub_region=Sub-Region: §a%s§r - Modified: %s
-litematica.hud.tool_hud.schematic_placement.region_count_and_modified=Region Count: §b%s§r - Modified: %s
 litematica.hud.tool_hud.schematic_placement.sub_region_origin=Region origin: §b%s, %s, %s
 litematica.hud.tool_hud.schematic_projects.current_version_date=Date: <c=77f>%s
 litematica.hud.tool_hud.schematic_projects.current_version=Version: §b%s§r / §b%s§r - Name: §a%s
@@ -239,9 +237,11 @@ litematica.info.schematic_vcs.confirm_project_removal=Are you sure you want to d
 
 litematica.label.area_browser.entry_name=%s [§b%s§r]
 litematica.label.area_editor.area_selection_name=Area Selection name
-litematica.label.area_editor.sub_region_name=Sub-Region name
-litematica.label.area_selection.mode.multi_region=Multi-Region
-litematica.label.area_selection.mode.simple=Simple
+litematica.label.area_editor.box_name=Box name
+litematica.label.area_selection.selection_type.multi_region=Multi-Region
+litematica.label.area_selection.selection_type.simple=Simple
+litematica.label.area_selection.tool_selection_mode.corners=Corners
+litematica.label.area_selection.tool_selection_mode.expand=Expand
 litematica.label.area_selection_browser.current_selection=Current Selection: §a%s
 litematica.label.area_selection_browser.selections=selections
 litematica.label.material_list.column.available=Available
@@ -359,13 +359,13 @@ litematica.title.hud.missing_chunks.schematic_paste=§f§lPaste, un-seen chunks 
 litematica.title.hud.schematic_verifier=Schematic Verifier
 litematica.title.hud.schematic_verifier.errors=<b>Schematic Verifier Errors</b>
 
-litematica.title.screen.area_editor.create_sub_region=Create a new Sub-Region
-litematica.title.screen.area_editor.multi_region=Area Editor (§eMulti-Region§r mode)
-litematica.title.screen.area_editor.rename_sub_region=Rename Sub Region
-litematica.title.screen.area_editor.simple=Area Editor (§eSimple§r mode)
+litematica.title.screen.area_editor.create_selection_box=Create a new selection box
+litematica.title.screen.area_editor.multi_region=Area Editor (§6Multi-Region§r mode)
+litematica.title.screen.area_editor.rename_selection_box=Rename Selection Box
+litematica.title.screen.area_editor.simple=Area Editor (§6Simple§r mode)
 litematica.title.screen.area_editor.schematic_vcs=Area Editor (§eSchematic VCS mode area§r)
-litematica.title.screen.area_editor.sub_region=Area Editor (§eMulti-Region§r mode) => Sub-Region
-litematica.title.screen.area_selection_browser=Litematica %s - Area Selection Browser
+litematica.title.screen.area_editor.selection_box=Area Editor (§6Multi-Region§r mode) => Box §e%s
+litematica.title.screen.area_selection_browser=Litematica %s - Area Browser
 litematica.title.screen.area_selection_browser.copy_selection=Copy Area Selection '%s'
 litematica.title.screen.area_selection_browser.rename_selection=Rename Area Selection
 litematica.title.screen.area_selection_browser.selection_from_placement=Area Selection from Placement
@@ -446,38 +446,38 @@ litematica.message.info.settings_copied_to_clipboard=Settings copied to clip boa
 litematica.message.info.settings_loaded_from_clipboard=Settings loaded from clipboard
 litematica.message.info.schematic_vcs.project_created=Schematic VCS Project §e%s§r created
 litematica.message.info.schematic_vcs.project_loaded=Schematic VCS Project §e%s§r loaded
-litematica.message.warn.area_selection_browser.in_simple_mode=Note: You are currently in the §eSimple§r Area Selection mode. These area selection save files are only used in the §e"Normal"/Multi-box§r selection mode.
+litematica.message.warn.area_selection_browser.in_simple_mode=Note: You are currently in the §6Simple§r Area Selection mode. These area selection save files are only used in the §6Multi-Region§r selection mode.
 
 litematica.error.area_selection.copy_failed=Failed to copy the selection
-litematica.error.area_selection.create_failed=Failed to create a new selection by the name '%s', file already exists
-litematica.error.area_selection.no_sub_region_selected=No sub-region selected!
-litematica.error.area_selection.rename.already_exists=Error: An area already exists with the file name '%s'
-litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated safe file name '%s'
+litematica.error.area_selection.create_failed=Failed to create a new selection by the name §e'%s'§r, file already exists
+litematica.error.area_selection.no_sub_region_selected=No selection box selected!
+litematica.error.area_selection.rename.already_exists=Error: An area already exists with the file name §e'%s'
+litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated safe file name §e'%s'
 
 litematica.error.duplicate_schematic_placement=Error: Tried to add a placement that already exists
 litematica.error.generic.creative_mode_only=This action is only available in Creative mode
-litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
-litematica.error.generic.schematic_world_not_loaded=Schematic World is not loaded
+litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored block states
+litematica.error.generic.schematic_world_not_loaded=The schematic world is not loaded
 
-litematica.error.area_editor.create_sub_region.exists=A sub-region by the name '%s' already exists
-litematica.error.area_editor.no_selection=No active Area Selections
-litematica.error.area_editor.open_gui.no_selection=Currently in Selection Mode: Normal, but no area is currently selected
-litematica.error.area_editor.rename_sub_region.exists=Failed to rename the sub-region:\nA sub-region already exists by the name '%s'
-litematica.error.area_editor.switch_mode.no_selection=Can't switch to Selection Mode: Normal, because there is currently no area selected.\nSelect an area or create a new selection in the Area Selection browser
+litematica.error.area_editor.create_sub_region.exists=A selection box by the name §e'%s'§r already exists
+litematica.error.area_editor.no_selection=No active area selections
+litematica.error.area_editor.open_gui.no_selection=Currently in §6Multi-Region§r Area Selection mode, but no area is currently selected via the §eArea Browser§r
+litematica.error.area_editor.rename_sub_region.exists=Failed to rename the selection box:\n- A selection box already exists by the name §e'%s'§r
+litematica.error.area_editor.switch_mode.no_selection=Can't switch to the §6Multi-Region§r Area Selection mode, because there is currently no area selected.\nSelect an existing area selection save file or create a new selection save file via the §eArea Browser§r screen.
 
-litematica.error.execute_operation_no_tool=As a safety measure the executeOperation hotkey requires you to hold the tool item, and the main rendering toggle option and the tool item both need to be enabled (Visuals -> 'enableRendering' ['%s'] and Generic -> 'toolItemEnabled' ['%s']). This requirement can be disabled in Generic -> 'executeRequireHoldingTool'.
+litematica.error.execute_operation_no_tool=As a safety measure the §eExecute Operation§r hotkey requires you to hold the tool item, and the main rendering toggle option and the tool item both need to be enabled (Visuals -> §eMain Rendering Toggle§r ['%s'] and Generic -> §eTool Item Functionality§r ['%s']). This requirement can be disabled in Generic -> §eExecute Requires Holding Tool§r.
 
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=Failed to create the Litematica schematic
-litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
-litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the Structure to a Litematica Schematic
+litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the schematic
+litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the vanilla structure to a Litematica schematic
 
 litematica.error.schematic.create.no_selections=No valid selection regions!
 
-litematica.error.schematic_load.cant_read_file=Can't read the schematic file '%s' (doesn't exist or permission issue)
-litematica.error.schematic_load.failed=Failed to read the schematic from file '%s'
+litematica.error.schematic_load.cant_read_file=Can't read the schematic file §e'%s'§r (doesn't exist or permission issue)
+litematica.error.schematic_load.failed=Failed to read the schematic from file §e'%s'§r
 litematica.error.schematic_load.no_schematic_version_information=The schematic doesn't have version information, and can't be safely loaded!
-litematica.error.schematic_load.unsupported_schematic_version=Unsupported or future schematic version '%d'
-litematica.error.schematic_load.unsupported_type=Unknown or unsupported file type for '%s'
+litematica.error.schematic_load.unsupported_schematic_version=Unsupported or future schematic version §b%d§r
+litematica.error.schematic_load.unsupported_type=Unknown or unsupported file type for §e'%s'§r
 
 litematica.error.schematic_placements.coordinate_locked=Can't move because of an active coordinate lock
 litematica.error.schematic_placements.load_fail=Failed to load the placement from file '§e%s§r'
@@ -672,7 +672,6 @@ litematica.message.area_selections.selection_created_from_placement=Created a ne
 litematica.message.blocks_updated=Updated the blocks within the area
 litematica.message.duplicated_selected_placement=Duplicated the selected placement
 litematica.message.easy_place_fail=Action prevented by the Easy Place mode
-litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.grid_paste.warning.select_base_placement_for_grid_paste=Note: Grid pasting only happens when you select the "original"/base placement and then use the Grid paste feature. If you select one of the repeated placements, then only that specific placement will be pasted.
 litematica.message.in_memory_schematic_created=Created an in-memory schematic as '%s'
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
@@ -724,7 +723,7 @@ litematica.config_group.name.hotkey.schematic_edit=Schematic Edit Hotkeys
 litematica.config_group.name.hotkey.selection=Selection Related Hotkeys
 litematica.config_group.name.hotkey.tool=Tool Related Hotkeys
 
-litematica.config.comment.areaselectionsperworld=Use per-world or per-server save directories for the Area Selections (in the Area Selection Browser). If disabled, then the same "global" save directory is used for all worlds.\n\n§eWARNING:§r Don't switch this §cOFF§r while you are for example live streaming, as then the Area Selection Browser will show the server IP in the navigation widget and also in the current selection name/path until you change the current directory and selection again.
+litematica.config.comment.areaselectionsperworld=Use per-world or per-server save directories for the area selections (in the §eArea Browser§r). If disabled, then the same "global" save directory is used for all worlds.\n\n§eWARNING:§r Don't switch this §cOFF§r while you are for example live streaming, as then the §eArea Browser§r will show the server IP in the navigation widget and also in the current selection name/path until you change the current directory and selection again.
 litematica.config.comment.betterrenderorder=If enabled, then the schematic rendering is done by injecting the different render call into the vanilla rendering code.\n\nThis should result in better translucent block rendering/ordering and schematic blocks not getting rendered through the client world blocks/terrain.\n\nIf the rendering doesn't work (for example with Optifine), then try disabling this option. But in most cases you want to keep this enabled.
 litematica.config.comment.changeselectedcorneronmove=If enabled, then the "element selection" of an area selection is always set to the last moved corner, when using the set corner hotkeys (Hotkeys -> §eSet Selection Box Corner 1 & 2§r).\n\nThe selected element is what the tool item and some hotkeys will control/move. This is basically the same as usin gthe §eTool Select Elements§r key (using default hotkeys middle clicking) with the tool on the moved corner to select it.
 litematica.config.comment.cloneatoriginalposition=If enabled, then using the §eClone Selection§r hotkey will create the placement at the original area selection's position, instead of at the player's current position
@@ -754,10 +753,10 @@ litematica.config.comment.rendermateriallistinguis=Whether or not the §fMateria
 litematica.config.comment.renderthreadnotimeout=Removes the timeout from the rendering worker threads.\n\nIf you get very stuttery rendering when moving around or dealing with large schematics, try disabling this. It will however make the schematic (re-)rendering a lot slower in some cases (which means that newly loaded chunks or changes to the schmematic will get processed slower).
 litematica.config.comment.requireadjacentchunks=Whether the adjacent chunks around the target chunk need to be loaded for it to get processed.\n\nThis mostly affects whether you can use the Schematic Verifier next to missing chunks. This is mostly only useful when working on very technical projects that require working next to empty/missing/non-synced-to-client chunks.
 litematica.config.comment.schematicbrowsercolumns=The "extra" columns that should be enabled by default in all the schematic browser screens.\n\nThese columns can also be toggled temporarily by right clicking on the list widget, but not on a list entry, so for example by right clicking on the header widget/search bar area.\n\nNote: The file name column is always enabled.
-litematica.config.comment.selectioncornersmode=The Area Selection corners mode (tool item behavior) to use.\n\nIn the §3Corners§r mode you left click to set the primary corner and right click to set the secondary corner.\n\nIn the §3Expand§r mode you right click to reset/collapse the selection box to the clicked position, and then you left click to expand the selection around all the clicked points.\n\n§6Tip:§r The §3Expand§r mode is almost always superior, the only downside being that it can't shrink by clicking (other than fully collapsing the selection). Because there is always a block somewhere at each side of the build you want to select, you can always use the §3Expand§r mode to select anything, while in the §3Corners§r mode you often don't have a block at the opposite corners of the build, which would require using annoying temporary blocks.\n\n§6TL;DR;§r Use the §3Expand§r mode, it's much more Pog ;)\n\n§6Tip:§r You can quickly cycle this value with the Hotkeys -> §eSub Mode Cycle§r hotkey while in any tool mode that uses area selections.
 litematica.config.comment.signtextpaste=Automatically add the stored sign text from the schematic to the sign GUI when placing a sign
 litematica.config.comment.toolitemenabled=If enabled, then the "tool item" can be used to control area selections, placements etc.\n\nYou can toggle this ON/OFF as needed to be able to use for example your regular food item as the tool, so that you don't need to carry around unnecessary extra items like sticks.\n\nSee Hotkeys -> §eTool Set Primary/Secondary Position§r and §eTool Select *§r etc. for the related hotkeys and modifier hotkeys that are used while holding the "tool item".
 litematica.config.comment.toolitem=The item to use as the "tool item" for the mod actions such as controlling area selection boxes.\n\n§6Tip:§r You can use an empty hand as the "tool" by leaving this textfield empty or putting in the literal word §aempty§r.\n\nBy default the item check ignores NBT data, but if you for some reason want to use a special (for example renamed) item as the tool, you can append the required NBT tags and their values after the item name and metadata, like: §aminecraft:stick@0{display:{name:"Foo Bar"}}§r.\n\nHowever in most cases I would recommend just using whatever item you always have on you, and toggle the tool functionality ON/OFF as needed. Dealing with "special items" is just pointless extra effort and annoyance IMO.
+litematica.config.comment.toolselectionmode=The tool item behavior mode for any area selections.\n\nIn the §3Corners§r mode you left click to set the primary corner and right click to set the secondary corner.\n\nIn the §3Expand§r mode you right click to reset/collapse the selection box to the clicked position, and then you left click to expand the selection around all the clicked points.\n\n§6Tip:§r The §3Expand§r mode is almost always superior, the only downside being that it can't shrink by clicking (other than fully collapsing the selection). Because there is always a block somewhere at each side of the build you want to select, you can always use the §3Expand§r mode to select anything, while in the §3Corners§r mode you often don't have a block at the opposite corners of the build, which would require using annoying temporary blocks.\n\n§6TL;DR;§r Use the §3Expand§r mode, it's much more Pog ;)\n\n§6Tip:§r You can quickly cycle this value with the Hotkeys -> §eSub Mode Cycle§r hotkey while in any tool mode that uses area selections.
 
 litematica.config.comment.areaselectionboxsides=Enable rendering the Area Selection box side quads (instead of just the wire frame)
 litematica.config.comment.areaselectionrendering=Enable Area Selection rendering
@@ -844,7 +843,7 @@ litematica.config.name.defaultareaselectionmode=Default Area Selection Mode
 litematica.config.name.easyplaceclickadjacent=Easy Place Click Adjacent
 litematica.config.name.easyplacemode=Easy Place Mode
 litematica.config.name.easyplacehold=Easy Place Hold
-litematica.config.name.executerequireholdingtool=Execute Require Holding Tool
+litematica.config.name.executerequireholdingtool=Execute Requires Holding Tool
 litematica.config.name.fixrailrotation=Fix Rail Rotation
 litematica.config.name.generatelowercasenames=Generate Lower Case Names
 litematica.config.name.loadentireschematics=Load Entire Schematics
@@ -856,17 +855,17 @@ litematica.config.name.pastereplacebehavior=Paste Replace Behavior
 litematica.config.name.pickblockauto=Pick Block Auto
 litematica.config.name.pickblock=Pick Block Enabled
 litematica.config.name.pickblockignorenbt=Pick Block Ignore NBT
-litematica.config.name.pickblockableslots=Pick Blockable Slots
+litematica.config.name.pickblockableslots=Pick Block Hotbar Slots
 litematica.config.name.placementrestriction=Placement Restriction
-litematica.config.name.placementinfrontofplayer=Placement Infront of Player
+litematica.config.name.placementinfrontofplayer=Placement In Front of Player
 litematica.config.name.rendermateriallistinguis=Render Material List in GUIs
 litematica.config.name.renderthreadnotimeout=Render Thread No Timeout
 litematica.config.name.requireadjacentchunks=Require Adjacent Chunks
 litematica.config.name.schematicbrowsercolumns=Schematic Browser Columns
-litematica.config.name.selectioncornersmode=Selection Corners Mode
 litematica.config.name.signtextpaste=Sign Text Paste
 litematica.config.name.toolitem=Tool Item
-litematica.config.name.toolitemenabled=Tool Item Enabled
+litematica.config.name.toolitemenabled=Tool Item Functionality
+litematica.config.name.toolselectionmode=Tool Selection Mode
 
 litematica.config.name.areaselectionboxsides=Area Selection Box Sides
 litematica.config.name.areaselectionrendering=Area Selection Rendering
@@ -975,7 +974,7 @@ litematica.hotkey.comment.nudgeselectionnegative=Nudge the current area selectio
 litematica.hotkey.comment.nudgeselectionpositive=Nudge the current area selection or placement in the "positive" direction. This is basically the same as mouse wheel up with the §eSelection Nudge Modifier§r hotkey held.
 litematica.hotkey.comment.moveentireselection=Move the entire current area selection or placement to the player's current position
 litematica.hotkey.comment.openareaeditorscreen=Open the Area Editor screen for the currently selected area selection
-litematica.hotkey.comment.openareaselectionbrowserscreen=Open the Area Selection Browser screen for managing §eNormal§r area selection mode save files.
+litematica.hotkey.comment.openareaselectionbrowserscreen=Open the §eArea Browser§r screen for managing §eMulti-Region§r mode area selection save files.
 litematica.hotkey.comment.openconfigscreen=Open the Litematica Config Screen
 litematica.hotkey.comment.openloadschematicsscreen=Open the Load Schematics screen
 litematica.hotkey.comment.openloadedschematicslistscreen=Open the Loaded Schematics screen
@@ -1045,7 +1044,7 @@ litematica.hotkey.name.nudgeselectionnegative=Nudge Selection (Negative)
 litematica.hotkey.name.nudgeselectionpositive=Nudge Selection (Positive)
 litematica.hotkey.name.moveentireselection=Move Entire Selection
 litematica.hotkey.name.openareaeditorscreen=Open Area Editor Screen
-litematica.hotkey.name.openareaselectionbrowserscreen=Open Area Selection Browser Screen
+litematica.hotkey.name.openareaselectionbrowserscreen=Open Area Browser Screen
 litematica.hotkey.name.openconfigscreen=Open Litematica Config Screen
 litematica.hotkey.name.openloadschematicsscreen=Open Load Schematics Screen
 litematica.hotkey.name.openloadedschematicslistscreen=Open Loaded Schematics List Screen

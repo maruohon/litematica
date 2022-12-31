@@ -18,13 +18,13 @@ import litematica.data.DataManager;
 import litematica.gui.util.LitematicaIcons;
 import litematica.gui.widget.list.entry.AreaSelectionEntryWidget;
 import litematica.schematic.placement.SchematicPlacement;
-import litematica.selection.SelectionManager;
-import litematica.selection.SelectionMode;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.AreaSelectionType;
 import litematica.util.FileType;
 
 public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {
-    protected final SelectionManager selectionManager;
+    protected final AreaSelectionManager areaSelectionManager;
     protected final GenericButton createSelectionButton;
     protected final GenericButton openAreaEditorButton;
     protected final GenericButton selectionFromPlacementButton;
@@ -35,7 +35,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     {
         super(10, 46, 20, 64);
 
-        this.selectionManager = DataManager.getSelectionManager();
+        this.areaSelectionManager = DataManager.getAreaSelectionManager();
 
         this.createSelectionButton        = GenericButton.create("litematica.button.area_selection_browser.create_selection", this::createSelection);
         this.openAreaEditorButton         = GenericButton.create("litematica.button.change_menu.area_editor", LitematicaIcons.AREA_EDITOR);
@@ -43,7 +43,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         this.unselectButton               = GenericButton.create("litematica.button.area_selection_browser.unselect", this::unselect);
         this.currentSelectionLabel = new LabelWidget();
 
-        this.openAreaEditorButton.setActionListener(DataManager.getSelectionManager()::openAreaEditorScreenWithParent);
+        this.openAreaEditorButton.setActionListener(DataManager.getAreaSelectionManager()::openAreaEditorScreenWithParent);
         this.selectionFromPlacementButton.translateAndAddHoverString("litematica.info.area_browser.from_placement");
         this.unselectButton.translateAndAddHoverString("litematica.hover.button.area_selection_browser.unselect");
 
@@ -58,7 +58,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     {
         super.initScreen();
 
-        if (this.selectionManager.getSelectionMode() == SelectionMode.SIMPLE)
+        if (this.areaSelectionManager.getSelectionMode() == AreaSelectionType.SIMPLE)
         {
             MessageDispatcher.warning(5000).translate("litematica.message.warn.area_selection_browser.in_simple_mode");
         }
@@ -105,14 +105,14 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
         listWidget.getEntrySelectionHandler().setAllowSelection(true);
         listWidget.setRootDirectoryDisplayName(StringUtils.translate("litematica.label.area_selection_browser.selections"));
-        listWidget.setDataListEntryWidgetFactory((d, cd) -> new AreaSelectionEntryWidget(d, cd, listWidget, null, this.selectionManager));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new AreaSelectionEntryWidget(d, cd, listWidget, null, this.areaSelectionManager));
 
         return listWidget;
     }
 
     protected void updateCurrentSelectionLabel()
     {
-        String currentSelection = this.selectionManager.getCurrentNormalSelectionId();
+        String currentSelection = this.areaSelectionManager.getCurrentMultiRegionSelectionId();
 
         if (currentSelection != null)
         {
@@ -142,7 +142,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     protected boolean createSelectionByName(String name)
     {
         Path dir = this.getListWidget().getCurrentDirectory();
-        this.selectionManager.createNewSelection(dir, name);
+        this.areaSelectionManager.createNewSelection(dir, name);
         this.getListWidget().refreshEntries();
         this.updateCurrentSelectionLabel();
         return true;
@@ -172,7 +172,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
         Path dir = this.getListWidget().getCurrentDirectory();
 
-        if (placement != null && this.selectionManager.createSelectionFromPlacement(dir, placement, name))
+        if (placement != null && this.areaSelectionManager.createSelectionFromPlacement(dir, placement, name))
         {
             String key = "litematica.message.area_selections.selection_created_from_placement";
             MessageDispatcher.success().translate(key, name);
@@ -186,29 +186,30 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
     protected void unselect()
     {
-        DataManager.getSelectionManager().setCurrentSelection(null);
-        this.updateCurrentSelectionLabel();
+        DataManager.getAreaSelectionManager().setCurrentSelection(null);
+        this.getListWidget().clearSelection();
         this.getListWidget().updateEntryWidgetStates();
+        this.updateCurrentSelectionLabel();
     }
 
     protected void onSelectionChange(@Nullable BaseFileBrowserWidget.DirectoryEntry entry)
     {
         if (entry == null)
         {
-            this.selectionManager.setCurrentSelection(null);
+            this.areaSelectionManager.setCurrentSelection(null);
         }
         else if (entry.getType() == BaseFileBrowserWidget.DirectoryEntryType.FILE &&
                  FileType.fromFileName(entry.getFullPath()) == FileType.JSON)
         {
             String selectionId = entry.getFullPath().toString();
 
-            if (selectionId.equals(this.selectionManager.getCurrentNormalSelectionId()))
+            if (selectionId.equals(this.areaSelectionManager.getCurrentMultiRegionSelectionId()))
             {
-                this.selectionManager.setCurrentSelection(null);
+                this.areaSelectionManager.setCurrentSelection(null);
             }
             else
             {
-                this.selectionManager.setCurrentSelection(selectionId);
+                this.areaSelectionManager.setCurrentSelection(selectionId);
             }
         }
 

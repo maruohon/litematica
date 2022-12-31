@@ -23,20 +23,20 @@ import malilib.util.StringUtils;
 import malilib.util.data.ResultingStringConsumer;
 import litematica.gui.MultiRegionModeAreaEditorScreen;
 import litematica.selection.AreaSelection;
-import litematica.selection.SelectionManager;
-import litematica.selection.SelectionMode;
+import litematica.selection.AreaSelectionManager;
+import litematica.selection.AreaSelectionType;
 import litematica.util.FileType;
 
 public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 {
-    protected final SelectionManager selectionManager;
+    protected final AreaSelectionManager areaSelectionManager;
     protected final FileType fileType;
     protected final String selectionId;
     protected final GenericButton configureButton;
     protected final GenericButton copyButton;
     protected final GenericButton removeButton;
     protected final GenericButton renameButton;
-    @Nullable protected final AreaSelection selection;
+    @Nullable protected AreaSelection selection;
     protected final boolean isSelectionEntry;
     protected boolean isSelected;
     protected int buttonsStartX;
@@ -45,15 +45,16 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
                                     DataListEntryWidgetData constructData,
                                     BaseFileBrowserWidget fileBrowserWidget,
                                     @Nullable FileBrowserIconProvider iconProvider,
-                                    SelectionManager selectionManager)
+                                    AreaSelectionManager areaSelectionManager)
     {
         super(entry, constructData, fileBrowserWidget, iconProvider);
 
         Path file = this.data.getFullPath();
         this.selectionId = file.toAbsolutePath().toString();
-        this.selection = selectionManager.getOrLoadSelection(this.selectionId);
+        // By default, load the selections as read-only, so that they won't unnecessarily get written back to the file
+        this.selection = areaSelectionManager.getOrLoadSelectionReadOnly(this.selectionId);
         this.fileType = FileType.fromFileName(file);
-        this.selectionManager = selectionManager;
+        this.areaSelectionManager = areaSelectionManager;
         this.isSelectionEntry = this.fileType == FileType.JSON && entry.getType() == DirectoryEntryType.FILE;
         this.textOffset.setXOffset(5);
 
@@ -64,7 +65,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
         if (this.isSelectionEntry)
         {
-            this.isSelected = this.selectionId.equals(this.selectionManager.getCurrentNormalSelectionId());
+            this.isSelected = this.selectionId.equals(this.areaSelectionManager.getCurrentMultiRegionSelectionId());
             this.addHoverTooltip();
         }
     }
@@ -111,7 +112,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
         if (this.isSelectionEntry)
         {
-            this.isSelected = this.selectionId.equals(this.selectionManager.getCurrentNormalSelectionId());
+            this.isSelected = this.selectionId.equals(this.areaSelectionManager.getCurrentMultiRegionSelectionId());
         }
     }
 
@@ -142,7 +143,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
                 String prefix = this.data.getDisplayNamePrefix();
                 String selectionName = this.selection.getName();
                 String name = prefix != null ? prefix + selectionName : selectionName;
-                int count = this.selection.getAllSubRegionBoxes().size();
+                int count = this.selection.getAllSelectionBoxes().size();
                 return StringUtils.translate("litematica.label.area_browser.entry_name", name, count);
             }
             else
@@ -163,7 +164,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
             if (this.selection.hasManualOrigin())
             {
                 String key = "litematica.hover.area_selection_browser.origin.manual";
-                BlockPos o = this.selection.getExplicitOrigin();
+                BlockPos o = this.selection.getManualOrigin();
                 lines.add(StringUtils.translate(key, o.getX(), o.getY(), o.getZ()));
             }
             else
@@ -173,8 +174,8 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
                 lines.add(StringUtils.translate(key, o.getX(), o.getY(), o.getZ()));
             }
 
-            int count = this.selection.getAllSubRegionBoxes().size();
-            lines.add(StringUtils.translate("litematica.hover.area_selection_browser.region_count", count));
+            int count = this.selection.getAllSelectionBoxes().size();
+            lines.add(StringUtils.translate("litematica.hover.area_selection_browser.box_count", count));
 
             this.getHoverInfoFactory().addStrings(lines);
         }
@@ -182,6 +183,9 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
     protected void openAreaEditor()
     {
+        // Fully load the selection if it's potentially going to be edited
+        this.selection = this.areaSelectionManager.getOrLoadSelection(this.selectionId);
+
         if (this.selection != null)
         {
             BaseScreen.openScreenWithParent(new MultiRegionModeAreaEditorScreen(this.selection));
@@ -212,17 +216,17 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         BaseScreen.openPopupScreenWithCurrentScreenAsParent(new TextInputScreen(title, name, callback));
     }
 
-    protected boolean renameSelectionUsingName(String name, boolean copy)
+    protected boolean renameSelectionUsingName(String newName, boolean copy)
     {
         Path dir = this.data.getDirectory();
-        return this.selectionManager.renameSelection(dir, this.selectionId, name, copy, MessageOutput.MESSAGE_OVERLAY);
+        return this.areaSelectionManager.renameSelection(dir, this.selectionId, newName, copy, MessageOutput.MESSAGE_OVERLAY);
     }
 
     protected void removeSelection()
     {
-        if (this.selectionManager.removeSelection(this.selectionId) &&
-            this.selectionManager.getSelectionMode() == SelectionMode.MULTI_REGION &&
-            this.selectionId.equals(this.selectionManager.getCurrentNormalSelectionId()))
+        if (this.areaSelectionManager.removeSelection(this.selectionId) &&
+            this.areaSelectionManager.getSelectionMode() == AreaSelectionType.MULTI_REGION &&
+            this.selectionId.equals(this.areaSelectionManager.getCurrentMultiRegionSelectionId()))
         {
             GuiUtils.reInitCurrentScreen();
         }

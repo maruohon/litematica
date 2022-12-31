@@ -20,7 +20,7 @@ public class AreaSelectionSimple extends AreaSelection
     }
 
     @Override
-    public boolean setSelectedSubRegionBox(String name)
+    public boolean setSelectedSelectionBox(String name)
     {
         // NO-OP
         return false;
@@ -28,34 +28,34 @@ public class AreaSelectionSimple extends AreaSelection
 
     @Override
     @Nullable
-    public String createNewSubRegionBox(BlockPos pos1, String nameIn)
+    public String createNewSelectionBox(BlockPos pos1, String nameIn)
     {
         // NO-OP
         return null;
     }
 
     @Override
-    public boolean addSubRegionBox(SelectionBox box, boolean replace)
+    public boolean addSelectionBox(SelectionBox box, boolean replace)
     {
         // NO-OP
         return false;
     }
 
     @Override
-    public void removeAllSubRegionBoxes()
+    public void removeAllSelectionBoxes()
     {
         // NO-OP
     }
 
     @Override
-    public boolean removeSubRegionBox(String name)
+    public boolean removeSelectionBox(String name)
     {
         // NO-OP
         return false;
     }
 
     @Override
-    public boolean removeSelectedSubRegionBox()
+    public boolean removeSelectedBox()
     {
         // NO-OP
         return false;
@@ -63,16 +63,16 @@ public class AreaSelectionSimple extends AreaSelection
 
     private void createDefaultBoxIfNeeded()
     {
-        if (this.subRegionBoxes.size() != 1)
+        if (this.selectionBoxes.size() != 1)
         {
-            this.subRegionBoxes.clear();
+            this.selectionBoxes.clear();
             SelectionBox box = new SelectionBox(BlockPos.ORIGIN, BlockPos.ORIGIN, this.getName());
-            this.subRegionBoxes.put(box.getName(), box);
-            this.currentBox = box.getName();
+            this.selectionBoxes.put(box.getName(), box);
+            this.selectedBox = box.getName();
         }
-        else if (this.currentBox == null || this.subRegionBoxes.get(this.currentBox) == null)
+        else if (this.selectedBox == null || this.selectionBoxes.get(this.selectedBox) == null)
         {
-            this.currentBox = this.subRegionBoxes.keySet().iterator().next();
+            this.selectedBox = this.selectionBoxes.keySet().iterator().next();
         }
     }
 
@@ -101,8 +101,8 @@ public class AreaSelectionSimple extends AreaSelection
 
                     if (box != null)
                     {
-                        area.subRegionBoxes.put(box.getName(), box);
-                        area.currentBox = box.getName();
+                        area.selectionBoxes.put(box.getName(), box);
+                        area.selectedBox = box.getName();
                     }
                 }
             }
@@ -117,11 +117,11 @@ public class AreaSelectionSimple extends AreaSelection
 
         if (pos != null)
         {
-            area.setExplicitOrigin(pos);
+            area.setManualOrigin(pos);
         }
         else
         {
-            area.updateCalculatedOrigin();
+            area.updateAutomaticOrigin();
         }
 
         // Make sure the simple area has exactly one box, and that it's selected

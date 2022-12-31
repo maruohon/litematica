@@ -3,7 +3,7 @@ package litematica.selection;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
 
-public class SlicedBox extends Box
+public class SlicedBox extends CornerDefinedBox
 {
     private EnumFacing sliceDirection = EnumFacing.EAST;
     private int sliceStart = 0;

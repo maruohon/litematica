@@ -26,7 +26,7 @@ import litematica.schematic.ISchematicRegion;
 import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.schematic.verifier.SchematicVerifier;
 import litematica.schematic.verifier.SchematicVerifierManager;
-import litematica.selection.Box;
+import litematica.selection.CornerDefinedBox;
 import litematica.selection.SelectionBox;
 import litematica.util.PositionUtils;
 
@@ -177,26 +177,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
             return;
         }
 
-        int minX = Integer.MAX_VALUE;
-        int minY = Integer.MAX_VALUE;
-        int minZ = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE;
-        int maxY = Integer.MIN_VALUE;
-        int maxZ = Integer.MIN_VALUE;
-
-        for (SelectionBox box : boxes.values())
-        {
-            BlockPos pos1 = box.getPos1();
-            BlockPos pos2 = box.getPos2();
-            minX = Math.min(minX, Math.min(pos1.getX(), pos2.getX()));
-            minY = Math.min(minY, Math.min(pos1.getY(), pos2.getY()));
-            minZ = Math.min(minZ, Math.min(pos1.getZ(), pos2.getZ()));
-            maxX = Math.max(maxX, Math.max(pos1.getX(), pos2.getX()));
-            maxY = Math.max(maxY, Math.max(pos1.getY(), pos2.getY()));
-            maxZ = Math.max(maxZ, Math.max(pos1.getZ(), pos2.getZ()));
-        }
-
-        this.enclosingBox = new IntBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        this.enclosingBox = PositionUtils.getEnclosingBox(boxes.values());
         this.gridSettings.setDefaultSize(PositionUtils.getAreaSizeFromBox(this.enclosingBox));
     }
 
@@ -275,10 +256,10 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         for (Map.Entry<String, SelectionBox> entry : map.entrySet())
         {
             SelectionBox box = entry.getValue();
-            final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX());
-            final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
-            final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX());
-            final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+            final int boxXMin = Math.min(box.getCorner1().getX(), box.getCorner2().getX());
+            final int boxZMin = Math.min(box.getCorner1().getZ(), box.getCorner2().getZ());
+            final int boxXMax = Math.max(box.getCorner1().getX(), box.getCorner2().getX());
+            final int boxZMax = Math.max(box.getCorner1().getZ(), box.getCorner2().getZ());
 
             boolean notOverlapping = boxXMin > chunkXMax || boxZMin > chunkZMax || boxXMax < chunkXMin || boxZMax < chunkZMin;
 
@@ -300,7 +281,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     @Nullable
     public IntBoundingBox getBoxWithinChunkForRegion(String regionName, int chunkX, int chunkZ)
     {
-        Box box = this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED).get(regionName);
+        CornerDefinedBox box = this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED).get(regionName);
         return box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
     }
 

@@ -23,8 +23,8 @@ import malilib.overlay.message.MessageOutput;
 import malilib.util.position.Vec2i;
 import litematica.Reference;
 import litematica.gui.SaveSchematicFromAreaScreen.SaveSide;
-import litematica.selection.CornerSelectionMode;
-import litematica.selection.SelectionMode;
+import litematica.selection.ToolSelectionMode;
+import litematica.selection.AreaSelectionType;
 import litematica.util.BlockInfoAlignment;
 import litematica.util.DefaultDirectories;
 import litematica.util.ReplaceBehavior;
@@ -68,10 +68,10 @@ public class Configs
         public static final BooleanConfig REQUIRE_ADJACENT_CHUNKS                   = new BooleanConfig("requireAdjacentChunks", true);
         public static final StringConfig  TOOL_ITEM                                 = new StringConfig( "toolItem", "minecraft:stick");
 
-        public static final OptionListConfig<SelectionMode> DEFAULT_AREA_SELECTION_MODE   = new OptionListConfig<>("defaultAreaSelectionMode", SelectionMode.SIMPLE, SelectionMode.VALUES);
-        public static final OptionListConfig<ReplaceBehavior> PASTE_REPLACE_BEHAVIOR        = new OptionListConfig<>("pasteReplaceBehavior", ReplaceBehavior.NONE, ReplaceBehavior.VALUES);
-        public static final OptionListConfig<FileBrowserColumns> SCHEMATIC_BROWSER_COLUMNS  = new OptionListConfig<>("schematicBrowserColumns", FileBrowserColumns.MTIME, FileBrowserColumns.VALUES);
-        public static final OptionListConfig<CornerSelectionMode> SELECTION_CORNERS_MODE    = new OptionListConfig<>("selectionCornersMode", CornerSelectionMode.CORNERS, CornerSelectionMode.VALUES);
+        public static final OptionListConfig<AreaSelectionType>     DEFAULT_AREA_SELECTION_MODE = new OptionListConfig<>("defaultAreaSelectionMode", AreaSelectionType.SIMPLE, AreaSelectionType.VALUES);
+        public static final OptionListConfig<ReplaceBehavior>       PASTE_REPLACE_BEHAVIOR      = new OptionListConfig<>("pasteReplaceBehavior", ReplaceBehavior.NONE, ReplaceBehavior.VALUES);
+        public static final OptionListConfig<FileBrowserColumns>    SCHEMATIC_BROWSER_COLUMNS   = new OptionListConfig<>("schematicBrowserColumns", FileBrowserColumns.MTIME, FileBrowserColumns.VALUES);
+        public static final OptionListConfig<ToolSelectionMode>     TOOL_SELECTION_MODE         = new OptionListConfig<>("toolSelectionMode", ToolSelectionMode.CORNERS, ToolSelectionMode.VALUES);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 AREAS_PER_WORLD,
@@ -104,10 +104,10 @@ public class Configs
                 RENDER_THREAD_NO_TIMEOUT,
                 REQUIRE_ADJACENT_CHUNKS,
                 SCHEMATIC_BROWSER_COLUMNS,
-                SELECTION_CORNERS_MODE,
                 SIGN_TEXT_PASTE,
                 TOOL_ITEM_ENABLED,
-                TOOL_ITEM
+                TOOL_ITEM,
+                TOOL_SELECTION_MODE
         );
 
         public static final ImmutableList<HotkeyedBooleanConfig> HOTKEYS = ImmutableList.of(

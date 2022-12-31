@@ -48,9 +48,9 @@ import litematica.schematic.SchematicType;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
 import litematica.schematic.projects.SchematicProject;
 import litematica.selection.AreaSelection;
-import litematica.selection.Box;
+import litematica.selection.CornerDefinedBox;
 import litematica.selection.SelectionBox;
-import litematica.selection.SelectionManager;
+import litematica.selection.AreaSelectionManager;
 import litematica.task.CreateSchematicTask;
 import litematica.util.PositionUtils;
 
@@ -79,7 +79,7 @@ public class SchematicCreationUtils
 
     public static ActionResult saveSchematic(boolean inMemoryOnly)
     {
-        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
 
         if (area != null)
@@ -149,7 +149,7 @@ public class SchematicCreationUtils
      */
     public static LitematicaSchematic createEmptySchematic(AreaSelection area)
     {
-        List<SelectionBox> boxes = area.getAllSubRegionBoxes();
+        List<SelectionBox> boxes = area.getAllSelectionBoxes();
 
         if (boxes.isEmpty())
         {
@@ -175,7 +175,7 @@ public class SchematicCreationUtils
                                                       String author,
                                                       ResultingStringConsumer feedback)
     {
-        List<SelectionBox> boxes = area.getAllSubRegionBoxes();
+        List<SelectionBox> boxes = area.getAllSelectionBoxes();
 
         if (boxes.isEmpty())
         {
@@ -223,8 +223,8 @@ public class SchematicCreationUtils
                 continue;
             }
 
-            AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-            BlockPos regionPosAbs = box.getPos1();
+            AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getCorner1(), box.getCorner2());
+            BlockPos regionPosAbs = box.getCorner1();
             List<EntityInfo> list = new ArrayList<>();
             List<Entity> entities = world.getEntitiesInAABBexcluding(null, bb, null);
 
@@ -255,7 +255,7 @@ public class SchematicCreationUtils
         for (Map.Entry<String, IntBoundingBox> entry : volumes.entrySet())
         {
             String regionName = entry.getKey();
-            Box box = boxes.get(regionName);
+            CornerDefinedBox box = boxes.get(regionName);
             ISchematicRegion region = schematic.getSchematicRegion(regionName);
             List<EntityInfo> schematicEntityList = region != null ? region.getEntityList() : null;
 
@@ -267,7 +267,7 @@ public class SchematicCreationUtils
 
             AxisAlignedBB bb = PositionUtils.createAABBFrom(entry.getValue());
             List<Entity> entities = world.getEntitiesInAABBexcluding(null, bb, null);
-            BlockPos regionPosAbs = box.getPos1();
+            BlockPos regionPosAbs = box.getCorner1();
 
             for (Entity entity : entities)
             {
@@ -322,7 +322,7 @@ public class SchematicCreationUtils
             // We want to loop nice & easy from 0 to n here, but the per-sub-region pos1 can be at
             // any corner of the area. Thus we need to offset from the total area origin
             // to the minimum/negative (ie. 0,0 in the loop) corner here.
-            final BlockPos minCorner = malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            final BlockPos minCorner = malilib.util.position.PositionUtils.getMinCorner(box.getCorner1(), box.getCorner2());
             final int startX = minCorner.getX();
             final int startY = minCorner.getY();
             final int startZ = minCorner.getZ();
@@ -410,7 +410,7 @@ public class SchematicCreationUtils
             String regionName = volumeEntry.getKey();
             ISchematicRegion region = schematic.getSchematicRegion(regionName);
             IntBoundingBox bb = volumeEntry.getValue();
-            Box box = boxes.get(regionName);
+            CornerDefinedBox box = boxes.get(regionName);
 
             if (box == null || region == null)
             {
@@ -432,7 +432,7 @@ public class SchematicCreationUtils
             // We want to loop nice & easy from 0 to n here, but the per-sub-region pos1 can be at
             // any corner of the area. Thus we need to offset from the total area origin
             // to the minimum/negative corner (ie. 0,0 in the loop) corner here.
-            final BlockPos minCorner = malilib.util.position.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            final BlockPos minCorner = malilib.util.position.PositionUtils.getMinCorner(box.getCorner1(), box.getCorner2());
             final int offsetX = minCorner.getX();
             final int offsetY = minCorner.getY();
             final int offsetZ = minCorner.getZ();

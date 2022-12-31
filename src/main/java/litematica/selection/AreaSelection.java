@@ -9,10 +9,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -22,37 +19,22 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.overlay.message.MessageOutput;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.NbtWrap;
-import malilib.util.position.Coordinate;
 import malilib.util.position.IntBoundingBox;
 import litematica.config.Configs;
 import litematica.render.infohud.StatusInfoRenderer;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.util.PositionUtils;
-import litematica.util.PositionUtils.Corner;
 
 public class AreaSelection
 {
-    protected final Map<String, SelectionBox> subRegionBoxes = new HashMap<>();
+    protected final Map<String, SelectionBox> selectionBoxes = new HashMap<>();
+    protected BlockPos automaticOrigin = BlockPos.ORIGIN;
     protected String name = "Unnamed";
+    protected boolean automaticOriginNeedsUpdate = true;
     protected boolean originSelected;
-    protected BlockPos calculatedOrigin = BlockPos.ORIGIN;
-    protected boolean calculatedOriginDirty = true;
-    @Nullable protected BlockPos explicitOrigin = null;
-    @Nullable protected String currentBox;
-
-    public static AreaSelection fromPlacement(SchematicPlacement placement)
-    {
-        ImmutableMap<String, SelectionBox> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
-        BlockPos origin = placement.getOrigin();
-
-        AreaSelection selection = new AreaSelection();
-        selection.setExplicitOrigin(origin);
-        selection.name = placement.getName();
-        selection.subRegionBoxes.putAll(boxes);
-
-        return selection;
-    }
+    @Nullable protected String selectedBox;
+    @Nullable protected BlockPos manualOrigin;
 
     public String getName()
     {
@@ -64,9 +46,9 @@ public class AreaSelection
         this.name = name;
     }
 
-    protected void markDirty()
+    protected void onAreaSelectionModified()
     {
-        this.calculatedOriginDirty = true;
+        this.automaticOriginNeedsUpdate = true;
 
         if (Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue() == false)
         {
@@ -75,16 +57,16 @@ public class AreaSelection
     }
 
     @Nullable
-    public String getCurrentSubRegionBoxName()
+    public String getSelectedSelectionBoxName()
     {
-        return this.currentBox;
+        return this.selectedBox;
     }
 
-    public boolean setSelectedSubRegionBox(@Nullable String name)
+    public boolean setSelectedSelectionBox(@Nullable String name)
     {
-        if (name == null || this.subRegionBoxes.containsKey(name))
+        if (name == null || this.selectionBoxes.containsKey(name))
         {
-            this.currentBox = name;
+            this.selectedBox = name;
             return true;
         }
 
@@ -103,42 +85,43 @@ public class AreaSelection
 
     public boolean hasManualOrigin()
     {
-        return this.explicitOrigin != null;
+        return this.manualOrigin != null;
     }
 
     /**
-     * @return Returns the effective origin point. This is the explicit origin point if one has been set,
-     *         otherwise it's an automatically calculated origin point, located at the minimum corner of all the boxes.
+     * @return Returns the effective origin point. This is the manual origin point if one has been set,
+     *         otherwise it's an automatically calculated origin point, located at the minimum corner of
+     *         the enclosing box around all the selection boxes.
      */
     public BlockPos getEffectiveOrigin()
     {
-        if (this.explicitOrigin != null)
+        if (this.manualOrigin != null)
         {
-            return this.explicitOrigin;
+            return this.manualOrigin;
         }
         else
         {
-            if (this.calculatedOriginDirty)
+            if (this.automaticOriginNeedsUpdate)
             {
-                this.updateCalculatedOrigin();
+                this.updateAutomaticOrigin();
             }
 
-            return this.calculatedOrigin;
+            return this.automaticOrigin;
         }
     }
 
     /**
-     * @return the explicitly defined origin point, if any.
+     * @return the manual origin point, if any
      */
     @Nullable
-    public BlockPos getExplicitOrigin()
+    public BlockPos getManualOrigin()
     {
-        return this.explicitOrigin;
+        return this.manualOrigin;
     }
 
-    public void setExplicitOrigin(@Nullable BlockPos origin)
+    public void setManualOrigin(@Nullable BlockPos origin)
     {
-        this.explicitOrigin = origin;
+        this.manualOrigin = origin;
 
         if (origin == null)
         {
@@ -146,58 +129,48 @@ public class AreaSelection
         }
     }
 
-    protected void updateCalculatedOrigin()
+    protected void updateAutomaticOrigin()
     {
-        Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(this.subRegionBoxes.values());
-
-        if (pair != null)
-        {
-            this.calculatedOrigin = pair.getLeft();
-        }
-        else
-        {
-            this.calculatedOrigin = BlockPos.ORIGIN;
-        }
-
-        this.calculatedOriginDirty = false;
+        this.automaticOrigin = PositionUtils.getMinCornerOfEnclosingBox(this.selectionBoxes.values());
+        this.automaticOriginNeedsUpdate = false;
     }
 
     @Nullable
-    public SelectionBox getSubRegionBox(String name)
+    public SelectionBox getSelectionBox(String name)
     {
-        return this.subRegionBoxes.get(name);
+        return this.selectionBoxes.get(name);
     }
 
     @Nullable
-    public SelectionBox getSelectedSubRegionBox()
+    public SelectionBox getSelectedSelectionBox()
     {
-        return this.currentBox != null ? this.subRegionBoxes.get(this.currentBox) : null;
+        return this.selectedBox != null ? this.selectionBoxes.get(this.selectedBox) : null;
     }
 
-    public List<String> getAllSubRegionNames()
+    public List<String> getAllSelectionBoxNames()
     {
-        List<String> list = new ArrayList<>(this.subRegionBoxes.keySet());
+        List<String> list = new ArrayList<>(this.selectionBoxes.keySet());
         list.sort(Comparator.naturalOrder());
         return list;
     }
 
-    public List<SelectionBox> getAllSubRegionBoxes()
+    public List<SelectionBox> getAllSelectionBoxes()
     {
-        return ImmutableList.copyOf(this.subRegionBoxes.values());
+        return ImmutableList.copyOf(this.selectionBoxes.values());
     }
 
-    public ImmutableMap<String, SelectionBox> getAllSubRegions()
+    public ImmutableMap<String, SelectionBox> getAllSelectionBoxesMap()
     {
         ImmutableMap.Builder<String, SelectionBox> builder = ImmutableMap.builder();
-        builder.putAll(this.subRegionBoxes);
+        builder.putAll(this.selectionBoxes);
         return builder.build();
     }
 
-    public NBTTagCompound getSubRegionsAsCompound()
+    public NBTTagCompound getAllSelectionBoxesAsNbtCompound()
     {
         NBTTagCompound tag = new NBTTagCompound();
 
-        for (Map.Entry<String, SelectionBox> entry : this.subRegionBoxes.entrySet())
+        for (Map.Entry<String, SelectionBox> entry : this.selectionBoxes.entrySet())
         {
             IntBoundingBox bb = entry.getValue().asIntBoundingBox();
             String regionName = entry.getKey();
@@ -208,39 +181,37 @@ public class AreaSelection
     }
 
     @Nullable
-    public String createNewSubRegionBox(BlockPos pos1, final String nameIn)
+    public String createNewSelectionBox(BlockPos pos1, final String nameIn)
     {
-        this.clearCurrentSelectedCorner();
+        this.clearCornerSelectionOfSelectedBox();
         this.setOriginSelected(false);
 
         String name = nameIn;
         int i = 1;
 
-        while (this.subRegionBoxes.containsKey(name))
+        while (this.selectionBoxes.containsKey(name))
         {
             name = nameIn + " " + i;
             i++;
         }
 
-        SelectionBox box = new SelectionBox();
-        box.setName(name);
-        box.setSelectedCorner(Corner.CORNER_1);
-        this.currentBox = name;
-        this.subRegionBoxes.put(name, box);
-        this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
-        this.setSubRegionCornerPos(box, Corner.CORNER_2, pos1);
+        SelectionBox box = new SelectionBox(pos1, pos1, name);
+        box.setSelectedCorner(BoxCorner.CORNER_1);
+        this.selectedBox = name;
+        this.selectionBoxes.put(name, box);
+        this.onAreaSelectionModified();
 
         return name;
     }
 
-    public void clearCurrentSelectedCorner()
+    public void clearCornerSelectionOfSelectedBox()
     {
-        this.setCurrentSelectedCorner(Corner.NONE);
+        this.setSelectedCornerOfSelectedBox(BoxCorner.NONE);
     }
 
-    public void setCurrentSelectedCorner(Corner corner)
+    public void setSelectedCornerOfSelectedBox(BoxCorner corner)
     {
-        SelectionBox box = this.getSelectedSubRegionBox();
+        SelectionBox box = this.getSelectedSelectionBox();
 
         if (box != null)
         {
@@ -250,61 +221,61 @@ public class AreaSelection
 
     /**
      * Adds the given SelectionBox, if either replace is true, or there isn't yet a box by the same name.
-     * @param box
-     * @param replace
+     * @param box the new box to add
+     * @param replace true if the box should replace an existing box by the same name, if one exists already
      * @return true if the box was successfully added, false if replace was false and there was already a box with the same name
      */
-    public boolean addSubRegionBox(SelectionBox box, boolean replace)
+    public boolean addSelectionBox(SelectionBox box, boolean replace)
     {
-        if (replace || this.subRegionBoxes.containsKey(box.getName()) == false)
+        if (replace || this.selectionBoxes.containsKey(box.getName()) == false)
         {
-            this.subRegionBoxes.put(box.getName(), box);
-            this.markDirty();
+            this.selectionBoxes.put(box.getName(), box);
+            this.onAreaSelectionModified();
             return true;
         }
 
         return false;
     }
 
-    public void removeAllSubRegionBoxes()
+    public void removeAllSelectionBoxes()
     {
-        this.subRegionBoxes.clear();
-        this.markDirty();
+        this.selectionBoxes.clear();
+        this.onAreaSelectionModified();
     }
 
-    public boolean removeSubRegionBox(String name)
+    public boolean removeSelectionBox(String name)
     {
-        boolean success = this.subRegionBoxes.remove(name) != null;
-        this.markDirty();
+        boolean success = this.selectionBoxes.remove(name) != null;
+        this.onAreaSelectionModified();
 
-        if (success && name.equals(this.currentBox))
+        if (success && name.equals(this.selectedBox))
         {
-            this.currentBox = null;
+            this.selectedBox = null;
         }
 
         return success;
     }
 
-    public boolean removeSelectedSubRegionBox()
+    public boolean removeSelectedBox()
     {
-        boolean success = this.currentBox != null && this.subRegionBoxes.remove(this.currentBox) != null;
-        this.currentBox = null;
-        this.markDirty();
+        boolean success = this.selectedBox != null && this.selectionBoxes.remove(this.selectedBox) != null;
+        this.selectedBox = null;
+        this.onAreaSelectionModified();
         return success;
     }
 
-    public boolean renameSubRegionBox(String oldName, String newName)
+    public boolean renameSelectionBox(String oldName, String newName)
     {
-        return this.renameSubRegionBox(oldName, newName, MessageOutput.NONE);
+        return this.renameSelectionBox(oldName, newName, MessageOutput.NONE);
     }
 
-    public boolean renameSubRegionBox(String oldName, String newName, MessageOutput output)
+    public boolean renameSelectionBox(String oldName, String newName, MessageOutput output)
     {
-        SelectionBox box = this.subRegionBoxes.get(oldName);
+        SelectionBox box = this.selectionBoxes.get(oldName);
 
         if (box != null)
         {
-            if (this.subRegionBoxes.containsKey(newName))
+            if (this.selectionBoxes.containsKey(newName))
             {
                 MessageDispatcher.error().type(output)
                         .translate("litematica.error.area_editor.rename_sub_region.exists", newName);
@@ -312,13 +283,13 @@ public class AreaSelection
                 return false;
             }
 
-            this.subRegionBoxes.remove(oldName);
             box.setName(newName);
-            this.subRegionBoxes.put(newName, box);
+            this.selectionBoxes.remove(oldName);
+            this.selectionBoxes.put(newName, box);
 
-            if (this.currentBox != null && this.currentBox.equals(oldName))
+            if (this.selectedBox != null && this.selectedBox.equals(oldName))
             {
-                this.currentBox = newName;
+                this.selectedBox = newName;
             }
 
             return true;
@@ -327,21 +298,23 @@ public class AreaSelection
         return false;
     }
 
-    public void moveEntireSelectionTo(BlockPos newOrigin, boolean printMessage)
+    public void moveEntireAreaSelectionTo(BlockPos newOrigin, boolean printMessage)
     {
         BlockPos old = this.getEffectiveOrigin();
         BlockPos diff = newOrigin.subtract(old);
 
-        for (SelectionBox box : this.subRegionBoxes.values())
+        for (SelectionBox box : this.selectionBoxes.values())
         {
-            this.setSubRegionCornerPos(box, Corner.CORNER_1, box.getPos1().add(diff));
-            this.setSubRegionCornerPos(box, Corner.CORNER_2, box.getPos2().add(diff));
+            box.setCorner1(box.getCorner1().add(diff));
+            box.setCorner2(box.getCorner2().add(diff));
         }
 
-        if (this.getExplicitOrigin() != null)
+        if (this.getManualOrigin() != null)
         {
-            this.setExplicitOrigin(newOrigin);
+            this.setManualOrigin(newOrigin);
         }
+
+        this.onAreaSelectionModified();
 
         if (printMessage)
         {
@@ -354,78 +327,44 @@ public class AreaSelection
 
     public void moveSelectedElement(EnumFacing direction, int amount)
     {
-        SelectionBox box = this.getSelectedSubRegionBox();
-
         if (this.isOriginSelected())
         {
-            if (this.getExplicitOrigin() != null)
+            if (this.getManualOrigin() != null)
             {
-                this.setExplicitOrigin(this.getExplicitOrigin().offset(direction, amount));
+                this.setManualOrigin(this.getManualOrigin().offset(direction, amount));
             }
+
+            return;
         }
-        else if (box != null)
+
+        SelectionBox box = this.getSelectedSelectionBox();
+
+        if (box != null)
         {
-            Corner corner = box.getSelectedCorner();
-
-            if (corner == Corner.NONE || corner == Corner.CORNER_1)
-            {
-                BlockPos pos = this.getSubRegionCornerPos(box, Corner.CORNER_1).offset(direction, amount);
-                this.setSubRegionCornerPos(box, Corner.CORNER_1, pos);
-            }
-
-            if (corner == Corner.NONE || corner == Corner.CORNER_2)
-            {
-                BlockPos pos = this.getSubRegionCornerPos(box, Corner.CORNER_2).offset(direction, amount);
-                this.setSubRegionCornerPos(box, Corner.CORNER_2, pos);
-            }
+            box.offsetSelectedCorner(direction, amount);
+            this.onAreaSelectionModified();
         }
         else
         {
             BlockPos newOrigin = this.getEffectiveOrigin().offset(direction, amount);
-            this.moveEntireSelectionTo(newOrigin, false);
+            this.moveEntireAreaSelectionTo(newOrigin, false);
         }
     }
 
-    public void setSelectedSubRegionCornerPos(BlockPos pos, Corner corner)
+    public void setSelectedSelectionBoxCornerPos(BlockPos pos, BoxCorner corner)
     {
-        SelectionBox box = this.getSelectedSubRegionBox();
+        SelectionBox box = this.getSelectedSelectionBox();
 
         if (box != null)
         {
-            this.setSubRegionCornerPos(box, corner, pos);
+            this.setBoxCornerPos(box, corner, pos);
         }
     }
 
-    public void setSubRegionCornerPos(Box box, Corner corner, BlockPos pos)
+    public void setBoxCornerPos(CornerDefinedBox box, BoxCorner corner, BlockPos pos)
     {
-        if (corner == Corner.CORNER_1)
-        {
-            box.setPos1(pos);
-            this.markDirty();
-        }
-        else if (corner == Corner.CORNER_2)
-        {
-            box.setPos2(pos);
-            this.markDirty();
-        }
-    }
-
-    public void setCoordinate(@Nullable Box box, Corner corner, Coordinate coordinate, int value)
-    {
-        if (box != null && corner != null && corner != Corner.NONE)
-        {
-            box.setCoordinate(value, corner, coordinate);
-            this.markDirty();
-        }
-        else if (this.explicitOrigin != null)
-        {
-            this.setExplicitOrigin(coordinate.modifyBlockPos(value, this.explicitOrigin));
-        }
-    }
-
-    public BlockPos getSubRegionCornerPos(Box box, Corner corner)
-    {
-        return box.getPosition(corner);
+        box.setCornerPosition(corner, pos);
+        this.onAreaSelectionModified();
     }
 
     public AreaSelection copy()
@@ -433,87 +372,60 @@ public class AreaSelection
         return fromJson(this.toJson());
     }
 
+    public JsonObject toJson()
+    {
+        JsonObject obj = new JsonObject();
+
+        JsonUtils.addStringIfNotNull(obj, "name", this.name);
+        JsonUtils.writeBlockPosIfNotNull(obj, "origin", this.getManualOrigin());
+
+        JsonArray arr = JsonUtils.toArray(this.selectionBoxes.values(), SelectionBox::toJson);
+
+        if (arr.size() > 0)
+        {
+            JsonUtils.addStringIfNotNull(obj, "current", this.selectedBox);
+            obj.add("boxes", arr);
+        }
+
+        return obj;
+    }
+
     public static AreaSelection fromJson(JsonObject obj)
     {
         AreaSelection area = new AreaSelection();
 
-        if (JsonUtils.hasArray(obj, "boxes"))
-        {
-            JsonArray arr = obj.get("boxes").getAsJsonArray();
-            final int size = arr.size();
+        JsonUtils.readArrayElementsIfObjects(obj, "boxes", o -> SelectionBox.fromJson(o, b -> area.selectionBoxes.put(b.getName(), b)));
 
-            for (int i = 0; i < size; i++)
-            {
-                JsonElement el = arr.get(i);
-
-                if (el.isJsonObject())
-                {
-                    SelectionBox box = SelectionBox.fromJson(el.getAsJsonObject());
-
-                    if (box != null)
-                    {
-                        area.subRegionBoxes.put(box.getName(), box);
-                    }
-                }
-            }
-        }
-
-        if (JsonUtils.hasString(obj, "name"))
-        {
-            area.name = obj.get("name").getAsString();
-        }
-
-        if (JsonUtils.hasString(obj, "current"))
-        {
-            area.currentBox = obj.get("current").getAsString();
-        }
+        area.name = JsonUtils.getStringOrDefault(obj, "name", area.name);
+        area.selectedBox = JsonUtils.getStringOrDefault(obj, "current", area.selectedBox);
 
         BlockPos pos = JsonUtils.blockPosFromJson(obj, "origin");
 
         if (pos != null)
         {
-            area.setExplicitOrigin(pos);
+            area.setManualOrigin(pos);
         }
         else
         {
-            area.updateCalculatedOrigin();
+            area.updateAutomaticOrigin();
         }
 
         return area;
     }
 
-    public JsonObject toJson()
+    public static AreaSelection fromPlacement(SchematicPlacement placement)
     {
-        JsonObject obj = new JsonObject();
-        JsonArray arr = new JsonArray();
+        ImmutableMap<String, SelectionBox> boxes = placement.getSubRegionBoxes(RequiredEnabled.ANY);
+        AreaSelection selection = new AreaSelection();
 
-        for (SelectionBox box : this.subRegionBoxes.values())
+        selection.name = placement.getName();
+        selection.setManualOrigin(placement.getOrigin());
+
+        for (Map.Entry<String, SelectionBox> entry : boxes.entrySet())
         {
-            JsonObject o = box.toJson();
-
-            if (o != null)
-            {
-                arr.add(o);
-            }
+            selection.selectionBoxes.put(entry.getKey(), entry.getValue().copy());
         }
 
-        obj.add("name", new JsonPrimitive(this.name));
-
-        if (arr.size() > 0)
-        {
-            if (this.currentBox != null)
-            {
-                obj.add("current", new JsonPrimitive(this.currentBox));
-            }
-
-            obj.add("boxes", arr);
-        }
-
-        if (this.getExplicitOrigin() != null)
-        {
-            obj.add("origin", JsonUtils.blockPosToJson(this.getExplicitOrigin()));
-        }
-
-        return obj;
+        return selection;
     }
 }
