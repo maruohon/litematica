@@ -9,11 +9,14 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
+import org.joml.Matrix4f;
+
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilderStorage;
@@ -22,7 +25,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Shader;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
@@ -35,20 +37,18 @@ import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.Mutable;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockRenderView;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
+
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.world.ChunkSchematic;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.LayerRange;
 
 public class WorldRendererSchematic
 {
@@ -65,9 +65,6 @@ public class WorldRendererSchematic
     private double lastCameraChunkUpdateX = Double.MIN_VALUE;
     private double lastCameraChunkUpdateY = Double.MIN_VALUE;
     private double lastCameraChunkUpdateZ = Double.MIN_VALUE;
-    private int cameraChunkX = Integer.MIN_VALUE;
-    private int cameraChunkY = Integer.MIN_VALUE;
-    private int cameraChunkZ = Integer.MIN_VALUE;
     private double lastCameraX = Double.MIN_VALUE;
     private double lastCameraY = Double.MIN_VALUE;
     private double lastCameraZ = Double.MIN_VALUE;
@@ -113,7 +110,7 @@ public class WorldRendererSchematic
 
     public String getDebugInfoRenders()
     {
-        int rcTotal = this.chunkRendererDispatcher != null ? this.chunkRendererDispatcher.renderers.length : 0;
+        int rcTotal = this.chunkRendererDispatcher != null ? this.chunkRendererDispatcher.getRendererCount() : 0;
         int rcRendered = this.chunkRendererDispatcher != null ? this.getRenderedChunks() : 0;
         return String.format("C: %d/%d %sD: %d, L: %d, %s", rcRendered, rcTotal, this.mc.chunkCullingEnabled ? "(s) " : "", this.renderDistanceChunks, 0, this.renderDispatcher == null ? "null" : this.renderDispatcher.getDebugInfo());
     }
@@ -145,9 +142,6 @@ public class WorldRendererSchematic
         this.lastCameraChunkUpdateX = Double.MIN_VALUE;
         this.lastCameraChunkUpdateY = Double.MIN_VALUE;
         this.lastCameraChunkUpdateZ = Double.MIN_VALUE;
-        this.cameraChunkX = Integer.MIN_VALUE;
-        this.cameraChunkY = Integer.MIN_VALUE;
-        this.cameraChunkZ = Integer.MIN_VALUE;
         //this.renderManager.setWorld(worldClientIn);
         this.world = worldSchematic;
 
@@ -201,14 +195,6 @@ public class WorldRendererSchematic
             }
 
             this.chunkRendererDispatcher = new ChunkRenderDispatcherSchematic(this.world, this.renderDistanceChunks, this, this.renderChunkFactory);
-
-            Entity entity = this.mc.getCameraEntity();
-
-            if (entity != null)
-            {
-                this.chunkRendererDispatcher.updateCameraPosition(entity.getX(), entity.getZ());
-            }
-
             this.renderEntitiesStartupCounter = 2;
         }
     }
@@ -223,12 +209,13 @@ public class WorldRendererSchematic
     {
         this.world.getProfiler().push("setup_terrain");
 
-        if (this.chunkRendererDispatcher == null || this.mc.options.getViewDistance().getValue() != this.renderDistanceChunks)
+        if (this.chunkRendererDispatcher == null ||
+            this.mc.options.getViewDistance().getValue() != this.renderDistanceChunks)
         {
             this.loadRenderers();
         }
 
-        Entity entity = this.mc.getCameraEntity();
+        Entity entity = EntityUtils.getCameraEntity();
 
         if (entity == null)
         {
@@ -242,26 +229,16 @@ public class WorldRendererSchematic
         double entityX = entity.getX();
         double entityY = entity.getY();
         double entityZ = entity.getZ();
-        int chunkX = ChunkSectionPos.getSectionCoord(entityX);
-        int chunkY = ChunkSectionPos.getSectionCoord(entityY);
-        int chunkZ = ChunkSectionPos.getSectionCoord(entityZ);
-
         double diffX = entityX - this.lastCameraChunkUpdateX;
         double diffY = entityY - this.lastCameraChunkUpdateY;
         double diffZ = entityZ - this.lastCameraChunkUpdateZ;
 
-        if (this.cameraChunkX != chunkX ||
-            this.cameraChunkY != chunkY ||
-            this.cameraChunkZ != chunkZ ||
-            diffX * diffX + diffY * diffY + diffZ * diffZ > 16.0D)
+        if (diffX * diffX + diffY * diffY + diffZ * diffZ > 256.0)
         {
             this.lastCameraChunkUpdateX = entityX;
             this.lastCameraChunkUpdateY = entityY;
             this.lastCameraChunkUpdateZ = entityZ;
-            this.cameraChunkX = chunkX;
-            this.cameraChunkY = chunkY;
-            this.cameraChunkZ = chunkZ;
-            this.chunkRendererDispatcher.updateCameraPosition(entityX, entityZ);
+            this.chunkRendererDispatcher.removeOutOfRangeRenderers();
         }
 
         this.world.getProfiler().swap("renderlist_camera");
@@ -278,8 +255,7 @@ public class WorldRendererSchematic
         final int centerChunkX = (viewPos.getX() >> 4);
         final int centerChunkZ = (viewPos.getZ() >> 4);
         final int renderDistance = this.mc.options.getViewDistance().getValue();
-        SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ);
-        BlockPos viewPosSubChunk = new BlockPos(viewSubChunk.getX() << 4, viewSubChunk.getY() << 4, viewSubChunk.getZ() << 4);
+        ChunkPos viewChunk = new ChunkPos(viewPos);
 
         this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false ||
                 entityX != this.lastCameraX ||
@@ -303,7 +279,7 @@ public class WorldRendererSchematic
             this.renderInfos.clear();
 
             this.world.getProfiler().swap("sort");
-            List<SubChunkPos> positions = DataManager.getSchematicPlacementManager().getAndUpdateVisibleSubChunks(viewSubChunk);
+            List<ChunkPos> positions = DataManager.getSchematicPlacementManager().getAndUpdateVisibleChunks(viewChunk);
             //positions.sort(new SubChunkPos.DistanceComparator(viewSubChunk));
 
             //Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
@@ -312,25 +288,25 @@ public class WorldRendererSchematic
             //if (GuiBase.isCtrlDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
             this.world.getProfiler().swap("iteration");
-            BlockPos.Mutable subChunkCornerPos = new Mutable();
 
             //while (queuePositions.isEmpty() == false)
-            for (SubChunkPos subChunk : positions)
+            for (ChunkPos chunkPos : positions)
             {
                 //SubChunkPos subChunk = queuePositions.poll();
+                int cx = chunkPos.x;
+                int cz = chunkPos.z;
                 // Only render sub-chunks that are within the client's render distance, and that
                 // have been already properly loaded on the client
-                if (Math.abs(subChunk.getX() - centerChunkX) <= renderDistance &&
-                    Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance &&
-                    this.world.getChunkProvider().isChunkLoaded(subChunk.getX(), subChunk.getZ()))
+                if (Math.abs(cx - centerChunkX) <= renderDistance &&
+                    Math.abs(cz - centerChunkZ) <= renderDistance &&
+                    this.world.getChunkProvider().isChunkLoaded(cx, cz))
                 {
-                    subChunkCornerPos.set(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
-                    ChunkRendererSchematicVbo chunkRenderer = this.chunkRendererDispatcher.getChunkRenderer(subChunkCornerPos);
+                    ChunkRendererSchematicVbo chunkRenderer = this.chunkRendererDispatcher.getChunkRenderer(cx, cz);
 
                     if (chunkRenderer != null && frustum.isVisible(chunkRenderer.getBoundingBox()))
                     {
                         //if (GuiBase.isCtrlDown()) System.out.printf("add @ %s\n", subChunk);
-                        if (chunkRenderer.needsUpdate() && subChunkCornerPos.equals(viewPosSubChunk))
+                        if (chunkRenderer.needsUpdate() && chunkPos.equals(viewChunk))
                         {
                             chunkRenderer.setNeedsUpdate(true);
                         }
@@ -466,8 +442,8 @@ public class WorldRendererSchematic
         int increment = reverse ? -1 : 1;
         int count = 0;
 
-        Shader shader = RenderSystem.getShader();
-        BufferRenderer.unbindAll();
+        ShaderProgram shader = RenderSystem.getShader();
+        BufferRenderer.reset();
 
         boolean renderAsTranslucent = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
 
@@ -500,7 +476,7 @@ public class WorldRendererSchematic
                 }
 
                 buffer.bind();
-                buffer.drawElements();
+                buffer.draw();
                 VertexBuffer.unbind();
                 startedDrawing = true;
                 ++count;
@@ -514,7 +490,7 @@ public class WorldRendererSchematic
 
         if (chunkOffsetUniform != null)
         {
-            chunkOffsetUniform.set(Vec3f.ZERO);
+            chunkOffsetUniform.set(0.0F, 0.0F, 0.0F);
         }
 
         shader.unbind();
@@ -539,7 +515,7 @@ public class WorldRendererSchematic
         this.renderBlockOverlay(OverlayRenderType.QUAD, matrices, camera, projMatrix);
     }
 
-    private static void initShader(Shader shader, MatrixStack matrices, Matrix4f projMatrix)
+    private static void initShader(ShaderProgram shader, MatrixStack matrices, Matrix4f projMatrix)
     {
         for (int i = 0; i < 12; ++i) shader.addSampler("Sampler" + i, RenderSystem.getShaderTexture(i));
 
@@ -580,11 +556,11 @@ public class WorldRendererSchematic
             RenderSystem.enableDepthTest();
         }
 
-        Shader originalShader = RenderSystem.getShader();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        ShaderProgram originalShader = RenderSystem.getShader();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
-        Shader shader = RenderSystem.getShader();
-        BufferRenderer.unbindAll();
+        ShaderProgram shader = RenderSystem.getShader();
+        BufferRenderer.reset();
 
         for (int i = this.renderInfos.size() - 1; i >= 0; --i)
         {
@@ -808,12 +784,12 @@ public class WorldRendererSchematic
         }
     }
 
-    public void scheduleChunkRenders(int chunkX, int chunkY, int chunkZ)
+    public void scheduleChunkRenders(int chunkX, int chunkZ)
     {
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
             Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
         {
-            this.chunkRendererDispatcher.scheduleChunkRender(chunkX, chunkY, chunkZ, false);
+            this.chunkRendererDispatcher.scheduleChunkRender(chunkX, chunkZ);
         }
     }
 }

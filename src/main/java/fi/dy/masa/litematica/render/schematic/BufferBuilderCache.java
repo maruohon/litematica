@@ -8,8 +8,8 @@ import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayR
 
 public class BufferBuilderCache
 {
-    private final Map<RenderLayer, BufferBuilder> blockBufferBuilders = new HashMap<>();
-    private final BufferBuilder[] overlayBufferBuilders;
+    private final Map<RenderLayer, OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder> blockBufferBuilders = new HashMap<>();
+    private final OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder[] overlayBufferBuilders;
 
     public BufferBuilderCache()
     {
@@ -26,12 +26,12 @@ public class BufferBuilderCache
         }
     }
 
-    public BufferBuilder getBlockBufferByLayer(RenderLayer layer)
+    public OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder getBlockBufferByLayer(RenderLayer layer)
     {
         return this.blockBufferBuilders.get(layer);
     }
 
-    public BufferBuilder getOverlayBuffer(OverlayRenderType type)
+    public OmegaHackfixForCrashJustTemporarilyForNowISwearBecauseOfShittyBrokenCodeBufferBuilder getOverlayBuffer(OverlayRenderType type)
     {
         return this.overlayBufferBuilders[type.ordinal()];
     }

@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 
 public class ChunkRenderDataSchematic
 {
@@ -45,8 +45,8 @@ public class ChunkRenderDataSchematic
 
     private final boolean[] overlayLayersUsed = new boolean[OverlayRenderType.values().length];
     private final boolean[] overlayLayersStarted = new boolean[OverlayRenderType.values().length];
-    private final Map<RenderLayer, BufferBuilder.State> blockBufferStates = new HashMap<>();
-    private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.values().length];
+    private final Map<RenderLayer, BufferBuilder.TransparentSortingData> blockBufferStates = new HashMap<>();
+    private final BufferBuilder.TransparentSortingData[] overlayBufferStates = new BufferBuilder.TransparentSortingData[OverlayRenderType.values().length];
     private boolean overlayEmpty = true;
     private boolean empty = true;
     private long timeBuilt;
@@ -103,22 +103,22 @@ public class ChunkRenderDataSchematic
         return this.overlayLayersStarted[type.ordinal()];
     }
 
-    public BufferBuilder.State getBlockBufferState(RenderLayer layer)
+    public BufferBuilder.TransparentSortingData getBlockBufferState(RenderLayer layer)
     {
         return this.blockBufferStates.get(layer);
     }
 
-    public void setBlockBufferState(RenderLayer layer, BufferBuilder.State state)
+    public void setBlockBufferState(RenderLayer layer, BufferBuilder.TransparentSortingData state)
     {
         this.blockBufferStates.put(layer, state);
     }
 
-    public BufferBuilder.State getOverlayBufferState(OverlayRenderType type)
+    public BufferBuilder.TransparentSortingData getOverlayBufferState(OverlayRenderType type)
     {
         return this.overlayBufferStates[type.ordinal()];
     }
 
-    public void setOverlayBufferState(OverlayRenderType type, BufferBuilder.State state)
+    public void setOverlayBufferState(OverlayRenderType type, BufferBuilder.TransparentSortingData state)
     {
         this.overlayBufferStates[type.ordinal()] = state;
     }

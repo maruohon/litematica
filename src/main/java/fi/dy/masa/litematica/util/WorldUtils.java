@@ -2,14 +2,12 @@ package fi.dy.masa.litematica.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
-import com.mojang.datafixers.DataFixer;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -49,16 +47,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-import fi.dy.masa.malilib.gui.Message;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.MessageOutputType;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.SubChunkPos;
+
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -69,6 +58,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager.PlacementPart;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -77,6 +67,15 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.MessageOutputType;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class WorldUtils
 {
@@ -277,16 +276,6 @@ public class WorldUtils
         }
 
         return false;
-    }
-
-    private static StructureTemplate readTemplateFromStream(InputStream stream, DataFixer fixer) throws IOException
-    {
-        NbtCompound nbt = NbtIo.readCompressed(stream);
-        StructureTemplate template = new StructureTemplate();
-        //template.read(fixer.process(FixTypes.STRUCTURE, nbt));
-        template.readNbt(nbt);
-
-        return template;
     }
 
     public static boolean isClientChunkLoaded(ClientWorld world, int chunkX, int chunkZ)
@@ -911,34 +900,29 @@ public class WorldUtils
     public static boolean isPositionWithinRangeOfSchematicRegions(BlockPos pos, int range)
     {
         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-        final int minCX = (pos.getX() - range) >> 4;
-        final int minCY = (pos.getY() - range) >> 4;
-        final int minCZ = (pos.getZ() - range) >> 4;
-        final int maxCX = (pos.getX() + range) >> 4;
-        final int maxCY = (pos.getY() + range) >> 4;
-        final int maxCZ = (pos.getZ() + range) >> 4;
         final int x = pos.getX();
         final int y = pos.getY();
         final int z = pos.getZ();
+        final int minCX = (x - range) >> 4;
+        final int minCZ = (z - range) >> 4;
+        final int maxCX = (x + range) >> 4;
+        final int maxCZ = (z + range) >> 4;
 
-        for (int cy = minCY; cy <= maxCY; ++cy)
+        for (int cz = minCZ; cz <= maxCZ; ++cz)
         {
-            for (int cz = minCZ; cz <= maxCZ; ++cz)
+            for (int cx = minCX; cx <= maxCX; ++cx)
             {
-                for (int cx = minCX; cx <= maxCX; ++cx)
+                List<PlacementPart> parts = manager.getPlacementPartsInChunk(cx, cz);
+
+                for (PlacementPart part : parts)
                 {
-                    List<IntBoundingBox> boxes = manager.getTouchedBoxesInSubChunk(new SubChunkPos(cx, cy, cz));
+                    IntBoundingBox box = part.bb;
 
-                    for (int i = 0; i < boxes.size(); ++i)
+                    if (x >= box.minX - range && x <= box.maxX + range &&
+                        y >= box.minY - range && y <= box.maxY + range &&
+                        z >= box.minZ - range && z <= box.maxZ + range)
                     {
-                        IntBoundingBox box = boxes.get(i);
-
-                        if (x >= box.minX - range && x <= box.maxX + range &&
-                            y >= box.minY - range && y <= box.maxY + range &&
-                            z >= box.minZ - range && z <= box.maxZ + range)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
