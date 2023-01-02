@@ -350,9 +350,13 @@ public class PositionUtils
             offZ = offZ >= 0 ? offZ - 1 : offZ + 1;
 
             BlockPos pos = region.getPosition();
-            minX = Math.min(minX, Math.min(pos.getX(), pos.getX() + offX));
-            minY = Math.min(minY, Math.min(pos.getY(), pos.getY() + offY));
-            minZ = Math.min(minZ, Math.min(pos.getZ(), pos.getZ() + offZ));
+            int x = pos.getX();
+            int y = pos.getY();
+            int z = pos.getZ();
+
+            minX = Math.min(minX, Math.min(x, x + offX));
+            minY = Math.min(minY, Math.min(y, y + offY));
+            minZ = Math.min(minZ, Math.min(z, z + offZ));
         }
 
         return new BlockPos(minX, minY, minZ);

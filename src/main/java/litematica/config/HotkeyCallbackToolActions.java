@@ -81,7 +81,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
                     }
                     else if (Configs.Generic.TOOL_SELECTION_MODE.getValue() == ToolSelectionMode.EXPAND)
                     {
-                        sm.handleCuboidModeMouseClick(maxDistance, isToolSecondary, moveEverything);
+                        sm.handleExpandModeMouseClick(maxDistance, isToolSecondary, moveEverything);
                     }
                 }
                 else if (mode.getUsesSchematic())

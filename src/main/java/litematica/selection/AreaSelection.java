@@ -33,8 +33,8 @@ public class AreaSelection
     protected String name = "Unnamed";
     protected boolean automaticOriginNeedsUpdate = true;
     protected boolean originSelected;
-    @Nullable protected String selectedBox;
-    @Nullable protected BlockPos manualOrigin;
+    @Nullable protected String selectedBoxName;
+    @Nullable protected BlockPos manualOriginPos;
 
     public String getName()
     {
@@ -59,14 +59,14 @@ public class AreaSelection
     @Nullable
     public String getSelectedSelectionBoxName()
     {
-        return this.selectedBox;
+        return this.selectedBoxName;
     }
 
     public boolean setSelectedSelectionBox(@Nullable String name)
     {
         if (name == null || this.selectionBoxes.containsKey(name))
         {
-            this.selectedBox = name;
+            this.selectedBoxName = name;
             return true;
         }
 
@@ -85,7 +85,7 @@ public class AreaSelection
 
     public boolean hasManualOrigin()
     {
-        return this.manualOrigin != null;
+        return this.manualOriginPos != null;
     }
 
     /**
@@ -95,9 +95,9 @@ public class AreaSelection
      */
     public BlockPos getEffectiveOrigin()
     {
-        if (this.manualOrigin != null)
+        if (this.manualOriginPos != null)
         {
-            return this.manualOrigin;
+            return this.manualOriginPos;
         }
         else
         {
@@ -116,12 +116,12 @@ public class AreaSelection
     @Nullable
     public BlockPos getManualOrigin()
     {
-        return this.manualOrigin;
+        return this.manualOriginPos;
     }
 
     public void setManualOrigin(@Nullable BlockPos origin)
     {
-        this.manualOrigin = origin;
+        this.manualOriginPos = origin;
 
         if (origin == null)
         {
@@ -144,7 +144,7 @@ public class AreaSelection
     @Nullable
     public SelectionBox getSelectedSelectionBox()
     {
-        return this.selectedBox != null ? this.selectionBoxes.get(this.selectedBox) : null;
+        return this.selectedBoxName != null ? this.selectionBoxes.get(this.selectedBoxName) : null;
     }
 
     public List<String> getAllSelectionBoxNames()
@@ -197,7 +197,7 @@ public class AreaSelection
 
         SelectionBox box = new SelectionBox(pos1, pos1, name);
         box.setSelectedCorner(BoxCorner.CORNER_1);
-        this.selectedBox = name;
+        this.selectedBoxName = name;
         this.selectionBoxes.put(name, box);
         this.onAreaSelectionModified();
 
@@ -248,9 +248,9 @@ public class AreaSelection
         boolean success = this.selectionBoxes.remove(name) != null;
         this.onAreaSelectionModified();
 
-        if (success && name.equals(this.selectedBox))
+        if (success && name.equals(this.selectedBoxName))
         {
-            this.selectedBox = null;
+            this.selectedBoxName = null;
         }
 
         return success;
@@ -258,8 +258,8 @@ public class AreaSelection
 
     public boolean removeSelectedBox()
     {
-        boolean success = this.selectedBox != null && this.selectionBoxes.remove(this.selectedBox) != null;
-        this.selectedBox = null;
+        boolean success = this.selectedBoxName != null && this.selectionBoxes.remove(this.selectedBoxName) != null;
+        this.selectedBoxName = null;
         this.onAreaSelectionModified();
         return success;
     }
@@ -287,9 +287,9 @@ public class AreaSelection
             this.selectionBoxes.remove(oldName);
             this.selectionBoxes.put(newName, box);
 
-            if (this.selectedBox != null && this.selectedBox.equals(oldName))
+            if (this.selectedBoxName != null && this.selectedBoxName.equals(oldName))
             {
-                this.selectedBox = newName;
+                this.selectedBoxName = newName;
             }
 
             return true;
@@ -383,7 +383,7 @@ public class AreaSelection
 
         if (arr.size() > 0)
         {
-            JsonUtils.addStringIfNotNull(obj, "current", this.selectedBox);
+            JsonUtils.addStringIfNotNull(obj, "current", this.selectedBoxName);
             obj.add("boxes", arr);
         }
 
@@ -397,7 +397,7 @@ public class AreaSelection
         JsonUtils.readArrayElementsIfObjects(obj, "boxes", o -> SelectionBox.fromJson(o, b -> area.selectionBoxes.put(b.getName(), b)));
 
         area.name = JsonUtils.getStringOrDefault(obj, "name", area.name);
-        area.selectedBox = JsonUtils.getStringOrDefault(obj, "current", area.selectedBox);
+        area.selectedBoxName = JsonUtils.getStringOrDefault(obj, "current", area.selectedBoxName);
 
         BlockPos pos = JsonUtils.blockPosFromJson(obj, "origin");
 

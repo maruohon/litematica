@@ -68,11 +68,11 @@ public class AreaSelectionSimple extends AreaSelection
             this.selectionBoxes.clear();
             SelectionBox box = new SelectionBox(BlockPos.ORIGIN, BlockPos.ORIGIN, this.getName());
             this.selectionBoxes.put(box.getName(), box);
-            this.selectedBox = box.getName();
+            this.selectedBoxName = box.getName();
         }
-        else if (this.selectedBox == null || this.selectionBoxes.get(this.selectedBox) == null)
+        else if (this.selectedBoxName == null || this.selectionBoxes.get(this.selectedBoxName) == null)
         {
-            this.selectedBox = this.selectionBoxes.keySet().iterator().next();
+            this.selectedBoxName = this.selectionBoxes.keySet().iterator().next();
         }
     }
 
@@ -102,7 +102,7 @@ public class AreaSelectionSimple extends AreaSelection
                     if (box != null)
                     {
                         area.selectionBoxes.put(box.getName(), box);
-                        area.selectedBox = box.getName();
+                        area.selectedBoxName = box.getName();
                     }
                 }
             }

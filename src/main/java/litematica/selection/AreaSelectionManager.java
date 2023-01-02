@@ -500,6 +500,7 @@ public class AreaSelectionManager
             if (movingCorner || movingOrigin)
             {
                 Entity entity = GameUtils.getCameraEntity();
+                // TODO: Add a new ray trace method that internally fetches the entity, either the camera or the player, depending on some config option
                 BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
 
                 if (pos == null)
@@ -552,7 +553,7 @@ public class AreaSelectionManager
         }
     }
 
-    public void handleCuboidModeMouseClick(double maxDistance, boolean isRightClick, boolean moveEntireSelection)
+    public void handleExpandModeMouseClick(double maxDistance, boolean isRightClick, boolean moveEntireSelection)
     {
         AreaSelection selection = this.getCurrentSelection();
 
@@ -612,8 +613,8 @@ public class AreaSelectionManager
                 CornerDefinedBox box = sel.getSelectedSelectionBox();
                 BlockPos pos1 = box.getCorner1();
                 BlockPos pos2 = box.getCorner2();
-                BlockPos posMin = PositionUtils.getMinCorner(PositionUtils.getMinCorner(pos1, pos2), pos);
-                BlockPos posMax = PositionUtils.getMaxCorner(PositionUtils.getMaxCorner(pos1, pos2), pos);
+                BlockPos posMin = PositionUtils.getMinCorner(pos, pos1, pos2);
+                BlockPos posMax = PositionUtils.getMaxCorner(pos, pos1, pos2);
 
                 sel.setSelectedSelectionBoxCornerPos(posMin, BoxCorner.CORNER_1);
                 sel.setSelectedSelectionBoxCornerPos(posMax, BoxCorner.CORNER_2);
