@@ -22,12 +22,11 @@ import litematica.data.DataManager;
 import litematica.gui.util.LitematicaIcons;
 import litematica.gui.widget.list.entry.AreaSubRegionEntryWidget;
 import litematica.selection.AreaSelection;
-import litematica.selection.CornerDefinedBox;
 import litematica.selection.AreaSelectionManager;
 
 public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidget<String>>
 {
-    protected final AreaSelection selection;
+    protected final AreaSelection areaSelection;
     protected final LabelWidget areaNameLabel;
     protected final BaseTextFieldWidget areaNameTextField;
     protected final GenericButton areaAnalyzerButton;
@@ -42,12 +41,12 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
     protected final BlockPosEditWidget originEditWidget;
     protected final CheckBoxWidget originCheckbox;
 
-    public MultiRegionModeAreaEditorScreen(AreaSelection selection)
+    public MultiRegionModeAreaEditorScreen(AreaSelection areaSelection)
     {
         super(10, 106, 20, 129);
 
-        this.selection = selection;
-        this.areaNameTextField = new BaseTextFieldWidget(200, 16, selection.getName());
+        this.areaSelection = areaSelection;
+        this.areaNameTextField = new BaseTextFieldWidget(200, 16, areaSelection.getName());
 
         this.areaNameLabel = new LabelWidget("litematica.label.area_editor.area_selection_name");
 
@@ -55,7 +54,7 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
         this.cornersModeButton      = GenericButton.create(18, SimpleModeAreaEditorScreen::getToolBehaviorModeButtonLabel, this::cycleCornersMode);
         this.createSubRegionButton  = GenericButton.create(18, "litematica.button.area_editor.create_selection_box", this::createSubRegion);
         this.manualOriginButton     = OnOffButton.onOff(18, "litematica.button.area_editor.manual_origin",
-                                                        this.selection::hasManualOrigin, this::toggleManualOrigin);
+                                                        this.areaSelection::hasManualOrigin, this::toggleManualOrigin);
 
         this.setAreaNameButton      = GenericButton.create(18, "litematica.button.misc.set", this::renameAreaSelection);
 
@@ -67,13 +66,12 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
         this.areaSelectionBrowserButton.setActionListener(() -> openScreenWithParent(new AreaSelectionBrowserScreen()));
 
         String hover = "litematica.hover.checkmark.area_editor.select_this_element";
-        this.originCheckbox = new CheckBoxWidget("litematica.checkmark.area_editor.origin", hover, selection::isOriginSelected, selection::setOriginSelected);
+        this.originCheckbox = new CheckBoxWidget("litematica.checkmark.area_editor.origin", hover, areaSelection::isOriginSelected, areaSelection::setOriginSelected);
         this.originCheckbox.setListener(this::onOriginCheckboxClick);
         this.manualOriginButton.translateAndAddHoverString("litematica.hover.button.area_editor.manual_origin");
 
-        CornerDefinedBox box = selection.getSelectedSelectionBox();
-        BlockPos pos = box != null ? box.getCorner1() : BlockPos.ORIGIN;
-        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, pos, selection::setManualOrigin);
+        BlockPos origin = this.areaSelection.hasManualOrigin() ? this.areaSelection.getManualOrigin() : this.areaSelection.getEffectiveOrigin();
+        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, origin, areaSelection::setManualOrigin);
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
@@ -103,7 +101,7 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
         this.addWidget(this.areaNameTextField);
         this.addWidget(this.setAreaNameButton);
 
-        if (this.selection.hasManualOrigin())
+        if (this.areaSelection.hasManualOrigin())
         {
             this.addWidget(this.originEditWidget);
             this.addWidget(this.originCheckbox);
@@ -145,31 +143,31 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
     @Override
     protected DataListWidget<String> createListWidget()
     {
-        Supplier<List<String>> supplier = this.selection::getAllSelectionBoxNames;
+        Supplier<List<String>> supplier = this.areaSelection::getAllSelectionBoxNames;
         DataListWidget<String> listWidget = new DataListWidget<>(supplier, true);
         listWidget.setListEntryWidgetFixedHeight(18);
         listWidget.addDefaultSearchBar();
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
         listWidget.getEntrySelectionHandler().setAllowSelection(true);
-        listWidget.setDataListEntryWidgetFactory((d, cd) -> new AreaSubRegionEntryWidget(d, cd, this.selection));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new AreaSubRegionEntryWidget(d, cd, this.areaSelection));
         return listWidget;
     }
 
     protected void onSelectionChange(@Nullable String regionName)
     {
-        if (regionName != null && regionName.equals(this.selection.getSelectedSelectionBoxName()))
+        if (regionName != null && regionName.equals(this.areaSelection.getSelectedSelectionBoxName()))
         {
             regionName = null;
         }
 
-        this.selection.setSelectedSelectionBox(regionName);
+        this.areaSelection.setSelectedSelectionBox(regionName);
     }
 
     protected void onOriginCheckboxClick(boolean value)
     {
         if (value)
         {
-            this.selection.clearCornerSelectionOfSelectedBox();
+            this.areaSelection.clearCornerSelectionOfSelectedBox();
         }
 
         this.originCheckbox.updateWidgetState();
@@ -198,19 +196,19 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
     protected void renameAreaSelection()
     {
         String newName = this.areaNameTextField.getText();
-        AreaSelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
-        this.selection.setName(newName);
+        AreaSelectionManager.renameSubRegionBoxIfSingle(this.areaSelection, newName);
+        this.areaSelection.setName(newName);
     }
 
     protected void toggleManualOrigin()
     {
-        if (this.selection.hasManualOrigin())
+        if (this.areaSelection.hasManualOrigin())
         {
-            this.selection.setManualOrigin(null);
+            this.areaSelection.setManualOrigin(null);
         }
         else
         {
-            this.selection.setManualOrigin(EntityWrap.getCameraEntityBlockPos());
+            this.areaSelection.setManualOrigin(EntityWrap.getCameraEntityBlockPos());
         }
 
         this.manualOriginButton.updateButtonState();
@@ -224,6 +222,6 @@ public class MultiRegionModeAreaEditorScreen extends BaseListScreen<DataListWidg
 
     protected void openSaveSchematicScreen()
     {
-        BaseScreen.openScreen(new SaveSchematicFromAreaScreen(this.selection));
+        BaseScreen.openScreen(new SaveSchematicFromAreaScreen(this.areaSelection));
     }
 }

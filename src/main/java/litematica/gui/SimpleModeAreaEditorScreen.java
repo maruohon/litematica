@@ -1,5 +1,7 @@
 package litematica.gui;
 
+import net.minecraft.util.math.BlockPos;
+
 import malilib.gui.widget.BaseTextFieldWidget;
 import malilib.gui.widget.BlockPosEditWidget;
 import malilib.gui.widget.CheckBoxWidget;
@@ -11,7 +13,6 @@ import malilib.util.game.wrap.EntityWrap;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.selection.AreaSelection;
-import litematica.selection.CornerDefinedBox;
 import litematica.selection.AreaSelectionManager;
 import litematica.selection.AreaSelectionType;
 
@@ -52,8 +53,8 @@ public class SimpleModeAreaEditorScreen extends BaseAreaSubRegionEditScreen
                                                  selection::isOriginSelected, selection::setOriginSelected);
         this.originCheckbox.setListener(this::onOriginCheckboxClick);
 
-        CornerDefinedBox box = selection.getSelectedSelectionBox();
-        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, box.getCorner1(), selection::setManualOrigin);
+        BlockPos origin = this.areaSelection.hasManualOrigin() ? this.areaSelection.getManualOrigin() : this.areaSelection.getEffectiveOrigin();
+        this.originEditWidget  = new BlockPosEditWidget(90, 80, 2, true, origin, selection::setManualOrigin);
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
