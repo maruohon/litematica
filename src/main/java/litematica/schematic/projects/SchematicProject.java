@@ -433,7 +433,7 @@ public class SchematicProject
     @Nullable
     public static SchematicProject fromJson(JsonObject obj, Path projectFile, boolean createPlacement)
     {
-        BlockPos origin = JsonUtils.blockPosFromJson(obj, "origin");
+        BlockPos origin = JsonUtils.getBlockPos(obj, "origin");
 
         if (JsonUtils.hasString(obj, "name") && JsonUtils.hasInteger(obj, "current_version_id") && origin != null)
         {

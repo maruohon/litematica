@@ -283,7 +283,7 @@ public class SchematicPlacementUnloaded
     {
         if (hasBaseSettings(obj))
         {
-            BlockPos origin = JsonUtils.blockPosFromJson(obj, "origin");
+            BlockPos origin = JsonUtils.getBlockPos(obj, "origin");
 
             if (origin == null)
             {

@@ -113,7 +113,7 @@ public class AreaSelectionSimple extends AreaSelection
             area.setName(obj.get("name").getAsString());
         }
 
-        BlockPos pos = JsonUtils.blockPosFromJson(obj, "origin");
+        BlockPos pos = JsonUtils.getBlockPos(obj, "origin");
 
         if (pos != null)
         {

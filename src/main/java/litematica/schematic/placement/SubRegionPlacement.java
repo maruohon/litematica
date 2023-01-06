@@ -192,7 +192,7 @@ public class SubRegionPlacement
             JsonUtils.hasString(obj, "rotation") &&
             JsonUtils.hasString(obj, "mirror"))
         {
-            BlockPos pos = JsonUtils.blockPosFromJson(obj, "pos");
+            BlockPos pos = JsonUtils.getBlockPos(obj, "pos");
 
             if (pos == null)
             {
@@ -200,7 +200,7 @@ public class SubRegionPlacement
                 return null;
             }
 
-            BlockPos defaultPos = JsonUtils.blockPosFromJson(obj, "default_pos");
+            BlockPos defaultPos = JsonUtils.getBlockPos(obj, "default_pos");
 
             if (defaultPos == null)
             {

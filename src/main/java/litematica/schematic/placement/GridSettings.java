@@ -2,9 +2,7 @@ package litematica.schematic.placement;
 
 import java.util.Objects;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
 import malilib.util.data.json.JsonUtils;
@@ -145,13 +143,9 @@ public class GridSettings
     public void fromJson(JsonObject obj)
     {
         this.enabled = JsonUtils.getBoolean(obj, "enabled");
-        BlockPos pos = JsonUtils.blockPosFromJson(obj, "size");
-        BlockPos repNeg = JsonUtils.blockPosFromJson(obj, "repeatNegative");
-        BlockPos repPos = JsonUtils.blockPosFromJson(obj, "repeatPositive");
-
-        this.repeatNegative = repNeg != null ? repNeg : Vec3i.NULL_VECTOR;
-        this.repeatPositive = repPos != null ? repPos : Vec3i.NULL_VECTOR;
-        this.size = pos != null ? pos : this.defaultSize;
+        this.size = JsonUtils.getVec3iOrDefault(obj, "size", this.defaultSize);
+        this.repeatNegative = JsonUtils.getVec3iOrDefault(obj, "repeatNegative", Vec3i.NULL_VECTOR);
+        this.repeatPositive = JsonUtils.getVec3iOrDefault(obj, "repeatPositive", Vec3i.NULL_VECTOR);
         this.initialized = this.isAtDefaultValues() == false;
     }
 
@@ -159,7 +153,7 @@ public class GridSettings
     {
         JsonObject obj = new JsonObject();
 
-        obj.add("enabled", new JsonPrimitive(this.enabled));
+        obj.addProperty("enabled", this.enabled);
         obj.add("size", JsonUtils.blockPosToJson(this.size));
         obj.add("repeatNegative", JsonUtils.blockPosToJson(this.repeatNegative));
         obj.add("repeatPositive", JsonUtils.blockPosToJson(this.repeatPositive));

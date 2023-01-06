@@ -282,9 +282,9 @@ public class DataManager implements DirectoryCache
 
     private void fromJson(JsonObject obj)
     {
-        JsonUtils.readObjectIfExists(obj, "selections", this.areaSelectionManager::loadFromJson);
-        JsonUtils.readObjectIfExists(obj, "placements", this.schematicPlacementManager::loadFromJson);
-        JsonUtils.readObjectIfExists(obj, "schematic_projects_manager", this.schematicProjectsManager::loadFromJson);
+        JsonUtils.getObjectIfExists(obj, "selections", this.areaSelectionManager::loadFromJson);
+        JsonUtils.getObjectIfExists(obj, "placements", this.schematicPlacementManager::loadFromJson);
+        JsonUtils.getObjectIfExists(obj, "schematic_projects_manager", this.schematicProjectsManager::loadFromJson);
 
         if (JsonUtils.hasObject(obj, "render_range"))
         {

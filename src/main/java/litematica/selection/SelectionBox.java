@@ -94,8 +94,8 @@ public class SelectionBox extends CornerDefinedBox
     {
         if (JsonUtils.hasString(obj, "name"))
         {
-            BlockPos pos1 = JsonUtils.blockPosFromJson(obj, "pos1");
-            BlockPos pos2 = JsonUtils.blockPosFromJson(obj, "pos2");
+            BlockPos pos1 = JsonUtils.getBlockPos(obj, "pos1");
+            BlockPos pos2 = JsonUtils.getBlockPos(obj, "pos2");
 
             if (pos1 != null && pos2 != null)
             {

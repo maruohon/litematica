@@ -377,7 +377,7 @@ public class AreaSelection
         JsonObject obj = new JsonObject();
 
         JsonUtils.addStringIfNotNull(obj, "name", this.name);
-        JsonUtils.writeBlockPosIfNotNull(obj, "origin", this.getManualOrigin());
+        JsonUtils.putBlockPosIfNotNull(obj, "origin", this.getManualOrigin());
 
         JsonArray arr = JsonUtils.toArray(this.selectionBoxes.values(), SelectionBox::toJson);
 
@@ -394,12 +394,12 @@ public class AreaSelection
     {
         AreaSelection area = new AreaSelection();
 
-        JsonUtils.readArrayElementsIfObjects(obj, "boxes", o -> SelectionBox.fromJson(o, b -> area.selectionBoxes.put(b.getName(), b)));
+        JsonUtils.getArrayElementsIfObjects(obj, "boxes", o -> SelectionBox.fromJson(o, b -> area.selectionBoxes.put(b.getName(), b)));
 
         area.name = JsonUtils.getStringOrDefault(obj, "name", area.name);
         area.selectedBoxName = JsonUtils.getStringOrDefault(obj, "current", area.selectedBoxName);
 
-        BlockPos pos = JsonUtils.blockPosFromJson(obj, "origin");
+        BlockPos pos = JsonUtils.getBlockPos(obj, "origin");
 
         if (pos != null)
         {

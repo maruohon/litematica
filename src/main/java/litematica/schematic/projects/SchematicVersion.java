@@ -75,7 +75,7 @@ public class SchematicVersion
     @Nullable
     public static SchematicVersion fromJson(JsonObject obj, SchematicProject project)
     {
-        BlockPos areaOffset = JsonUtils.blockPosFromJson(obj, "area_offset");
+        BlockPos areaOffset = JsonUtils.getBlockPos(obj, "area_offset");
 
         if (areaOffset != null &&
             JsonUtils.hasString(obj, "name") &&
