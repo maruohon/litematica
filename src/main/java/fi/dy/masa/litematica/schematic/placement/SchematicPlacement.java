@@ -7,12 +7,19 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.apache.commons.lang3.tuple.Pair;
+
+import net.minecraft.structure.StructurePlacementData;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -33,17 +40,13 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.structure.StructurePlacementData;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
 public class SchematicPlacement
 {
     private static final Set<Integer> USED_COLORS = new HashSet<>();
     private static int nextColorIndex;
 
+    protected final SchematicPlacementManager placementManager;
     private final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
     private final int subRegionCount;
     private SchematicVerifier verifier;
@@ -72,7 +75,12 @@ public class SchematicPlacement
     @Nullable
     private MaterialListBase materialList;
 
-    private SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    public SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    {
+        this(schematic, origin, name, enabled, enableRender, DataManager.getSchematicPlacementManager());
+    }
+
+    public SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender, SchematicPlacementManager placementManager)
     {
         this.schematic = schematic;
         this.schematicFile = schematic.getFile();
@@ -81,6 +89,7 @@ public class SchematicPlacement
         this.subRegionCount = schematic.getSubRegionCount();
         this.enabled = enabled;
         this.enableRender = enableRender;
+        this.placementManager = placementManager;
     }
 
     public static SchematicPlacement createFor(LitematicaSchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
@@ -187,11 +196,10 @@ public class SchematicPlacement
     public void toggleIgnoreEntities(IMessageConsumer feedback)
     {
         // Marks the currently touched chunks before doing the modification
-        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-        manager.onPrePlacementChange(this);
+        this.placementManager.onPrePlacementChange(this);
 
         this.ignoreEntities = ! this.ignoreEntities;
-        this.onModified(manager);
+        this.onModified(this.placementManager);
     }
 
     public void toggleRenderEnclosingBox()
@@ -585,8 +593,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             // The input argument position is an absolute position, so need to convert to relative position here
             newPos = newPos.subtract(this.origin);
@@ -594,7 +601,7 @@ public class SchematicPlacement
             newPos = PositionUtils.getReverseTransformedBlockPos(newPos, this.mirror, this.rotation);
 
             this.relativeSubRegionPlacements.get(regionName).setPos(newPos);
-            this.onModified(regionName, manager);
+            this.onModified(regionName, this.placementManager);
         }
     }
 
@@ -609,11 +616,10 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).setRotation(rotation);
-            this.onModified(regionName, manager);
+            this.onModified(regionName, this.placementManager);
         }
     }
 
@@ -628,19 +634,17 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
-            this.onModified(regionName, manager);
+            this.onModified(regionName, this.placementManager);
         }
     }
 
     public void setSubRegionsEnabledState(boolean state, Collection<SubRegionPlacement> subRegions, IMessageConsumer feedback)
     {
-        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
         // Marks the currently touched chunks before doing the modification
-        manager.onPrePlacementChange(this);
+        this.placementManager.onPrePlacementChange(this);
 
         for (SubRegionPlacement placement : subRegions)
         {
@@ -654,7 +658,7 @@ public class SchematicPlacement
         }
 
         this.checkAreSubRegionsModified();
-        this.onModified(manager);
+        this.onModified(this.placementManager);
     }
 
     public void toggleSubRegionEnabled(String regionName, IMessageConsumer feedback)
@@ -662,11 +666,10 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).toggleEnabled();
-            this.onModified(regionName, manager);
+            this.onModified(regionName, this.placementManager);
         }
     }
 
@@ -675,11 +678,10 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).toggleIgnoreEntities();
-            this.onModified(regionName, manager);
+            this.onModified(regionName, this.placementManager);
         }
     }
 
@@ -699,7 +701,7 @@ public class SchematicPlacement
         if (updatePlacementManager)
         {
             // Marks the currently touched chunks before doing the modification
-            DataManager.getSchematicPlacementManager().onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
         }
 
         Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
@@ -714,7 +716,7 @@ public class SchematicPlacement
 
         if (updatePlacementManager)
         {
-            this.onModified(DataManager.getSchematicPlacementManager());
+            this.onModified(this.placementManager);
         }
     }
 
@@ -732,11 +734,10 @@ public class SchematicPlacement
         if (pos != null && placement != null)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             placement.resetToOriginalValues();
-            this.onModified(regionName, manager);
+            this.onModified(regionName, this.placementManager);
         }
     }
 
@@ -745,11 +746,10 @@ public class SchematicPlacement
         if (enabled != this.enabled)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.enabled = enabled;
-            this.onModified(manager);
+            this.onModified(this.placementManager);
         }
     }
 
@@ -763,11 +763,10 @@ public class SchematicPlacement
         if (render != this.enableRender)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.enableRender = render;
-            this.onModified(manager);
+            this.onModified(this.placementManager);
         }
     }
 
@@ -794,11 +793,10 @@ public class SchematicPlacement
         if (this.origin.equals(origin) == false)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.origin = origin;
-            this.onModified(manager);
+            this.onModified(this.placementManager);
         }
 
         return this;
@@ -815,11 +813,10 @@ public class SchematicPlacement
         if (this.rotation != rotation)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.rotation = rotation;
-            this.onModified(manager);
+            this.onModified(this.placementManager);
         }
 
         return this;
@@ -836,11 +833,10 @@ public class SchematicPlacement
         if (this.mirror != mirror)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+            this.placementManager.onPrePlacementChange(this);
 
             this.mirror = mirror;
-            this.onModified(manager);
+            this.onModified(this.placementManager);
         }
 
         return this;

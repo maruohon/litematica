@@ -40,7 +40,7 @@ public class MaterialCache
 
     private MaterialCache()
     {
-        this.tempWorld = SchematicWorldHandler.createSchematicWorld();
+        this.tempWorld = SchematicWorldHandler.createSchematicWorld(null);
         this.checkPos = new BlockPos(8, 0, 8);
 
         WorldUtils.loadChunksSchematicWorld(this.tempWorld, this.checkPos, new Vec3i(1, 1, 1));

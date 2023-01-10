@@ -23,7 +23,7 @@ public class WorldLoadListener implements IWorldLoadListener
     @Override
     public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
     {
-        SchematicWorldHandler.recreateSchematicWorld(worldAfter == null);
+        SchematicWorldHandler.INSTANCE.recreateSchematicWorld(worldAfter == null);
 
         if (worldAfter != null)
         {

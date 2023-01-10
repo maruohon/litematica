@@ -137,15 +137,15 @@ public class BlockModelRendererSchematic
         return renderedSomething;
     }
 
-    private boolean shouldRenderModelSide(BlockRenderView worldIn, BlockState stateIn, BlockPos posIn, Direction side)
+    protected boolean shouldRenderModelSide(BlockRenderView worldIn, BlockState stateIn, BlockPos posIn, Direction side)
     {
         return DataManager.getRenderLayerRange().isPositionAtRenderEdgeOnSide(posIn, side) ||
                (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.getBooleanValue()) ||
                Block.shouldDrawSide(stateIn, worldIn, posIn, side ,posIn.offset(side));
     }
 
-    private void renderQuadsSmooth(BlockRenderView world, BlockState state, BlockPos pos, MatrixStack matrices,
-            VertexConsumer vertexConsumer, List<BakedQuad> list, float[] box, BitSet flags, AmbientOcclusionCalculator ambientOcclusionCalculator, int overlay)
+    protected void renderQuadsSmooth(BlockRenderView world, BlockState state, BlockPos pos, MatrixStack matrices,
+                                     VertexConsumer vertexConsumer, List<BakedQuad> list, float[] box, BitSet flags, AmbientOcclusionCalculator ambientOcclusionCalculator, int overlay)
     {
         final int size = list.size();
 
@@ -168,8 +168,8 @@ public class BlockModelRendererSchematic
         }
     }
 
-    private void renderQuadsFlat(BlockRenderView world, BlockState state, BlockPos pos,
-            int light, int overlay, boolean useWorldLight, MatrixStack matrices, VertexConsumer vertexConsumer, List<BakedQuad> list, BitSet flags)
+    protected void renderQuadsFlat(BlockRenderView world, BlockState state, BlockPos pos,
+                                   int light, int overlay, boolean useWorldLight, MatrixStack matrices, VertexConsumer vertexConsumer, List<BakedQuad> list, BitSet flags)
     {
         final int size = list.size();
 
@@ -188,9 +188,9 @@ public class BlockModelRendererSchematic
         }
     }
 
-    private void renderQuad(BlockRenderView world, BlockState state, BlockPos pos, VertexConsumer vertexConsumer, MatrixStack.Entry matrixEntry,
-            BakedQuad quad, float brightness0, float brightness1, float brightness2, float brightness3,
-            int light0, int light1, int light2, int light3, int overlay)
+    protected void renderQuad(BlockRenderView world, BlockState state, BlockPos pos, VertexConsumer vertexConsumer, MatrixStack.Entry matrixEntry,
+                              BakedQuad quad, float brightness0, float brightness1, float brightness2, float brightness3,
+                              int light0, int light1, int light2, int light3, int overlay)
     {
         float r;
         float g;
@@ -214,7 +214,7 @@ public class BlockModelRendererSchematic
                             r, g, b, new int[]{ light0, light1, light2, light3 }, overlay, true);
     }
 
-    private void getQuadDimensions(BlockRenderView world, BlockState state, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] box, BitSet flags)
+    protected void getQuadDimensions(BlockRenderView world, BlockState state, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] box, BitSet flags)
     {
         float minX = 32.0F;
         float minY = 32.0F;
