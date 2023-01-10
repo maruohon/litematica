@@ -114,7 +114,7 @@ public class WorldUtils
             return null;
         }
 
-        WorldSchematic world = SchematicWorldHandler.createSchematicWorld();
+        WorldSchematic world = SchematicWorldHandler.createSchematicWorld(null);
 
         loadChunksSchematicWorld(world, BlockPos.ORIGIN, schematic.getSize());
         StructurePlacementData placementSettings = new StructurePlacementData();
@@ -226,7 +226,7 @@ public class WorldUtils
             return null;
         }
 
-        WorldSchematic world = SchematicWorldHandler.createSchematicWorld();
+        WorldSchematic world = SchematicWorldHandler.createSchematicWorld(null);
 
         BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
         loadChunksSchematicWorld(world, BlockPos.ORIGIN, size);

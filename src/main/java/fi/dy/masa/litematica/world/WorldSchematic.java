@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -45,29 +46,30 @@ import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.tick.EmptyTickSchedulers;
 import net.minecraft.world.tick.QueryableTickScheduler;
+
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 
 public class WorldSchematic extends World
 {
-    private static final RegistryKey<World> REGISTRY_KEY = RegistryKey.of(Registry.WORLD_KEY, new Identifier(Reference.MOD_ID, "schematic_world"));
+    protected static final RegistryKey<World> REGISTRY_KEY = RegistryKey.of(Registry.WORLD_KEY, new Identifier(Reference.MOD_ID, "schematic_world"));
 
-    private final MinecraftClient mc;
-    private final WorldRendererSchematic worldRenderer;
-    private final ChunkManagerSchematic chunkManagerSchematic;
-    private final RegistryEntry<Biome> biome;
-    private int nextEntityId;
-    private int entityCount;
+    protected final MinecraftClient mc;
+    protected final ChunkManagerSchematic chunkManagerSchematic;
+    protected final RegistryEntry<Biome> biome;
+    @Nullable protected final WorldRendererSchematic worldRenderer;
+    protected int nextEntityId;
+    protected int entityCount;
 
     public WorldSchematic(MutableWorldProperties properties,
                           RegistryEntry<DimensionType> dimension,
-                          Supplier<Profiler> supplier)
+                          Supplier<Profiler> supplier,
+                          @Nullable WorldRendererSchematic worldRenderer)
     {
         super(properties, REGISTRY_KEY, dimension, supplier, true, false, 0L, 0);
 
         this.mc = MinecraftClient.getInstance();
-        this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
+        this.worldRenderer = worldRenderer;
         this.chunkManagerSchematic = new ChunkManagerSchematic(this);
         this.biome = RegistryEntry.of(BuiltinRegistries.BIOME.get(BiomeKeys.PLAINS));
     }
@@ -286,7 +288,10 @@ public class WorldSchematic extends World
 
     public void scheduleChunkRenders(int chunkX, int chunkZ)
     {
-        this.worldRenderer.scheduleChunkRenders(chunkX, chunkZ);
+        if (this.worldRenderer != null)
+        {
+            this.worldRenderer.scheduleChunkRenders(chunkX, chunkZ);
+        }
     }
 
     @Override
