@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.BaseScreen;
+import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.button.GenericButton;
@@ -26,17 +27,18 @@ import litematica.data.DataManager;
 import litematica.gui.SchematicPlacementSettingsScreen;
 import litematica.gui.SchematicPlacementsListScreen;
 import litematica.gui.util.LitematicaIcons;
+import litematica.schematic.ISchematic;
 import litematica.schematic.SchematicMetadata;
+import litematica.schematic.SchematicType;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
-import litematica.schematic.placement.SchematicPlacementUnloaded;
 import litematica.util.PositionUtils;
 
-public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<SchematicPlacementUnloaded>
+public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<SchematicPlacement>
 {
+    protected final SchematicPlacement placement;
     protected final SchematicPlacementManager manager;
-    protected final SchematicPlacementsListScreen gui;
-    @Nullable protected final SchematicPlacement loadedPlacement;
+    protected final SchematicPlacementsListScreen screen;
     protected final GenericButton configureButton;
     protected final GenericButton duplicateButton;
     protected final GenericButton removeButton;
@@ -44,17 +46,16 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
     protected final GenericButton toggleEnabledButton;
     protected final IconWidget lockedIcon;
     protected final IconWidget modificationNoticeIcon;
-    protected final IconWidget schematicTypeIcon;
     protected int buttonsStartX;
 
-    public SchematicPlacementEntryWidget(SchematicPlacementUnloaded placement,
+    public SchematicPlacementEntryWidget(SchematicPlacement placement,
                                          DataListEntryWidgetData constructData,
-                                         SchematicPlacementsListScreen gui)
+                                         SchematicPlacementsListScreen screen)
     {
         super(placement, constructData);
 
-        this.gui = gui;
-        this.loadedPlacement = placement.isLoaded() ? (SchematicPlacement) placement : null;
+        this.screen = screen;
+        this.placement = placement;
         this.manager = DataManager.getSchematicPlacementManager();
 
         this.lockedIcon = new IconWidget(LitematicaIcons.LOCK_LOCKED);
@@ -92,9 +93,33 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         this.saveToFileButton.setHoverInfoRequiresShift(true);
         this.toggleEnabledButton.setHoverInfoRequiresShift(true);
 
-        Icon icon = this.loadedPlacement != null && this.loadedPlacement.getSchematicFile() != null ? this.loadedPlacement.getSchematic().getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
-        this.schematicTypeIcon = new IconWidget(icon);
+        // FIXME This should show the correct schematic type, and then just ADD the in-memory icon for in-memory schematics
+        // TODO Add icon variants that are half schematic type and half in-memory icon
+        @Nullable ISchematic schematic = placement.getSchematic();
+        Icon icon = null;
+
+        if (schematic != null)
+        {
+            icon = schematic.getType().getIcon();
+        }
+        else
+        {
+            List<SchematicType<?>> types = SchematicType.getPossibleTypesFromFileName(placement.getSchematicFile());
+
+            if (types.size() > 0)
+            {
+                icon = types.get(0).getIcon();
+            }
+        }
+
+        if (icon == null)
+        {
+            icon = DefaultIcons.EXCLAMATION;
+        }
+
+        this.iconOffset.setXOffset(3);
         this.textOffset.setXOffset(icon.getWidth() + 6);
+        this.setIcon(icon);
 
         String key = placement.isEnabled() ? "litematica.button.schematic_placement_settings.entry_name.enabled" :
                                              "litematica.button.schematic_placement_settings.entry_name.disabled";
@@ -110,22 +135,13 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
     {
         super.reAddSubWidgets();
 
-        this.addWidget(this.schematicTypeIcon);
         this.addWidget(this.configureButton);
         this.addWidget(this.duplicateButton);
         this.addWidget(this.removeButton);
         this.addWidget(this.saveToFileButton);
         this.addWidget(this.toggleEnabledButton);
-
-        if (this.data.isRegionPlacementModified())
-        {
-            this.addWidget(this.modificationNoticeIcon);
-        }
-
-        if (this.data.isLocked())
-        {
-            this.addWidget(this.lockedIcon);
-        }
+        this.addWidgetIf(this.modificationNoticeIcon, this.data.isRegionPlacementModified());
+        this.addWidgetIf(this.lockedIcon, this.data.isLocked());
     }
 
     @Override
@@ -133,7 +149,6 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
     {
         super.updateSubWidgetPositions();
 
-        this.schematicTypeIcon.centerVerticallyInside(this);
         this.modificationNoticeIcon.centerVerticallyInside(this);
         this.lockedIcon.centerVerticallyInside(this);
         this.configureButton.centerVerticallyInside(this);
@@ -142,7 +157,6 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         this.saveToFileButton.centerVerticallyInside(this);
         this.toggleEnabledButton.centerVerticallyInside(this);
 
-        this.schematicTypeIcon.setX(this.getX() + 2);
         this.removeButton.setRight(this.getRight() - 2);
         this.saveToFileButton.setRight(this.removeButton.getX() - 1);
         this.duplicateButton.setRight(this.saveToFileButton.getX() - 1);
@@ -166,58 +180,55 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         return mouseX <= this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
-    protected void addHoverInfo(SchematicPlacementUnloaded placement)
+    protected void addHoverInfo(SchematicPlacement placement)
     {
-        Path schematicFile = placement.getSchematicFile();
-        SchematicMetadata metadata = this.loadedPlacement != null ? this.loadedPlacement.getSchematic().getMetadata() : null;
+        @Nullable Path schematicFile = placement.getSchematicFile();
+        @Nullable ISchematic schematic = placement.getSchematic();
+        @Nullable SchematicMetadata metadata = schematic != null ? schematic.getMetadata() : null;
         String fileName = schematicFile != null ? schematicFile.getFileName().toString() :
                           StringUtils.translate("litematica.hover.schematic_list.in_memory_only");
-        List<String> lines = new ArrayList<>();
+        List<StyledTextLine> lines = new ArrayList<>();
         boolean saved = placement.isSavedToFile();
+
+        StyledTextLine.translate(lines, "litematica.hover.schematic_list.schematic_file", fileName);
 
         if (metadata != null)
         {
-            lines.add(StringUtils.translate("litematica.hover.schematic_list.schematic_name", metadata.getName()));
+            StyledTextLine.translate(lines, "litematica.hover.schematic_list.schematic_name", metadata.getName());
         }
 
-        lines.add(StringUtils.translate("litematica.hover.schematic_list.schematic_file", fileName));
-
-        if (this.loadedPlacement != null)
-        {
-            lines.add(StringUtils.translate("litematica.hover.placement_list.sub_region_count",
-                                            this.loadedPlacement.getSubRegionCount()));
-        }
+        BlockPos o = placement.getPosition();
+        StyledTextLine.translate(lines, "litematica.hover.placement_list.origin", o.getX(), o.getY(), o.getZ());
+        StyledTextLine.translate(lines, "litematica.hover.placement_list.rotation",
+                                 PositionUtils.getRotationNameShort(placement.getRotation()));
+        StyledTextLine.translate(lines, "litematica.hover.placement_list.mirror",
+                                 PositionUtils.getMirrorName(placement.getMirror()));
 
         if (metadata != null)
         {
             Vec3i size = metadata.getEnclosingSize();
-            lines.add(StringUtils.translate("litematica.hover.placement_list.enclosing_size",
-                                            size.getX(), size.getY(), size.getZ()));
+            StyledTextLine.translate(lines, "litematica.hover.placement_list.enclosing_size",
+                                     size.getX(), size.getY(), size.getZ());
         }
 
-        lines.add(StringUtils.translate("litematica.hover.placement_list.is_loaded",
-                                        MessageHelpers.getYesNoColored(placement.isLoaded(), false)));
+        StyledTextLine.translate(lines, "litematica.hover.placement_list.sub_region_count",
+                                 placement.getSubRegionCount());
+
+        StyledTextLine.translate(lines, "litematica.hover.placement_list.is_loaded",
+                                 MessageHelpers.getYesNoColored(placement.isLoaded(), false));
 
         // Get a cached value, to not query and read the file every rendered frame...
-        if (saved && this.gui.getCachedWasModifiedSinceSaved(placement))
+        if (saved && this.screen.getCachedWasModifiedSinceSaved(placement))
         {
-            lines.add(StringUtils.translate("litematica.hover.placement_list.saved_to_file.modified"));
+            StyledTextLine.translate(lines, "litematica.hover.placement_list.saved_to_file.modified");
         }
         else
         {
-            lines.add(StringUtils.translate("litematica.hover.placement_list.saved_to_file.not_modified",
-                                            MessageHelpers.getYesNoColored(saved, false)));
+            StyledTextLine.translate(lines, "litematica.hover.placement_list.saved_to_file.not_modified",
+                                     MessageHelpers.getYesNoColored(saved, false));
         }
 
-        lines.add(StringUtils.translate("litematica.hover.placement_list.rotation",
-                                        PositionUtils.getRotationNameShort(placement.getRotation())));
-        lines.add(StringUtils.translate("litematica.hover.placement_list.mirror",
-                                        PositionUtils.getMirrorName(placement.getMirror())));
-
-        BlockPos o = placement.getOrigin();
-        lines.add(StringUtils.translate("litematica.hover.placement_list.origin", o.getX(), o.getY(), o.getZ()));
-
-        this.getHoverInfoFactory().addStrings(lines);
+        this.getHoverInfoFactory().setTextLines("hover", lines);
     }
 
     protected boolean useIconButtons()
@@ -233,15 +244,15 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
     protected void openConfigurationMenu()
     {
-        if (this.loadedPlacement != null)
+        if (this.placement != null)
         {
-            BaseScreen.openScreenWithParent(new SchematicPlacementSettingsScreen(this.loadedPlacement));
+            BaseScreen.openScreenWithParent(new SchematicPlacementSettingsScreen(this.placement));
         }
     }
 
     protected void removePlacement()
     {
-        SchematicPlacementUnloaded placement = this.getData();
+        SchematicPlacement placement = this.getData();
 
         if (placement.isLocked() && BaseScreen.isShiftDown() == false)
         {
@@ -261,6 +272,7 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
             MessageDispatcher.error("litematica.message.error.placement_list.save_failed");
         }
 
+        this.screen.clearModifiedSinceSavedCache();
         this.listWidget.reCreateListEntryWidgets();
     }
 
@@ -270,7 +282,7 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         this.listWidget.reCreateListEntryWidgets();
     }
 
-    public static boolean placementSearchFilter(SchematicPlacementUnloaded entry, List<String> searchTerms)
+    public static boolean placementSearchFilter(SchematicPlacement entry, List<String> searchTerms)
     {
         String fileName = null;
 

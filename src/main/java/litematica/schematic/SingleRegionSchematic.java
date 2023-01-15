@@ -49,12 +49,6 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
     }
 
     @Override
-    public int getSubRegionCount()
-    {
-        return 1;
-    }
-
-    @Override
     public ImmutableList<String> getRegionNames()
     {
         return ImmutableList.of(this.getMetadata().getName());

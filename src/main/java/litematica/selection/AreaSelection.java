@@ -17,13 +17,13 @@ import net.minecraft.util.math.BlockPos;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.overlay.message.MessageOutput;
+import malilib.util.data.EnabledCondition;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.position.IntBoundingBox;
 import litematica.config.Configs;
 import litematica.render.infohud.StatusInfoRenderer;
 import litematica.schematic.placement.SchematicPlacement;
-import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.util.PositionUtils;
 
 public class AreaSelection
@@ -415,11 +415,11 @@ public class AreaSelection
 
     public static AreaSelection fromPlacement(SchematicPlacement placement)
     {
-        ImmutableMap<String, SelectionBox> boxes = placement.getSubRegionBoxes(RequiredEnabled.ANY);
+        ImmutableMap<String, SelectionBox> boxes = placement.getSubRegionBoxes(EnabledCondition.ANY);
         AreaSelection selection = new AreaSelection();
 
         selection.name = placement.getName();
-        selection.setManualOrigin(placement.getOrigin());
+        selection.setManualOrigin(placement.getPosition());
 
         for (Map.Entry<String, SelectionBox> entry : boxes.entrySet())
         {

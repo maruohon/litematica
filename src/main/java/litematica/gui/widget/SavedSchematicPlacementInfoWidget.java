@@ -14,17 +14,21 @@ import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import malilib.overlay.message.MessageHelpers;
 import malilib.render.text.StyledTextLine;
 import litematica.gui.util.SchematicPlacementInfoCache;
-import litematica.schematic.placement.SchematicPlacementUnloaded;
+import litematica.schematic.placement.SchematicPlacement;
 import litematica.util.PositionUtils;
 
 public class SavedSchematicPlacementInfoWidget extends ContainerWidget
 {
     protected final SchematicPlacementInfoCache infoCache = new SchematicPlacementInfoCache();
-    @Nullable protected SchematicPlacementUnloaded currentInfo;
+    protected final LabelWidget infoLabelWidget;
+    @Nullable protected SchematicPlacement currentInfo;
 
     public SavedSchematicPlacementInfoWidget(int width, int height)
     {
         super(width, height);
+
+        this.infoLabelWidget = new LabelWidget();
+        this.infoLabelWidget.setLineHeight(12);
 
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
         this.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
@@ -33,32 +37,19 @@ public class SavedSchematicPlacementInfoWidget extends ContainerWidget
     @Override
     public void reAddSubWidgets()
     {
-        this.reCreateSubWidgets();
+        super.reAddSubWidgets();
+
+        this.addWidgetIf(this.infoLabelWidget, this.currentInfo != null);
     }
 
     @Override
     public void updateSubWidgetPositions()
     {
-        this.reCreateSubWidgets();
-    }
-
-    protected void reCreateSubWidgets()
-    {
-        this.clearWidgets();
-
-        if (this.currentInfo == null)
-        {
-            return;
-        }
-
-        int x = this.getX() + 4;
-        int y = this.getY() + 4;
-        LabelWidget label = this.createInfoLabelWidget(x, y, this.currentInfo);
-        this.addWidget(label);
+        this.infoLabelWidget.setPosition(this.getX() + 4, this.getY() + 4);
     }
 
     @Nullable
-    public SchematicPlacementUnloaded getSelectedPlacementInfo()
+    public SchematicPlacement getSelectedPlacementInfo()
     {
         return this.currentInfo;
     }
@@ -74,33 +65,38 @@ public class SavedSchematicPlacementInfoWidget extends ContainerWidget
             this.currentInfo = null;
         }
 
-        this.reCreateSubWidgets();
+        if (this.currentInfo != null)
+        {
+            this.updateInfoLabelWidget(this.currentInfo);
+        }
+
+        this.reAddSubWidgets();
     }
 
-    protected LabelWidget createInfoLabelWidget(int x, int y, SchematicPlacementUnloaded data)
+    protected void updateInfoLabelWidget(SchematicPlacement placement)
     {
         List<StyledTextLine> lines = new ArrayList<>();
 
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.region_count",
-                                 data.getRegionCount());
+                                 placement.getSubRegionCount());
 
-        String stateStr = MessageHelpers.getOnOffColored(data.isEnabled(), true);
+        String stateStr = MessageHelpers.getOnOffColored(placement.isEnabled(), true);
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.placement_state", stateStr);
 
-        stateStr = MessageHelpers.getYesNoColored(data.isRegionPlacementModified(), false);
+        stateStr = MessageHelpers.getYesNoColored(placement.isRegionPlacementModified(), false);
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.modified", stateStr);
 
-        String rotationStr = PositionUtils.getRotationNameShort(data.getRotation());
+        String rotationStr = PositionUtils.getRotationNameShort(placement.getRotation());
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.rotation", rotationStr);
 
-        String mirrorStr = PositionUtils.getMirrorName(data.getMirror());
+        String mirrorStr = PositionUtils.getMirrorName(placement.getMirror());
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.mirror", mirrorStr);
 
-        BlockPos o = data.getOrigin();
+        BlockPos o = placement.getPosition();
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.origin",
                                  o.getX(), o.getY(), o.getZ());
 
-        long time = data.getLastSaveTime();
+        long time = placement.getLastSaveTime();
 
         if (time > 0)
         {
@@ -108,11 +104,6 @@ public class SavedSchematicPlacementInfoWidget extends ContainerWidget
                                      BaseFileBrowserWidget.DATE_FORMAT.format(new Date(time)));
         }
 
-        LabelWidget label = new LabelWidget();
-        label.setPosition(x, y);
-        label.setLineHeight(12);
-        label.setLabelStyledTextLines(lines);
-
-        return label;
+        this.infoLabelWidget.setLabelStyledTextLines(lines);
     }
 }

@@ -31,6 +31,7 @@ import malilib.render.ShapeRenderUtils;
 import malilib.render.TextRenderUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
+import malilib.util.data.EnabledCondition;
 import malilib.util.game.BlockUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
@@ -45,7 +46,6 @@ import litematica.data.DataManager;
 import litematica.gui.widget.SchematicVerifierBlockInfoWidget;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
-import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.schematic.projects.SchematicProject;
 import litematica.schematic.verifier.BlockPairTypePosition;
 import litematica.schematic.verifier.SchematicVerifier;
@@ -103,7 +103,7 @@ public class OverlayRenderer
         {
             if (placement.isEnabled())
             {
-                this.placements.put(placement, placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED));
+                this.placements.put(placement, placement.getSubRegionBoxes(EnabledCondition.ENABLED));
             }
         }
     }
@@ -182,7 +182,7 @@ public class OverlayRenderer
                     }
 
                     Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoundingBoxColor();
-                    RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+                    RenderUtils.renderBlockOutline(schematicPlacement.getPosition(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
 
                     if (schematicPlacement.shouldRenderEnclosingBox())
                     {

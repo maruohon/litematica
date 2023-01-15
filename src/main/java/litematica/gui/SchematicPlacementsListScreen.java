@@ -16,11 +16,10 @@ import litematica.gui.util.LitematicaIcons;
 import litematica.gui.widget.list.entry.SchematicPlacementEntryWidget;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
-import litematica.schematic.placement.SchematicPlacementUnloaded;
 
-public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget<SchematicPlacementUnloaded>>
+public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget<SchematicPlacement>>
 {
-    protected final HashMap<SchematicPlacementUnloaded, Boolean> modifiedCache = new HashMap<>();
+    protected final HashMap<SchematicPlacement, Boolean> modifiedCache = new HashMap<>();
     protected final SchematicPlacementManager manager;
     protected final GenericButton iconsTextToggleButton;
     protected final GenericButton loadSchematicsScreenButton;
@@ -54,7 +53,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     protected void initScreen()
     {
         super.initScreen();
-        this.modifiedCache.clear();
+        this.clearModifiedSinceSavedCache();
     }
 
     @Override
@@ -86,20 +85,20 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.mainMenuButton.setY(y);
     }
 
-    public void onSelectionChange(@Nullable SchematicPlacementUnloaded entry)
+    public void onSelectionChange(@Nullable SchematicPlacement entry)
     {
         if (entry == null || entry.isLoaded())
         {
-            boolean isCurrentlySelected = entry == this.manager.getSelectedSchematicPlacement();
-            this.manager.setSelectedSchematicPlacement(isCurrentlySelected ? null : (SchematicPlacement) entry);
+            boolean selected = (entry != null) && (entry == this.manager.getSelectedSchematicPlacement());
+            this.manager.setSelectedSchematicPlacement(selected ? null : entry);
         }
     }
 
     @Override
-    protected DataListWidget<SchematicPlacementUnloaded> createListWidget()
+    protected DataListWidget<SchematicPlacement> createListWidget()
     {
-        Supplier<List<SchematicPlacementUnloaded>> supplier = DataManager.getSchematicPlacementManager()::getAllSchematicPlacements;
-        DataListWidget<SchematicPlacementUnloaded> listWidget = new DataListWidget<>(supplier, true);
+        Supplier<List<SchematicPlacement>> supplier = DataManager.getSchematicPlacementManager()::getAllSchematicPlacements;
+        DataListWidget<SchematicPlacement> listWidget = new DataListWidget<>(supplier, true);
 
         listWidget.getEntrySelectionHandler()
                 .setAllowSelection(true)
@@ -117,7 +116,12 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.initScreen();
     }
 
-    public boolean getCachedWasModifiedSinceSaved(SchematicPlacementUnloaded placement)
+    public void clearModifiedSinceSavedCache()
+    {
+        this.modifiedCache.clear();
+    }
+
+    public boolean getCachedWasModifiedSinceSaved(SchematicPlacement placement)
     {
         Boolean modified = this.modifiedCache.get(placement);
 

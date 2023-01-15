@@ -17,7 +17,7 @@ import litematica.data.DataManager;
 import litematica.gui.util.LitematicaIcons;
 import litematica.gui.widget.SavedSchematicPlacementInfoWidget;
 import litematica.gui.widget.list.entry.SchematicPlacementBrowserEntryWidget;
-import litematica.schematic.placement.SchematicPlacementUnloaded;
+import litematica.schematic.placement.SchematicPlacement;
 
 public class SavedSchematicPlacementsBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {
@@ -81,7 +81,7 @@ public class SavedSchematicPlacementsBrowserScreen extends BaseListScreen<BaseFi
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        Path dir = SchematicPlacementUnloaded.getSaveDirectory();
+        Path dir = SchematicPlacement.getSaveDirectory();
         String context = "saved_placements_" + StringUtils.getWorldOrServerNameOrDefault("__fallback");
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE, context);
         FileBrowserIconProvider iconProvider = null;
@@ -108,7 +108,7 @@ public class SavedSchematicPlacementsBrowserScreen extends BaseListScreen<BaseFi
 
     protected void updateInfoWidgets()
     {
-        SchematicPlacementUnloaded placement = this.placementInfoWidget.getSelectedPlacementInfo();
+        SchematicPlacement placement = this.placementInfoWidget.getSelectedPlacementInfo();
 
         if (placement != null)
         {

@@ -115,7 +115,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
                                                       this.placement::isLocked, this.placement::toggleLocked);
         this.togglePlacementEnabledButton = OnOffButton.onOff(18, "litematica.button.placement_list.placement_enabled",
                                                               this.placement::isEnabled, this::toggleEnabled);
-        this.originEditWidget = new BlockPosEditWidget(90, 72, 2, true, placement.getOrigin(), this::setOrigin);
+        this.originEditWidget = new BlockPosEditWidget(90, 72, 2, true, placement.getPosition(), this::setOrigin);
 
         this.lockXCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockYCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
@@ -241,7 +241,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     @Override
     protected DataListWidget<SubRegionPlacement> createListWidget()
     {
-        Supplier<List<SubRegionPlacement>> supplier = this.placement::getAllSubRegionsPlacements;
+        Supplier<List<SubRegionPlacement>> supplier = this.placement::getAllSubRegions;
         DataListWidget<SubRegionPlacement> listWidget = new DataListWidget<>(supplier, true);
 
         listWidget.setListEntryWidgetFixedHeight(20);
@@ -337,7 +337,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
         if (obj.equals(origJson) == false && this.manager.loadPlacementSettings(this.placement, obj))
         {
-            this.originEditWidget.setPosNoUpdate(this.placement.getOrigin());
+            this.originEditWidget.setPosNoUpdate(this.placement.getPosition());
             this.updateWidgetStates();
         }
 

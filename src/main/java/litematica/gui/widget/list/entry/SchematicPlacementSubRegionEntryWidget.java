@@ -132,9 +132,9 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
         lines.add(StringUtils.translate("litematica.hover.placement_list.mirror",
                                         PositionUtils.getMirrorName(this.data.getMirror())));
 
-        BlockPos relativeOrigin = this.data.getPos();
+        BlockPos relativeOrigin = this.data.getPosition();
         BlockPos o = PositionUtils.getTransformedBlockPos(relativeOrigin, this.placement.getMirror(),
-                                                          this.placement.getRotation()).add(this.placement.getOrigin());
+                                                          this.placement.getRotation()).add(this.placement.getPosition());
         lines.add(StringUtils.translate("litematica.hover.placement_list.origin", o.getX(), o.getY(), o.getZ()));
 
         this.getHoverInfoFactory().addStrings(lines);

@@ -223,7 +223,7 @@ public class ToolHud extends InfoHud
             lines.add(StringUtils.translate("litematica.hud.tool_hud.schematic_placement.region_count_and_modified",
                                             schematicPlacement.getSubRegionCount(), strModified));
 
-            BlockPos or = schematicPlacement.getOrigin();
+            BlockPos or = schematicPlacement.getPosition();
             lines.add(StringUtils.translate("litematica.hud.tool_hud.schematic_placement.origin",
                                             or.getX(), or.getY(), or.getZ()));
 
@@ -245,10 +245,10 @@ public class ToolHud extends InfoHud
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.schematic_placement.selected_sub_region",
                                                 subRegion.getName(), strModified));
 
-                or = subRegion.getPos();
+                or = subRegion.getPosition();
                 // FIXME: NASTY STUFF
                 or = PositionUtils.getTransformedBlockPos(or, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-                or = or.add(schematicPlacement.getOrigin());
+                or = or.add(schematicPlacement.getPosition());
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.schematic_placement.sub_region_origin",
                                                 or.getX(), or.getY(), or.getZ()));
             }

@@ -62,10 +62,10 @@ public class SchematicUtils
 
     @Nullable
     private static BlockPos getReverseTransformedWorldPosition(BlockPos worldPos, ISchematic schematic,
-            SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, Vec3i regionSize)
+                                                               SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, Vec3i regionSize)
     {
-        BlockPos origin = schematicPlacement.getOrigin();
-        BlockPos regionPos = regionPlacement.getPos();
+        BlockPos origin = schematicPlacement.getPosition();
+        BlockPos regionPos = regionPlacement.getPosition();
 
         // These are the untransformed relative positions
         BlockPos posEndRel = (new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize))).add(regionPos);
@@ -92,7 +92,7 @@ public class SchematicUtils
 
     @Nullable
     public static Pair<Vec3i, Vec3i> getLayerRangeClampedSubRegion(LayerRange range,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement, Vec3i regionSize)
+                                                                   SchematicPlacement schematicPlacement, SubRegionPlacement placement, Vec3i regionSize)
     {
         int minX = range.getClampedValue(-30000000, EnumFacing.Axis.X);
         int minY = range.getClampedValue(        0, EnumFacing.Axis.Y);
@@ -128,7 +128,7 @@ public class SchematicUtils
 
     public static IBlockState getUntransformedBlockState(IBlockState state, SchematicPlacement schematicPlacement, String subRegionName)
     {
-        SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(subRegionName);
+        SubRegionPlacement placement = schematicPlacement.getSubRegion(subRegionName);
 
         if (placement != null)
         {

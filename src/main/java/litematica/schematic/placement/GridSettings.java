@@ -67,23 +67,26 @@ public class GridSettings
         this.initialized = true;
     }
 
-    public void setDefaultSize(Vec3i size)
+    public void setDefaultSize(Vec3i defaultSize)
     {
-        this.defaultSize = size;
-
-        if (size.getX() > this.size.getX() ||
-            size.getY() > this.size.getY() ||
-            size.getZ() > this.size.getZ())
-        {
-            int x = Math.max(size.getX(), this.size.getX());
-            int y = Math.max(size.getY(), this.size.getY());
-            int z = Math.max(size.getZ(), this.size.getZ());
-            this.setSize(new Vec3i(x, y, z));
-        }
+        this.defaultSize = defaultSize;
+        // If the new default size is larger than the current size, then grow the current size
+        this.setSize(this.size);
     }
 
     public void setSize(Vec3i size)
     {
+        // Don't allow shrinking the grid size smaller than the placement enclosing box
+        if (size.getX() < this.defaultSize.getX() ||
+            size.getY() < this.defaultSize.getY() ||
+            size.getZ() < this.defaultSize.getZ())
+        {
+            int x = Math.max(size.getX(), this.defaultSize.getX());
+            int y = Math.max(size.getY(), this.defaultSize.getY());
+            int z = Math.max(size.getZ(), this.defaultSize.getZ());
+            size = new Vec3i(x, y, z);
+        }
+
         this.size = size;
     }
 
@@ -101,19 +104,13 @@ public class GridSettings
 
     public void setSize(Coordinate coordinate, int value)
     {
-        Vec3i oldSize = this.getSize();
-        int defaultValue = coordinate.asInt(this.defaultSize);
-        // Don't allow shrinking the grid size smaller than the placement enclosing box
-        int newValue = Math.max(defaultValue, value);
-
-        this.setSize(coordinate.modifyVec3i(newValue, oldSize));
+        this.setSize(coordinate.modifyVec3i(value, this.size));
         this.initialized = true;
     }
 
     public void modifySize(Coordinate coordinate, int amount)
     {
-        Vec3i oldSize = this.getSize();
-        int oldValue = coordinate.asInt(oldSize);
+        int oldValue = coordinate.asInt(this.size);
         int newValue = Math.max(1, oldValue + amount);
         this.setSize(coordinate, newValue);
     }

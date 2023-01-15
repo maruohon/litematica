@@ -237,7 +237,7 @@ public class EntityUtils
     }
 
     public static List<Entity> getEntitiesWithinSubRegion(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement)
+                                                          SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
         // These are the untransformed relative positions
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());

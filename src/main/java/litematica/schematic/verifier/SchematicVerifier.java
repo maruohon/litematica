@@ -22,6 +22,7 @@ import net.minecraft.util.math.ChunkPos;
 import malilib.listener.EventListener;
 import malilib.listener.TaskCompletionListener;
 import malilib.util.StringUtils;
+import malilib.util.data.EnabledCondition;
 import malilib.util.data.RunStatus;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.IntBoundingBox;
@@ -32,7 +33,6 @@ import litematica.render.infohud.IInfoHudRenderer;
 import litematica.render.infohud.RenderPhase;
 import litematica.scheduler.TaskScheduler;
 import litematica.schematic.placement.SchematicPlacement;
-import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.selection.SelectionBox;
 import litematica.task.SchematicVerifierTask;
 import litematica.util.BlockInfoListType;
@@ -467,7 +467,7 @@ public class SchematicVerifier implements IInfoHudRenderer
 
         for (SchematicPlacement placement : this.placements)
         {
-            Collection<SelectionBox> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values();
+            Collection<SelectionBox> boxes = placement.getSubRegionBoxes(EnabledCondition.ENABLED).values();
 
             if (this.verifierType == BlockInfoListType.RENDER_LAYERS)
             {

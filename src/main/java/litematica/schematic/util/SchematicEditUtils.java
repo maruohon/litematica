@@ -22,6 +22,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.data.EnabledCondition;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
@@ -40,7 +41,6 @@ import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
 import litematica.schematic.placement.SchematicPlacementManager.PlacementPart;
 import litematica.schematic.placement.SubRegionPlacement;
-import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.tool.ToolMode;
 import litematica.util.RayTraceUtils;
 import litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -390,7 +390,7 @@ public class SchematicEditUtils
 
                         ILitematicaBlockStateContainer container = region.getBlockStateContainer();
                         BlockPos posSchematic = SchematicUtils.getSchematicContainerPositionFromWorldPosition(pos, schematic,
-                                regionName, placement, placement.getRelativeSubRegionPlacement(regionName), container);
+                                                                                                              regionName, placement, placement.getSubRegion(regionName), container);
 
                         if (posSchematic != null)
                         {
@@ -448,7 +448,7 @@ public class SchematicEditUtils
                     {
                         String regionName = part.getSubRegionName();
                         SchematicPlacement schematicPlacement = part.getPlacement();
-                        SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+                        SubRegionPlacement placement = schematicPlacement.getSubRegion(regionName);
                         ISchematic schematic = schematicPlacement.getSchematic();
                         ISchematicRegion region = schematic.getSchematicRegion(regionName);
 
@@ -573,7 +573,7 @@ public class SchematicEditUtils
         // No sub-regions selected, replace in the entire schematic
         else
         {
-            regions.addAll(schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).keySet());
+            regions.addAll(schematicPlacement.getSubRegionBoxes(EnabledCondition.ENABLED).keySet());
         }
 
         LayerRange range = DataManager.getRenderLayerRange();
@@ -599,7 +599,7 @@ public class SchematicEditUtils
                 continue;
             }
 
-            SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+            SubRegionPlacement placement = schematicPlacement.getSubRegion(regionName);
             ILitematicaBlockStateContainer container = region.getBlockStateContainer();
             Vec3i regionSize = region.getSize();
 

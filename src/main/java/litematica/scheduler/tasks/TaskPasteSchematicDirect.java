@@ -23,7 +23,7 @@ public class TaskPasteSchematicDirect extends TaskBase
     @Override
     public boolean canExecute()
     {
-        return this.placement.isInvalidated() == false &&
+        return this.placement.isValid() &&
                GameUtils.getClientWorld() != null &&
                GameUtils.getClientPlayer() != null &&
                GameUtils.isSinglePlayer();

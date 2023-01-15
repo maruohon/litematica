@@ -69,8 +69,8 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         this.toggleRegionEnabledButton = OnOffButton.onOff(18, "litematica.button.schematic_placement_sub_region_settings.region_enabled",
                                                            this.subRegion::isEnabled, this::toggleEnabled);
 
-        BlockPos pos = this.subRegion.getPos();
-        pos = litematica.util.PositionUtils.getTransformedBlockPos(pos, placement.getMirror(), placement.getRotation()).add(placement.getOrigin());
+        BlockPos pos = this.subRegion.getPosition();
+        pos = litematica.util.PositionUtils.getTransformedBlockPos(pos, placement.getMirror(), placement.getRotation()).add(placement.getPosition());
         this.originEditWidget = new BlockPosEditWidget(90, 72, 2, true, pos, this::setOrigin);
 
         this.lockXCoordCheckbox = new CheckBoxWidget(null, () -> this.isCoordinateLocked(Coordinate.X), (val) -> this.setCoordinateLocked(val, Coordinate.X));

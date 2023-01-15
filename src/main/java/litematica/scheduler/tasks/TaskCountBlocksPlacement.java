@@ -6,11 +6,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 
+import malilib.util.data.EnabledCondition;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.materials.IMaterialList;
 import litematica.schematic.placement.SchematicPlacement;
-import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.selection.SelectionBox;
 import litematica.util.BlockInfoListType;
 import litematica.world.SchematicWorldHandler;
@@ -30,7 +30,7 @@ public class TaskCountBlocksPlacement extends TaskCountBlocksMaterialList
         this.worldSchematic = SchematicWorldHandler.getSchematicWorld();
         this.schematicPlacement = schematicPlacement;
 
-        Collection<SelectionBox> boxes = schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values();
+        Collection<SelectionBox> boxes = schematicPlacement.getSubRegionBoxes(EnabledCondition.ENABLED).values();
 
         // Filter/clamp the boxes to intersect with the render layer
         if (materialList.getMaterialListType() == BlockInfoListType.RENDER_LAYERS)

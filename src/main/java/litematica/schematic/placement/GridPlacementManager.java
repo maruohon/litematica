@@ -177,7 +177,7 @@ public class GridPlacementManager
 
         if (gridPoints.isEmpty() == false)
         {
-            BlockPos baseOrigin = basePlacement.getOrigin();
+            BlockPos baseOrigin = basePlacement.getPosition();
             Vec3i size = basePlacement.getGridSettings().getSize();
             int sizeX = size.getX();
             int sizeY = size.getY();
@@ -185,7 +185,7 @@ public class GridPlacementManager
 
             for (Vec3i point : gridPoints)
             {
-                SchematicPlacement placement = basePlacement.copyAsFullyLoaded(true);
+                SchematicPlacement placement = basePlacement.createRepeatedCopy();
                 placement.setOrigin(baseOrigin.add(point.getX() * sizeX, point.getY() * sizeY, point.getZ() * sizeZ));
                 placement.updateEnclosingBox();
                 placements.put(point, placement);

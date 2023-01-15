@@ -144,8 +144,8 @@ public class SchematicPlacingUtils
             WorldUtils.setShouldPreventBlockUpdates(world, true);
 
             ISchematic schematic = schematicPlacement.getSchematic();
-            ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
-            BlockPos origin = schematicPlacement.getOrigin();
+            ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledSubRegions();
+            BlockPos origin = schematicPlacement.getPosition();
 
             for (String regionName : relativePlacements.keySet())
             {
@@ -154,7 +154,7 @@ public class SchematicPlacingUtils
 
                 if (placement.isEnabled() && region != null)
                 {
-                    BlockPos regionPos = placement.getPos();
+                    BlockPos regionPos = placement.getPosition();
                     Vec3i regionSize = region.getSize();
                     ILitematicaBlockStateContainer container = region.getBlockStateContainer();
                     Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
@@ -191,9 +191,9 @@ public class SchematicPlacingUtils
     }
 
     public static boolean placeBlocksToWorld(World world, BlockPos origin, BlockPos regionPos, Vec3i regionSize,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement,
-            ILitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap,
-            @Nullable Map<BlockPos, NextTickListEntry> scheduledTicks, LayerRange range, boolean notifyNeighbors)
+                                             SchematicPlacement schematicPlacement, SubRegionPlacement placement,
+                                             ILitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap,
+                                             @Nullable Map<BlockPos, NextTickListEntry> scheduledTicks, LayerRange range, boolean notifyNeighbors)
     {
         // These are the untransformed relative positions
         BlockPos posEndRelSub = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize));
@@ -351,7 +351,7 @@ public class SchematicPlacingUtils
     }
 
     public static void placeEntitiesToWorld(World world, BlockPos origin, BlockPos regionPos, Vec3i regionSize,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement, List<EntityInfo> entityList, LayerRange range)
+                                            SchematicPlacement schematicPlacement, SubRegionPlacement placement, List<EntityInfo> entityList, LayerRange range)
     {
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         final int offX = regionPosRelTransformed.getX() + origin.getX();
@@ -395,8 +395,8 @@ public class SchematicPlacingUtils
     public static boolean placeToWorldWithinChunk(SchematicPlacement schematicPlacement, ChunkPos chunkPos, World world, ReplaceBehavior replace, boolean notifyNeighbors)
     {
         ISchematic schematic = schematicPlacement.getSchematic();
-        Set<String> regionsTouchingChunk = schematicPlacement.getRegionsTouchingChunk(chunkPos.x, chunkPos.z);
-        BlockPos origin = schematicPlacement.getOrigin();
+        Set<String> regionsTouchingChunk = schematicPlacement.getSubRegionNamesTouchingChunk(chunkPos.x, chunkPos.z);
+        BlockPos origin = schematicPlacement.getPosition();
         boolean allSuccess = true;
 
         try
@@ -408,7 +408,7 @@ public class SchematicPlacingUtils
 
             for (String regionName : regionsTouchingChunk)
             {
-                SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+                SubRegionPlacement placement = schematicPlacement.getSubRegion(regionName);
                 ISchematicRegion region = schematic.getSchematicRegion(regionName);
 
                 if (region == null)
@@ -441,7 +441,7 @@ public class SchematicPlacingUtils
     }
 
     public static boolean placeBlocksWithinChunk(World world, ChunkPos chunkPos, String regionName, ISchematicRegion region,
-            BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement, ReplaceBehavior replace, boolean notifyNeighbors)
+                                                 BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement, ReplaceBehavior replace, boolean notifyNeighbors)
     {
         IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
         ILitematicaBlockStateContainer container = region.getBlockStateContainer();
@@ -452,7 +452,7 @@ public class SchematicPlacingUtils
             return false;
         }
 
-        BlockPos regionPos = placement.getPos();
+        BlockPos regionPos = placement.getPosition();
         Vec3i regionSize = region.getSize();
 
         // These are the untransformed relative positions
@@ -606,9 +606,9 @@ public class SchematicPlacingUtils
     }
 
     public static void placeEntitiesToWorldWithinChunk(World world, ChunkPos chunkPos, ISchematicRegion region,
-            BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement)
+                                                       BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
-        BlockPos regionPos = placement.getPos();
+        BlockPos regionPos = placement.getPosition();
         List<EntityInfo> entityList = region.getEntityList();
 
         if (entityList == null)

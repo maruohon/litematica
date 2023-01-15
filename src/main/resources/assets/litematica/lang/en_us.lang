@@ -264,11 +264,11 @@ litematica.label.placement_grid_settings.repeat_count=Repeat Count
 litematica.label.saved_placement.info_widget.last_saved=<c=aaa>Last Saved:\n  <c=77f>%s
 litematica.label.saved_placement.info_widget.modified=<c=aaa>Modified: %s
 litematica.label.saved_placement.info_widget.mirror=<c=aaa>Mirror: §3%s
-litematica.label.saved_placement.info_widget.origin=<c=aaa>Project Origin:\n  x: §6%s\n  <c=aaa>y: §6%s\n  <c=aaa>z: §6%s
+litematica.label.saved_placement.info_widget.origin=<c=aaa>Origin:\n  x: §6%s\n  <c=aaa>y: §6%s\n  <c=aaa>z: §6%s
 litematica.label.saved_placement.info_widget.placement_state=<c=aaa>Placement: %s
 litematica.label.saved_placement.info_widget.region_count=<c=aaa>Regions: §6%s
 litematica.label.saved_placement.info_widget.rotation=<c=aaa>Rotation: §3%s
-litematica.label.saved_placement.names=Placement: §a%s§r\nSchematic: §3%s§r\nSchematic path: §3%s§r\nPlacement file: §3%s
+litematica.label.saved_placement.names=Placement: §a%s§r\nSchematic file: §3%s§r\nSchematic directory: §3%s§r\nPlacement file: §3%s
 litematica.label.schematic_browser.schematics=schematics
 litematica.label.schematic_info.block_entity_count=<c=aaa>Block Entities: §6%s
 litematica.label.schematic_info.description=<c=aaa>Description:

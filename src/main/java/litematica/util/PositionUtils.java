@@ -25,6 +25,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.data.EnabledCondition;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.Coordinate;
@@ -36,7 +37,6 @@ import litematica.schematic.ISchematicRegion;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
 import litematica.schematic.placement.SubRegionPlacement;
-import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.selection.AreaSelection;
 import litematica.selection.AreaSelectionManager;
 import litematica.selection.BoxCorner;
@@ -845,7 +845,7 @@ public class PositionUtils
             if (sub != null)
             {
                 String regionName = placement.getSelectedSubRegionName();
-                ImmutableMap<String, SelectionBox> map = placement.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED);
+                ImmutableMap<String, SelectionBox> map = placement.getSubRegionBoxFor(regionName, EnabledCondition.ENABLED);
                 box = map.get(regionName);
             }
             else
@@ -855,7 +855,7 @@ public class PositionUtils
 
             if (box != null)
             {
-                BlockPos originOffset = newOrigin.subtract(placement.getOrigin());
+                BlockPos originOffset = newOrigin.subtract(placement.getPosition());
                 BlockPos corner1 = box.getCorner1().add(originOffset);
                 BlockPos corner2 = box.getCorner2().add(originOffset);
                 BlockPos entityPos = EntityWrap.getEntityBlockPos(entity);

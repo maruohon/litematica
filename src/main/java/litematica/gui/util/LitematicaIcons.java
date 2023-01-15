@@ -20,7 +20,7 @@ public class LitematicaIcons extends BaseMultiIcon
     public static final LitematicaIcons FILE_ICON_SCHEMATIC         = new LitematicaIcons(144, 12, 12, 12, 0, 0);
     public static final LitematicaIcons FILE_ICON_SPONGE            = new LitematicaIcons(144, 24, 12, 12, 0, 0);
     public static final LitematicaIcons FILE_ICON_VANILLA           = new LitematicaIcons(144, 36, 12, 12, 0, 0);
-    public static final LitematicaIcons FILE_ICON_JSON              = new LitematicaIcons(144, 44, 12, 12, 0, 0);
+    public static final LitematicaIcons FILE_ICON_JSON              = new LitematicaIcons(144, 48, 12, 12, 0, 0);
 
     public static final LitematicaIcons INFO_11                     = new LitematicaIcons(168, 18, 11, 11, 0, 0);
     public static final LitematicaIcons NOTICE_EXCLAMATION_11       = new LitematicaIcons(168, 29, 11, 11, 0, 0);

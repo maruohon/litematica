@@ -17,6 +17,7 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import malilib.util.data.EnabledCondition;
 import malilib.util.game.RayTraceUtils.RayTraceCalculationData;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import malilib.util.position.LayerRange;
@@ -24,7 +25,6 @@ import litematica.config.Configs;
 import litematica.config.Hotkeys;
 import litematica.data.DataManager;
 import litematica.schematic.placement.SchematicPlacement;
-import litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import litematica.schematic.verifier.BlockPairTypePosition;
 import litematica.selection.AreaSelection;
 import litematica.selection.BoxCorner;
@@ -109,7 +109,7 @@ public class RayTraceUtils
                 if (placement.isEnabled())
                 {
                     traceToPlacementBox(placement, eyesPos, lookEndPos);
-                    traceToPosition(placement.getOrigin(), eyesPos, lookEndPos, HitType.PLACEMENT_ORIGIN, placement);
+                    traceToPosition(placement.getPosition(), eyesPos, lookEndPos, HitType.PLACEMENT_ORIGIN, placement);
                 }
             }
         }
@@ -213,7 +213,7 @@ public class RayTraceUtils
 
     private static boolean traceToPlacementBox(SchematicPlacement placement, Vec3d start, Vec3d end)
     {
-        ImmutableMap<String, SelectionBox> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
+        ImmutableMap<String, SelectionBox> boxes = placement.getSubRegionBoxes(EnabledCondition.ENABLED);
         boolean hitSomething = false;
 
         for (Map.Entry<String, SelectionBox> entry : boxes.entrySet())
