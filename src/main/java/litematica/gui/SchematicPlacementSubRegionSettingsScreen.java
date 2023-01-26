@@ -8,6 +8,8 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.BaseScreen;
+import malilib.gui.icon.DefaultIcons;
+import malilib.gui.widget.BaseTextFieldWidget;
 import malilib.gui.widget.BlockPosEditWidget;
 import malilib.gui.widget.CheckBoxWidget;
 import malilib.gui.widget.LabelWidget;
@@ -29,11 +31,14 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
     protected final SchematicPlacement placement;
     protected final SubRegionPlacement subRegion;
 
+    protected final LabelWidget displayNameLabel;
     protected final LabelWidget originLabel;
     protected final LabelWidget placementNameLabel;
     protected final LabelWidget regionNameLabel;
     protected final LabelWidget schematicNameLabel;
+    protected final BaseTextFieldWidget nameTextField;
     protected final GenericButton mirrorButton;
+    protected final GenericButton nameResetButton;
     protected final GenericButton openPlacementSettingsButton;
     protected final GenericButton resetSubRegionButton;
     protected final GenericButton rotateButton;
@@ -54,12 +59,19 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         Path file = schematic.getFile();
         String fileName = file != null ? file.getFileName().toString() : "-";
 
+        this.displayNameLabel   = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.display_name");
         this.originLabel        = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.region_position");
         this.placementNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.placement_name", placement.getName()));
         this.regionNameLabel    = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.region_name", subRegion.getName()));
         this.schematicNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_settings.schematic_name", schematic.getMetadata().getName(), fileName));
+        this.schematicNameLabel.setLineHeight(12);
+
+        this.nameTextField = new BaseTextFieldWidget(300, 16, subRegion.getDisplayName());
+        this.nameTextField.setUpdateListenerAlways(false);
+        this.nameTextField.setListener(this::setName);
 
         this.mirrorButton                = GenericButton.create(18, this::getMirrorButtonLabel, this::mirror);
+        this.nameResetButton             = GenericButton.create(DefaultIcons.RESET_12, this::resetName);
         this.openPlacementSettingsButton = GenericButton.create(18, "litematica.button.schematic_placement_sub_region_settings.placement_settings", this::openPlacementSettings);
         this.resetSubRegionButton        = GenericButton.create(18, "litematica.button.schematic_placement_sub_region_settings.reset_region", this::resetSubRegion);
         this.rotateButton                = GenericButton.create(18, this::getRotateButtonLabel, this::rotate);
@@ -68,6 +80,8 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
                                                            this.subRegion::ignoreEntities, this::toggleIgnoreEntities);
         this.toggleRegionEnabledButton = OnOffButton.onOff(18, "litematica.button.schematic_placement_sub_region_settings.region_enabled",
                                                            this.subRegion::isEnabled, this::toggleEnabled);
+
+        this.nameResetButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_sub_region_settings.reset_display_name");
 
         BlockPos pos = this.subRegion.getPosition();
         pos = litematica.util.PositionUtils.getTransformedBlockPos(pos, placement.getMirror(), placement.getRotation()).add(placement.getPosition());
@@ -94,20 +108,23 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
     {
         super.reAddActiveWidgets();
 
-        this.addWidget(this.originLabel);
-        this.addWidget(this.placementNameLabel);
-        this.addWidget(this.regionNameLabel);
-        this.addWidget(this.schematicNameLabel);
-        this.addWidget(this.mirrorButton);
-        this.addWidget(this.openPlacementSettingsButton);
-        this.addWidget(this.resetSubRegionButton);
-        this.addWidget(this.rotateButton);
-        this.addWidget(this.toggleEntitiesButton);
-        this.addWidget(this.toggleRegionEnabledButton);
+        this.addWidget(this.displayNameLabel);
         this.addWidget(this.lockXCoordCheckbox);
         this.addWidget(this.lockYCoordCheckbox);
         this.addWidget(this.lockZCoordCheckbox);
+        this.addWidget(this.mirrorButton);
+        this.addWidget(this.nameResetButton);
+        this.addWidget(this.nameTextField);
+        this.addWidget(this.openPlacementSettingsButton);
         this.addWidget(this.originEditWidget);
+        this.addWidget(this.originLabel);
+        this.addWidget(this.placementNameLabel);
+        this.addWidget(this.regionNameLabel);
+        this.addWidget(this.resetSubRegionButton);
+        this.addWidget(this.rotateButton);
+        this.addWidget(this.schematicNameLabel);
+        this.addWidget(this.toggleEntitiesButton);
+        this.addWidget(this.toggleRegionEnabledButton);
     }
 
     @Override
@@ -118,7 +135,13 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         int x = this.x + 12;
         int y = this.y + 25;
 
-        this.regionNameLabel.setPosition(x + 2, y + 2);
+        this.displayNameLabel.setPosition(x + 2, y + 4);
+        this.nameTextField.setPosition(this.displayNameLabel.getRight() + 4, y);
+        this.nameTextField.setWidth(Math.min(240, this.screenWidth - 300));
+        this.nameResetButton.setX(this.nameTextField.getRight() + 2);
+        this.nameResetButton.centerVerticallyInside(this.nameTextField);
+
+        this.regionNameLabel.setPosition(x + 2, this.nameTextField.getBottom() + 2);
         this.placementNameLabel.setPosition(x + 2, this.regionNameLabel.getBottom() + 2);
         this.schematicNameLabel.setPosition(x + 2, this.placementNameLabel.getBottom() + 2);
 
@@ -163,6 +186,17 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         BaseScreen.openScreenWithParent(new SchematicPlacementSettingsScreen(this.placement));
     }
 
+    protected void setName(String name)
+    {
+        this.subRegion.setDisplayName(name);
+    }
+
+    protected void resetName()
+    {
+        this.subRegion.setDisplayName(this.subRegion.getName());
+        this.nameTextField.setText(this.subRegion.getDisplayName());
+    }
+
     protected void setOrigin(BlockPos origin)
     {
         this.manager.moveSubRegionTo(this.placement, this.subRegion.getName(), origin);
@@ -172,7 +206,7 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
     {
         boolean reverse = mouseButton == 1;
         Mirror mirror = PositionUtils.cycleMirror(this.subRegion.getMirror(), reverse);
-        this.manager.setSubRegionMirror(this.placement,this.subRegion.getName(),  mirror);
+        this.manager.setSubRegionMirror(this.placement,this.subRegion.getName(), mirror);
         return true;
     }
 

@@ -33,6 +33,11 @@ public class SubRegionPlacement extends BasePlacement
         return this.displayName;
     }
 
+    public void setDisplayName(String displayName)
+    {
+        this.displayName = displayName;
+    }
+
     public SubRegionPlacement copy()
     {
         SubRegionPlacement copy = new SubRegionPlacement(this.position, this.defaultPos, this.name);
