@@ -315,6 +315,20 @@ public class Configs
         );
     }
 
+    // These will be shown as a config group within Generic
+    public static class Nags
+    {
+        public static final BooleanConfig SHOW_HELPFUL_REMINDERS        = new BooleanConfig("showHelpfulReminders", true);
+        public static final BooleanConfig SHOW_NEW_USER_EXTRA_NAGS      = new BooleanConfig("showNewUserExtraNags", true);
+        public static final BooleanConfig SHOW_REMINDERS_DISABLE        = new BooleanConfig("showReminderDisable", true);
+
+        public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
+                SHOW_HELPFUL_REMINDERS,
+                SHOW_NEW_USER_EXTRA_NAGS,
+                SHOW_REMINDERS_DISABLE
+        );
+    }
+
     // Configs that are not shown on the config screen
     public static class Internal
     {
@@ -368,6 +382,7 @@ public class Configs
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Internal",     Internal.OPTIONS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Visuals",      Visuals.OPTIONS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Colors",       Colors.OPTIONS),
+            BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Nags",         Nags.OPTIONS),
             BaseConfigOptionCategory.normal(Reference.MOD_INFO, "Hotkeys",      Hotkeys.HOTKEY_LIST)
     );
 

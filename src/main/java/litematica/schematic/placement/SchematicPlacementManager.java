@@ -48,6 +48,7 @@ import litematica.render.infohud.StatusInfoRenderer;
 import litematica.schematic.ISchematic;
 import litematica.schematic.util.SchematicPlacingUtils;
 import litematica.schematic.verifier.SchematicVerifierManager;
+import litematica.util.Nags;
 import litematica.util.PositionUtils;
 import litematica.util.RayTraceUtils;
 import litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -384,9 +385,11 @@ public class SchematicPlacementManager
                         MessageDispatcher.warning("litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
                     }
 
-                    MessageUtils.printErrorMessageIfConfigDisabled(Configs.Visuals.MAIN_RENDERING_TOGGLE,      "litematica.message.warn.main_rendering_disabled");
-                    MessageUtils.printErrorMessageIfConfigDisabled(Configs.Visuals.SCHEMATIC_RENDERING,        "litematica.message.warn.schematic_rendering_disabled");
-                    MessageUtils.printErrorMessageIfConfigDisabled(Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING, "litematica.message.warn.schematic_blocks_rendering_disabled");
+                    Nags.HELPER.startNag();
+                    Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.MAIN_RENDERING_TOGGLE,      "litematica.message.warn.main_rendering_disabled");
+                    Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.SCHEMATIC_RENDERING,        "litematica.message.warn.schematic_rendering_disabled");
+                    Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING, "litematica.message.warn.schematic_blocks_rendering_disabled");
+                    Nags.HELPER.buildNag(MessageDispatcher.warning());
                 }
             }
         }

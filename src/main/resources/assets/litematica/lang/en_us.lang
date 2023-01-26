@@ -663,6 +663,9 @@ litematica.message.error.schematic_save_no_area_selected=§cSchematic saving fai
 litematica.message.error.schematic_write.schematica.palette.invalid_id=SchematicaSchematic: Block id %s for block '%s' is out of range, max = %s
 litematica.message.error.update_blocks_aborted=Aborted updating the blocks in the area
 
+litematica.message.nag.info.disable_helpful_nags=<c=bbb>You can disable all helpful nag messages by turning off the config §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow Helpful Nags<c=bbb>. You can disable just this reminder message by turning off the config §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow Nag Disable Reminder
+litematica.message.nag.new_user_extra_nag=§d<b>EYES HERE YOU CRAFTER</b> §eIf you ignore the above reminder/warning<c=bbb> and <i>go and post an issue report</i> about a simple question when stuff <i>doesn't seem to work</i>, when you have been clearly told in the above message what the issue is, you shall be §dSHAMED SO HARD <c=bbb>that your ears will fall off! §eYou have been warned! <c=bbb>(/j, but still)\n\nAlso in general §eplease prefer Discord <c=bbb>for questions/user support, or if you don't use Discord, then use CurseForge or Modrinth comments or the §eDiscussion<c=bbb> area on GitHub instead of Issues.\nI'll repeat: §ePlease don't post questions as issue reports!\n\n<c=bbb>This message can be disabled at §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow New User Nag
+
 litematica.message.success.save_schematic_convert=Successfully saved the schematic as §e'%s'§r (and possibly converted it to the new format)
 litematica.message.success.save_schematic_new=Successfully saved the schematic as §e'%s'§r
 
