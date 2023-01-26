@@ -57,9 +57,8 @@ import litematica.data.DataManager;
 import litematica.mixin.IMixinBlockRendererDispatcher;
 import litematica.mixin.IMixinViewFrustum;
 import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
-import litematica.util.IGenericEventListener;
 
-public class RenderGlobalSchematic extends RenderGlobal implements IGenericEventListener
+public class RenderGlobalSchematic extends RenderGlobal
 {
     private final Minecraft mc;
     private final RenderManager renderManager;
@@ -128,7 +127,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColors());
         this.fluidRenderer = ((IMixinBlockRendererDispatcher) dispatcher).getFluidRenderer();
 
-        DataManager.getSchematicPlacementManager().addRebuildListener(this);
+        DataManager.getSchematicPlacementManager().addRebuildListener(this::onEvent);
     }
 
     public void markNeedsUpdate()

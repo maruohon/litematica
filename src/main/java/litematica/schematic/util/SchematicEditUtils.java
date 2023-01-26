@@ -400,7 +400,7 @@ public class SchematicEditUtils
 
                             SchematicMetadata metadata = schematic.getMetadata();
                             long totalBlocks = metadata.getTotalBlocks();
-                            long increment = 0;
+                            long increment;
 
                             if (stateOriginal.getBlock() != Blocks.AIR)
                             {
@@ -419,7 +419,7 @@ public class SchematicEditUtils
                             metadata.setTimeModifiedToNow();
                             metadata.setModifiedSinceSaved();
 
-                            DataManager.getSchematicPlacementManager().markChunkForRebuild(new ChunkPos(cpos.getX(), cpos.getZ()));
+                            DataManager.getSchematicPlacementManager().markChunkForRebuild(ChunkPos.asLong(cpos.getX(), cpos.getZ()));
 
                             return true;
                         }

@@ -290,7 +290,7 @@ public class ToolUtils
                                            TaskScheduler scheduler,
                                            BlockPos pos)
     {
-        SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, "-", true);
+        SchematicPlacement placement = SchematicPlacement.create(schematic, pos, "-", true);
         DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, false);
 
         areaMovedTime = System.currentTimeMillis();
@@ -382,7 +382,7 @@ public class ToolUtils
         SchematicCreationUtils.setSchematicMetadataOnCreation(schematic, name);
         SchematicHolder.getInstance().addSchematic(schematic, true);
 
-        SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, false);
+        SchematicPlacement placement = SchematicPlacement.create(schematic, origin, name, true, false);
         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
 
         manager.addSchematicPlacement(placement, false);

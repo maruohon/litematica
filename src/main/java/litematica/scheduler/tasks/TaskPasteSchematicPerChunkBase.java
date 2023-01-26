@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
+import it.unimi.dsi.fastutil.longs.LongSet;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.ChunkPos;
@@ -63,28 +63,30 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
 
     protected void addPlacement(SchematicPlacement placement, LayerRange range)
     {
-        Set<ChunkPos> touchedChunks = placement.getTouchedChunks();
+        LongSet touchedChunks = placement.getTouchedChunks();
 
-        for (ChunkPos pos : touchedChunks)
+        for (long chunkPosLong : touchedChunks)
         {
             int count = 0;
 
-            for (IntBoundingBox box : placement.getBoxesWithinChunk(pos.x, pos.z).values())
+            /*
+            for (IntBoundingBox box : placement.getBoxesWithinChunk(chunkPosLong.x, chunkPosLong.z).values())
             {
                 box = range.getClampedBox(box);
 
                 if (box != null)
                 {
-                    this.boxesInChunks.put(pos, box);
+                    this.boxesInChunks.put(chunkPosLong, box);
                     ++count;
                 }
             }
 
             if (count > 0)
             {
-                this.individualChunks.add(pos);
-                this.onChunkAddedForHandling(pos, placement);
+                this.individualChunks.add(chunkPosLong);
+                this.onChunkAddedForHandling(chunkPosLong, placement);
             }
+            */
         }
     }
 
@@ -104,7 +106,7 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
     protected boolean canProcessChunk(ChunkPos pos, World worldSchematic, WorldClient worldClient)
     {
         if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z) == false ||
-            DataManager.getSchematicPlacementManager().hasPendingRebuildFor(pos))
+            DataManager.getSchematicPlacementManager().hasPendingRebuildForChunk(pos.x, pos.z))
         {
             return false;
         }

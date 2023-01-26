@@ -13,6 +13,7 @@ import litematica.Litematica;
 public class SubRegionPlacement extends BasePlacement
 {
     protected final BlockPos defaultPos;
+    protected String displayName;
 
     public SubRegionPlacement(BlockPos pos, String name)
     {
@@ -21,9 +22,15 @@ public class SubRegionPlacement extends BasePlacement
 
     public SubRegionPlacement(BlockPos pos, BlockPos defaultPos, String name)
     {
-        this.position = pos;
+        super(name, pos);
+
         this.defaultPos = defaultPos;
-        this.name = name;
+        this.displayName = name;
+    }
+
+    public String getDisplayName()
+    {
+        return this.displayName;
     }
 
     public SubRegionPlacement copy()
@@ -54,6 +61,12 @@ public class SubRegionPlacement extends BasePlacement
                this.position.equals(defaultPosition) == false;
     }
 
+    protected boolean shouldSave()
+    {
+        return this.isRegionPlacementModifiedFromDefault() ||
+               this.displayName.equals(this.name) == false;
+    }
+
     void resetToOriginalValues()
     {
         this.position = this.defaultPos;
@@ -63,11 +76,23 @@ public class SubRegionPlacement extends BasePlacement
         this.ignoreEntities = false;
     }
 
+    protected static void removeNonImportantSubRegionPropsForSharing(JsonObject obj)
+    {
+        obj.remove("locked_coords");
+        obj.remove("render_enclosing_box");
+    }
+
     @Override
     public JsonObject toJson()
     {
         JsonObject obj = super.toJson();
         obj.add("default_pos", JsonUtils.blockPosToJson(this.defaultPos));
+
+        if (this.displayName.equals(this.name) == false)
+        {
+            obj.addProperty("display_name", this.displayName);
+        }
+
         return obj;
     }
 
@@ -101,6 +126,7 @@ public class SubRegionPlacement extends BasePlacement
         placement.mirror = JsonUtils.getMirror(obj, "mirror");
         placement.ignoreEntities = JsonUtils.getBooleanOrDefault(obj, "ignore_entities", false);
         placement.coordinateLockMask = JsonUtils.getIntegerOrDefault(obj, "locked_coords", 0);
+        placement.displayName = JsonUtils.getStringOrDefault(obj, "display_name", placement.name);
 
         return placement;
     }

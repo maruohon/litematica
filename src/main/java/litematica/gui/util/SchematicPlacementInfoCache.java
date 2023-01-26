@@ -21,7 +21,7 @@ public class SchematicPlacementInfoCache
     {
         if (this.cachedData.containsKey(file) == false)
         {
-            this.cachedData.put(file, SchematicPlacement.fromFile(file));
+            this.cachedData.put(file, SchematicPlacement.createFromFile(file));
         }
 
         return this.cachedData.get(file);

@@ -54,9 +54,9 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         Path file = schematic.getFile();
         String fileName = file != null ? file.getFileName().toString() : "-";
 
-        this.originLabel = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.region_position");
+        this.originLabel        = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.region_position");
         this.placementNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.placement_name", placement.getName()));
-        this.regionNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.region_name", subRegion.getName()));
+        this.regionNameLabel    = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.region_name", subRegion.getName()));
         this.schematicNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_settings.schematic_name", schematic.getMetadata().getName(), fileName));
 
         this.mirrorButton                = GenericButton.create(18, this::getMirrorButtonLabel, this::mirror);

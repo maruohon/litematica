@@ -171,7 +171,7 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
         boolean createAsEnabled = BaseScreen.isShiftDown() == false;
 
         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-        SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, createAsEnabled);
+        SchematicPlacement placement = SchematicPlacement.create(schematic, pos, name, createAsEnabled);
         manager.addSchematicPlacement(placement, true);
         manager.setSelectedSchematicPlacement(placement);
     }

@@ -15,8 +15,8 @@ import litematica.util.PositionUtils;
 
 public class BasePlacement
 {
-    protected String name = "?";
-    protected BlockPos position = BlockPos.ORIGIN;
+    protected String name;
+    protected BlockPos position;
     protected Rotation rotation = Rotation.NONE;
     protected Mirror mirror = Mirror.NONE;
     protected Color4f boundingBoxColor = Color4f.WHITE;
@@ -24,6 +24,12 @@ public class BasePlacement
     protected boolean ignoreEntities;
     protected boolean renderEnclosingBox;
     protected int coordinateLockMask;
+
+    protected BasePlacement(String name, BlockPos position)
+    {
+        this.name = name;
+        this.position = position;
+    }
 
     public String getName()
     {
@@ -138,17 +144,17 @@ public class BasePlacement
     {
         JsonObject obj = new JsonObject();
 
-        obj.add("pos", JsonUtils.blockPosToJson(this.position));
         obj.addProperty("name", this.name);
+        obj.add("pos", JsonUtils.blockPosToJson(this.position));
 
         // Only add the properties that have changed from the default values
 
-        if (this.rotation != Rotation.NONE)     { obj.addProperty("rotation",               this.rotation.name());    }
-        if (this.mirror != Mirror.NONE)         { obj.addProperty("mirror",                 this.mirror.name());      }
-        if (this.enabled == false)              { obj.addProperty("enabled",                this.enabled);            }
-        if (this.ignoreEntities)                { obj.addProperty("ignore_entities",        this.ignoreEntities);     }
-        if (this.renderEnclosingBox)            { obj.addProperty("render_enclosing_box",   this.renderEnclosingBox); }
-        if (this.coordinateLockMask != 0)       { obj.addProperty("locked_coords",          this.coordinateLockMask); }
+        if (this.rotation != Rotation.NONE) { obj.addProperty("rotation",               this.rotation.name());    }
+        if (this.mirror != Mirror.NONE)     { obj.addProperty("mirror",                 this.mirror.name());      }
+        if (this.enabled == false)          { obj.addProperty("enabled",                this.enabled);            }
+        if (this.ignoreEntities)            { obj.addProperty("ignore_entities",        this.ignoreEntities);     }
+        if (this.renderEnclosingBox)        { obj.addProperty("render_enclosing_box",   this.renderEnclosingBox); }
+        if (this.coordinateLockMask != 0)   { obj.addProperty("locked_coords",          this.coordinateLockMask); }
 
         return obj;
     }

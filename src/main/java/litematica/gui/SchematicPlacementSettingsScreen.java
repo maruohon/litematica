@@ -10,8 +10,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.BaseListScreen;
@@ -249,7 +247,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
                 .setAllowSelection(true)
                 .setSelectionListener(this::onSelectionChange);
         listWidget.addDefaultSearchBar();
-        listWidget.setEntryFilterStringFunction((p) -> Collections.singletonList(p.getName()));
+        listWidget.setEntryFilterStringFunction((p) -> Collections.singletonList(p.getDisplayName()));
         listWidget.setDataListEntryWidgetFactory((d, cd) -> new SchematicPlacementSubRegionEntryWidget(d, cd, this.placement));
 
         return listWidget;
@@ -283,7 +281,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected boolean clickCopyPasteSettings(int mouseButton, GenericButton button)
     {
-        JsonObject origJson = this.placement.baseSettingsToJson(true);
+        JsonObject origJson = this.placement.getSettingsShareJson();
 
         if (isShiftDown())
         {
@@ -362,16 +360,14 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     protected boolean mirror(int mouseButton, GenericButton button)
     {
         boolean reverse = mouseButton == 1;
-        Mirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
-        this.manager.setMirror(this.placement, mirror);
+        this.manager.setMirror(this.placement, PositionUtils.cycleMirror(this.placement.getMirror(), reverse));
         return true;
     }
 
     protected boolean rotate(int mouseButton, GenericButton button)
     {
         boolean reverse = mouseButton == 1;
-        Rotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
-        this.manager.setRotation(this.placement, rotation);
+        this.manager.setRotation(this.placement, PositionUtils.cycleRotation(this.placement.getRotation(), reverse));
         return true;
     }
 
@@ -435,8 +431,8 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected void updateLabels()
     {
-        int regionCount = this.placement.getSubRegionCount();
         String key = "litematica.label.schematic_placement_settings.sub_regions";
+        int regionCount = this.placement.getSubRegionCount();
         this.subRegionsLabel.setLabelStyledText(StyledText.translate(key, regionCount));
     }
 

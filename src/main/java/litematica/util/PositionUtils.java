@@ -2,13 +2,13 @@ package litematica.util;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.entity.Entity;
@@ -423,14 +423,14 @@ public class PositionUtils
         return builder.build();
     }
 
-    public static Set<ChunkPos> getTouchedChunks(ImmutableMap<String, SelectionBox> boxes)
+    public static LongSet getTouchedChunks(ImmutableMap<String, SelectionBox> boxes)
     {
         return getTouchedChunksForBoxes(boxes.values());
     }
 
-    public static Set<ChunkPos> getTouchedChunksForBoxes(Collection<? extends CornerDefinedBox> boxes)
+    public static LongSet getTouchedChunksForBoxes(Collection<? extends CornerDefinedBox> boxes)
     {
-        Set<ChunkPos> set = new HashSet<>();
+        LongSet set = new LongOpenHashSet();
 
         for (CornerDefinedBox box : boxes)
         {
@@ -443,7 +443,7 @@ public class PositionUtils
             {
                 for (int cx = boxXMin; cx <= boxXMax; ++cx)
                 {
-                    set.add(new ChunkPos(cx, cz));
+                    set.add(ChunkPos.asLong(cx, cz));
                 }
             }
         }

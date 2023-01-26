@@ -4,17 +4,19 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
@@ -27,8 +29,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import malilib.config.value.LayerMode;
+import malilib.listener.EventListener;
 import malilib.overlay.message.MessageDispatcher;
-import malilib.overlay.message.MessageUtils;
 import malilib.util.data.EnabledCondition;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
@@ -45,7 +47,7 @@ import litematica.render.OverlayRenderer;
 import litematica.render.infohud.StatusInfoRenderer;
 import litematica.schematic.ISchematic;
 import litematica.schematic.util.SchematicPlacingUtils;
-import litematica.util.IGenericEventListener;
+import litematica.schematic.verifier.SchematicVerifierManager;
 import litematica.util.PositionUtils;
 import litematica.util.RayTraceUtils;
 import litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -56,24 +58,22 @@ import litematica.world.WorldSchematic;
 
 public class SchematicPlacementManager
 {
-    private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
-    private final List<SchematicPlacement> lightlyLoadedPlacements = new ArrayList<>();
-    private final Set<SchematicPlacement> allVisibleSchematicPlacements = new HashSet<>();
+    protected final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
+    protected final List<SchematicPlacement> lightlyLoadedPlacements = new ArrayList<>();
+    protected final Set<SchematicPlacement> allVisibleSchematicPlacements = new HashSet<>();
 
-    private final HashMultimap<ChunkPos, SchematicPlacement> schematicsTouchingChunk = HashMultimap.create();
-    private final ArrayListMultimap<ChunkSectionPos, PlacementPart> touchedVolumesInSubChunk = ArrayListMultimap.create();
+    protected final Long2ObjectOpenHashMap<List<SchematicPlacement>> schematicsTouchingChunk = new Long2ObjectOpenHashMap<>();
+    protected final ArrayListMultimap<ChunkSectionPos, PlacementPart> touchedVolumesInSubChunk = ArrayListMultimap.create();
 
-    private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
-    private final Set<ChunkPos> chunksToUnload = new HashSet<>();
-    private final Set<ChunkPos> chunksPreChange = new HashSet<>();
+    protected final LongSet chunksToRebuild = new LongOpenHashSet();
+    protected final LongSet chunksToUnload = new LongOpenHashSet();
+    protected final LongSet chunksPreChange = new LongOpenHashSet();
 
-    private final List<IGenericEventListener> rebuildListeners = new ArrayList<>();
+    protected final List<EventListener> rebuildListeners = new ArrayList<>();
+    protected final GridPlacementManager gridManager;
 
-    private final GridPlacementManager gridManager;
-
-    @Nullable
-    private SchematicPlacement selectedPlacement;
-    private int tickCounter;
+    @Nullable protected SchematicPlacement selectedPlacement;
+    protected int tickCounter;
 
     public SchematicPlacementManager()
     {
@@ -101,12 +101,12 @@ public class SchematicPlacementManager
         return this.chunksToRebuild.isEmpty() == false;
     }
 
-    public boolean hasPendingRebuildFor(ChunkPos pos)
+    public boolean hasPendingRebuildForChunk(int chunkX, int chunkZ)
     {
-        return this.chunksToRebuild.contains(pos);
+        return this.chunksToRebuild.contains(ChunkPos.asLong(chunkX, chunkZ));
     }
 
-    public void addRebuildListener(IGenericEventListener listener)
+    public void addRebuildListener(EventListener listener)
     {
         if (this.rebuildListeners.contains(listener) == false)
         {
@@ -127,9 +127,9 @@ public class SchematicPlacementManager
 
             if (worldSchematic != null)
             {
-                for (ChunkPos pos : this.chunksToUnload)
+                for (long chunkPosLong : this.chunksToUnload)
                 {
-                    this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
+                    this.unloadSchematicChunk(worldSchematic, chunkPosLong);
                 }
             }
 
@@ -148,56 +148,61 @@ public class SchematicPlacementManager
             }
 
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
-            Iterator<ChunkPos> iter = this.chunksToRebuild.iterator();
+            LongIterator it = this.chunksToRebuild.iterator();
 
-            while (iter.hasNext())
+            while (it.hasNext())
             {
-                if ((System.nanoTime() - DataManager.getClientTickStartTime()) >= 45000000L)
+                if ((System.nanoTime() - DataManager.getClientTickStartTime()) >= 50000000L)
                 {
                     break;
                 }
 
-                ChunkPos pos = iter.next();
+                long chunkPosLong = it.next();
 
-                if (this.schematicsTouchingChunk.containsKey(pos) == false)
+                if (this.schematicsTouchingChunk.containsKey(chunkPosLong) == false)
                 {
-                    iter.remove();
+                    it.remove();
                     continue;
                 }
 
+                int chunkX = malilib.util.position.PositionUtils.getChunkPosX(chunkPosLong);
+                int chunkZ = malilib.util.position.PositionUtils.getChunkPosZ(chunkPosLong);
+
                 if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() ||
-                    clientWorld.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                    clientWorld.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
                 {
                     // Wipe the old chunk if it exists
-                    if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                    if (worldSchematic.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
                     {
                         //System.out.printf("wiping chunk at %s\n", pos);
-                        this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
+                        this.unloadSchematicChunk(worldSchematic, chunkX, chunkZ);
                     }
 
                     //System.out.printf("loading chunk at %s\n", pos);
-                    worldSchematic.getChunkProvider().loadChunk(pos.x, pos.z);
+                    worldSchematic.getChunkProvider().loadChunk(chunkX, chunkZ);
                 }
 
-                if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                if (worldSchematic.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
                 {
                     //System.out.printf("placing at %s\n", pos);
-                    Collection<SchematicPlacement> placements = this.schematicsTouchingChunk.get(pos);
+                    List<SchematicPlacement> placements = this.schematicsTouchingChunk.get(chunkPosLong);
 
-                    if (placements.isEmpty() == false)
+                    if (placements != null)
                     {
                         for (SchematicPlacement placement : placements)
                         {
                             if (placement.isEnabled())
                             {
-                                SchematicPlacingUtils.placeToWorldWithinChunk(placement, pos, worldSchematic, ReplaceBehavior.ALL, false);
+                                SchematicPlacingUtils.placeToWorldWithinChunk(placement, new ChunkPos(chunkX, chunkZ),
+                                                                              worldSchematic, ReplaceBehavior.ALL, false);
                             }
                         }
 
-                        worldSchematic.markBlockRangeForRenderUpdate(pos.x << 4, 0, pos.z << 4, (pos.x << 4) + 15, 256, (pos.z << 4) + 15);
+                        worldSchematic.markBlockRangeForRenderUpdate( chunkX << 4      ,   0,  chunkZ << 4,
+                                                                     (chunkX << 4) + 15, 256, (chunkZ << 4) + 15);
                     }
 
-                    iter.remove();
+                    it.remove();
                 }
             }
 
@@ -218,17 +223,25 @@ public class SchematicPlacementManager
             if (worldSchematic != null)
             {
                 this.unloadSchematicChunk(worldSchematic, chunkX, chunkZ);
-                this.chunksToRebuild.add(new ChunkPos(chunkX, chunkZ));
+                this.chunksToRebuild.add(ChunkPos.asLong(chunkX, chunkZ));
             }
         }
     }
 
-    private void unloadSchematicChunk(WorldSchematic worldSchematic, int chunkX, int chunkZ)
+    protected void unloadSchematicChunk(WorldSchematic worldSchematic, long chunkPosLong)
+    {
+        int chunkX = malilib.util.position.PositionUtils.getChunkPosX(chunkPosLong);
+        int chunkZ = malilib.util.position.PositionUtils.getChunkPosZ(chunkPosLong);
+        this.unloadSchematicChunk(worldSchematic, chunkX, chunkZ);
+    }
+
+    protected void unloadSchematicChunk(WorldSchematic worldSchematic, int chunkX, int chunkZ)
     {
         if (worldSchematic.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
         {
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
-            worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4) - 1, 0, (chunkZ << 4) - 1, (chunkX << 4) + 16, 256, (chunkZ << 4) + 16);
+            worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4) - 1 ,   0, (chunkZ << 4) - 1,
+                                                         (chunkX << 4) + 16, 256, (chunkZ << 4) + 16);
             worldSchematic.getChunkProvider().unloadChunk(chunkX, chunkZ);
         }
     }
@@ -266,11 +279,6 @@ public class SchematicPlacementManager
     public Set<ChunkSectionPos> getAllTouchedSubChunks()
     {
         return this.touchedVolumesInSubChunk.keySet();
-    }
-
-    public void addSchematicPlacement(SchematicPlacement placement, boolean printMessages)
-    {
-        this.addSchematicPlacement(placement, printMessages, false);
     }
 
     public boolean duplicateSelectedPlacement()
@@ -331,7 +339,12 @@ public class SchematicPlacementManager
         this.allVisibleSchematicPlacements.remove(placement);
     }
 
-    private void addSchematicPlacement(SchematicPlacement placement, boolean printMessages, boolean isLoadFromFile)
+    public void addSchematicPlacement(SchematicPlacement placement, boolean printMessages)
+    {
+        this.addSchematicPlacement(placement, printMessages, false);
+    }
+
+    protected void addSchematicPlacement(SchematicPlacement placement, boolean printMessages, boolean isLoadFromFile)
     {
         if (this.schematicPlacements.contains(placement))
         {
@@ -402,6 +415,11 @@ public class SchematicPlacementManager
         if (this.selectedPlacement == placement)
         {
             this.selectedPlacement = null;
+        }
+
+        if (placement.isValid())
+        {
+            SchematicVerifierManager.INSTANCE.onPlacementRemoved(placement);
         }
 
         placement.invalidate();
@@ -500,26 +518,52 @@ public class SchematicPlacementManager
         }
     }
 
-    private void addTouchedChunksFor(SchematicPlacement placement)
+    protected void addTouchedChunksFor(SchematicPlacement placement)
     {
         this.addTouchedChunksFor(placement, true);
+    }
+
+    protected boolean hasPlacementInChunk(long chunkPosLong, SchematicPlacement placement)
+    {
+        List<SchematicPlacement> list = this.schematicsTouchingChunk.get(chunkPosLong);
+        return list != null && list.contains(placement);
+    }
+
+    protected void addPlacementToChunk(long chunkPosLong, SchematicPlacement placement)
+    {
+        this.schematicsTouchingChunk.computeIfAbsent(chunkPosLong, cp -> new ArrayList<>()).add(placement);
+    }
+
+    protected void removePlacementFromChunk(long chunkPosLong, SchematicPlacement placement)
+    {
+        List<SchematicPlacement> list = this.schematicsTouchingChunk.get(chunkPosLong);
+
+        if (list != null)
+        {
+            list.remove(placement);
+
+            if (list.isEmpty())
+            {
+                this.schematicsTouchingChunk.remove(chunkPosLong);
+            }
+        }
     }
 
     void addTouchedChunksFor(SchematicPlacement placement, boolean updateOverlay)
     {
         if (placement.matchesRequirement(EnabledCondition.ENABLED))
         {
-            Set<ChunkPos> chunks = placement.getTouchedChunks();
+            LongSet chunks = placement.getTouchedChunks();
 
-            for (ChunkPos pos : chunks)
+            for (long chunkPosLong : chunks)
             {
-                if (this.schematicsTouchingChunk.containsEntry(pos, placement) == false)
+                if (this.hasPlacementInChunk(chunkPosLong, placement) == false)
                 {
-                    this.schematicsTouchingChunk.put(pos, placement);
-                    this.updateTouchedBoxesInChunk(pos);
+                    this.addPlacementToChunk(chunkPosLong, placement);
+                    this.updateTouchedBoxesInChunk(chunkPosLong);
                 }
 
-                this.chunksToUnload.remove(pos);
+                this.chunksToUnload.remove(chunkPosLong);
             }
 
             this.markChunksForRebuild(chunks);
@@ -535,16 +579,16 @@ public class SchematicPlacementManager
     {
         if (placement.matchesRequirement(EnabledCondition.ENABLED))
         {
-            Set<ChunkPos> chunks = placement.getTouchedChunks();
+            LongSet chunks = placement.getTouchedChunks();
 
-            for (ChunkPos pos : chunks)
+            for (long chunkPosLong : chunks)
             {
-                this.schematicsTouchingChunk.remove(pos, placement);
-                this.updateTouchedBoxesInChunk(pos);
+                this.removePlacementFromChunk(chunkPosLong, placement);
+                this.updateTouchedBoxesInChunk(chunkPosLong);
 
-                if (this.schematicsTouchingChunk.containsKey(pos) == false)
+                if (this.schematicsTouchingChunk.containsKey(chunkPosLong) == false)
                 {
-                    this.chunksToUnload.add(pos);
+                    this.chunksToUnload.add(chunkPosLong);
                 }
             }
 
@@ -559,52 +603,52 @@ public class SchematicPlacementManager
         this.gridManager.updateGridPlacementsFor(basePlacement);
     }
 
-    private void onPrePlacementChange(SchematicPlacement placement)
+    protected void onPrePlacementChange(SchematicPlacement placement)
     {
         this.chunksPreChange.clear();
         this.chunksPreChange.addAll(placement.getTouchedChunks());
     }
 
-    private void onPostPlacementChange(SchematicPlacement placement)
+    protected void onPostPlacementChange(SchematicPlacement placement)
     {
-        Set<ChunkPos> chunksPost = placement.getTouchedChunks();
-        Set<ChunkPos> toRebuild = new HashSet<>(chunksPost);
+        LongSet chunksPost = placement.getTouchedChunks();
+        LongSet toRebuild = new LongOpenHashSet(chunksPost);
 
         //System.out.printf("chunkPre: %s - chunkPost: %s\n", this.chunksPreChange, chunksPost);
         this.chunksPreChange.removeAll(chunksPost);
 
-        for (ChunkPos pos : this.chunksPreChange)
+        for (long chunkPosLong : this.chunksPreChange)
         {
-            this.schematicsTouchingChunk.remove(pos, placement);
-            this.updateTouchedBoxesInChunk(pos);
+            this.removePlacementFromChunk(chunkPosLong, placement);
+            this.updateTouchedBoxesInChunk(chunkPosLong);
             //System.out.printf("removing placement from: %s\n", pos);
 
-            if (this.schematicsTouchingChunk.containsKey(pos) == false)
+            if (this.schematicsTouchingChunk.containsKey(chunkPosLong) == false)
             {
                 //System.out.printf("unloading: %s\n", pos);
-                this.chunksToUnload.add(pos);
+                this.chunksToUnload.add(chunkPosLong);
             }
             else
             {
                 //System.out.printf("rebuilding: %s\n", pos);
-                toRebuild.add(pos);
+                toRebuild.add(chunkPosLong);
             }
         }
 
-        for (ChunkPos pos : chunksPost)
+        for (long chunkPosLong : chunksPost)
         {
-            if (this.schematicsTouchingChunk.containsEntry(pos, placement) == false)
+            if (this.hasPlacementInChunk(chunkPosLong, placement) == false)
             {
-                this.schematicsTouchingChunk.put(pos, placement);
+                this.addPlacementToChunk(chunkPosLong, placement);
             }
 
-            this.updateTouchedBoxesInChunk(pos);
+            this.updateTouchedBoxesInChunk(chunkPosLong);
         }
 
         this.markChunksForRebuild(toRebuild);
     }
 
-    private void onPlacementModified(SchematicPlacement placement)
+    protected void onPlacementModified(SchematicPlacement placement)
     {
         placement.resetEnclosingBox();
         this.onPostPlacementChange(placement);
@@ -612,13 +656,13 @@ public class SchematicPlacementManager
         OverlayRenderer.getInstance().updatePlacementCache();
     }
 
-    private void onPlacementRegionModified(SchematicPlacement placement)
+    protected void onPlacementRegionModified(SchematicPlacement placement)
     {
         placement.checkAreSubRegionsModified();
         this.onPlacementModified(placement);
     }
 
-    private void updateOverlayRendererIfEnabled(SchematicPlacement placement)
+    protected void updateOverlayRendererIfEnabled(SchematicPlacement placement)
     {
         if (placement.isEnabled())
         {
@@ -825,7 +869,30 @@ public class SchematicPlacementManager
         return false;
     }
 
+    public interface PlacementSettingsLoader
+    {
+        boolean load(SchematicPlacement placement, JsonObject obj);
+    }
+
     public boolean loadPlacementSettings(SchematicPlacement placement, JsonObject obj)
+    {
+        return this.loadPlacementSettings(placement, obj, SchematicPlacement::readFromJson);
+    }
+
+    public boolean loadPlacementSettingsFromSharedString(SchematicPlacement placement, String str)
+    {
+        JsonElement el = JsonUtils.parseJsonFromString(str);
+
+        if (el == null || el.isJsonObject() == false)
+        {
+            MessageDispatcher.error("litematica.error.schematic_placements.settings_load.invalid_data");
+            return false;
+        }
+
+        return this.loadPlacementSettings(placement, el.getAsJsonObject(), SchematicPlacement::loadFromSharedSettings);
+    }
+
+    protected boolean loadPlacementSettings(SchematicPlacement placement, JsonObject obj, PlacementSettingsLoader loader)
     {
         if (placement.isLocked())
         {
@@ -835,47 +902,52 @@ public class SchematicPlacementManager
 
         this.onPrePlacementChange(placement);
 
-        boolean success = placement.readBaseSettingsFromJson(obj);
+        boolean success = loader.load(placement, obj);
 
         this.onPlacementModified(placement);
 
         return success;
     }
 
-    private void updateTouchedBoxesInChunk(ChunkPos pos)
+    protected void updateTouchedBoxesInChunk(long chunkPosLong)
     {
+        int chunkX = malilib.util.position.PositionUtils.getChunkPosX(chunkPosLong);
+        int chunkZ = malilib.util.position.PositionUtils.getChunkPosZ(chunkPosLong);
+
         for (int y = 0; y < 16; ++y)
         {
-            ChunkSectionPos subChunk = new ChunkSectionPos(pos.x, y, pos.z);
+            ChunkSectionPos subChunk = new ChunkSectionPos(chunkX, y, chunkZ);
             this.touchedVolumesInSubChunk.removeAll(subChunk);
         }
 
-        Collection<SchematicPlacement> placements = this.schematicsTouchingChunk.get(pos);
+        List<SchematicPlacement> placements = this.schematicsTouchingChunk.get(chunkPosLong);
 
-        if (placements.isEmpty() == false)
+        if (placements == null)
         {
-            for (SchematicPlacement placement : placements)
+            return;
+        }
+
+        for (SchematicPlacement placement : placements)
+        {
+            if (placement.matchesRequirement(EnabledCondition.ENABLED))
             {
-                if (placement.matchesRequirement(EnabledCondition.ENABLED))
+                Map<String, IntBoundingBox> boxMap = placement.getBoxesWithinChunk(chunkX, chunkZ);
+
+                for (Map.Entry<String, IntBoundingBox> entry : boxMap.entrySet())
                 {
-                    Map<String, IntBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
+                    IntBoundingBox bbOrig = entry.getValue();
+                    final int startCY = (bbOrig.minY >> 4);
+                    final int endCY = (bbOrig.maxY >> 4);
 
-                    for (Map.Entry<String, IntBoundingBox> entry : boxMap.entrySet())
+                    for (int cy = startCY; cy <= endCY; ++cy)
                     {
-                        IntBoundingBox bbOrig = entry.getValue();
-                        final int startCY = (bbOrig.minY >> 4);
-                        final int endCY = (bbOrig.maxY >> 4);
+                        int y1 = Math.max((cy << 4)     , bbOrig.minY);
+                        int y2 = Math.min((cy << 4) + 15, bbOrig.maxY);
 
-                        for (int cy = startCY; cy <= endCY; ++cy)
-                        {
-                            int y1 = Math.max((cy << 4)     , bbOrig.minY);
-                            int y2 = Math.min((cy << 4) + 15, bbOrig.maxY);
-
-                            IntBoundingBox bbSub = new IntBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
-                            PlacementPart part = new PlacementPart(placement, entry.getKey(), bbSub);
-                            this.touchedVolumesInSubChunk.put(new ChunkSectionPos(pos.x, cy, pos.z), part);
-                            //System.out.printf("updateTouchedBoxesInChunk box at %d, %d, %d: %s\n", pos.x, cy, pos.z, bbSub);
-                        }
+                        IntBoundingBox bbSub = new IntBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
+                        PlacementPart part = new PlacementPart(placement, entry.getKey(), bbSub);
+                        this.touchedVolumesInSubChunk.put(new ChunkSectionPos(chunkX, cy, chunkZ), part);
+                        //System.out.printf("updateTouchedBoxesInChunk box at %d, %d, %d: %s\n", pos.x, cy, pos.z, bbSub);
                     }
                 }
             }
@@ -901,27 +973,27 @@ public class SchematicPlacementManager
         }
     }
 
-    private void markChunksForRebuild(Collection<ChunkPos> chunks)
+    protected void markChunksForRebuild(LongSet chunks)
     {
         //System.out.printf("rebuilding %d chunks: %s\n", chunks.size(), chunks);
         this.chunksToRebuild.addAll(chunks);
 
-        for (IGenericEventListener listener : this.rebuildListeners)
+        for (EventListener listener : this.rebuildListeners)
         {
             listener.onEvent();
         }
     }
 
-    public void markChunkForRebuild(ChunkPos pos)
+    public void markChunkForRebuild(long chunkPosLong)
     {
-        this.chunksToRebuild.add(pos);
+        this.chunksToRebuild.add(chunkPosLong);
     }
 
-    public boolean changeSelection(World world, Entity entity, int maxDistance)
+    public boolean changeSelection(World world, Entity cameraEntity, int maxDistance)
     {
         if (this.schematicPlacements.isEmpty() == false)
         {
-            RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
+            RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, cameraEntity, maxDistance);
 
             SchematicPlacement placement = this.getSelectedSchematicPlacement();
 
@@ -1049,7 +1121,7 @@ public class SchematicPlacementManager
 
     public void loadPlacementFromFile(Path file)
     {
-        SchematicPlacement placement = SchematicPlacement.fromFile(file);
+        SchematicPlacement placement = SchematicPlacement.createFromFile(file);
 
         if (placement != null)
         {
@@ -1061,7 +1133,7 @@ public class SchematicPlacementManager
         }
     }
 
-    private void loadPlacementFromFile(SchematicPlacement placement, boolean isActiveList)
+    protected void loadPlacementFromFile(SchematicPlacement placement, boolean isActiveList)
     {
         if (placement != null)
         {
@@ -1071,7 +1143,7 @@ public class SchematicPlacementManager
                 return;
             }
 
-            if (placement.isEnabled())
+            if (placement.isEnabled() && placement.isLoaded())
             {
                 this.addSchematicPlacement(placement, false, true);
             }
@@ -1087,7 +1159,7 @@ public class SchematicPlacementManager
         }
     }
 
-    private boolean checkIsAlreadyLoaded(SchematicPlacement placement)
+    protected boolean checkIsAlreadyLoaded(SchematicPlacement placement)
     {
         if (placement.placementSaveFile == null)
         {
@@ -1117,7 +1189,7 @@ public class SchematicPlacementManager
     {
         BlockPos pos = EntityWrap.getCameraEntityBlockPos();
         String name = schematic.getMetadata().getName();
-        SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, createAsEnabled);
+        SchematicPlacement placement = SchematicPlacement.create(schematic, pos, name, createAsEnabled);
 
         this.addSchematicPlacement(placement, true);
         this.setSelectedSchematicPlacement(placement);
@@ -1185,7 +1257,7 @@ public class SchematicPlacementManager
 
                 if (el.isJsonObject())
                 {
-                    SchematicPlacement placement = SchematicPlacement.fromJson(el.getAsJsonObject());
+                    SchematicPlacement placement = SchematicPlacement.createFromJson(el.getAsJsonObject());
                     this.loadPlacementFromFile(placement, true);
                 }
                 else
