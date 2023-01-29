@@ -122,7 +122,7 @@ public class SchematicPlacingUtils
 
                 if (printMessage)
                 {
-                    MessageDispatcher.generic().screenOrActionbar().translate("litematica.message.scheduled_task_added");
+                    MessageDispatcher.generic().customHotbar().translate("litematica.message.scheduled_task_added");
                 }
             }
             else

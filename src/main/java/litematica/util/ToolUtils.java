@@ -166,7 +166,7 @@ public class ToolUtils
 
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
 
-                MessageDispatcher.generic("litematica.message.scheduled_task_added");
+                MessageDispatcher.generic().customHotbar().translate("litematica.message.scheduled_task_added");
             }
             else
             {
@@ -217,7 +217,7 @@ public class ToolUtils
                 TaskUpdateBlocks task = new TaskUpdateBlocks(boxes);
                 TaskScheduler.getInstanceServer().scheduleTask(task, 20);
 
-                MessageDispatcher.generic("litematica.message.scheduled_task_added");
+                MessageDispatcher.generic().customHotbar().translate("litematica.message.scheduled_task_added");
             }
             else
             {

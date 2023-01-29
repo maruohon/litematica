@@ -59,14 +59,14 @@ public class TaskFillArea extends TaskProcessChunkBase
                 }
                 else
                 {
-                    MessageDispatcher.error().translate("litematica-message.error.invalid_block", replaceState.toString());
+                    MessageDispatcher.error().translate("litematica.message.error.invalid_block", replaceState.toString());
                     strName = null;
                 }
             }
         }
         else
         {
-            MessageDispatcher.error().translate("litematica-message.error.invalid_block", fillState.toString());
+            MessageDispatcher.error().translate("litematica.message.error.invalid_block", fillState.toString());
         }
 
         this.blockString = strName;
@@ -203,7 +203,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         {
             if (this.printCompletionMessage)
             {
-                MessageDispatcher.success().translate("litematica.message.area_filled");
+                MessageDispatcher.success().customHotbar().translate("litematica.message.area_filled");
             }
         }
         else

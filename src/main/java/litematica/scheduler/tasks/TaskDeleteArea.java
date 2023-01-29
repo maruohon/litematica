@@ -21,12 +21,12 @@ public class TaskDeleteArea extends TaskFillArea
         {
             if (this.printCompletionMessage)
             {
-                MessageDispatcher.success().translate("litematica.message.area_cleared");
+                MessageDispatcher.success().customHotbar().translate("litematica.message.area_cleared");
             }
         }
         else
         {
-            MessageDispatcher.error().translate("litematica.message.error.area_deletion_aborted");
+            MessageDispatcher.error().customHotbar().translate("litematica.message.error.area_deletion_aborted");
         }
     }
 }
