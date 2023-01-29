@@ -6,10 +6,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
@@ -35,7 +33,6 @@ import litematica.materials.MaterialListPlacement;
 import litematica.schematic.ISchematic;
 import litematica.schematic.ISchematicRegion;
 import litematica.schematic.verifier.SchematicVerifier;
-import litematica.selection.CornerDefinedBox;
 import litematica.selection.SelectionBox;
 import litematica.util.PositionUtils;
 
@@ -62,7 +59,7 @@ public class SchematicPlacement extends BasePlacement
     protected boolean repeatedPlacement;
     protected boolean shouldBeSaved = true;
     protected boolean valid = true;
-    protected int subRegionCount;
+    protected int subRegionCount = 1;
     protected long lastSaveTime = -1;
 
     protected SchematicPlacement(@Nullable Path schematicFile)
@@ -92,10 +89,10 @@ public class SchematicPlacement extends BasePlacement
         this(schematicFile, origin, name, enabled);
 
         this.schematic = schematic;
-        this.subRegionCount = schematic != null ? schematic.getSubRegionCount() : 0;
+        this.subRegionCount = schematic != null ? schematic.getSubRegionCount() : 1;
     }
 
-    public boolean isLoaded()
+    public boolean isSchematicLoaded()
     {
         return this.schematic != null;
     }
@@ -203,10 +200,9 @@ public class SchematicPlacement extends BasePlacement
 
         this.schematic = schematic;
 
-        if (this.schematic != null)
+        if (this.isSchematicLoaded())
         {
             this.configureSubRegions();
-
             return true;
         }
 
@@ -218,7 +214,7 @@ public class SchematicPlacement extends BasePlacement
         this.schematicFile = file;
         this.setSchematic(SchematicHolder.getInstance().getOrLoad(file));
 
-        return this.schematic != null;
+        return this.isSchematicLoaded();
     }
 
     protected void loadSchematicFromFileIfEnabled()
@@ -300,55 +296,58 @@ public class SchematicPlacement extends BasePlacement
         return new ArrayList<>(this.subRegionPlacements.values());
     }
 
-    public ImmutableMap<String, SubRegionPlacement> getEnabledSubRegions()
+    public List<SubRegionPlacement> getEnabledSubRegions()
     {
-        ImmutableMap.Builder<String, SubRegionPlacement> builder = ImmutableMap.builder();
+        ArrayList<SubRegionPlacement> list = new ArrayList<>();
 
-        for (Map.Entry<String, SubRegionPlacement> entry : this.subRegionPlacements.entrySet())
+        for (SubRegionPlacement region : this.subRegionPlacements.values())
         {
-            SubRegionPlacement placement = entry.getValue();
-
-            if (placement.matchesRequirement(EnabledCondition.ENABLED))
+            if (region.matchesRequirement(EnabledCondition.ENABLED))
             {
-                builder.put(entry.getKey(), entry.getValue());
+                list.add(region);
             }
         }
 
-        return builder.build();
+        return list;
+    }
+
+    protected SelectionBox getSelectionBoxForRegion(SubRegionPlacement regionPlacement,
+                                                    ISchematicRegion schematicRegion)
+    {
+        BlockPos boxOriginRelative = regionPlacement.getPosition();
+        BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.position);
+        BlockPos pos2 = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(schematicRegion.getSize()));
+        pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
+        pos2 = PositionUtils.getTransformedBlockPos(pos2, regionPlacement.getMirror(), regionPlacement.getRotation()).add(boxOriginAbsolute);
+
+        return new SelectionBox(boxOriginAbsolute, pos2, regionPlacement.getName());
     }
 
     public ImmutableMap<String, SelectionBox> getSubRegionBoxes(EnabledCondition condition)
     {
-        if (this.isLoaded() == false)
+        if (this.isSchematicLoaded() == false)
         {
             return ImmutableMap.of();
         }
 
         ImmutableMap.Builder<String, SelectionBox> builder = ImmutableMap.builder();
-        Map<String, ISchematicRegion> subRegions = this.schematic.getRegions();
+        Map<String, ISchematicRegion> schematicRegions = this.schematic.getRegions();
 
-        for (Map.Entry<String, SubRegionPlacement> entry : this.subRegionPlacements.entrySet())
+        for (SubRegionPlacement regionPlacement : this.subRegionPlacements.values())
         {
-            SubRegionPlacement placement = entry.getValue();
-
-            if (placement.matchesRequirement(condition))
+            if (regionPlacement.matchesRequirement(condition))
             {
-                String name = entry.getKey();
-                ISchematicRegion region = subRegions.get(name);
+                String regionName = regionPlacement.getName();
+                ISchematicRegion schematicRegion = schematicRegions.get(regionName);
 
-                if (region != null)
+                if (schematicRegion != null)
                 {
-                    BlockPos boxOriginRelative = placement.getPosition();
-                    BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.position);
-                    BlockPos pos2 = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(region.getSize()));
-                    pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
-                    pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
-
-                    builder.put(name, new SelectionBox(boxOriginAbsolute, pos2, name));
+                    builder.put(regionName, this.getSelectionBoxForRegion(regionPlacement, schematicRegion));
                 }
                 else
                 {
-                    Litematica.logger.warn("SchematicPlacement.getSubRegionBoxes(): Sub-region '{}' not found in the schematic '{}'", name, this.schematic.getMetadata().getName());
+                    Litematica.logger.warn("SchematicPlacement.getSubRegionBoxes(): Subregion '{}' not found in the schematic '{}'",
+                                           regionName, this.schematic.getMetadata().getName());
                 }
             }
         }
@@ -356,25 +355,18 @@ public class SchematicPlacement extends BasePlacement
         return builder.build();
     }
 
-    public ImmutableMap<String, SelectionBox> getSubRegionBoxFor(String regionName, EnabledCondition condition)
+    @Nullable
+    public SelectionBox getSubRegionBox(String regionName, EnabledCondition condition)
     {
-        ImmutableMap.Builder<String, SelectionBox> builder = ImmutableMap.builder();
-        SubRegionPlacement placement = this.subRegionPlacements.get(regionName);
+        SubRegionPlacement regionPlacement = this.subRegionPlacements.get(regionName);
 
-        if (this.isLoaded() && placement != null && placement.matchesRequirement(condition))
+        if (this.isSchematicLoaded() && regionPlacement != null && regionPlacement.matchesRequirement(condition))
         {
-            Map<String, ISchematicRegion> subRegions = this.schematic.getRegions();
-            ISchematicRegion region = subRegions.get(regionName);
+            ISchematicRegion schematicRegion = this.schematic.getRegions().get(regionName);
 
-            if (region != null)
+            if (schematicRegion != null)
             {
-                BlockPos boxOriginRelative = placement.getPosition();
-                BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.position);
-                BlockPos pos2 = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(region.getSize()));
-                pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
-                pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
-
-                builder.put(regionName, new SelectionBox(boxOriginAbsolute, pos2, regionName));
+                return this.getSelectionBoxForRegion(regionPlacement, schematicRegion);
             }
             else
             {
@@ -382,35 +374,7 @@ public class SchematicPlacement extends BasePlacement
             }
         }
 
-        return builder.build();
-    }
-
-    public Set<String> getSubRegionNamesTouchingChunk(int chunkX, int chunkZ)
-    {
-        ImmutableMap<String, SelectionBox> map = this.getSubRegionBoxes(EnabledCondition.ENABLED);
-        final int chunkXMin = chunkX << 4;
-        final int chunkZMin = chunkZ << 4;
-        final int chunkXMax = chunkXMin + 15;
-        final int chunkZMax = chunkZMin + 15;
-        Set<String> set = new HashSet<>();
-
-        for (Map.Entry<String, SelectionBox> entry : map.entrySet())
-        {
-            SelectionBox box = entry.getValue();
-            final int boxXMin = Math.min(box.getCorner1().getX(), box.getCorner2().getX());
-            final int boxZMin = Math.min(box.getCorner1().getZ(), box.getCorner2().getZ());
-            final int boxXMax = Math.max(box.getCorner1().getX(), box.getCorner2().getX());
-            final int boxZMax = Math.max(box.getCorner1().getZ(), box.getCorner2().getZ());
-
-            boolean notOverlapping = boxXMin > chunkXMax || boxZMin > chunkZMax || boxXMax < chunkXMin || boxZMax < chunkZMin;
-
-            if (notOverlapping == false)
-            {
-                set.add(entry.getKey());
-            }
-        }
-
-        return set;
+        return null;
     }
 
     public ImmutableMap<String, IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
@@ -419,21 +383,15 @@ public class SchematicPlacement extends BasePlacement
         return PositionUtils.getBoxesWithinChunk(chunkX, chunkZ, subRegions);
     }
 
-    @Nullable
-    public IntBoundingBox getBoxWithinChunkForRegion(String regionName, int chunkX, int chunkZ)
-    {
-        CornerDefinedBox box = this.getSubRegionBoxFor(regionName, EnabledCondition.ENABLED).get(regionName);
-        return box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
-    }
-
     public LongSet getTouchedChunks()
     {
         return PositionUtils.getTouchedChunks(this.getSubRegionBoxes(EnabledCondition.ENABLED));
     }
 
+    /*
     protected void storeModifiedSubRegions()
     {
-        if (this.schematic == null)
+        if (this.isSchematicLoaded() == false)
         {
             return;
         }
@@ -449,6 +407,7 @@ public class SchematicPlacement extends BasePlacement
             }
         }
     }
+    */
 
     protected void configureModifiedSubRegions()
     {
@@ -465,18 +424,20 @@ public class SchematicPlacement extends BasePlacement
 
     protected void configureSubRegions()
     {
-        if (this.schematic != null)
+        if (this.isSchematicLoaded() == false)
         {
-            this.resetAllSubRegionsToSchematicValues();
-            this.configureModifiedSubRegions();
-            this.checkSubRegionsModified();
-            this.subRegionCount = this.schematic.getSubRegionCount();
+            return;
         }
+
+        this.resetAllSubRegionsToSchematicValues();
+        this.configureModifiedSubRegions();
+        this.checkSubRegionsModified();
+        this.subRegionCount = this.schematic.getSubRegionCount();
     }
 
     protected void checkSubRegionsModified()
     {
-        if (this.isLoaded() == false)
+        if (this.isSchematicLoaded() == false)
         {
             return;
         }
@@ -527,7 +488,7 @@ public class SchematicPlacement extends BasePlacement
     }
 
     /**
-     * Moves the sub-region to the given <b>world position</b>.
+     * Moves the subregion to the given <b>world position</b>.
      */
     void moveSubRegionTo(String regionName, BlockPos newPos)
     {
@@ -549,7 +510,7 @@ public class SchematicPlacement extends BasePlacement
     {
         for (SubRegionPlacement subRegion : subRegions)
         {
-            // Check that the sub-region is actually from this placement
+            // Check that the subregion is actually from this placement
             subRegion = this.subRegionPlacements.get(subRegion.getName());
 
             if (subRegion != null)
@@ -572,7 +533,7 @@ public class SchematicPlacement extends BasePlacement
 
     void resetAllSubRegionsToSchematicValues()
     {
-        if (this.isLoaded() == false)
+        if (this.isSchematicLoaded() == false)
         {
             return;
         }
@@ -641,26 +602,18 @@ public class SchematicPlacement extends BasePlacement
         return copy;
     }
 
-    public SchematicPlacement copyAsUnloaded()
-    {
-        SchematicPlacement copy = new SchematicPlacement(null, this.schematicFile,
-                                                         this.position, this.name, this.enabled);
-        copy.copyBaseSettingsFrom(this);
-        copy.copyGridSettingsFrom(this);
-        return copy;
-    }
-
     public boolean fullyLoadPlacement()
     {
         if (this.schematicFile != null &&
-            this.schematic == null &&
+            this.isSchematicLoaded() == false &&
             this.loadAndSetSchematicFromFile(this.schematicFile) == false)
         {
             MessageDispatcher.error().translate("litematica.error.schematic_load.failed",
                                                 this.schematicFile.toAbsolutePath().toString());
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     protected void setBoundingBoxColorToNext()
@@ -718,8 +671,8 @@ public class SchematicPlacement extends BasePlacement
             return false;
         }
 
-        if (this.placementSaveFile == null || Files.exists(file) == false || this.wasModifiedSinceSaved())
-        {
+        //if (this.placementSaveFile == null || Files.exists(file) == false || this.wasModifiedSinceSaved())
+        //{
             JsonObject obj = this.toJson();
 
             if (obj != null)
@@ -731,6 +684,7 @@ public class SchematicPlacement extends BasePlacement
                 MessageDispatcher.error().translate("litematica.message.error.schematic_placement.save.failed_to_serialize");
                 return false;
             }
+        /*
         }
         else
         {
@@ -738,6 +692,7 @@ public class SchematicPlacement extends BasePlacement
         }
 
         return true;
+        */
     }
 
     protected boolean saveToFile(Path file, JsonObject obj)
@@ -767,6 +722,12 @@ public class SchematicPlacement extends BasePlacement
         return obj;
     }
 
+    @Nullable
+    public JsonObject toJsonIfShouldSave()
+    {
+        return this.shouldBeSaved ? this.toJson() : null;
+    }
+
     @Override
     @Nullable
     public JsonObject toJson()
@@ -785,7 +746,7 @@ public class SchematicPlacement extends BasePlacement
         JsonUtils.addIfNotEqual(obj, "bb_color", this.boundingBoxColor.intValue, 0);
         JsonUtils.addIfNotEqual(obj, "locked", this.locked, false);
         // The region count is for the lightly loaded placements where it can't be read from the schematic
-        JsonUtils.addIfNotEqual(obj, "region_count", this.subRegionCount, 0);
+        JsonUtils.addIfNotEqual(obj, "region_count", this.subRegionCount, 1);
         JsonUtils.addStringIfNotNull(obj, "selected_region", this.selectedSubRegionName);
         JsonUtils.addStringIfNotNull(obj, "storage_file", this.placementSaveFile);
 
@@ -842,7 +803,7 @@ public class SchematicPlacement extends BasePlacement
         obj.remove("region_count");
         obj.remove("schematic");
 
-        if (this.schematic != null && this.schematic.getMetadata().getName().equals(this.name))
+        if (this.isSchematicLoaded() && this.schematic.getMetadata().getName().equals(this.name))
         {
             obj.remove("name");
         }

@@ -217,7 +217,7 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
                                  placement.getSubRegionCount());
 
         StyledTextLine.translate(lines, "litematica.hover.placement_list.is_loaded",
-                                 MessageHelpers.getYesNoColored(placement.isLoaded(), false));
+                                 MessageHelpers.getYesNoColored(placement.isSchematicLoaded(), false));
 
         // Get a cached value, to not query and read the file every rendered frame...
         if (saved && this.screen.getCachedWasModifiedSinceSaved(placement))
@@ -246,9 +246,14 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
     protected void openConfigurationMenu()
     {
-        if (this.placement != null)
+        if (this.placement.isSchematicLoaded())
         {
             BaseScreen.openScreenWithParent(new SchematicPlacementSettingsScreen(this.placement));
+        }
+        else
+        {
+            MessageDispatcher.error("litematica.message.error.schematic_placement_configure_schematic_not_loaded",
+                                    this.placement.getName());
         }
     }
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -27,6 +26,7 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.data.EnabledCondition;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.nbt.NbtUtils;
@@ -45,6 +45,7 @@ import litematica.schematic.container.ILitematicaBlockStateContainer;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
 import litematica.schematic.placement.SubRegionPlacement;
+import litematica.selection.CornerDefinedBox;
 import litematica.util.EntityUtils;
 import litematica.util.PositionUtils;
 import litematica.util.ReplaceBehavior;
@@ -137,6 +138,11 @@ public class SchematicPlacingUtils
 
     public static boolean placeToWorld(SchematicPlacement schematicPlacement, World world, LayerRange range, boolean notifyNeighbors)
     {
+        if (schematicPlacement.isSchematicLoaded() == false)
+        {
+            return false;
+        }
+
         boolean success = true;
 
         try
@@ -144,26 +150,25 @@ public class SchematicPlacingUtils
             WorldUtils.setShouldPreventBlockUpdates(world, true);
 
             ISchematic schematic = schematicPlacement.getSchematic();
-            ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledSubRegions();
             BlockPos origin = schematicPlacement.getPosition();
 
-            for (String regionName : relativePlacements.keySet())
+            for (SubRegionPlacement regionPlacement : schematicPlacement.getEnabledSubRegions())
             {
-                SubRegionPlacement placement = relativePlacements.get(regionName);
-                ISchematicRegion region = schematic.getSchematicRegion(regionName);
+                String regionName = regionPlacement.getName();
+                ISchematicRegion schematicRegion = schematic.getSchematicRegion(regionName);
 
-                if (placement.isEnabled() && region != null)
+                if (regionPlacement.isEnabled() && schematicRegion != null)
                 {
-                    BlockPos regionPos = placement.getPosition();
-                    Vec3i regionSize = region.getSize();
-                    ILitematicaBlockStateContainer container = region.getBlockStateContainer();
-                    Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
-                    List<EntityInfo> entityList = region.getEntityList();
-                    Map<BlockPos, NextTickListEntry> scheduledBlockTicks = region.getBlockTickMap();
+                    BlockPos regionPos = regionPlacement.getPosition();
+                    Vec3i regionSize = schematicRegion.getSize();
+                    ILitematicaBlockStateContainer container = schematicRegion.getBlockStateContainer();
+                    Map<BlockPos, NBTTagCompound> blockEntityMap = schematicRegion.getBlockEntityMap();
+                    List<EntityInfo> entityList = schematicRegion.getEntityList();
+                    Map<BlockPos, NextTickListEntry> scheduledBlockTicks = schematicRegion.getBlockTickMap();
 
                     if (regionPos != null && regionSize != null && container != null && blockEntityMap != null)
                     {
-                        if (placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement,
+                        if (placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, regionPlacement,
                                 container, blockEntityMap, scheduledBlockTicks, range, notifyNeighbors) == false)
                         {
                             success = false;
@@ -175,9 +180,9 @@ public class SchematicPlacingUtils
                         Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
                     }
 
-                    if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
+                    if (schematicPlacement.ignoreEntities() == false && regionPlacement.ignoreEntities() == false && entityList != null)
                     {
-                        placeEntitiesToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, entityList, range);
+                        placeEntitiesToWorld(world, origin, regionPos, regionSize, schematicPlacement, regionPlacement, entityList, range);
                     }
                 }
             }
@@ -395,7 +400,7 @@ public class SchematicPlacingUtils
     public static boolean placeToWorldWithinChunk(SchematicPlacement schematicPlacement, ChunkPos chunkPos, World world, ReplaceBehavior replace, boolean notifyNeighbors)
     {
         ISchematic schematic = schematicPlacement.getSchematic();
-        Set<String> regionsTouchingChunk = schematicPlacement.getSubRegionNamesTouchingChunk(chunkPos.x, chunkPos.z);
+        Set<String> regionsTouchingChunk = PositionUtils.getSubRegionNamesTouchingChunk(chunkPos.x, chunkPos.z, schematicPlacement.getSubRegionBoxes(EnabledCondition.ENABLED));
         BlockPos origin = schematicPlacement.getPosition();
         boolean allSuccess = true;
 
@@ -443,7 +448,8 @@ public class SchematicPlacingUtils
     public static boolean placeBlocksWithinChunk(World world, ChunkPos chunkPos, String regionName, ISchematicRegion region,
                                                  BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement, ReplaceBehavior replace, boolean notifyNeighbors)
     {
-        IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
+        CornerDefinedBox box = schematicPlacement.getSubRegionBox(regionName, EnabledCondition.ENABLED);
+        IntBoundingBox bounds = box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkPos.x, chunkPos.z) : null;
         ILitematicaBlockStateContainer container = region.getBlockStateContainer();
         Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
 

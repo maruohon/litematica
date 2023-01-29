@@ -2,7 +2,9 @@ package litematica.util;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
@@ -404,6 +406,33 @@ public class PositionUtils
         }
 
         return builder.build();
+    }
+
+    public static Set<String> getSubRegionNamesTouchingChunk(int chunkX, int chunkZ, ImmutableMap<String, SelectionBox> boxMap)
+    {
+        final int chunkXMin = chunkX << 4;
+        final int chunkZMin = chunkZ << 4;
+        final int chunkXMax = chunkXMin + 15;
+        final int chunkZMax = chunkZMin + 15;
+        Set<String> set = new HashSet<>();
+
+        for (Map.Entry<String, SelectionBox> entry : boxMap.entrySet())
+        {
+            SelectionBox box = entry.getValue();
+            final int boxXMin = Math.min(box.getCorner1().getX(), box.getCorner2().getX());
+            final int boxZMin = Math.min(box.getCorner1().getZ(), box.getCorner2().getZ());
+            final int boxXMax = Math.max(box.getCorner1().getX(), box.getCorner2().getX());
+            final int boxZMax = Math.max(box.getCorner1().getZ(), box.getCorner2().getZ());
+
+            boolean notOverlapping = boxXMin > chunkXMax || boxZMin > chunkZMax || boxXMax < chunkXMin || boxZMax < chunkZMin;
+
+            if (notOverlapping == false)
+            {
+                set.add(entry.getKey());
+            }
+        }
+
+        return set;
     }
 
     public static ImmutableList<IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<? extends CornerDefinedBox> boxes)
@@ -845,8 +874,7 @@ public class PositionUtils
             if (sub != null)
             {
                 String regionName = placement.getSelectedSubRegionName();
-                ImmutableMap<String, SelectionBox> map = placement.getSubRegionBoxFor(regionName, EnabledCondition.ENABLED);
-                box = map.get(regionName);
+                box = placement.getSubRegionBox(regionName, EnabledCondition.ENABLED);
             }
             else
             {

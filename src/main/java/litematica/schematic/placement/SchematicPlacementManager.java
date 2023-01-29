@@ -60,7 +60,6 @@ import litematica.world.WorldSchematic;
 public class SchematicPlacementManager
 {
     protected final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
-    protected final List<SchematicPlacement> lightlyLoadedPlacements = new ArrayList<>();
     protected final Set<SchematicPlacement> allVisibleSchematicPlacements = new HashSet<>();
 
     protected final Long2ObjectOpenHashMap<List<SchematicPlacement>> schematicsTouchingChunk = new Long2ObjectOpenHashMap<>();
@@ -86,7 +85,6 @@ public class SchematicPlacementManager
         this.selectedPlacement = null;
         this.gridManager.clear();
         this.allVisibleSchematicPlacements.clear();
-        this.lightlyLoadedPlacements.clear();
         this.schematicPlacements.clear();
         this.schematicsTouchingChunk.clear();
         this.touchedVolumesInSubChunk.clear();
@@ -192,7 +190,7 @@ public class SchematicPlacementManager
                     {
                         for (SchematicPlacement placement : placements)
                         {
-                            if (placement.isEnabled())
+                            if (placement.isEnabled() && placement.isSchematicLoaded())
                             {
                                 SchematicPlacingUtils.placeToWorldWithinChunk(placement, new ChunkPos(chunkX, chunkZ),
                                                                               worldSchematic, ReplaceBehavior.ALL, false);
@@ -254,10 +252,7 @@ public class SchematicPlacementManager
 
     public List<SchematicPlacement> getAllSchematicPlacements()
     {
-        List<SchematicPlacement> list = new ArrayList<>();
-        list.addAll(this.schematicPlacements);
-        list.addAll(this.lightlyLoadedPlacements);
-        return list;
+        return this.schematicPlacements;
     }
 
     public List<IntBoundingBox> getTouchedBoxesInSubChunk(ChunkSectionPos subChunk)
@@ -297,17 +292,9 @@ public class SchematicPlacementManager
 
     public void duplicateSchematicPlacement(SchematicPlacement placement)
     {
-        if (placement.isLoaded())
-        {
-            SchematicPlacement duplicate = placement.copy();
-            duplicate.setBoundingBoxColorToNext();
-            this.addSchematicPlacement(duplicate, false);
-            this.setSelectedSchematicPlacement(duplicate);
-        }
-        else
-        {
-            this.lightlyLoadedPlacements.add(placement.copyAsUnloaded());
-        }
+        SchematicPlacement duplicate = placement.copy();
+        duplicate.setBoundingBoxColorToNext();
+        this.addSchematicPlacement(duplicate, false);
     }
 
     public void updateDependentPlacements(ISchematic schematic, Path newSchematicFile, boolean selectedOnly)
@@ -375,23 +362,27 @@ public class SchematicPlacementManager
             if (printMessages)
             {
                 MessageDispatcher.success("litematica.message.schematic_placement_created", placement.getName());
-
-                if (Configs.InfoOverlays.WARN_DISABLED_RENDERING.getBooleanValue())
-                {
-                    LayerMode mode = DataManager.getRenderLayerRange().getLayerMode();
-
-                    if (mode != LayerMode.ALL)
-                    {
-                        MessageDispatcher.warning("litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
-                    }
-
-                    Nags.HELPER.startNag();
-                    Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.MAIN_RENDERING_TOGGLE,      "litematica.message.warn.main_rendering_disabled");
-                    Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.SCHEMATIC_RENDERING,        "litematica.message.warn.schematic_rendering_disabled");
-                    Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING, "litematica.message.warn.schematic_blocks_rendering_disabled");
-                    Nags.HELPER.buildNag(MessageDispatcher.warning());
-                }
+                this.printRendererDisabledWarningMessages();
             }
+        }
+    }
+
+    protected void printRendererDisabledWarningMessages()
+    {
+        if (Configs.InfoOverlays.WARN_DISABLED_RENDERING.getBooleanValue())
+        {
+            LayerMode mode = DataManager.getRenderLayerRange().getLayerMode();
+
+            if (mode != LayerMode.ALL)
+            {
+                MessageDispatcher.warning("litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
+            }
+
+            Nags.HELPER.startNag();
+            Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.MAIN_RENDERING_TOGGLE,      "litematica.message.warn.main_rendering_disabled");
+            Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.SCHEMATIC_RENDERING,        "litematica.message.warn.schematic_rendering_disabled");
+            Nags.HELPER.pushNagIfConfigDisabled(Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING, "litematica.message.warn.schematic_blocks_rendering_disabled");
+            Nags.HELPER.buildNag(MessageDispatcher.warning());
         }
     }
 
@@ -427,26 +418,18 @@ public class SchematicPlacementManager
 
         placement.invalidate();
 
-        if (placement.isLoaded())
+        boolean removed = this.schematicPlacements.remove(placement);
+
+        this.gridManager.onPlacementRemoved(placement);
+        this.removeVisiblePlacement(placement);
+        this.removeTouchedChunksFor(placement);
+
+        if (removed && update)
         {
-            boolean ret = this.schematicPlacements.remove(placement);
-
-            this.gridManager.onPlacementRemoved(placement);
-            this.removeVisiblePlacement(placement);
-            this.removeTouchedChunksFor(placement);
-
-            if (ret && update)
-            {
-                this.updateOverlayRendererIfEnabled(placement);
-            }
-
-            return ret;
+            this.updateOverlayRendererIfEnabled(placement);
         }
-        else
-        {
-            this.lightlyLoadedPlacements.remove(placement);
-            return false;
-        }
+
+        return removed;
     }
 
     public List<SchematicPlacement> getAllPlacementsOfSchematic(ISchematic schematic)
@@ -511,7 +494,7 @@ public class SchematicPlacementManager
     {
         SchematicPlacement placement = this.getSelectedSchematicPlacement();
 
-        if (placement != null)
+        if (placement != null && placement.isSchematicLoaded())
         {
             SchematicHolder.getInstance().removeSchematic(placement.getSchematic());
         }
@@ -675,26 +658,17 @@ public class SchematicPlacementManager
 
     public void toggleEnabled(SchematicPlacement placement)
     {
-        if (placement.isLoaded())
+        if (placement.isSchematicLoaded() == false &&
+            placement.fullyLoadPlacement() == false)
         {
-            this.onPrePlacementChange(placement);
-            placement.toggleEnabled();
-            this.onPlacementModified(placement);
+            MessageDispatcher.error("litematica.message.error.schematic_placement.load_failed",
+                                    placement.getName(), placement.getSchematicFile());
+            return;
         }
-        else
-        {
-            if (placement.fullyLoadPlacement())
-            {
-                placement.toggleEnabled();
-                this.addSchematicPlacement(placement, false);
-                this.lightlyLoadedPlacements.remove(placement);
-            }
-            else
-            {
-                MessageDispatcher.error("litematica.message.error.schematic_placement.load_failed",
-                                        placement.getName(), placement.getSchematicFile());
-            }
-        }
+
+        this.onPrePlacementChange(placement);
+        placement.toggleEnabled();
+        this.onPlacementModified(placement);
     }
 
     public void toggleIgnoreEntities(SchematicPlacement placement)
@@ -1126,40 +1100,22 @@ public class SchematicPlacementManager
     {
         SchematicPlacement placement = SchematicPlacement.createFromFile(file);
 
-        if (placement != null)
-        {
-            this.loadPlacementFromFile(placement, false);
-        }
-        else
+        if (placement == null)
         {
             MessageDispatcher.error("litematica.error.schematic_placements.load_fail", file.getFileName().toString());
+            return;
         }
-    }
 
-    protected void loadPlacementFromFile(SchematicPlacement placement, boolean isActiveList)
-    {
-        if (placement != null)
+        if (this.checkIsAlreadyLoaded(placement))
         {
-            if (isActiveList == false && this.checkIsAlreadyLoaded(placement))
-            {
-                MessageDispatcher.error("litematica.error.schematic_placements.load_fail.already_loaded", placement.getName());
-                return;
-            }
-
-            if (placement.isEnabled() && placement.isLoaded())
-            {
-                this.addSchematicPlacement(placement, false, true);
-            }
-            else
-            {
-                this.lightlyLoadedPlacements.add(placement);
-            }
-
-            if (isActiveList == false)
-            {
-                MessageDispatcher.generic("litematica.message.schematic_placement_loaded", placement.getName());
-            }
+            MessageDispatcher.error("litematica.error.schematic_placements.load_fail.already_loaded",
+                                    placement.getName());
+            return;
         }
+
+        this.addSchematicPlacement(placement, false, false);
+        MessageDispatcher.generic().customHotbar().translate("litematica.message.schematic_placement_loaded", placement.getName());
+        this.printRendererDisabledWarningMessages();
     }
 
     protected boolean checkIsAlreadyLoaded(SchematicPlacement placement)
@@ -1170,14 +1126,6 @@ public class SchematicPlacementManager
         }
 
         for (SchematicPlacement entry : this.schematicPlacements)
-        {
-            if (placement.placementSaveFile.equals(entry.placementSaveFile))
-            {
-                return true;
-            }
-        }
-
-        for (SchematicPlacement entry : this.lightlyLoadedPlacements)
         {
             if (placement.placementSaveFile.equals(entry.placementSaveFile))
             {
@@ -1201,47 +1149,27 @@ public class SchematicPlacementManager
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
-        List<SchematicPlacement> list = this.getAllSchematicPlacements();
 
-        if (list.isEmpty() == false)
+        JsonArray arr = JsonUtils.toArray(this.schematicPlacements, SchematicPlacement::toJsonIfShouldSave);
+        int selectedIndex = this.selectedPlacement != null ? this.schematicPlacements.indexOf(this.selectedPlacement) : -1;
+
+        if (arr.size() > 0)
         {
-            JsonArray arr = new JsonArray();
-            int selectedIndex = 0;
-            boolean indexValid = false;
-
-            for (SchematicPlacement placement : list)
-            {
-                if (placement.shouldBeSaved() == false)
-                {
-                    continue;
-                }
-
-                JsonObject objPlacement = placement.toJson();
-
-                if (objPlacement != null)
-                {
-                    arr.add(objPlacement);
-
-                    if (this.selectedPlacement == placement && placement.isEnabled())
-                    {
-                        indexValid = true;
-                    }
-                    else if (indexValid == false && placement.isLoaded() && placement.isEnabled())
-                    {
-                        selectedIndex++;
-                    }
-                }
-            }
-
             obj.add("placements", arr);
-
-            if (indexValid)
-            {
-                obj.addProperty("selected", selectedIndex);
-            }
+            JsonUtils.addIfNotEqual(obj, "selected", selectedIndex, -1);
         }
 
         return obj;
+    }
+
+    protected void loadPlacementFromJson(JsonObject obj)
+    {
+        SchematicPlacement placement = SchematicPlacement.createFromJson(obj);
+
+        if (placement != null)
+        {
+            this.addSchematicPlacement(placement, false, true);
+        }
     }
 
     public void loadFromJson(JsonObject obj)
@@ -1250,25 +1178,8 @@ public class SchematicPlacementManager
 
         if (JsonUtils.hasArray(obj, "placements"))
         {
-            JsonArray arr = obj.get("placements").getAsJsonArray();
-            int index = JsonUtils.hasInteger(obj, "selected") ? obj.get("selected").getAsInt() : -1;
-            final int size = arr.size();
-
-            for (int i = 0; i < size; ++i)
-            {
-                JsonElement el = arr.get(i);
-
-                if (el.isJsonObject())
-                {
-                    SchematicPlacement placement = SchematicPlacement.createFromJson(el.getAsJsonObject());
-                    this.loadPlacementFromFile(placement, true);
-                }
-                else
-                {
-                    // Invalid data in the array, don't select an entry
-                    index = -1;
-                }
-            }
+            JsonUtils.getArrayElementsIfObjects(obj, "placements", this::loadPlacementFromJson);
+            int index = JsonUtils.getIntegerOrDefault(obj, "selected", -1);
 
             if (index >= 0 && index < this.schematicPlacements.size())
             {

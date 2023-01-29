@@ -117,22 +117,28 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         {
             SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-            if (schematicPlacement != null)
+            if (schematicPlacement == null)
             {
-                SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
+                MessageDispatcher.error("litematica.message.error.no_placement_selected");
+                return ActionResult.FAIL;
+            }
 
-                if (placement != null)
-                {
-                    BaseScreen.openScreen(new SchematicPlacementSubRegionSettingsScreen(schematicPlacement, placement));
-                }
-                else
-                {
-                    BaseScreen.openScreen(new SchematicPlacementSettingsScreen(schematicPlacement));
-                }
+            if (schematicPlacement.isSchematicLoaded() == false)
+            {
+                MessageDispatcher.error("litematica.message.error.schematic_placement_configure_schematic_not_loaded",
+                                        schematicPlacement.getName());
+                return ActionResult.FAIL;
+            }
+
+            SubRegionPlacement subRegionPlacement = schematicPlacement.getSelectedSubRegionPlacement();
+
+            if (subRegionPlacement != null)
+            {
+                BaseScreen.openScreen(new SchematicPlacementSubRegionSettingsScreen(schematicPlacement, subRegionPlacement));
             }
             else
             {
-                MessageDispatcher.error("litematica.message.error.no_placement_selected");
+                BaseScreen.openScreen(new SchematicPlacementSettingsScreen(schematicPlacement));
             }
         }
         else if (key == Hotkeys.OPEN_PLACEMENTS_LIST_SCREEN.getKeyBind())

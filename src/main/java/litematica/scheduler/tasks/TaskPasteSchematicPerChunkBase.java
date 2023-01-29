@@ -11,10 +11,12 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
+import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
+import malilib.util.position.PositionUtils;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.render.infohud.IInfoHudRenderer;
@@ -63,30 +65,38 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
 
     protected void addPlacement(SchematicPlacement placement, LayerRange range)
     {
+        if (placement.isSchematicLoaded() == false)
+        {
+            MessageDispatcher.error("litematica.message.error.schematic_placement_paste_schematic_not_loaded",
+                                    placement.getName());
+            return;
+        }
+
         LongSet touchedChunks = placement.getTouchedChunks();
 
         for (long chunkPosLong : touchedChunks)
         {
             int count = 0;
+            int chunkX = PositionUtils.getChunkPosX(chunkPosLong);
+            int chunkZ = PositionUtils.getChunkPosZ(chunkPosLong);
+            ChunkPos pos = new ChunkPos(chunkX, chunkZ);
 
-            /*
-            for (IntBoundingBox box : placement.getBoxesWithinChunk(chunkPosLong.x, chunkPosLong.z).values())
+            for (IntBoundingBox box : placement.getBoxesWithinChunk(chunkX, chunkZ).values())
             {
                 box = range.getClampedBox(box);
 
                 if (box != null)
                 {
-                    this.boxesInChunks.put(chunkPosLong, box);
+                    this.boxesInChunks.put(pos, box);
                     ++count;
                 }
             }
 
             if (count > 0)
             {
-                this.individualChunks.add(chunkPosLong);
-                this.onChunkAddedForHandling(chunkPosLong, placement);
+                this.individualChunks.add(pos);
+                this.onChunkAddedForHandling(pos, placement);
             }
-            */
         }
     }
 

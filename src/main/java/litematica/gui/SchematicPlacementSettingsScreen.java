@@ -91,7 +91,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.subRegionsLabel = new LabelWidget();
 
         StyledText name = StyledText.translate("litematica.label.schematic_placement_settings.schematic_name",
-                                           schematic.getMetadata().getName(), fileName);
+                                               schematic.getMetadata().getName(), fileName);
         this.schematicNameLabel = new LabelWidget();
         this.schematicNameLabel.setLabelStyledText(name);
 
@@ -121,7 +121,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.lockYCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockZCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
 
-        Icon icon = placement.getSchematicFile() != null ? placement.getSchematic().getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
+        Icon icon = placement.getSchematicFile() != null ? schematic.getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
         this.schematicTypeIcon = new IconWidget(icon);
 
         this.copyPasteSettingsButton.setRenderButtonBackgroundTexture(true);
@@ -399,13 +399,8 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected void resetName()
     {
-        ISchematic schematic = this.placement.getSchematic();
-
-        if (schematic != null)
-        {
-            this.placement.setName(schematic.getMetadata().getName());
-            this.nameTextField.setText(this.placement.getName());
-        }
+        this.placement.setName(this.placement.getSchematic().getMetadata().getName());
+        this.nameTextField.setText(this.placement.getName());
     }
 
     protected void resetSubRegions()

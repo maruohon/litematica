@@ -87,11 +87,8 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
 
     public void onSelectionChange(@Nullable SchematicPlacement entry)
     {
-        if (entry == null || entry.isLoaded())
-        {
-            boolean selected = (entry != null) && (entry == this.manager.getSelectedSchematicPlacement());
-            this.manager.setSelectedSchematicPlacement(selected ? null : entry);
-        }
+        boolean selected = (entry != null) && (entry == this.manager.getSelectedSchematicPlacement());
+        this.manager.setSelectedSchematicPlacement(selected ? null : entry);
     }
 
     @Override
