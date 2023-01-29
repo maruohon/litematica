@@ -285,7 +285,6 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected boolean clickCopyPasteSettings(int mouseButton, GenericButton button)
     {
-
         if (isShiftDown())
         {
             // Shift + left click: Copy settings to clip board
@@ -315,9 +314,20 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
             String titleKey = "litematica.title.screen.schematic_placement_settings.copy_or_load_settings";
             JsonObject origJson = this.placement.getSettingsShareJson();
 
-            TextInputScreen screen = new TextInputScreen(titleKey, origJson.toString(), this::loadSettingsFromString);
+            TextInputScreen screen = new TextInputScreen(titleKey, origJson.toString(), this::loadSettingsFromStringWithMessage);
             screen.setParent(this);
             openPopupScreen(screen);
+            return true;
+        }
+
+        return false;
+    }
+
+    protected boolean loadSettingsFromStringWithMessage(String str)
+    {
+        if (this.loadSettingsFromString(str))
+        {
+            MessageDispatcher.success("litematica.message.info.settings_loaded_from_string");
             return true;
         }
 

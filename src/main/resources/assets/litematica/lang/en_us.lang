@@ -447,6 +447,7 @@ litematica.message.info.schematic_manager.set_preview.success=Schematic preview 
 litematica.message.info.selected_placement_removed=Selected Schematic Placement §e%s§r removed
 litematica.message.info.settings_copied_to_clipboard=Settings copied to clip board
 litematica.message.info.settings_loaded_from_clipboard=Settings loaded from clipboard
+litematica.message.info.settings_loaded_from_string=Settings loaded from string
 litematica.message.info.schematic_vcs.project_created=Schematic VCS Project §e%s§r created
 litematica.message.info.schematic_vcs.project_loaded=Schematic VCS Project §e%s§r loaded
 litematica.message.warn.area_selection_browser.in_simple_mode=Note: You are currently in the §6Simple§r Area Selection mode. These area selection save files are only used in the §6Multi-Region§r selection mode.

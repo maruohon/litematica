@@ -42,12 +42,14 @@ public class SubRegionPlacement extends BasePlacement
     {
         SubRegionPlacement copy = new SubRegionPlacement(this.position, this.defaultPos, this.name);
 
-        copy.position = this.position;
+        copy.displayName = this.displayName;
         copy.rotation = this.rotation;
         copy.mirror = this.mirror;
         copy.enabled = this.enabled;
         copy.ignoreEntities = this.ignoreEntities;
+        copy.renderEnclosingBox = this.renderEnclosingBox;
         copy.coordinateLockMask = this.coordinateLockMask;
+        copy.boundingBoxColor = this.boundingBoxColor;
 
         return copy;
     }
@@ -91,7 +93,11 @@ public class SubRegionPlacement extends BasePlacement
     public JsonObject toJson()
     {
         JsonObject obj = super.toJson();
-        obj.add("default_pos", JsonUtils.blockPosToJson(this.defaultPos));
+
+        if (this.defaultPos.equals(this.position) == false)
+        {
+            obj.add("default_pos", JsonUtils.blockPosToJson(this.defaultPos));
+        }
 
         if (this.displayName.equals(this.name) == false)
         {

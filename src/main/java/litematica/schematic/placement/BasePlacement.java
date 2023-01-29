@@ -148,13 +148,12 @@ public class BasePlacement
         obj.add("pos", JsonUtils.blockPosToJson(this.position));
 
         // Only add the properties that have changed from the default values
-
-        if (this.rotation != Rotation.NONE) { obj.addProperty("rotation",               this.rotation.name());    }
-        if (this.mirror != Mirror.NONE)     { obj.addProperty("mirror",                 this.mirror.name());      }
-        if (this.enabled == false)          { obj.addProperty("enabled",                this.enabled);            }
-        if (this.ignoreEntities)            { obj.addProperty("ignore_entities",        this.ignoreEntities);     }
-        if (this.renderEnclosingBox)        { obj.addProperty("render_enclosing_box",   this.renderEnclosingBox); }
-        if (this.coordinateLockMask != 0)   { obj.addProperty("locked_coords",          this.coordinateLockMask); }
+        JsonUtils.addIfNotEqual(obj, "rotation", this.rotation, Rotation.NONE);
+        JsonUtils.addIfNotEqual(obj, "mirror", this.mirror, Mirror.NONE);
+        JsonUtils.addIfNotEqual(obj, "enabled", this.enabled, true);
+        JsonUtils.addIfNotEqual(obj, "ignore_entities", this.ignoreEntities, false);
+        JsonUtils.addIfNotEqual(obj, "render_enclosing_box", this.renderEnclosingBox, false);
+        JsonUtils.addIfNotEqual(obj, "locked_coords", this.coordinateLockMask, 0);
 
         return obj;
     }

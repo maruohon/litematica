@@ -44,6 +44,7 @@ public class SchematicPlacement extends BasePlacement
     protected static int lastColor;
 
     protected final Map<String, SubRegionPlacement> subRegionPlacements = new HashMap<>();
+    protected final Map<String, SubRegionPlacement> modifiedSubRegions = new HashMap<>();
 
     @Nullable protected Path schematicFile;
     @Nullable protected ISchematic schematic;
@@ -77,8 +78,6 @@ public class SchematicPlacement extends BasePlacement
         super(name, origin);
 
         this.schematicFile = schematicFile;
-        this.position = origin;
-        this.name = name;
         this.enabled = enabled;
 
         this.setShouldBeSaved(schematicFile != null);
@@ -168,12 +167,6 @@ public class SchematicPlacement extends BasePlacement
         return this.selectedSubRegionName;
     }
 
-    @Nullable
-    public SubRegionPlacement getSelectedSubRegionPlacement()
-    {
-        return this.selectedSubRegionName != null ? this.subRegionPlacements.get(this.selectedSubRegionName) : null;
-    }
-
     public GridSettings getGridSettings()
     {
         if (this.gridSettings == null)
@@ -201,16 +194,18 @@ public class SchematicPlacement extends BasePlacement
         this.schematicFile = schematicFile;
     }
 
-    public boolean loadAndSetSchematicFromFile(Path file)
+    protected boolean setSchematic(@Nullable ISchematic schematic)
     {
-        this.schematicFile = file;
-        this.schematic = SchematicHolder.getInstance().getOrLoad(file);
+        // Do we want to try to keep any modified subregions between different schematics?
+        // That calls for problems if the schematics are actually different, as in if
+        // they have a different set of subregions or some regions are in different locations etc.
+        // this.storeModifiedSubRegions();
+
+        this.schematic = schematic;
 
         if (this.schematic != null)
         {
-            this.resetEnclosingBox();
-            this.checkAreSubRegionsModified();
-            this.subRegionCount = this.schematic.getSubRegionCount();
+            this.configureSubRegions();
 
             return true;
         }
@@ -218,9 +213,18 @@ public class SchematicPlacement extends BasePlacement
         return false;
     }
 
+    public boolean loadAndSetSchematicFromFile(Path file)
+    {
+        this.schematicFile = file;
+        this.setSchematic(SchematicHolder.getInstance().getOrLoad(file));
+
+        return this.schematic != null;
+    }
+
     protected void loadSchematicFromFileIfEnabled()
     {
-        if (this.enabled && this.schematicFile != null &&
+        if (this.enabled &&
+            this.schematicFile != null &&
             this.loadAndSetSchematicFromFile(this.schematicFile) == false)
         {
             this.enabled = false;
@@ -277,6 +281,12 @@ public class SchematicPlacement extends BasePlacement
         }
 
         return this.materialList;
+    }
+
+    @Nullable
+    public SubRegionPlacement getSelectedSubRegionPlacement()
+    {
+        return this.selectedSubRegionName != null ? this.subRegionPlacements.get(this.selectedSubRegionName) : null;
     }
 
     @Nullable
@@ -421,7 +431,50 @@ public class SchematicPlacement extends BasePlacement
         return PositionUtils.getTouchedChunks(this.getSubRegionBoxes(EnabledCondition.ENABLED));
     }
 
-    protected void checkAreSubRegionsModified()
+    protected void storeModifiedSubRegions()
+    {
+        if (this.schematic == null)
+        {
+            return;
+        }
+
+        for (Map.Entry<String, ISchematicRegion> entry : this.schematic.getRegions().entrySet())
+        {
+            String name = entry.getKey();
+            SubRegionPlacement region = this.subRegionPlacements.get(name);
+
+            if (region != null && region.isRegionPlacementModified(entry.getValue().getPosition()))
+            {
+                this.modifiedSubRegions.put(name, region.copy());
+            }
+        }
+    }
+
+    protected void configureModifiedSubRegions()
+    {
+        for (SubRegionPlacement region : this.modifiedSubRegions.values())
+        {
+            String name = region.getName();
+
+            if (this.subRegionPlacements.containsKey(name))
+            {
+                this.subRegionPlacements.put(name, region.copy());
+            }
+        }
+    }
+
+    protected void configureSubRegions()
+    {
+        if (this.schematic != null)
+        {
+            this.resetAllSubRegionsToSchematicValues();
+            this.configureModifiedSubRegions();
+            this.checkSubRegionsModified();
+            this.subRegionCount = this.schematic.getSubRegionCount();
+        }
+    }
+
+    protected void checkSubRegionsModified()
     {
         if (this.isLoaded() == false)
         {
@@ -599,13 +652,12 @@ public class SchematicPlacement extends BasePlacement
 
     public boolean fullyLoadPlacement()
     {
-        if (this.schematicFile != null && this.schematic == null)
+        if (this.schematicFile != null &&
+            this.schematic == null &&
+            this.loadAndSetSchematicFromFile(this.schematicFile) == false)
         {
-            if (this.loadAndSetSchematicFromFile(this.schematicFile) == false)
-            {
-                MessageDispatcher.error().translate("litematica.error.schematic_load.failed",
-                                                    this.schematicFile.toAbsolutePath().toString());
-            }
+            MessageDispatcher.error().translate("litematica.error.schematic_load.failed",
+                                                this.schematicFile.toAbsolutePath().toString());
         }
 
         return false;
@@ -752,19 +804,19 @@ public class SchematicPlacement extends BasePlacement
             obj.add("material_list", this.materialList.toJson());
         }
 
-        if (this.regionPlacementsModified && this.subRegionPlacements.isEmpty() == false)
+        JsonArray arr = new JsonArray();
+
+        for (SubRegionPlacement region : this.subRegionPlacements.values())
         {
-            JsonArray arr = new JsonArray();
-
-            for (Map.Entry<String, SubRegionPlacement> entry : this.subRegionPlacements.entrySet())
+            if (region.isRegionPlacementModifiedFromDefault())
             {
-                JsonObject placementObj = new JsonObject();
-                placementObj.addProperty("name", entry.getKey());
-                placementObj.add("placement", entry.getValue().toJson());
-                arr.add(placementObj);
+                arr.add(region.toJson());
             }
+        }
 
-            obj.add("placements", arr);
+        if (arr.size() > 0)
+        {
+            obj.add("regions", arr);
         }
 
         return obj;
@@ -802,20 +854,50 @@ public class SchematicPlacement extends BasePlacement
 
         JsonUtils.copyPropertyIfExists(objIn, obj, "name");
         JsonUtils.copyPropertyIfExists(objIn, obj, "pos");
-        JsonUtils.copyPropertyIfExists(objIn, obj, "origin");
         JsonUtils.copyPropertyIfExists(objIn, obj, "rotation");
         JsonUtils.copyPropertyIfExists(objIn, obj, "mirror");
         JsonUtils.copyPropertyIfExists(objIn, obj, "ignore_entities");
-        JsonUtils.copyPropertyIfExists(objIn, obj, "placements");
+        JsonUtils.copyPropertyIfExists(objIn, obj, "regions");
         JsonUtils.copyPropertyIfExists(objIn, obj, "grid");
+
+        JsonUtils.copyPropertyIfExists(objIn, obj, "origin"); // backwards compat
+        JsonUtils.copyPropertyIfExists(objIn, obj, "placements"); // backwards compat
 
         return obj;
     }
 
+    protected void readSubRegionFromJson(JsonObject obj)
+    {
+        SubRegionPlacement placement = SubRegionPlacement.fromJson(obj);
+
+        // Backwards compatibility with old configs/placement save files
+        if (placement == null &&
+            JsonUtils.hasString(obj, "name") &&
+            JsonUtils.hasObject(obj, "placement"))
+        {
+            placement = SubRegionPlacement.fromJson(obj.get("placement").getAsJsonObject());
+        }
+
+        if (placement != null)
+        {
+            this.modifiedSubRegions.put(placement.getName(), placement);
+        }
+    }
+
     public boolean loadFromSharedSettings(JsonObject obj)
     {
+        // Only use a fixed subset of the properties, to prevent copy-pasting settings
+        // from other people messing up some of the internal values, or setting values
+        // that don't really make sense to share.
         obj = this.getSharedSettingsPropertiesToLoad(obj);
-        return this.readFromJson(obj);
+
+        if (this.readFromJson(obj))
+        {
+            this.configureSubRegions();
+            return true;
+        }
+
+        return false;
     }
 
     public boolean readFromJson(JsonObject obj)
@@ -849,32 +931,10 @@ public class SchematicPlacement extends BasePlacement
         this.setBoundingBoxColor(JsonUtils.getIntegerOrDefault(obj, "bb_color", this.boundingBoxColor.intValue));
         JsonUtils.getObjectIfExists(obj, "material_list", o -> this.materialListData = o);
 
-        if (JsonUtils.hasArray(obj, "placements"))
-        {
-            JsonArray placementArr = obj.get("placements").getAsJsonArray();
-
-            for (int i = 0; i < placementArr.size(); ++i)
-            {
-                JsonElement el = placementArr.get(i);
-
-                if (el.isJsonObject())
-                {
-                    JsonObject placementObj = el.getAsJsonObject();
-
-                    if (JsonUtils.hasString(placementObj, "name") &&
-                        JsonUtils.hasObject(placementObj, "placement"))
-                    {
-                        SubRegionPlacement placement = SubRegionPlacement.fromJson(placementObj.get("placement").getAsJsonObject());
-
-                        if (placement != null)
-                        {
-                            String placementName = placementObj.get("name").getAsString();
-                            this.subRegionPlacements.put(placementName, placement);
-                        }
-                    }
-                }
-            }
-        }
+        this.modifiedSubRegions.clear();
+        JsonUtils.getArrayElementsIfObjects(obj, "regions", this::readSubRegionFromJson);
+        // This is for backwards compatibility with older configs
+        JsonUtils.getArrayElementsIfObjects(obj, "placements", this::readSubRegionFromJson);
 
         // Note: This needs to be after reading the sub-regions, so that the enclosing box can be calculated
         // and the grid's default size set correctly.

@@ -661,7 +661,7 @@ public class SchematicPlacementManager
 
     protected void onPlacementRegionModified(SchematicPlacement placement)
     {
-        placement.checkAreSubRegionsModified();
+        placement.checkSubRegionsModified();
         this.onPlacementModified(placement);
     }
 
