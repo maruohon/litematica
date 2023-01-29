@@ -113,7 +113,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
                                                       this.placement::ignoreEntities, this::toggleIgnoreEntities);
         this.toggleLockedButton   = OnOffButton.onOff(18, "litematica.button.schematic_placement_settings.locked",
                                                       this.placement::isLocked, this.placement::toggleLocked);
-        this.togglePlacementEnabledButton = OnOffButton.onOff(18, "litematica.button.placement_list.placement_enabled",
+        this.togglePlacementEnabledButton = OnOffButton.onOff(18, "litematica.button.schematic_placement_settings.enabled",
                                                               this.placement::isEnabled, this::toggleEnabled);
         this.originEditWidget = new BlockPosEditWidget(90, 72, 2, true, placement.getPosition(), this::setOrigin);
 

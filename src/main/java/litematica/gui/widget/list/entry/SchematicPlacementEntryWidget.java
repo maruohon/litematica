@@ -65,18 +65,19 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         {
             this.configureButton     = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.CONFIGURATION, this::openConfigurationMenu);
             this.duplicateButton     = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.DUPLICATE,     this::duplicatePlacement);
-            this.removeButton        = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.TRASH_CAN,     this::removePlacement);
+            //this.removeButton        = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.TRASH_CAN,     this::removePlacement);
             this.saveToFileButton    = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.SAVE_TO_DISK,  this::saveToFile);
             this.toggleEnabledButton = OnOffButton.onOff(20, "%s", placement::isEnabled, this::toggleEnabled);
         }
         else
         {
-            this.configureButton     = GenericButton.create("litematica.button.misc.configure", this::openConfigurationMenu);
-            this.duplicateButton     = GenericButton.create("litematica.button.misc.duplicate", this::duplicatePlacement);
-            this.removeButton        = GenericButton.create("litematica.button.misc.remove", this::removePlacement);
-            this.saveToFileButton    = GenericButton.create("litematica.button.misc.save", this::saveToFile);
-            this.toggleEnabledButton = OnOffButton.onOff(20, "litematica.button.placement_list.placement_enabled", placement::isEnabled, this::toggleEnabled);
+            this.configureButton     = GenericButton.create("litematica.button.schematic_placements_list.configure", this::openConfigurationMenu);
+            this.duplicateButton     = GenericButton.create("litematica.button.schematic_placements_list.duplicate", this::duplicatePlacement);
+            this.saveToFileButton    = GenericButton.create("litematica.button.schematic_placements_list.save", this::saveToFile);
+            this.toggleEnabledButton = OnOffButton.onOff(20, "litematica.button.schematic_placements_list.enabled", placement::isEnabled, this::toggleEnabled);
         }
+
+        this.removeButton = GenericButton.create("litematica.button.schematic_placements_list.remove", this::removePlacement);
 
         this.lockedIcon.translateAndAddHoverString("litematica.hover.placement_list.icon.placement_locked");
         this.modificationNoticeIcon.translateAndAddHoverString("litematica.hover.placement_list.icon.placement_modified");
@@ -160,9 +161,10 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         this.removeButton.setRight(this.getRight() - 2);
         this.saveToFileButton.setRight(this.removeButton.getX() - 1);
         this.duplicateButton.setRight(this.saveToFileButton.getX() - 1);
-        this.toggleEnabledButton.setRight(this.duplicateButton.getX() - 1);
-        this.configureButton.setRight(this.toggleEnabledButton.getX() - 1);
-        this.modificationNoticeIcon.setRight(this.configureButton.getX() - 2);
+        this.configureButton.setRight(this.duplicateButton.getX() - 1);
+        this.toggleEnabledButton.setRight(this.configureButton.getX() - 1);
+
+        this.modificationNoticeIcon.setRight(this.toggleEnabledButton.getX() - 2);
         this.lockedIcon.setRight(this.modificationNoticeIcon.getX() - 1);
 
         this.buttonsStartX = this.lockedIcon.getX() - 1;

@@ -41,8 +41,8 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
         this.manager = DataManager.getSchematicPlacementManager();
         this.placement = placement;
 
-        this.configureButton     = GenericButton.create(18, "litematica.button.misc.configure", this::openConfigurationMenu);
-        this.toggleEnabledButton = OnOffButton.onOff(18, "litematica.button.placement_list.placement_enabled", data::isEnabled, this::toggleEnabled);
+        this.configureButton     = GenericButton.create(18, "litematica.button.schematic_placements_list.configure", this::openConfigurationMenu);
+        this.toggleEnabledButton = OnOffButton.onOff(18, "litematica.button.schematic_placements_list.enabled", data::isEnabled, this::toggleEnabled);
         this.modificationNoticeIcon = new IconWidget(LitematicaIcons.NOTICE_EXCLAMATION_11);
         this.modificationNoticeIcon.translateAndAddHoverString("litematica.hover.placement_list.icon.placement_modified");
 
