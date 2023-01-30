@@ -48,6 +48,7 @@ import litematica.selection.AreaSelectionManager;
 import litematica.tool.ToolMode;
 import litematica.tool.ToolModeData;
 import litematica.util.DefaultDirectories;
+import litematica.world.SchematicWorldHandler;
 import litematica.world.SchematicWorldRenderingNotifier;
 
 public class DataManager implements DirectoryCache
@@ -66,7 +67,7 @@ public class DataManager implements DirectoryCache
     private static long clientTickStart;
 
     private final AreaSelectionManager areaSelectionManager = new AreaSelectionManager();
-    private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
+    private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager(SchematicWorldHandler::getSchematicWorld);
     private final SchematicProjectsManager schematicProjectsManager = new SchematicProjectsManager();
     private LayerRange renderRange = new LayerRange(SchematicWorldRenderingNotifier.INSTANCE);
     private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
