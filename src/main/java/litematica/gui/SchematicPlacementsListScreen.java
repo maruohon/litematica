@@ -37,7 +37,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.loadSchematicsScreenButton          = GenericButton.create("litematica.button.change_menu.load_schematics", LitematicaIcons.SCHEMATIC_BROWSER);
         this.loadedSchematicsListScreenButton    = GenericButton.create("litematica.button.change_menu.loaded_schematics", LitematicaIcons.LOADED_SCHEMATICS);
         this.mainMenuButton                      = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
-        this.schematicPlacementFileBrowserButton = GenericButton.create("litematica.button.placement_list.open_placement_browser");
+        this.schematicPlacementFileBrowserButton = GenericButton.create("litematica.button.schematic_placement_list.open_placement_browser");
 
         this.loadSchematicsScreenButton.setActionListener(() -> openScreenWithParent(new SchematicBrowserScreen()));
         this.loadedSchematicsListScreenButton.setActionListener(() -> openScreenWithParent(new LoadedSchematicsListScreen()));
@@ -61,11 +61,11 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     {
         super.reAddActiveWidgets();
 
-        this.addWidget(this.loadSchematicsScreenButton);
-        this.addWidget(this.loadedSchematicsListScreenButton);
-        this.addWidget(this.schematicPlacementFileBrowserButton);
         this.addWidget(this.iconsTextToggleButton);
+        this.addWidget(this.loadedSchematicsListScreenButton);
+        this.addWidget(this.loadSchematicsScreenButton);
         this.addWidget(this.mainMenuButton);
+        this.addWidget(this.schematicPlacementFileBrowserButton);
     }
 
     @Override
@@ -135,11 +135,11 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     {
         if (Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue())
         {
-            return StringUtils.translate("litematica.button.placement_list.icon_vs_text.icons");
+            return StringUtils.translate("litematica.button.schematic_placement_list.icon_vs_text.icons");
         }
         else
         {
-            return StringUtils.translate("litematica.button.placement_list.icon_vs_text.text");
+            return StringUtils.translate("litematica.button.schematic_placement_list.icon_vs_text.text");
         }
     }
 }

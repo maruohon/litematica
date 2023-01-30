@@ -84,11 +84,11 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
     {
         if (Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.getBooleanValue())
         {
-            return StringUtils.translate("litematica.button.placement_list.icon_vs_text.icons");
+            return StringUtils.translate("litematica.button.schematic_placement_list.icon_vs_text.icons");
         }
         else
         {
-            return StringUtils.translate("litematica.button.placement_list.icon_vs_text.text");
+            return StringUtils.translate("litematica.button.schematic_placement_list.icon_vs_text.text");
         }
     }
 }

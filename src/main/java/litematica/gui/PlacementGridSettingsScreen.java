@@ -33,10 +33,10 @@ public class PlacementGridSettingsScreen extends BaseScreen
         GridSettings settings = placement.getGridSettings();
         this.cachedSettings.copyFrom(settings);
 
-        this.gridSizeLabel = new LabelWidget("litematica.label.placement_grid_settings.grid_size");
-        this.repeatCountLabel = new LabelWidget("litematica.label.placement_grid_settings.repeat_count");
+        this.gridSizeLabel = new LabelWidget("litematica.label.schematic_placement_grid_settings.grid_size");
+        this.repeatCountLabel = new LabelWidget("litematica.label.schematic_placement_grid_settings.repeat_count");
 
-        this.resetGridSizeButton    = GenericButton.create("litematica.button.placement_grid_settings.reset_size", this::resetGridSize);
+        this.resetGridSizeButton = GenericButton.create("litematica.button.schematic_placement_grid_settings.reset_size", this::resetGridSize);
         this.toggleGridEnabledButton = OnOffButton.onOff(20, "litematica.button.schematic_placement_settings.grid_settings",
                                                          this.placement.getGridSettings()::isEnabled,
                                                          this::toggleGridEnabled);
