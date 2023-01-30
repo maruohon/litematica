@@ -77,11 +77,6 @@ public class DataManager implements DirectoryCache
     {
     }
 
-    private static DataManager getInstance()
-    {
-        return INSTANCE;
-    }
-
     public static void onClientTickStart()
     {
         clientTickStart = System.nanoTime();
@@ -109,28 +104,28 @@ public class DataManager implements DirectoryCache
 
     public static AreaSelectionManager getAreaSelectionManager()
     {
-        return getInstance().areaSelectionManager;
+        return INSTANCE.areaSelectionManager;
     }
 
     public static SchematicPlacementManager getSchematicPlacementManager()
     {
-        return getInstance().schematicPlacementManager;
+        return INSTANCE.schematicPlacementManager;
     }
 
     public static SchematicProjectsManager getSchematicProjectsManager()
     {
-        return getInstance().schematicProjectsManager;
+        return INSTANCE.schematicProjectsManager;
     }
 
     @Nullable
     public static MaterialListBase getMaterialList()
     {
-        return getInstance().materialList;
+        return INSTANCE.materialList;
     }
 
     public static void setMaterialList(@Nullable MaterialListBase materialList)
     {
-        MaterialListBase old = getInstance().materialList;
+        MaterialListBase old = INSTANCE.materialList;
 
         if (old != null && materialList != old)
         {
@@ -143,7 +138,7 @@ public class DataManager implements DirectoryCache
             }
         }
 
-        getInstance().materialList = materialList;
+        INSTANCE.materialList = materialList;
     }
 
     public static ToolMode getToolMode()
@@ -163,12 +158,12 @@ public class DataManager implements DirectoryCache
 
     public static LayerRange getRenderLayerRange()
     {
-        return getInstance().renderRange;
+        return INSTANCE.renderRange;
     }
 
     public static AreaSelectionSimple getSimpleArea()
     {
-        return getInstance().areaSimple;
+        return INSTANCE.areaSimple;
     }
 
     @Override
@@ -189,7 +184,7 @@ public class DataManager implements DirectoryCache
         TaskScheduler.getInstanceClient().clearTasks();
         InfoHud.getInstance().reset(); // remove the line providers and clear the data
 
-        getInstance().clearData(true);
+        INSTANCE.clearData(true);
     }
 
     private void clearData(boolean isLogout)
@@ -212,7 +207,7 @@ public class DataManager implements DirectoryCache
             loadPerWorldData();
         }
 
-        getInstance().loadPerDimensionData();
+        INSTANCE.loadPerDimensionData();
 
         canSave = true;
     }
@@ -304,7 +299,7 @@ public class DataManager implements DirectoryCache
             return;
         }
 
-        getInstance().savePerDimensionData();
+        INSTANCE.savePerDimensionData();
 
         if (isDimensionChange == false)
         {
