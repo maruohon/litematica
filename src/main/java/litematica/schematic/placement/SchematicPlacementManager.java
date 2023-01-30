@@ -277,6 +277,19 @@ public class SchematicPlacementManager
         return this.touchedVolumesInSubChunk.keySet();
     }
 
+    public void reOrderPlacements(List<SchematicPlacement> newList)
+    {
+        HashSet<SchematicPlacement> set = new HashSet<>(newList);
+
+        // Check that the contents don't change other than on their order
+        if (set.size() == this.schematicPlacements.size() &&
+            set.containsAll(this.schematicPlacements))
+        {
+            this.schematicPlacements.clear();
+            this.schematicPlacements.addAll(newList);
+        }
+    }
+
     public boolean duplicateSelectedPlacement()
     {
         SchematicPlacement placement = this.getSelectedSchematicPlacement();

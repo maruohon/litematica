@@ -26,6 +26,8 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     protected final GenericButton loadedSchematicsListScreenButton;
     protected final GenericButton mainMenuButton;
     protected final GenericButton schematicPlacementFileBrowserButton;
+    protected final GenericButton sortModeButton;
+    protected boolean sortMode;
 
     public SchematicPlacementsListScreen()
     {
@@ -38,6 +40,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.loadedSchematicsListScreenButton    = GenericButton.create("litematica.button.change_menu.loaded_schematics", LitematicaIcons.LOADED_SCHEMATICS);
         this.mainMenuButton                      = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.schematicPlacementFileBrowserButton = GenericButton.create("litematica.button.schematic_placement_list.open_placement_browser");
+        this.sortModeButton                      = GenericButton.create(16, this::getSortModeButtonLabel, this::sortModeButtonClicked);
 
         this.loadSchematicsScreenButton.setActionListener(() -> openScreenWithParent(new SchematicBrowserScreen()));
         this.loadedSchematicsListScreenButton.setActionListener(() -> openScreenWithParent(new LoadedSchematicsListScreen()));
@@ -45,6 +48,8 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
 
         this.iconsTextToggleButton.translateAndAddHoverString("litematica.hover.button.icon_vs_text_buttons");
         this.iconsTextToggleButton.setIsRightAligned(true);
+        this.sortModeButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_list.sort_mode_button");
+        this.sortModeButton.setHoverInfoRequiresShift(true);
 
         this.setTitle("litematica.title.screen.schematic_placements_list", Reference.MOD_VERSION);
     }
@@ -66,6 +71,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.addWidget(this.loadSchematicsScreenButton);
         this.addWidget(this.mainMenuButton);
         this.addWidget(this.schematicPlacementFileBrowserButton);
+        this.addWidget(this.sortModeButton);
     }
 
     @Override
@@ -75,6 +81,9 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
 
         this.iconsTextToggleButton.setRight(this.getRight() - 10);
         this.iconsTextToggleButton.setBottom(this.getListY() - 1);
+
+        this.sortModeButton.setRight(this.iconsTextToggleButton.getX() - 2);
+        this.sortModeButton.setBottom(this.getListY() - 1);
 
         int y = this.getBottom() - 24;
         this.loadSchematicsScreenButton.setPosition(this.x + 10, y);
@@ -113,6 +122,26 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.initScreen();
     }
 
+    protected void sortModeButtonClicked()
+    {
+        this.sortMode = ! this.sortMode;
+
+        DataListWidget<SchematicPlacement> listWidget = this.getListWidget();
+        listWidget.setFetchFromSupplierOnRefresh(! this.sortMode);
+
+        if (this.sortMode)
+        {
+            listWidget.setDataListEntryWidgetFactory((d, cd) -> new SchematicPlacementEntryWidget(d, cd, this).setSortMode(true));
+        }
+        else
+        {
+            DataManager.getSchematicPlacementManager().reOrderPlacements(listWidget.getNonFilteredDataList());
+            listWidget.setDataListEntryWidgetFactory((d, cd) -> new SchematicPlacementEntryWidget(d, cd, this));
+        }
+
+        listWidget.refreshEntries();
+    }
+
     public void clearModifiedSinceSavedCache()
     {
         this.modifiedCache.clear();
@@ -129,6 +158,16 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         }
 
         return modified.booleanValue();
+    }
+
+    protected String getSortModeButtonLabel()
+    {
+        if (this.sortMode)
+        {
+            return StringUtils.translate("litematica.button.schematic_placement_list.sort_mode.leave_sort_mode");
+        }
+
+        return StringUtils.translate("litematica.button.schematic_placement_list.sort_mode.enter_sort_mode");
     }
 
     protected String getIconVsTextButtonLabel()

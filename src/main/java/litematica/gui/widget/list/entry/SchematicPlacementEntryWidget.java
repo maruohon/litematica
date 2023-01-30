@@ -15,7 +15,7 @@ import malilib.gui.icon.Icon;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
-import malilib.gui.widget.list.entry.BaseDataListEntryWidget;
+import malilib.gui.widget.list.entry.BaseOrderableListEditEntryWidget;
 import malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.overlay.message.MessageHelpers;
@@ -34,7 +34,7 @@ import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
 import litematica.util.PositionUtils;
 
-public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<SchematicPlacement>
+public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWidget<SchematicPlacement>
 {
     protected final SchematicPlacement placement;
     protected final SchematicPlacementManager manager;
@@ -46,6 +46,7 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
     protected final GenericButton toggleEnabledButton;
     protected final IconWidget lockedIcon;
     protected final IconWidget modificationNoticeIcon;
+    protected boolean sortMode;
     protected int buttonsStartX;
 
     public SchematicPlacementEntryWidget(SchematicPlacement placement,
@@ -60,6 +61,10 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
 
         this.lockedIcon = new IconWidget(LitematicaIcons.LOCK_LOCKED);
         this.modificationNoticeIcon = new IconWidget(LitematicaIcons.NOTICE_EXCLAMATION_11);
+        this.useAddButton = false;
+        this.useMoveButtons = false;
+        this.useRemoveButton = false;
+        this.canReOrder = false;
 
         if (this.useIconButtons())
         {
@@ -131,24 +136,40 @@ public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<Schem
         this.addHoverInfo(placement);
     }
 
+    public SchematicPlacementEntryWidget setSortMode(boolean sortMode)
+    {
+        this.sortMode = sortMode;
+        this.canReOrder = sortMode;
+        return this;
+    }
+
     @Override
     public void reAddSubWidgets()
     {
         super.reAddSubWidgets();
 
-        this.addWidget(this.configureButton);
-        this.addWidget(this.duplicateButton);
-        this.addWidget(this.removeButton);
-        this.addWidget(this.saveToFileButton);
-        this.addWidget(this.toggleEnabledButton);
-        this.addWidgetIf(this.modificationNoticeIcon, this.data.isRegionPlacementModified());
-        this.addWidgetIf(this.lockedIcon, this.data.isLocked());
+        if (this.sortMode == false)
+        {
+            this.addWidget(this.configureButton);
+            this.addWidget(this.duplicateButton);
+            this.addWidget(this.removeButton);
+            this.addWidget(this.saveToFileButton);
+            this.addWidget(this.toggleEnabledButton);
+            this.addWidgetIf(this.modificationNoticeIcon, this.data.isRegionPlacementModified());
+            this.addWidgetIf(this.lockedIcon, this.data.isLocked());
+        }
     }
 
     @Override
     public void updateSubWidgetPositions()
     {
         super.updateSubWidgetPositions();
+
+        if (this.sortMode)
+        {
+            this.buttonsStartX = this.getRight();
+            return;
+        }
 
         this.modificationNoticeIcon.centerVerticallyInside(this);
         this.lockedIcon.centerVerticallyInside(this);
