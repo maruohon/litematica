@@ -202,6 +202,7 @@ public class SchematicPlacement extends BasePlacement
 
         if (this.isSchematicLoaded())
         {
+            this.schematicFile = schematic.getFile();
             this.configureSubRegions();
             return true;
         }

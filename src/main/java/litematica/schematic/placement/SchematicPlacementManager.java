@@ -693,6 +693,19 @@ public class SchematicPlacementManager
         this.onPlacementModified(placement);
     }
 
+    public void changeSchematicInPlacement(SchematicPlacement placement, ISchematic newSchematic)
+    {
+        if (placement.isLocked())
+        {
+            this.printLockedErrorMessage();
+            return;
+        }
+
+        this.onPrePlacementChange(placement);
+        placement.setSchematic(newSchematic);
+        this.onPlacementModified(placement);
+    }
+
     public void setOrigin(SchematicPlacement placement, BlockPos origin)
     {
         if (placement.isLocked())

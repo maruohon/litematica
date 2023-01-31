@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.BaseListScreen;
 import malilib.gui.BaseScreen;
+import malilib.gui.ConfirmActionScreen;
 import malilib.gui.TextInputScreen;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
@@ -25,6 +26,7 @@ import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
 import malilib.gui.widget.list.DataListWidget;
+import malilib.listener.EventListener;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.render.text.StyledText;
 import malilib.util.StringUtils;
@@ -53,6 +55,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     protected final LabelWidget subRegionsLabel;
     protected final IconWidget schematicTypeIcon;
     protected final BaseTextFieldWidget nameTextField;
+    protected final GenericButton changeSchematicButton;
     protected final GenericButton copyPasteSettingsButton;
     protected final GenericButton mirrorButton;
     protected final GenericButton nameResetButton;
@@ -80,22 +83,16 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.placement = placement;
         this.manager = DataManager.getSchematicPlacementManager();
 
-        ISchematic schematic = placement.getSchematic();
-        Path file = schematic.getFile();
-        String fileName = file != null ? file.getFileName().toString() : "-";
-
         this.nameTextField = new BaseTextFieldWidget(300, 16, placement.getName());
         this.nameTextField.setListener(this::setName);
         this.nameTextField.setUpdateListenerAlways(false);
         this.originLabel = new LabelWidget("litematica.label.schematic_placement_settings.placement_origin");
         this.subRegionsLabel = new LabelWidget();
 
-        StyledText name = StyledText.translate("litematica.label.schematic_placement_settings.schematic_name",
-                                               schematic.getMetadata().getName(), fileName);
         this.schematicNameLabel = new LabelWidget();
-        this.schematicNameLabel.setLabelStyledText(name);
 
-        this.copyPasteSettingsButton   = GenericButton.create(18, "malilib.button.export_slash_import", this::clickCopyPasteSettings);
+        this.changeSchematicButton     = GenericButton.create(12, "litematica.button.schematic_placement_settings.change_schematic", this::changeSchematicButtonClicked);
+        this.copyPasteSettingsButton   = GenericButton.create(18, "litematica.button.schematic_placement_settings.export_import_settings", this::clickCopyPasteSettings);
         this.mirrorButton              = GenericButton.create(18, this::getMirrorButtonLabel, this::mirror);
         this.nameResetButton           = GenericButton.create(DefaultIcons.RESET_12, this::resetName);
         this.openMaterialListButton    = GenericButton.create(18, "litematica.button.misc.material_list", this::openMaterialList);
@@ -121,10 +118,12 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.lockYCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockZCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
 
+        ISchematic schematic = placement.getSchematic();
         Icon icon = placement.getSchematicFile() != null ? schematic.getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
         this.schematicTypeIcon = new IconWidget(icon);
 
         this.copyPasteSettingsButton.setRenderButtonBackgroundTexture(true);
+        this.changeSchematicButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.change_schematic");
         this.copyPasteSettingsButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.copy_paste_settings");
         this.gridSettingsButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.grid_settings");
         this.nameTextField.translateAndAddHoverString("litematica.hover.schematic_placement_settings.rename_placement");
@@ -151,6 +150,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     {
         super.reAddActiveWidgets();
 
+        this.addWidget(this.changeSchematicButton);
         this.addWidget(this.copyPasteSettingsButton);
         this.addWidget(this.gridSettingsButton);
         this.addWidget(this.lockXCoordCheckbox);
@@ -185,15 +185,17 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         super.updateWidgetPositions();
 
         int x = this.x + 12;
-        int y = this.y + 25;
+        int y = this.y + 17;
         this.schematicTypeIcon.setPosition(x, y + 2);
         this.nameTextField.setPosition(x + 16, y);
         this.nameTextField.setWidth(Math.min(240, this.screenWidth - 300));
         this.nameResetButton.setX(this.nameTextField.getRight() + 4);
         this.nameResetButton.centerVerticallyInside(this.nameTextField);
-        this.schematicNameLabel.setPosition(x + 2, this.nameTextField.getBottom() + 3);
+        this.schematicNameLabel.setPosition(x + 2, this.nameTextField.getBottom() + 2);
 
-        this.subRegionsLabel.setPosition(x + 2, this.getListY() - 10);
+        this.subRegionsLabel.setPosition(x + 2, this.getListY() - 9);
+
+        this.changeSchematicButton.setPosition(x, this.schematicNameLabel.getBottom() - 1);
 
         this.copyPasteSettingsButton.setRight(this.getRight() - 140);
         this.copyPasteSettingsButton.setY(this.y + 6);
@@ -360,6 +362,35 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         }
     }
 
+    protected void changeSchematicButtonClicked()
+    {
+        ConfirmActionScreen screen = new ConfirmActionScreen(300, "litematica.title.screen.confirm.change_schematic_in_placement",
+                                                             () -> openScreenWithParent(new SchematicSelectorScreen(this::changeSchematicInPlacement)),
+                                                             (EventListener) null,
+                                                             "litematica.button.misc.continue",
+                                                             "litematica.button.misc.cancel",
+                                                             "litematica.label.confirm.change_schematic_in_placement");
+        openPopupScreenWithCurrentScreenAsParent(screen);
+    }
+
+    protected void changeSchematicInPlacement(ISchematic newSchematic)
+    {
+        String oldSchematicName = this.placement.getSchematic().getMetadata().getName();
+        String newSchematicName = newSchematic.getMetadata().getName();
+        boolean unnamed = this.placement.getName().equals(oldSchematicName);
+
+        DataManager.getSchematicPlacementManager().changeSchematicInPlacement(this.placement, newSchematic);
+
+        if (unnamed)
+        {
+            this.resetName();
+        }
+
+        this.updateWidgetStates();
+
+        MessageDispatcher.success("litematica.message.info.schematic_changed_in_placement", newSchematicName);
+    }
+
     protected boolean mirror(int mouseButton, GenericButton button)
     {
         boolean reverse = mouseButton == 1;
@@ -443,6 +474,13 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         String key = "litematica.label.schematic_placement_settings.sub_regions";
         int regionCount = this.placement.getSubRegionCount();
         this.subRegionsLabel.setLabelStyledText(StyledText.translate(key, regionCount));
+
+        ISchematic schematic = this.placement.getSchematic();
+        Path file = schematic.getFile();
+        String fileName = file != null ? file.getFileName().toString() : "-";
+        StyledText name = StyledText.translate("litematica.label.schematic_placement_settings.schematic_name",
+                                               schematic.getMetadata().getName(), fileName);
+        this.schematicNameLabel.setLabelStyledText(name);
     }
 
     protected MultiIcon getEnclosingBoxButtonIcon()
