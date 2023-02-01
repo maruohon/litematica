@@ -58,12 +58,12 @@ public class SelectionBox extends CornerDefinedBox
 
         if (corner == BoxCorner.NONE || corner == BoxCorner.CORNER_1)
         {
-            this.corner1 = this.corner1.offset(direction, amount);
+            this.setCorner1(this.corner1.offset(direction, amount));
         }
 
         if (corner == BoxCorner.NONE || corner == BoxCorner.CORNER_2)
         {
-            this.corner2 = this.corner2.offset(direction, amount);
+            this.setCorner2(this.corner2.offset(direction, amount));
         }
     }
 
