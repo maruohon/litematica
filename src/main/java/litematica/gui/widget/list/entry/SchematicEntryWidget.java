@@ -9,6 +9,7 @@ import java.util.Locale;
 import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.BaseScreen;
+import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
 import malilib.gui.icon.MultiIcon;
 import malilib.gui.widget.IconWidget;
@@ -44,7 +45,7 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
     {
         super(schematic, constructData);
 
-        this.modificationNoticeIcon = new IconWidget(LitematicaIcons.NOTICE_EXCLAMATION_11);
+        this.modificationNoticeIcon = new IconWidget(DefaultIcons.EXCLAMATION_11);
         String timeStr = BaseFileBrowserWidget.DATE_FORMAT.format(new Date(schematic.getMetadata().getTimeModified()));
         this.modificationNoticeIcon.translateAndAddHoverString("litematica.hover.schematic_list.modified_on", timeStr);
 

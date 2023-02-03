@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.BaseScreen;
+import malilib.gui.icon.DefaultIcons;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
@@ -16,7 +17,6 @@ import malilib.render.text.StyledTextLine;
 import malilib.util.StringUtils;
 import litematica.data.DataManager;
 import litematica.gui.SchematicPlacementSubRegionSettingsScreen;
-import litematica.gui.util.LitematicaIcons;
 import litematica.schematic.ISchematicRegion;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
@@ -43,7 +43,7 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
 
         this.configureButton     = GenericButton.create(18, "litematica.button.schematic_placements_list.configure", this::openConfigurationMenu);
         this.toggleEnabledButton = OnOffButton.onOff(18, "litematica.button.schematic_placements_list.enabled", data::isEnabled, this::toggleEnabled);
-        this.modificationNoticeIcon = new IconWidget(LitematicaIcons.NOTICE_EXCLAMATION_11);
+        this.modificationNoticeIcon = new IconWidget(DefaultIcons.EXCLAMATION_11);
         this.modificationNoticeIcon.translateAndAddHoverString("litematica.hover.placement_list.icon.placement_modified");
 
         String key = data.isEnabled() ? "litematica.button.schematic_placement_settings.entry_name.enabled" :

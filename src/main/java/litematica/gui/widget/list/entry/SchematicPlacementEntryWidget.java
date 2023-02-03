@@ -59,8 +59,8 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
         this.placement = placement;
         this.manager = DataManager.getSchematicPlacementManager();
 
-        this.lockedIcon = new IconWidget(LitematicaIcons.LOCK_LOCKED);
-        this.modificationNoticeIcon = new IconWidget(LitematicaIcons.NOTICE_EXCLAMATION_11);
+        this.lockedIcon = new IconWidget(DefaultIcons.LOCK_LOCKED);
+        this.modificationNoticeIcon = new IconWidget(DefaultIcons.EXCLAMATION_11);
         this.useAddButton = false;
         this.useMoveButtons = false;
         this.useRemoveButton = false;

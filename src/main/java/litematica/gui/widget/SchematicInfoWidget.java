@@ -52,7 +52,7 @@ public class SchematicInfoWidget extends ContainerWidget
         // FIXME (malilib) this seems silly to have to be enabled for the border to render (see IconWidget#renderAt())
         this.iconWidget.getBackgroundRenderer().getNormalSettings().setEnabled(true);
 
-        this.configButton = GenericButton.create(DefaultIcons.INFO_ICON_11, this::openConfigScreen);
+        this.configButton = GenericButton.create(DefaultIcons.INFO_11, this::openConfigScreen);
 
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
         this.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);

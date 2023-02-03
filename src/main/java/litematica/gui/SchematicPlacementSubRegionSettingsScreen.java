@@ -87,9 +87,9 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
         pos = litematica.util.PositionUtils.getTransformedBlockPos(pos, placement.getMirror(), placement.getRotation()).add(placement.getPosition());
         this.originEditWidget = new BlockPosEditWidget(90, 72, 2, true, pos, this::setOrigin);
 
-        this.lockXCoordCheckbox = new CheckBoxWidget(null, () -> this.isCoordinateLocked(Coordinate.X), (val) -> this.setCoordinateLocked(val, Coordinate.X));
-        this.lockYCoordCheckbox = new CheckBoxWidget(null, () -> this.isCoordinateLocked(Coordinate.Y), (val) -> this.setCoordinateLocked(val, Coordinate.Y));
-        this.lockZCoordCheckbox = new CheckBoxWidget(null, () -> this.isCoordinateLocked(Coordinate.Z), (val) -> this.setCoordinateLocked(val, Coordinate.Z));
+        this.lockXCoordCheckbox = new CheckBoxWidget(null, null, () -> this.isCoordinateLocked(Coordinate.X), (val) -> this.setCoordinateLocked(val, Coordinate.X));
+        this.lockYCoordCheckbox = new CheckBoxWidget(null, null, () -> this.isCoordinateLocked(Coordinate.Y), (val) -> this.setCoordinateLocked(val, Coordinate.Y));
+        this.lockZCoordCheckbox = new CheckBoxWidget(null, null, () -> this.isCoordinateLocked(Coordinate.Z), (val) -> this.setCoordinateLocked(val, Coordinate.Z));
         this.lockXCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockYCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockZCoordCheckbox.translateAndAddHoverString("litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");

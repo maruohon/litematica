@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import malilib.gui.BaseListScreen;
 import malilib.gui.BaseScreen;
+import malilib.gui.icon.DefaultIcons;
 import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.InfoIconWidget;
 import malilib.gui.widget.IntegerEditWidget;
@@ -23,7 +24,6 @@ import malilib.util.StringUtils;
 import malilib.util.datadump.DataDump;
 import malilib.util.datadump.DataDump.Format;
 import litematica.data.DataManager;
-import litematica.gui.util.LitematicaIcons;
 import litematica.gui.widget.list.entry.MaterialListEntryWidget;
 import litematica.materials.MaterialCache;
 import litematica.materials.MaterialListAreaAnalyzer;
@@ -60,7 +60,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
         this.shouldRestoreScrollbarPosition = true;
 
         this.progressLabel = new LabelWidget();
-        this.infoIcon = new InfoIconWidget(LitematicaIcons.INFO_11, "litematica.hover.material_list.info_widget");
+        this.infoIcon = new InfoIconWidget(DefaultIcons.INFO_11, "litematica.hover.material_list.info_widget");
 
         this.clearCacheButton   = GenericButton.create(18, "litematica.button.material_list.clear_cache", this::clearCache);
         this.clearIgnoredButton = GenericButton.create(18, "litematica.button.material_list.clear_ignored", this::clearIgnored);
