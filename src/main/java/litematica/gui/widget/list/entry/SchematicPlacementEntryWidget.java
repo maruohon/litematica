@@ -99,16 +99,15 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
         this.saveToFileButton.setHoverInfoRequiresShift(true);
         this.toggleEnabledButton.setHoverInfoRequiresShift(true);
 
-        // FIXME This should show the correct schematic type, and then just ADD the in-memory icon for in-memory schematics
-        // TODO Add icon variants that are half schematic type and half in-memory icon
         @Nullable ISchematic schematic = placement.getSchematic();
-        Icon icon = null;
+        Icon icon = DefaultIcons.EXCLAMATION_11;
 
         if (schematic != null)
         {
-            icon = schematic.getType().getIcon();
+            SchematicType<?> type = schematic.getType();
+            icon = placement.isSchematicInMemoryOnly() ? type.getInMemoryIcon() : type.getIcon();
         }
-        else
+        else if (placement.getSchematicFile() != null)
         {
             List<SchematicType<?>> types = SchematicType.getPossibleTypesFromFileName(placement.getSchematicFile());
 
@@ -116,11 +115,6 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
             {
                 icon = types.get(0).getIcon();
             }
-        }
-
-        if (icon == null)
-        {
-            icon = DefaultIcons.EXCLAMATION;
         }
 
         this.iconOffset.setXOffset(3);

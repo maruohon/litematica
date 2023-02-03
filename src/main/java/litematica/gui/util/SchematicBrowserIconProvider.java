@@ -6,18 +6,18 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import malilib.gui.icon.FileBrowserIconProvider;
-import malilib.gui.icon.MultiIcon;
+import malilib.gui.icon.Icon;
 import litematica.schematic.SchematicType;
 
 public class SchematicBrowserIconProvider implements FileBrowserIconProvider
 {
-    protected final HashMap<Path, MultiIcon> cachedIcons = new HashMap<>();
+    protected final HashMap<Path, Icon> cachedIcons = new HashMap<>();
 
     @Override
     @Nullable
-    public MultiIcon getIconForFile(Path file)
+    public Icon getIconForFile(Path file)
     {
-        MultiIcon icon = this.cachedIcons.get(file);
+        Icon icon = this.cachedIcons.get(file);
 
         if (icon == null && this.cachedIcons.containsKey(file) == false)
         {
@@ -34,7 +34,7 @@ public class SchematicBrowserIconProvider implements FileBrowserIconProvider
         return icon;
     }
 
-    public void setIconForFile(Path file, @Nullable MultiIcon icon)
+    public void setIconForFile(Path file, @Nullable Icon icon)
     {
         this.cachedIcons.put(file, icon);
     }

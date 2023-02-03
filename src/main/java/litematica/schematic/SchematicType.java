@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-import malilib.gui.icon.MultiIcon;
+import malilib.gui.icon.Icon;
 import malilib.util.FileNameUtils;
 import malilib.util.nbt.NbtUtils;
 import litematica.gui.util.LitematicaIcons;
@@ -25,7 +25,8 @@ public class SchematicType<S extends ISchematic>
             .setDataValidator(LitematicaSchematic::isValidSchematic)
             .setExtension(LitematicaSchematic.FILE_NAME_EXTENSION)
             .setExtensionValidator(LitematicaSchematic.FILE_NAME_EXTENSION::equals)
-            .setIcon(LitematicaIcons.FILE_ICON_LITEMATIC)
+            .setDefaultIcon(LitematicaIcons.SCHEMATIC_LITEMATIC)
+            .setInMemoryIcon(LitematicaIcons.SCHEMATIC_IN_MEMORY_LITEMATIC)
             .setHasName(true)
             .build();
 
@@ -35,7 +36,8 @@ public class SchematicType<S extends ISchematic>
             .setDataValidator(SchematicaSchematic::isValidSchematic)
             .setExtension(SchematicaSchematic.FILE_NAME_EXTENSION)
             .setExtensionValidator(SchematicaSchematic.FILE_NAME_EXTENSION::equals)
-            .setIcon(LitematicaIcons.FILE_ICON_SCHEMATIC)
+            .setDefaultIcon(LitematicaIcons.SCHEMATIC_SCHEMATICA)
+            .setInMemoryIcon(LitematicaIcons.SCHEMATIC_IN_MEMORY_SCHEMATICA)
             .setHasName(true)
             .build();
 
@@ -45,7 +47,8 @@ public class SchematicType<S extends ISchematic>
             .setDataValidator(SpongeSchematic::isValidSchematic)
             .setExtension(SpongeSchematic.FILE_NAME_EXTENSION)
             .setExtensionValidator((ext) -> SpongeSchematic.FILE_NAME_EXTENSION.equals(ext) || SchematicaSchematic.FILE_NAME_EXTENSION.equals(ext))
-            .setIcon(LitematicaIcons.FILE_ICON_SPONGE)
+            .setDefaultIcon(LitematicaIcons.SCHEMATIC_SPONGE)
+            .setInMemoryIcon(LitematicaIcons.SCHEMATIC_IN_MEMORY_SPONGE)
             .setHasName(true)
             .build();
 
@@ -55,7 +58,8 @@ public class SchematicType<S extends ISchematic>
             .setDataValidator(VanillaStructure::isValidSchematic)
             .setExtension(VanillaStructure.FILE_NAME_EXTENSION)
             .setExtensionValidator(VanillaStructure.FILE_NAME_EXTENSION::equals)
-            .setIcon(LitematicaIcons.FILE_ICON_VANILLA)
+            .setDefaultIcon(LitematicaIcons.SCHEMATIC_VANILLA)
+            .setInMemoryIcon(LitematicaIcons.SCHEMATIC_IN_MEMORY_VANILLA)
             .setHasName(true)
             .build();
 
@@ -64,7 +68,8 @@ public class SchematicType<S extends ISchematic>
     public static final Predicate<Path> SCHEMATIC_FILE_FILTER = p -> Files.isRegularFile(p) && Files.isReadable(p) && getPossibleTypesFromFileName(p).isEmpty() == false;
 
     private final String extension;
-    private final MultiIcon icon;
+    private final Icon defaultIcon;
+    private final Icon inMemoryIcon;
     private final Function<Path, S> factory;
     private final Function<String, Boolean> extensionValidator;
     private final Function<NBTTagCompound, Boolean> dataValidator;
@@ -72,14 +77,16 @@ public class SchematicType<S extends ISchematic>
     private final boolean hasName;
 
     private SchematicType(String displayName, Function<Path, S> factory, Function<NBTTagCompound, Boolean> dataValidator,
-                          String extension, Function<String, Boolean> extensionValidator, MultiIcon icon, boolean hasName)
+                          String extension, Function<String, Boolean> extensionValidator,
+                          Icon defaultIcon, Icon inMemoryIcon, boolean hasName)
     {
         this.displayName = displayName;
         this.extension = extension;
         this.factory = factory;
         this.extensionValidator = extensionValidator;
         this.dataValidator = dataValidator;
-        this.icon = icon;
+        this.defaultIcon = defaultIcon;
+        this.inMemoryIcon = inMemoryIcon;
         this.hasName = hasName;
     }
 
@@ -93,9 +100,14 @@ public class SchematicType<S extends ISchematic>
         return this.displayName;
     }
 
-    public MultiIcon getIcon()
+    public Icon getIcon()
     {
-        return this.icon;
+        return this.defaultIcon;
+    }
+
+    public Icon getInMemoryIcon()
+    {
+        return this.inMemoryIcon;
     }
 
     public boolean getHasName()
@@ -116,8 +128,6 @@ public class SchematicType<S extends ISchematic>
     /**
      * Creates a new schematic, with the provided file passed to the constructor of the schematic.
      * This does not read anything from the file.
-     * @param file
-     * @return
      */
     public S createSchematic(@Nullable Path file)
     {
@@ -215,7 +225,8 @@ public class SchematicType<S extends ISchematic>
     public static class Builder<S extends ISchematic>
     {
         private String extension = null;
-        private MultiIcon icon = null;
+        private Icon defaultIcon = null;
+        private Icon inMemoryIcon = null;
         private Function<Path, S> factory = null;
         private Function<String, Boolean> extensionValidator = null;
         private Function<NBTTagCompound, Boolean> dataValidator = null;
@@ -258,15 +269,33 @@ public class SchematicType<S extends ISchematic>
             return this;
         }
 
-        public Builder<S> setIcon(MultiIcon icon)
+        public Builder<S> setDefaultIcon(Icon defaultIcon)
         {
-            this.icon = icon;
+            this.defaultIcon = defaultIcon;
+            return this;
+        }
+
+        public Builder<S> setInMemoryIcon(Icon inMemoryIcon)
+        {
+            this.inMemoryIcon = inMemoryIcon;
             return this;
         }
 
         public SchematicType<S> build()
         {
-            return new SchematicType<>(this.displayName, this.factory, this.dataValidator, this.extension, this.extensionValidator, this.icon, this.hasName);
+            if (this.factory == null ||
+                this.dataValidator == null ||
+                this.extension == null ||
+                this.extensionValidator == null ||
+                this.defaultIcon == null ||
+                this.inMemoryIcon == null)
+            {
+                throw new IllegalArgumentException("SchematicType.Builder#build(): Some of the values were null!");
+            }
+
+            return new SchematicType<>(this.displayName, this.factory, this.dataValidator,
+                                       this.extension, this.extensionValidator,
+                                       this.defaultIcon, this.inMemoryIcon, this.hasName);
         }
     }
 }

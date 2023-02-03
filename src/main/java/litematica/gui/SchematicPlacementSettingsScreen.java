@@ -17,7 +17,6 @@ import malilib.gui.ConfirmActionScreen;
 import malilib.gui.TextInputScreen;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
-import malilib.gui.icon.MultiIcon;
 import malilib.gui.widget.BaseTextFieldWidget;
 import malilib.gui.widget.BlockPosEditWidget;
 import malilib.gui.widget.CheckBoxWidget;
@@ -39,6 +38,7 @@ import litematica.gui.util.LitematicaIcons;
 import litematica.gui.widget.list.entry.SchematicPlacementSubRegionEntryWidget;
 import litematica.materials.MaterialListPlacement;
 import litematica.schematic.ISchematic;
+import litematica.schematic.SchematicType;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
 import litematica.schematic.placement.SubRegionPlacement;
@@ -118,8 +118,8 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.lockYCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockZCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
 
-        ISchematic schematic = placement.getSchematic();
-        Icon icon = placement.getSchematicFile() != null ? schematic.getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
+        SchematicType<?> type = placement.getSchematic().getType();
+        Icon icon = placement.isSchematicInMemoryOnly() ? type.getInMemoryIcon() : type.getIcon();
         this.schematicTypeIcon = new IconWidget(icon);
 
         this.copyPasteSettingsButton.setRenderButtonBackgroundTexture(true);
@@ -187,6 +187,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         int x = this.x + 12;
         int y = this.y + 17;
         this.schematicTypeIcon.setPosition(x, y + 2);
+
         this.nameTextField.setPosition(x + 16, y);
         this.nameTextField.setWidth(Math.min(240, this.screenWidth - 300));
         this.nameResetButton.setX(this.nameTextField.getRight() + 4);
@@ -477,13 +478,14 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
         ISchematic schematic = this.placement.getSchematic();
         Path file = schematic.getFile();
-        String fileName = file != null ? file.getFileName().toString() : "-";
+        String fileName = file != null ? file.getFileName().toString() :
+                          StringUtils.translate("litematica.hover.schematic_list.in_memory_only");
         StyledText name = StyledText.translate("litematica.label.schematic_placement_settings.schematic_name",
                                                schematic.getMetadata().getName(), fileName);
         this.schematicNameLabel.setLabelStyledText(name);
     }
 
-    protected MultiIcon getEnclosingBoxButtonIcon()
+    protected Icon getEnclosingBoxButtonIcon()
     {
         return this.placement.shouldRenderEnclosingBox() ? LitematicaIcons.ENCLOSING_BOX_ENABLED :
                        LitematicaIcons.ENCLOSING_BOX_DISABLED;

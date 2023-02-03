@@ -1,59 +1,59 @@
 package litematica.gui.util;
 
-import malilib.gui.icon.BaseMultiIcon;
+import malilib.gui.icon.BaseIcon;
+import malilib.registry.Registry;
 import malilib.util.data.Identifier;
 import litematica.Reference;
 
-public class LitematicaIcons extends BaseMultiIcon
+public class LitematicaIcons
 {
     public static final Identifier LITEMATICA_GUI_TEXTURES = new Identifier(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 
+    public static final BaseIcon DUMMY                          = register(  0,   0,  0,  0,  0,  0);
+    public static final BaseIcon ENCLOSING_BOX_ENABLED          = register(  0, 144, 16, 16);
+    public static final BaseIcon ENCLOSING_BOX_DISABLED         = register(  0, 160, 16, 16);
+
     // Non-hover-variant icons
-    public static final LitematicaIcons DUMMY                       = new LitematicaIcons(0, 0, 0, 0);
-    public static final LitematicaIcons BUTTON_PLUS_MINUS_8         = new LitematicaIcons(0, 0, 8, 8);
-    public static final LitematicaIcons BUTTON_PLUS_MINUS_12        = new LitematicaIcons(24, 0, 12, 12);
-    public static final LitematicaIcons BUTTON_PLUS_MINUS_16        = new LitematicaIcons(0, 128, 16, 16);
-    public static final LitematicaIcons ENCLOSING_BOX_ENABLED       = new LitematicaIcons(0, 144, 16, 16);
-    public static final LitematicaIcons ENCLOSING_BOX_DISABLED      = new LitematicaIcons(0, 160, 16, 16);
+    public static final BaseIcon SCHEMATIC_LITEMATIC            = register(144,   0, 12, 12,  0,  0);
+    public static final BaseIcon SCHEMATIC_SCHEMATICA           = register(144,  12, 12, 12,  0,  0);
+    public static final BaseIcon SCHEMATIC_SPONGE               = register(144,  24, 12, 12,  0,  0);
+    public static final BaseIcon SCHEMATIC_VANILLA              = register(144,  36, 12, 12,  0,  0);
+    public static final BaseIcon SCHEMATIC_MCEDIT               = register(144,  48, 12, 12,  0,  0);
+    public static final BaseIcon FILE_ICON_JSON                 = register(144,  60, 12, 12,  0,  0);
 
-    public static final LitematicaIcons FILE_ICON_LITEMATIC         = new LitematicaIcons(144, 0, 12, 12, 0, 0);
-    public static final LitematicaIcons FILE_ICON_SCHEMATIC         = new LitematicaIcons(144, 12, 12, 12, 0, 0);
-    public static final LitematicaIcons FILE_ICON_SPONGE            = new LitematicaIcons(144, 24, 12, 12, 0, 0);
-    public static final LitematicaIcons FILE_ICON_VANILLA           = new LitematicaIcons(144, 36, 12, 12, 0, 0);
-    public static final LitematicaIcons FILE_ICON_JSON              = new LitematicaIcons(144, 48, 12, 12, 0, 0);
+    public static final BaseIcon SCHEMATIC_TYPE_MEMORY          = register(144,  72, 12, 12,  0,  0);
+    public static final BaseIcon IN_MEMORY_OVERLAY              = register(144,  84, 12, 12,  0,  0);
 
-    public static final LitematicaIcons INFO_11                     = new LitematicaIcons(168, 18, 11, 11, 0, 0);
-    public static final LitematicaIcons NOTICE_EXCLAMATION_11       = new LitematicaIcons(168, 29, 11, 11, 0, 0);
-    public static final LitematicaIcons LOCK_LOCKED                 = new LitematicaIcons(168, 51, 11, 11, 0, 0);
-    public static final LitematicaIcons SCHEMATIC_TYPE_MEMORY       = new LitematicaIcons(186, 0, 12, 12, 0, 0);
-    public static final LitematicaIcons CHECKBOX_UNSELECTED         = new LitematicaIcons(198, 0, 11, 11, 0, 0);
-    public static final LitematicaIcons CHECKBOX_SELECTED           = new LitematicaIcons(198, 11, 11, 11, 0, 0);
-    public static final LitematicaIcons ARROW_UP                    = new LitematicaIcons(209, 0, 15, 15);
-    public static final LitematicaIcons ARROW_DOWN                  = new LitematicaIcons(209, 15, 15, 15);
+    public static final BaseIcon SCHEMATIC_IN_MEMORY_LITEMATIC  = register(156,   0, 12, 12,  0,  0);
+    public static final BaseIcon SCHEMATIC_IN_MEMORY_SCHEMATICA = register(156,  12, 12, 12,  0,  0);
+    public static final BaseIcon SCHEMATIC_IN_MEMORY_SPONGE     = register(156,  24, 12, 12,  0,  0);
+    public static final BaseIcon SCHEMATIC_IN_MEMORY_VANILLA    = register(156,  36, 12, 12,  0,  0);
+    public static final BaseIcon SCHEMATIC_IN_MEMORY_MCEDIT     = register(156,  48, 12, 12,  0,  0);
 
     // Hover-variant icons
-    public static final LitematicaIcons AREA_EDITOR                 = new LitematicaIcons(102, 70, 14, 14);
-    public static final LitematicaIcons AREA_SELECTION              = new LitematicaIcons(102, 0, 14, 14);
-    public static final LitematicaIcons CONFIGURATION               = new LitematicaIcons(102, 84, 14, 14);
-    public static final LitematicaIcons DUPLICATE                   = new LitematicaIcons(102, 168, 14, 14);
-    public static final LitematicaIcons LOADED_SCHEMATICS           = new LitematicaIcons(102, 14, 14, 14);
-    public static final LitematicaIcons PLACEMENT                   = new LitematicaIcons(102, 196, 14, 14);
-    public static final LitematicaIcons RELOAD                      = new LitematicaIcons(102, 182, 14, 14);
-    public static final LitematicaIcons SAVE_TO_DISK                = new LitematicaIcons(102, 140, 14, 14);
-    public static final LitematicaIcons SCHEMATIC_BROWSER           = new LitematicaIcons(102, 28, 14, 14);
-    public static final LitematicaIcons SCHEMATIC_MANAGER           = new LitematicaIcons(102, 56, 14, 14);
-    public static final LitematicaIcons SCHEMATIC_PLACEMENTS        = new LitematicaIcons(102, 42, 14, 14);
-    public static final LitematicaIcons SCHEMATIC_VCS               = new LitematicaIcons(102, 98, 14, 14);
-    public static final LitematicaIcons TASK_MANAGER                = new LitematicaIcons(102, 112, 14, 14);
-    public static final LitematicaIcons TRASH_CAN                   = new LitematicaIcons(102, 154, 14, 14);
+    public static final BaseIcon AREA_EDITOR                = register(102,  70, 14, 14);
+    public static final BaseIcon AREA_SELECTION             = register(102,   0, 14, 14);
+    public static final BaseIcon CONFIGURATION              = register(102,  84, 14, 14);
+    public static final BaseIcon DUPLICATE                  = register(102, 168, 14, 14);
+    public static final BaseIcon LOADED_SCHEMATICS          = register(102,  14, 14, 14);
+    public static final BaseIcon PLACEMENT                  = register(102, 196, 14, 14);
+    public static final BaseIcon RELOAD                     = register(102, 182, 14, 14);
+    public static final BaseIcon SAVE_TO_DISK               = register(102, 140, 14, 14);
+    public static final BaseIcon SCHEMATIC_BROWSER          = register(102,  28, 14, 14);
+    public static final BaseIcon SCHEMATIC_MANAGER          = register(102,  56, 14, 14);
+    public static final BaseIcon SCHEMATIC_PLACEMENTS       = register(102,  42, 14, 14);
+    public static final BaseIcon SCHEMATIC_VCS              = register(102,  98, 14, 14);
+    public static final BaseIcon TASK_MANAGER               = register(102, 112, 14, 14);
+    public static final BaseIcon TRASH_CAN                  = register(102, 154, 14, 14);
 
-    private LitematicaIcons(int u, int v, int w, int h)
+    public static BaseIcon register(int u, int v, int w, int h)
     {
-        super(u, v, w, h, LITEMATICA_GUI_TEXTURES);
+        return register(u, v, w, h, w, 0);
     }
 
-    private LitematicaIcons(int u, int v, int w, int h, int hoverOffU, int hoverOffV)
+    public static BaseIcon register(int u, int v, int w, int h, int variantOffU, int variantOffV)
     {
-        super(u, v, w, h, hoverOffU, hoverOffV, LITEMATICA_GUI_TEXTURES);
+        BaseIcon icon = new BaseIcon(u, v, w, h, variantOffU, variantOffV, LITEMATICA_GUI_TEXTURES);
+        return Registry.ICON.registerModIcon(icon);
     }
 }

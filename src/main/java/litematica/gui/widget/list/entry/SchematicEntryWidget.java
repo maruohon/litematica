@@ -11,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import malilib.gui.BaseScreen;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
-import malilib.gui.icon.MultiIcon;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.BaseFileBrowserWidget;
@@ -28,6 +27,7 @@ import litematica.data.SchematicHolder;
 import litematica.gui.SaveConvertSchematicScreen;
 import litematica.gui.util.LitematicaIcons;
 import litematica.schematic.ISchematic;
+import litematica.schematic.SchematicType;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
 
@@ -38,7 +38,6 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
     protected final GenericButton saveToFileButton;
     protected final GenericButton unloadButton;
     protected final IconWidget modificationNoticeIcon;
-    protected final IconWidget schematicTypeIcon;
     protected int buttonsStartX;
 
     public SchematicEntryWidget(ISchematic schematic, DataListEntryWidgetData constructData)
@@ -74,12 +73,15 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
         this.saveToFileButton.setHoverInfoRequiresShift(true);
         this.unloadButton.setHoverInfoRequiresShift(true);
 
-        Icon icon = schematic.getFile() != null ? schematic.getType().getIcon() : LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
+        SchematicType<?> type = schematic.getType();
+        Icon icon = schematic.getFile() == null ? type.getInMemoryIcon() : type.getIcon();
+
         boolean modified = schematic.getMetadata().wasModifiedSinceSaved();
-        this.schematicTypeIcon = new IconWidget(icon);
-        this.textOffset.setXOffset(icon.getWidth() + 4);
+        this.iconOffset.setXOffset(3);
+        this.textOffset.setXOffset(icon.getWidth() + 6);
         this.textSettings.setTextColor(modified ? 0xFFFF9010 : 0xFFFFFFFF);
 
+        this.setIcon(icon);
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0xA0101010 : 0xA0303030);
         this.getBackgroundRenderer().getHoverSettings().setEnabledAndColor(true, 0xA0707070);
         this.setText(StyledTextLine.of(schematic.getMetadata().getName()));
@@ -91,7 +93,6 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
     {
         super.reAddSubWidgets();
 
-        this.addWidget(this.schematicTypeIcon);
         this.addWidget(this.createPlacementButton);
         this.addWidget(this.reloadButton);
         this.addWidget(this.saveToFileButton);
@@ -108,14 +109,12 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
     {
         super.updateSubWidgetPositions();
 
-        this.schematicTypeIcon.centerVerticallyInside(this);
         this.modificationNoticeIcon.centerVerticallyInside(this);
         this.createPlacementButton.centerVerticallyInside(this);
         this.reloadButton.centerVerticallyInside(this);
         this.saveToFileButton.centerVerticallyInside(this);
         this.unloadButton.centerVerticallyInside(this);
 
-        this.schematicTypeIcon.setX(this.getX() + 2);
         this.unloadButton.setRight(this.getRight() - 2);
         this.reloadButton.setRight(this.unloadButton.getX() - 1);
         this.saveToFileButton.setRight(this.reloadButton.getX() - 1);
@@ -131,7 +130,7 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
         return mouseX <= this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
-    public static GenericButton createIconButton20x20(MultiIcon icon, EventListener listener)
+    public static GenericButton createIconButton20x20(Icon icon, EventListener listener)
     {
         GenericButton button = GenericButton.create(20, 20, icon);
         button.setRenderButtonBackgroundTexture(true);
