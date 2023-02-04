@@ -119,6 +119,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
     protected void toggleIconsVsText()
     {
         Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue();
+        this.iconsTextToggleButton.updateButtonState();
         this.initScreen();
     }
 
