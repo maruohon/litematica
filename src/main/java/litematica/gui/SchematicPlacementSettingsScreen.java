@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.BaseListScreen;
 import malilib.gui.BaseScreen;
-import malilib.gui.ConfirmActionScreen;
+import malilib.gui.ChooseActionScreen;
 import malilib.gui.TextInputScreen;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
@@ -78,12 +78,12 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     public SchematicPlacementSettingsScreen(SchematicPlacement placement)
     {
-        super(10, 77, 150, 99);
+        super(10, 82, 150, 104);
 
         this.placement = placement;
         this.manager = DataManager.getSchematicPlacementManager();
 
-        this.nameTextField = new BaseTextFieldWidget(300, 16, placement.getName());
+        this.nameTextField = new BaseTextFieldWidget(300, 14, placement.getName());
         this.nameTextField.setListener(this::setName);
         this.nameTextField.setUpdateListenerAlways(false);
         this.originLabel = new LabelWidget("litematica.label.schematic_placement_settings.placement_origin");
@@ -91,7 +91,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
         this.schematicNameLabel = new LabelWidget();
 
-        this.changeSchematicButton     = GenericButton.create(12, "litematica.button.schematic_placement_settings.change_schematic", this::changeSchematicButtonClicked);
+        this.changeSchematicButton     = GenericButton.create(14, "litematica.button.schematic_placement_settings.change_schematic", this::changeSchematicButtonClicked);
         this.copyPasteSettingsButton   = GenericButton.create(18, "litematica.button.schematic_placement_settings.export_import_settings", this::clickCopyPasteSettings);
         this.mirrorButton              = GenericButton.create(18, this::getMirrorButtonLabel, this::mirror);
         this.nameResetButton           = GenericButton.create(DefaultIcons.RESET_12, this::resetName);
@@ -188,15 +188,15 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         int y = this.y + 17;
         this.schematicTypeIcon.setPosition(x, y + 2);
 
-        this.nameTextField.setPosition(x + 16, y);
+        this.nameTextField.setPosition(x + 16, y + 1);
         this.nameTextField.setWidth(Math.min(240, this.screenWidth - 300));
         this.nameResetButton.setX(this.nameTextField.getRight() + 4);
         this.nameResetButton.centerVerticallyInside(this.nameTextField);
-        this.schematicNameLabel.setPosition(x + 2, this.nameTextField.getBottom() + 2);
+        this.schematicNameLabel.setPosition(x + 2, this.nameTextField.getBottom() + 3);
 
-        this.subRegionsLabel.setPosition(x + 2, this.getListY() - 9);
+        this.subRegionsLabel.setPosition(x + 1, this.getListY() - 9);
 
-        this.changeSchematicButton.setPosition(x, this.schematicNameLabel.getBottom() - 1);
+        this.changeSchematicButton.setPosition(x, this.schematicNameLabel.getBottom());
 
         this.copyPasteSettingsButton.setRight(this.getRight() - 140);
         this.copyPasteSettingsButton.setY(this.y + 6);
@@ -365,13 +365,26 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected void changeSchematicButtonClicked()
     {
-        ConfirmActionScreen screen = new ConfirmActionScreen(300, "litematica.title.screen.confirm.change_schematic_in_placement",
-                                                             () -> openScreenWithParent(new SchematicSelectorScreen(this::changeSchematicInPlacement)),
-                                                             (EventListener) null,
-                                                             "litematica.button.misc.continue",
-                                                             "litematica.button.misc.cancel",
-                                                             "litematica.label.confirm.change_schematic_in_placement");
+        BaseScreen screen = new ChooseActionScreen<>(300, "litematica.title.screen.confirm.change_schematic_in_placement",
+                                                     ChangeSchematicType.VALUES, ChangeSchematicType::getDisplayName, ChangeSchematicType.FROM_FILE,
+                                                     this::openChangeSchematicScreen,
+                                                     (EventListener) null,
+                                                     "litematica.button.misc.continue",
+                                                     "litematica.button.misc.cancel",
+                                                     "litematica.label.confirm.change_schematic_in_placement");
         openPopupScreenWithCurrentScreenAsParent(screen);
+    }
+
+    protected void openChangeSchematicScreen(ChangeSchematicType type)
+    {
+        if (type == ChangeSchematicType.FROM_FILE)
+        {
+            openScreenWithParent(new SchematicSelectorScreen(this::changeSchematicInPlacement));
+        }
+        else if (type == ChangeSchematicType.LOADED)
+        {
+            openScreenWithParent(new SelectLoadedSchematicScreen(this::changeSchematicInPlacement));
+        }
     }
 
     protected void changeSchematicInPlacement(ISchematic newSchematic)
@@ -519,5 +532,25 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         String val = litematica.util.PositionUtils.getRotationNameShort(this.placement.getRotation());
         String key = "litematica.button.schematic_placement_settings.rotation_value";
         return StringUtils.translate(key, val);
+    }
+
+    protected enum ChangeSchematicType
+    {
+        FROM_FILE   ("litematica.label.schematic_placement_change_schematic.type.from_file"),
+        LOADED      ("litematica.label.schematic_placement_change_schematic.type.loaded");
+
+        public static final ImmutableList<ChangeSchematicType> VALUES = ImmutableList.copyOf(values());
+
+        private final String translationKey;
+
+        ChangeSchematicType(String translationKey)
+        {
+            this.translationKey = translationKey;
+        }
+
+        public String getDisplayName()
+        {
+            return StringUtils.translate(this.translationKey);
+        }
     }
 }

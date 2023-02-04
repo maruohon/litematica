@@ -11,6 +11,7 @@ import litematica.Reference;
 import litematica.config.Configs;
 import litematica.data.SchematicHolder;
 import litematica.gui.util.LitematicaIcons;
+import litematica.gui.widget.list.entry.BaseSchematicEntryWidget;
 import litematica.gui.widget.list.entry.SchematicEntryWidget;
 import litematica.schematic.ISchematic;
 
@@ -75,7 +76,7 @@ public class LoadedSchematicsListScreen extends BaseListScreen<DataListWidget<IS
         Supplier<List<ISchematic>> supplier = SchematicHolder.getInstance()::getAllSchematics;
         DataListWidget<ISchematic> listWidget = new DataListWidget<>(supplier, true);
         listWidget.addDefaultSearchBar();
-        listWidget.setEntryFilter(SchematicEntryWidget::schematicSearchFilter);
+        listWidget.setEntryFilter(BaseSchematicEntryWidget::schematicSearchFilter);
         listWidget.setDataListEntryWidgetFactory(SchematicEntryWidget::new);
         return listWidget;
     }

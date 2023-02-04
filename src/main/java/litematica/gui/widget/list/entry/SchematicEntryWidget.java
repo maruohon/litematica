@@ -1,25 +1,12 @@
 package litematica.gui.widget.list.entry;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.BaseScreen;
-import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
-import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.button.GenericButton;
-import malilib.gui.widget.list.BaseFileBrowserWidget;
-import malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import malilib.listener.EventListener;
-import malilib.render.text.StyledTextLine;
-import malilib.util.FileNameUtils;
-import malilib.util.StringUtils;
 import malilib.util.game.wrap.EntityWrap;
 import litematica.config.Configs;
 import litematica.data.DataManager;
@@ -27,26 +14,20 @@ import litematica.data.SchematicHolder;
 import litematica.gui.SaveConvertSchematicScreen;
 import litematica.gui.util.LitematicaIcons;
 import litematica.schematic.ISchematic;
-import litematica.schematic.SchematicType;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
 
-public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
+public class SchematicEntryWidget extends BaseSchematicEntryWidget
 {
     protected final GenericButton createPlacementButton;
     protected final GenericButton reloadButton;
     protected final GenericButton saveToFileButton;
     protected final GenericButton unloadButton;
-    protected final IconWidget modificationNoticeIcon;
     protected int buttonsStartX;
 
     public SchematicEntryWidget(ISchematic schematic, DataListEntryWidgetData constructData)
     {
         super(schematic, constructData);
-
-        this.modificationNoticeIcon = new IconWidget(DefaultIcons.EXCLAMATION_11);
-        String timeStr = BaseFileBrowserWidget.DATE_FORMAT.format(new Date(schematic.getMetadata().getTimeModified()));
-        this.modificationNoticeIcon.translateAndAddHoverString("litematica.hover.schematic_list.modified_on", timeStr);
 
         if (this.useIconButtons())
         {
@@ -72,20 +53,6 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
         this.reloadButton.setHoverInfoRequiresShift(true);
         this.saveToFileButton.setHoverInfoRequiresShift(true);
         this.unloadButton.setHoverInfoRequiresShift(true);
-
-        SchematicType<?> type = schematic.getType();
-        Icon icon = schematic.getFile() == null ? type.getInMemoryIcon() : type.getIcon();
-
-        boolean modified = schematic.getMetadata().wasModifiedSinceSaved();
-        this.iconOffset.setXOffset(3);
-        this.textOffset.setXOffset(icon.getWidth() + 6);
-        this.textSettings.setTextColor(modified ? 0xFFFF9010 : 0xFFFFFFFF);
-
-        this.setIcon(icon);
-        this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0xA0101010 : 0xA0303030);
-        this.getBackgroundRenderer().getHoverSettings().setEnabledAndColor(true, 0xA0707070);
-        this.setText(StyledTextLine.of(schematic.getMetadata().getName()));
-        this.addHoverInfo(schematic);
     }
 
     @Override
@@ -97,11 +64,6 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
         this.addWidget(this.reloadButton);
         this.addWidget(this.saveToFileButton);
         this.addWidget(this.unloadButton);
-
-        if (this.getData().getMetadata().wasModifiedSinceSaved())
-        {
-            this.addWidget(this.modificationNoticeIcon);
-        }
     }
 
     @Override
@@ -138,26 +100,6 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
         return button;
     }
 
-    protected void addHoverInfo(ISchematic schematic)
-    {
-        List<String> lines = new ArrayList<>();
-        Path schematicFile = schematic.getFile();
-        String fileName = schematicFile != null ? schematicFile.getFileName().toString() :
-                          StringUtils.translate("litematica.hover.schematic_list.in_memory_only");
-
-        lines.add(StringUtils.translate("litematica.hover.schematic_list.schematic_name", schematic.getMetadata().getName()));
-        lines.add(StringUtils.translate("litematica.hover.schematic_list.schematic_file", fileName));
-        lines.add(StringUtils.translate("litematica.hover.schematic_list.schematic_type", schematic.getType().getDisplayName()));
-
-        if (schematic.getMetadata().wasModifiedSinceSaved())
-        {
-            String timeStr = BaseFileBrowserWidget.DATE_FORMAT.format(new Date(schematic.getMetadata().getTimeModified()));
-            lines.add(StringUtils.translate("litematica.hover.schematic_list.modified_on", timeStr));
-        }
-
-        this.getHoverInfoFactory().addStrings(lines);
-    }
-
     protected boolean useIconButtons()
     {
         return Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.getBooleanValue();
@@ -192,31 +134,5 @@ public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
     {
         SchematicHolder.getInstance().removeSchematic(this.getData());
         this.listWidget.refreshEntries();
-    }
-
-    public static boolean schematicSearchFilter(ISchematic entry, List<String> searchTerms)
-    {
-        String fileName = null;
-
-        if (entry.getFile() != null)
-        {
-            fileName = entry.getFile().getFileName().toString().toLowerCase(Locale.ROOT);
-            fileName = FileNameUtils.getFileNameWithoutExtension(fileName);
-        }
-
-        for (String searchTerm : searchTerms)
-        {
-            if (entry.getMetadata().getName().toLowerCase(Locale.ROOT).contains(searchTerm))
-            {
-                return true;
-            }
-
-            if (fileName != null && fileName.contains(searchTerm))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

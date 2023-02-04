@@ -109,6 +109,7 @@ litematica.button.schematic_verifier.start=Start Verifier
 litematica.button.schematic_verifier.stop=Stop Verifier
 litematica.button.schematic_verifier.toggle_auto_refresh=Auto Refresh: %s
 litematica.button.schematic_verifier.toggle_info_hud=Info HUD: %s
+litematica.button.select_schematic.confirm=Use Schematic
 
 litematica.button.misc.cancel=Cancel
 litematica.button.misc.configure=Configure
@@ -306,6 +307,8 @@ litematica.label.schematic_info.time_modified=<c=aaa>Modified: <c=7af>%s
 litematica.label.schematic_info.total_blocks=<c=aaa>Total blocks: §6%d
 litematica.label.schematic_info.total_blocks_and_volume=<c=aaa>Blocks/Volume: §6%s<c=aaa> / §6%s
 litematica.label.schematic_info.total_volume=<c=aaa>Total volume: §6%s
+litematica.label.schematic_placement_change_schematic.type.from_file=Load a schematic from file
+litematica.label.schematic_placement_change_schematic.type.loaded=Use an already loaded schematic
 litematica.label.schematic_placement_browser.placements=placements
 litematica.label.schematic_placement_grid_settings.grid_size=Grid Size
 litematica.label.schematic_placement_grid_settings.repeat_count=Repeat Count
@@ -422,6 +425,7 @@ litematica.title.screen.schematic_vcs.project_browser=Litematica %s - Schematic 
 litematica.title.screen.schematic_vcs.project_manager=Litematica %s - Schematic VCS Project Manager
 litematica.title.screen.schematic_vcs.save_new_version=Save New Schematic VCS Version
 litematica.title.screen.schematic_verifier=Schematic Verifier for §e%s
+litematica.title.screen.select_loaded_schematic=Select a loaded schematic
 litematica.title.screen.task_manager=Litematica %s - Task Manager
 
 litematica.message.error.area_selection_browser.failed_to_load=Failed to load the Area Selection
