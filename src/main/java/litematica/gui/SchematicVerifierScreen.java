@@ -86,22 +86,12 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         this.visibleCategoriesDropdown.setMultiSelectionHoverTextSupplier(this::getMultiEntryHoverText);
         this.visibleCategoriesDropdown.setMultiSelectionTranslationKey("litematica.label.schematic_verifier.visible_categories_count");
 
+        // Why was this after super.initScreen() ?
+        this.verifier.setStatusChangeListener(this::onVerifierDataChanged);
+
+        this.addPreScreenCloseListener(() -> this.verifier.setStatusChangeListener(null));
         this.setTitle("litematica.title.screen.schematic_verifier", verifier.getName());
         this.updateStatusLabel();
-    }
-
-    @Override
-    protected void initScreen()
-    {
-        super.initScreen();
-        this.verifier.setStatusChangeListener(this::onVerifierDataChanged);
-    }
-
-    @Override
-    protected void onScreenClosed()
-    {
-        super.onScreenClosed();
-        this.verifier.setStatusChangeListener(null);
     }
 
     @Override

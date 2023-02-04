@@ -32,21 +32,11 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         this.mainMenuScreenButton = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.cachingIconProvider = new SchematicBrowserIconProvider();
         this.schematicInfoWidget = new SchematicInfoWidget(170, 290);
-    }
 
-    @Override
-    protected void initScreen()
-    {
-        this.clearSchematicInfoCache();
-        super.initScreen();
-        this.getListWidget().clearSelection();
-    }
-
-    @Override
-    protected void onScreenClosed()
-    {
-        this.clearSchematicInfoCache();
-        super.onScreenClosed();
+        Runnable clearTask = this::clearSchematicInfoCache;
+        this.addPreInitListener(clearTask);
+        this.addPostInitListener(() -> this.getListWidget().clearSelection());
+        this.addPreScreenCloseListener(clearTask);
     }
 
     @Override

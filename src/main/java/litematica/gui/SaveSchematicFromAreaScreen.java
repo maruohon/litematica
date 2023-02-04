@@ -80,15 +80,8 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
 
         this.saveSideButton.translateAndAddHoverString(hoverKey);
 
+        this.addPreScreenCloseListener(this::saveSettings);
         this.setTitle("litematica.title.screen.save_schematic_from_area", areaName);
-    }
-
-    @Override
-    protected void onScreenClosed()
-    {
-        super.onScreenClosed();
-        Configs.Internal.SAVE_SIDE.setValue(this.saveSide.getValue());
-        Configs.Internal.SAVE_WITH_CUSTOM_SETTINGS.setBooleanValue(this.customSettingsEnabled.getBooleanValue());
     }
 
     @Override
@@ -216,6 +209,12 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
     {
         this.reAddActiveWidgets();
         this.updateWidgetPositions();
+    }
+
+    protected void saveSettings()
+    {
+        Configs.Internal.SAVE_SIDE.setValue(this.saveSide.getValue());
+        Configs.Internal.SAVE_WITH_CUSTOM_SETTINGS.setBooleanValue(this.customSettingsEnabled.getBooleanValue());
     }
 
     public static class SaveSide extends BaseOptionListConfigValue

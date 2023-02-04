@@ -49,19 +49,9 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
         this.selectionFromPlacementButton.setEnabled(DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement() != null);
 
+        this.addPostInitListener(this::printSimpleModeWarning);
         this.setTitle("litematica.title.screen.area_selection_browser", Reference.MOD_VERSION);
         this.updateCurrentSelectionLabel();
-    }
-
-    @Override
-    protected void initScreen()
-    {
-        super.initScreen();
-
-        if (this.areaSelectionManager.getSelectionMode() == AreaSelectionType.SIMPLE)
-        {
-            MessageDispatcher.warning(5000).translate("litematica.message.warn.area_selection_browser.in_simple_mode");
-        }
     }
 
     @Override
@@ -128,6 +118,14 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         else
         {
             this.currentSelectionLabel.clearText();
+        }
+    }
+
+    protected void printSimpleModeWarning()
+    {
+        if (this.areaSelectionManager.getSelectionMode() == AreaSelectionType.SIMPLE)
+        {
+            MessageDispatcher.warning(5000).translate("litematica.message.warn.area_selection_browser.in_simple_mode");
         }
     }
 

@@ -52,13 +52,7 @@ public class SchematicPlacementsListScreen extends BaseListScreen<DataListWidget
         this.sortModeButton.setHoverInfoRequiresShift(true);
 
         this.setTitle("litematica.title.screen.schematic_placements_list", Reference.MOD_VERSION);
-    }
-
-    @Override
-    protected void initScreen()
-    {
-        super.initScreen();
-        this.clearModifiedSinceSavedCache();
+        this.addPostInitListener(this::clearModifiedSinceSavedCache);
     }
 
     @Override
