@@ -12,15 +12,17 @@ import malilib.util.StringUtils;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.gui.util.SchematicBrowserIconProvider;
-import litematica.gui.widget.SchematicInfoWidget;
+import litematica.gui.widget.SchematicInfoWidgetByPath;
+import litematica.schematic.ISchematic;
 import litematica.schematic.SchematicType;
 
 public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {
     protected final SchematicBrowserIconProvider cachingIconProvider;
     protected final GenericButton mainMenuScreenButton;
-    protected final SchematicInfoWidget schematicInfoWidget;
+    protected final SchematicInfoWidgetByPath schematicInfoWidget;
     protected final String browserContext;
+    @Nullable protected Path lastSelectedSchematicFile;
 
     public BaseSchematicBrowserScreen(int listX, int listY,
                                       int totalListMarginX, int totalListMarginY,
@@ -31,7 +33,7 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         this.browserContext = browserContext;
         this.mainMenuScreenButton = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.cachingIconProvider = new SchematicBrowserIconProvider();
-        this.schematicInfoWidget = new SchematicInfoWidget(170, 290);
+        this.schematicInfoWidget = new SchematicInfoWidgetByPath(170, 290);
 
         Runnable clearTask = this::clearSchematicInfoCache;
         this.addPreInitListener(clearTask);
@@ -105,6 +107,19 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
     public void onSelectionChange(@Nullable DirectoryEntry entry)
     {
-        this.schematicInfoWidget.onSelectionChange(entry);
+        Path fullPath = entry != null ? entry.getFullPath() : null;
+        this.lastSelectedSchematicFile = fullPath;
+        this.schematicInfoWidget.onSelectionChange(fullPath);
+    }
+
+    @Nullable
+    protected ISchematic getLastSelectedSchematic()
+    {
+        if (this.lastSelectedSchematicFile == null)
+        {
+            return null;
+        }
+
+        return SchematicType.tryCreateSchematicFrom(this.lastSelectedSchematicFile);
     }
 }

@@ -16,30 +16,32 @@ import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.BaseFileBrowserWidget;
-import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import malilib.render.text.StyledText;
 import malilib.render.text.StyledTextLine;
 import malilib.render.text.StyledTextUtils;
 import malilib.util.StringUtils;
 import litematica.config.Configs;
 import litematica.gui.SchematicInfoConfigScreen;
-import litematica.gui.util.SchematicInfoCache;
-import litematica.gui.util.SchematicInfoCache.SchematicInfo;
+import litematica.gui.util.AbstractSchematicInfoCache;
+import litematica.gui.util.AbstractSchematicInfoCache.SchematicInfo;
 import litematica.schematic.SchematicMetadata;
 
-public class SchematicInfoWidget extends ContainerWidget
+public abstract class AbstractSchematicInfoWidget<T> extends ContainerWidget
 {
-    protected final SchematicInfoCache infoCache = new SchematicInfoCache();
-    protected final LabelWidget infoTextLabel;
-    protected final LabelWidget descriptionLabel;
-    protected final IconWidget iconWidget;
+    protected final AbstractSchematicInfoCache<T> infoCache;
     protected final GenericButton configButton;
+    protected final LabelWidget descriptionLabel;
+    protected final LabelWidget infoTextLabel;
+    protected final IconWidget iconWidget;
     @Nullable protected SchematicInfo currentInfo;
     protected boolean hasDescription;
 
-    public SchematicInfoWidget(int width, int height)
+    public AbstractSchematicInfoWidget(int width, int height, AbstractSchematicInfoCache<T> cache)
     {
         super(width, height);
+
+        this.infoCache = cache;
+        this.configButton = GenericButton.create(DefaultIcons.INFO_11, this::openConfigScreen);
 
         this.infoTextLabel = new LabelWidget();
         this.infoTextLabel.setLineHeight(12);
@@ -51,8 +53,6 @@ public class SchematicInfoWidget extends ContainerWidget
         this.iconWidget.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
         // FIXME (malilib) this seems silly to have to be enabled for the border to render (see IconWidget#renderAt())
         this.iconWidget.getBackgroundRenderer().getNormalSettings().setEnabled(true);
-
-        this.configButton = GenericButton.create(DefaultIcons.INFO_11, this::openConfigScreen);
 
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
         this.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
@@ -117,17 +117,22 @@ public class SchematicInfoWidget extends ContainerWidget
         this.infoCache.clearCache();
     }
 
-    public void onSelectionChange(@Nullable DirectoryEntry entry)
+    public void onSelectionChange(@Nullable T entry)
     {
         if (entry != null)
         {
-            this.currentInfo = this.infoCache.getOrCacheSchematicInfo(entry.getFullPath());
+            this.currentInfo = this.infoCache.getOrCacheSchematicInfo(entry);
         }
         else
         {
             this.currentInfo = null;
         }
 
+        this.onPostSelectionChange();
+    }
+
+    protected void onPostSelectionChange()
+    {
         this.updateWidgetState();
         this.updateSubWidgetPositions();
         this.reAddSubWidgets();
@@ -184,7 +189,7 @@ public class SchematicInfoWidget extends ContainerWidget
             return;
         }
 
-        SchematicMetadata meta = this.currentInfo.schematic.getMetadata();
+        SchematicMetadata meta = this.currentInfo.schematicMetadata;
         List<StyledTextLine> lines = new ArrayList<>();
 
         if (Configs.Internal.SCHEMATIC_INFO_SHOW_NAME.getBooleanValue())
