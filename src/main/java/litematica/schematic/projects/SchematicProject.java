@@ -519,7 +519,7 @@ public class SchematicProject
             return false;
         }
 
-        if (this.getSelection().getAllSelectionBoxes().size() == 0)
+        if (this.getSelection().getBoxCount() == 0)
         {
             MessageDispatcher.error().translate("litematica.error.schematic_projects.empty_selection");
             return false;

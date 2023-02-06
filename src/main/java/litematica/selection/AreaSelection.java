@@ -73,6 +73,11 @@ public class AreaSelection
         return false;
     }
 
+    public int getBoxCount()
+    {
+        return this.selectionBoxes.size();
+    }
+
     public boolean isOriginSelected()
     {
         return this.originSelected;

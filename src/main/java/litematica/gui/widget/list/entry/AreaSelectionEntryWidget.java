@@ -143,7 +143,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
                 String prefix = this.data.getDisplayNamePrefix();
                 String selectionName = this.selection.getName();
                 String name = prefix != null ? prefix + selectionName : selectionName;
-                int count = this.selection.getAllSelectionBoxes().size();
+                int count = this.selection.getBoxCount();
                 return StringUtils.translate("litematica.label.area_browser.entry_name", name, count);
             }
             else
@@ -174,7 +174,7 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
                 lines.add(StringUtils.translate(key, o.getX(), o.getY(), o.getZ()));
             }
 
-            int count = this.selection.getAllSelectionBoxes().size();
+            int count = this.selection.getBoxCount();
             lines.add(StringUtils.translate("litematica.hover.area_selection_browser.box_count", count));
 
             this.getHoverInfoFactory().addStrings(lines);

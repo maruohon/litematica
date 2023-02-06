@@ -94,7 +94,7 @@ public class ToolUtils
                 return;
             }
 
-            if (area.getAllSelectionBoxes().size() > 0)
+            if (area.getBoxCount() > 0)
             {
                 SelectionBox currentBox = area.getSelectedSelectionBox();
                 final ImmutableList<SelectionBox> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSelectionBoxes());
@@ -152,7 +152,7 @@ public class ToolUtils
                 return;
             }
 
-            if (area.getAllSelectionBoxes().size() > 0)
+            if (area.getBoxCount() > 0)
             {
                 SelectionBox currentBox = area.getSelectedSelectionBox();
                 final ImmutableList<SelectionBox> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSelectionBoxes());
@@ -210,7 +210,7 @@ public class ToolUtils
                 return;
             }
 
-            if (area.getAllSelectionBoxes().size() > 0)
+            if (area.getBoxCount() > 0)
             {
                 SelectionBox currentBox = area.getSelectedSelectionBox();
                 final ImmutableList<SelectionBox> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSelectionBoxes());
@@ -235,7 +235,7 @@ public class ToolUtils
         AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
 
-        if (area != null && area.getAllSelectionBoxes().size() > 0)
+        if (area != null && area.getBoxCount() > 0)
         {
             BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(cameraEntity), amount);
             moveCurrentlySelectedWorldRegionTo(pos);
@@ -270,7 +270,7 @@ public class ToolUtils
         AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection selection = sm.getCurrentSelection();
 
-        if (selection != null && selection.getAllSelectionBoxes().size() > 0)
+        if (selection != null && selection.getBoxCount() > 0)
         {
             LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(selection);
             CreateSchematicTask taskSave = new CreateSchematicTask(schematic, selection, false,
@@ -340,7 +340,7 @@ public class ToolUtils
         AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection selection = sm.getCurrentSelection();
 
-        if (selection != null && selection.getAllSelectionBoxes().size() > 0)
+        if (selection != null && selection.getBoxCount() > 0)
         {
             LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(selection);
             CreateSchematicTask taskSave = new CreateSchematicTask(schematic, selection, false,

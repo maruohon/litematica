@@ -177,7 +177,7 @@ public class ToolHud extends InfoHud
 
             if (multiRegionMode)
             {
-                int count = selection.getAllSelectionBoxes().size();
+                int count = selection.getBoxCount();
                 lines.add(StringUtils.translate("litematica.hud.tool_hud.area_selection.origin.multi_region",
                                                 originMode, o.getX(), o.getY(), o.getZ(), count));
             }
