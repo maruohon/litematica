@@ -73,6 +73,11 @@ public class SavedSchematicPlacementInfoWidget extends ContainerWidget
         this.reAddSubWidgets();
     }
 
+    public void clearInfoCache()
+    {
+        this.infoCache.clearCache();
+    }
+
     protected void updateInfoLabelWidget(SchematicPlacement placement)
     {
         List<StyledTextLine> lines = new ArrayList<>();

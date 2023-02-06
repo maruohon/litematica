@@ -1,12 +1,12 @@
 package litematica.schematic.placement;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
@@ -20,13 +20,11 @@ import net.minecraft.util.math.BlockPos;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileNameUtils;
 import malilib.util.FileUtils;
-import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.EnabledCondition;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.position.IntBoundingBox;
 import litematica.Litematica;
-import litematica.data.DataManager;
 import litematica.data.SchematicHolder;
 import litematica.materials.MaterialListBase;
 import litematica.materials.MaterialListPlacement;
@@ -34,6 +32,7 @@ import litematica.schematic.ISchematic;
 import litematica.schematic.ISchematicRegion;
 import litematica.schematic.verifier.SchematicVerifier;
 import litematica.selection.SelectionBox;
+import litematica.util.LitematicaDirectories;
 import litematica.util.PositionUtils;
 
 public class SchematicPlacement extends BasePlacement
@@ -156,6 +155,12 @@ public class SchematicPlacement extends BasePlacement
     public Path getSchematicFile()
     {
         return this.schematicFile;
+    }
+
+    @Nullable
+    public String getSaveFile()
+    {
+        return this.placementSaveFile;
     }
 
     @Nullable
@@ -647,75 +652,6 @@ public class SchematicPlacement extends BasePlacement
         return false;
     }
 
-    public boolean saveToFileIfChanged()
-    {
-        if (this.shouldBeSaved == false)
-        {
-            MessageDispatcher.warning().translate("litematica.message.error.schematic_placement.save.should_not_save");
-            return false;
-        }
-
-        Path file;
-
-        if (this.placementSaveFile != null)
-        {
-            file = getSaveDirectory().resolve(this.placementSaveFile);
-        }
-        else
-        {
-            file = this.getAvailableFileName();
-        }
-
-        if (file == null)
-        {
-            MessageDispatcher.error().translate("litematica.message.error.schematic_placement.save.failed_to_get_save_file");
-            return false;
-        }
-
-        //if (this.placementSaveFile == null || Files.exists(file) == false || this.wasModifiedSinceSaved())
-        //{
-            JsonObject obj = this.toJson();
-
-            if (obj != null)
-            {
-                return this.saveToFile(file, obj);
-            }
-            else
-            {
-                MessageDispatcher.error().translate("litematica.message.error.schematic_placement.save.failed_to_serialize");
-                return false;
-            }
-        /*
-        }
-        else
-        {
-            MessageDispatcher.warning().translate("litematica.message.error.schematic_placement.save.no_changes");
-        }
-
-        return true;
-        */
-    }
-
-    protected boolean saveToFile(Path file, JsonObject obj)
-    {
-        obj.addProperty("last_save_time", System.currentTimeMillis());
-
-        if (JsonUtils.writeJsonToFile(obj, file))
-        {
-            if (this.placementSaveFile == null)
-            {
-                this.placementSaveFile = file.getFileName().toString();
-            }
-
-            MessageDispatcher.generic("litematica.gui.label.schematic_placement.saved_to_file",
-                                      file.getFileName().toString());
-
-            return true;
-        }
-
-        return false;
-    }
-
     public JsonObject getSettingsShareJson()
     {
         JsonObject obj = this.toJson();
@@ -905,43 +841,115 @@ public class SchematicPlacement extends BasePlacement
         return true;
     }
 
-    public static Path getSaveDirectory()
+    public String getSuggestedSaveFileName()
     {
-        String worldName = StringUtils.getWorldOrServerNameOrDefault("__fallback");
-        Path dir = DataManager.getDataBaseDirectory("placements").resolve(worldName);
+        String name;
 
-        if (FileUtils.createDirectoriesIfMissing(dir) == false)
+        if (this.schematicFile != null)
         {
-            String key = "litematica.message.error.schematic_placement.failed_to_create_directory";
-            MessageDispatcher.error().translate(key, dir.toAbsolutePath().toString());
+            name = FileNameUtils.getFileNameWithoutExtension(this.schematicFile.getFileName().toString().toLowerCase(Locale.ROOT));
+            name = FileNameUtils.generateSafeFileName(name);
+        }
+        else if (this.schematic != null)
+        {
+            name = FileNameUtils.generateSafeFileName(this.schematic.getMetadata().getName().toLowerCase(Locale.ROOT));
+        }
+        else
+        {
+            name = FileNameUtils.generateSafeFileName(this.name.toLowerCase(Locale.ROOT));
         }
 
-        return dir;
+        return name;
     }
 
     @Nullable
     protected Path getAvailableFileName()
     {
-        if (this.getSchematicFile() == null)
+        if (this.schematicFile == null)
         {
             return null;
         }
 
-        Path dir = getSaveDirectory();
-        String schName = FileNameUtils.getFileNameWithoutExtension(this.getSchematicFile().getFileName().toString());
+        String schName = FileNameUtils.getFileNameWithoutExtension(this.schematicFile.getFileName().toString());
         String nameBase = FileNameUtils.generateSafeFileName(schName);
-        int id = 1;
-        String name = String.format("%s_%03d.json", nameBase, id);
-        Path file = dir.resolve(name);
 
-        while (Files.exists(file))
+        return FileUtils.getUnusedFileName(getSaveDirectory(), nameBase + "_%03d.json", 1);
+    }
+
+    public boolean saveToFileIfChanged()
+    {
+        if (this.shouldBeSaved == false)
         {
-            ++id;
-            name = String.format("%s_%03d.json", nameBase, id);
-            file = dir.resolve(name);
+            MessageDispatcher.warning().translate("litematica.message.error.schematic_placement.save.should_not_save");
+            return false;
         }
 
-        return file;
+        Path file;
+
+        if (this.placementSaveFile != null)
+        {
+            file = getSaveDirectory().resolve(this.placementSaveFile);
+        }
+        else
+        {
+            file = this.getAvailableFileName();
+        }
+
+        if (file == null)
+        {
+            MessageDispatcher.error().translate("litematica.message.error.schematic_placement.save.failed_to_get_save_file");
+            return false;
+        }
+
+        //if (this.placementSaveFile == null || Files.exists(file) == false || this.wasModifiedSinceSaved())
+        //{
+        return this.saveToFile(file);
+        /*
+        }
+        else
+        {
+            MessageDispatcher.warning().translate("litematica.message.error.schematic_placement.save.no_changes");
+        }
+
+        return true;
+        */
+    }
+
+    public boolean saveToFile(Path file)
+    {
+        JsonObject obj = this.toJson();
+
+        if (obj != null)
+        {
+            return this.saveToFile(file, obj);
+        }
+        else
+        {
+            MessageDispatcher.error().translate("litematica.message.error.schematic_placement.save.failed_to_serialize");
+            return false;
+        }
+    }
+
+    protected boolean saveToFile(Path file, JsonObject obj)
+    {
+        obj.addProperty("last_save_time", System.currentTimeMillis());
+
+        if (JsonUtils.writeJsonToFile(obj, file))
+        {
+            this.placementSaveFile = FileUtils.getRelativePath(getSaveDirectory(), file);
+
+            MessageDispatcher.generic("litematica.gui.label.schematic_placement.saved_to_file",
+                                      file.getFileName().toString());
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected static Path getSaveDirectory()
+    {
+        return LitematicaDirectories.getPlacementSaveFilesDirectory();
     }
 
     protected static int getNextBoxColor()
@@ -992,7 +1000,7 @@ public class SchematicPlacement extends BasePlacement
 
             if (placement != null)
             {
-                placement.placementSaveFile = file.getFileName().toString();
+                placement.placementSaveFile = FileUtils.getRelativePath(getSaveDirectory(), file);
             }
 
             return placement;

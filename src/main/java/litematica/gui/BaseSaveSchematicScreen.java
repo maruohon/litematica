@@ -44,7 +44,7 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
         this.schematicTypeDropdown.setSelectedEntry(SchematicType.LITEMATICA);
 
         this.revertNameButton.translateAndAddHoverString("litematica.hover.button.save_schematic.revert_name");
-        this.saveButton.translateAndAddHoverString("litematica.hover.button.save_schematic.hold_shift_to_overwrite");
+        this.saveButton.translateAndAddHoverString("litematica.hover.button.save_file.hold_shift_to_overwrite");
     }
 
     @Override

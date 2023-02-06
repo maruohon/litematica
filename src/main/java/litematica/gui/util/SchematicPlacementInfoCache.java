@@ -26,4 +26,9 @@ public class SchematicPlacementInfoCache
 
         return this.cachedData.get(file);
     }
+
+    public void clearCache()
+    {
+        this.cachedData.clear();
+    }
 }

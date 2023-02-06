@@ -24,6 +24,7 @@ import malilib.util.FileNameUtils;
 import malilib.util.StringUtils;
 import litematica.config.Configs;
 import litematica.data.DataManager;
+import litematica.gui.SaveSchematicPlacementScreen;
 import litematica.gui.SchematicPlacementSettingsScreen;
 import litematica.gui.SchematicPlacementsListScreen;
 import litematica.gui.util.LitematicaIcons;
@@ -245,6 +246,12 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
                                      MessageHelpers.getYesNoColored(saved, false));
         }
 
+        if (saved)
+        {
+            StyledTextLine.translate(lines, "litematica.hover.placement_list.saved_to_file.save_file_name",
+                                     placement.getSaveFile());
+        }
+
         this.getHoverInfoFactory().setTextLines("hover", lines);
     }
 
@@ -289,9 +296,28 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
 
     protected void saveToFile()
     {
-        if (this.getData().saveToFileIfChanged() == false)
+        if (BaseScreen.isShiftDown())
         {
-            MessageDispatcher.error("litematica.message.error.placement_list.save_failed");
+            if (this.getData().saveToFileIfChanged() == false)
+            {
+                MessageDispatcher.error("litematica.message.error.placement_list.save_failed");
+            }
+        }
+        else
+        {
+            // TODO Manually saving should be allowed even if the placement should not be saved automatically
+            //      in the active list (such as in-memory schematic based placements).
+            //      However placements for the VCS system probably shouldn't be saved here either?
+            //      In that case also don't add the Save button for such placements.
+            /*
+            if (this.data.shouldBeSaved() == false)
+            {
+                MessageDispatcher.warning().translate("litematica.message.error.schematic_placement.save.should_not_save");
+                return;
+            }
+            */
+
+            BaseScreen.openScreenWithParent(new SaveSchematicPlacementScreen(this.data));
         }
 
         this.screen.clearModifiedSinceSavedCache();

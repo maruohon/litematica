@@ -38,6 +38,7 @@ litematica.button.material_list.ignore=Ignore
 litematica.button.material_list.refresh=Refresh
 litematica.button.material_list.scope=Range: %s
 litematica.button.material_list.toggle_hud=Info HUD: %s
+litematica.button.save_placement.save=Save Placement
 litematica.button.save_schematic.save_schematic=Save Schematic
 litematica.button.schematic_browser.load_schematic=Load Schematic
 litematica.button.schematic_list.create_placement=Create Placement
@@ -140,8 +141,8 @@ litematica.hover.button.material_list.export_shift_for_csv=Hold §e<i>Shift</i>�
 litematica.hover.button.placement_list.configure=Edit the settings of this placement, such as the position, rotation or mirror values, or move/rotate/mirror some subregions etc.
 litematica.hover.button.placement_list.duplicate=Creates a new identical copy of this placement
 litematica.hover.button.placement_list.remove=Removes this placement.\n\nRemoving a placement won't unload the schematic itself from memory. To unload the schematic too, unload it on the §eLoaded Schematics§r screen. Unloading a schematic there will automatically remove all placements of it.\n\n§6Note:§r If you may need the placement again later on, you can save it first using the §eSave§r button. You can then load it back via the §eSaved Placements§r menu if you need it again later.
-litematica.hover.button.placement_list.save=Save this placement to a separate file on disk.\n\nThis allows you to remove it from this list, but still load it back via the §eSaved Placements§r menu if you need it again later.
-litematica.hover.button.save_schematic.hold_shift_to_overwrite=Hold §eShift§r to overwrite an existing file
+litematica.hover.button.placement_list.save=Save this placement to a separate file on disk.\n\nThis allows you to remove it from this list, but still load it back via the §eSaved Placements§r menu (on the bottom) if you need it again later.\n\n§dTip:§r Hold §e<i>Shift</i>§r to quickly save with to an automatically named file in the base placement save directory. Without §e<i>Shift</i>§r you can create directories and name and organise the placement save files manually.
+litematica.hover.button.save_file.hold_shift_to_overwrite=Hold §eShift§r to overwrite an existing file
 litematica.hover.button.save_schematic.revert_name=Revert to the original suggested name
 litematica.hover.button.schematic_browser.create_material_list=Hold shift to select which sub-regions are used for the Material List. By default all regions will be included.
 litematica.hover.button.schematic_list.create_placement=Create a new placement of this schematic.\n\nHold §6Shift§r to create the placement as disabled to begin with.
@@ -186,8 +187,9 @@ litematica.hover.placement_list.is_loaded=Loaded: %s
 litematica.hover.placement_list.mirror=Mirror: §3%s
 litematica.hover.placement_list.origin=Origin: x: <c=77f>%s§r y: <c=77f>%s§r z: <c=77f>%s
 litematica.hover.placement_list.rotation=Rotation: §3%s
-litematica.hover.placement_list.saved_to_file.modified=Saved to file: §ayes§7 - §6modified§7 since saved
-litematica.hover.placement_list.saved_to_file.not_modified=Saved to file: %s
+litematica.hover.placement_list.saved_to_file.modified=Placement saved to file: §ayes§7 - §6modified§7 since saved
+litematica.hover.placement_list.saved_to_file.not_modified=Placement saved to file: %s
+litematica.hover.placement_list.saved_to_file.save_file_name=Save file: §3%s§r
 litematica.hover.placement_list.sub_region_count=Sub-regions: §6%s
 litematica.hover.placement_list.sub_region_modified=§6This sub-region has been modified
 litematica.hover.placement_list.sub_region_size=Region size: <c=77f>%s§r x <c=77f>%s§r x <c=77f>%s
@@ -284,7 +286,7 @@ litematica.label.saved_placement.info_widget.origin=<c=aaa>Origin:\n  x: §6%s\n
 litematica.label.saved_placement.info_widget.placement_state=<c=aaa>Placement: %s
 litematica.label.saved_placement.info_widget.region_count=<c=aaa>Regions: §6%s
 litematica.label.saved_placement.info_widget.rotation=<c=aaa>Rotation: §3%s
-litematica.label.saved_placement.names=Placement: §a%s§r\nSchematic file: §3%s§r\nSchematic directory: §3%s§r\nPlacement file: §3%s
+litematica.label.saved_placement.names=Placement: §a%s§r\nSchematic file: §3%s§r\nSchematic directory: §3%s§r\nPlacement save file: §3%s
 litematica.label.schematic_browser.schematics=schematics
 litematica.label.schematic_info.block_entity_count=<c=aaa>Block Entities: §6%s
 litematica.label.schematic_info.description=<c=aaa>Description:
@@ -403,6 +405,7 @@ litematica.title.screen.placement_grid_settings=Grid/Repeat Settings for Placeme
 litematica.title.screen.render_layers=Litematica %s - Render Layers
 litematica.title.screen.save_in_memory_schematic=Create an In-Memory-Only Schematic
 litematica.title.screen.save_schematic_from_area=Save Schematic from selection §e%s§r
+litematica.title.screen.save_placement=Litematica %s - Save a Schematic Placement to a file
 litematica.title.screen.saved_placements=Litematica %s - Saved Schematic Placements
 litematica.title.screen.save_or_convert_schematic=Save or Convert Schematic §e%s§r
 litematica.title.screen.schematic_browser=Litematica %s - Schematic Browser
@@ -434,6 +437,8 @@ litematica.message.error.file_exists.hold_shift_to_override=The file already exi
 litematica.message.error.no_placement_selected=No Schematic Placement currently selected, or the selected placement's schematic isn't loaded.\n\nTo select a placement, either:\n1) click on one on the Schematic Placements screen so that it has the white outline to indicate it's selected\n2) Use the §eTool Select Elements§r hotkey (by default middle click) while holding the "tool item" and looking at a placement in the world\n\nThe selected placement's name also appears on the tool HUD, and the placement has a light cyan outline color in-world.
 litematica.message.error.placement_list.remove_failed_locked=The placement is locked!\nHold §6Shift§r to force remove it
 litematica.message.error.placement_list.save_failed=Failed to save the placement to file
+litematica.message.error.save_placement.write_to_file_failed.exception=Failed to write the placement to file §e'%s'§r (exception: §e%s§r)
+litematica.message.error.save_placement.write_to_file_failed.exists=Failed to write the placement to file §e'%s'§r, the file already exists.\n\n<c=ddd>Hold §e<i>Shift</i><c=ddd> to overwrite the file
 litematica.message.error.save_schematic.failed_to_convert=Failed to convert the schematic to the new format!
 litematica.message.error.save_schematic.failed_to_save_converted=Failed to save the schematic to file §e'%s'§r
 litematica.message.error.save_schematic.failed_to_save_from_area=Failed to save the schematic to file §e'%s'§r.\n§7The schematic has been added to the Loaded Schematics list as an "in-memory-only" schematic, so you can try to save it from there to another file.
@@ -533,7 +538,7 @@ litematica.error.schematic_save.schematic_creation_failed=Failed to create the s
 
 litematica.error.schematic_write_to_file_failed.directory_creation_failed=Failed to create schematic directory '%s'
 litematica.error.schematic_write_to_file_failed.exception=Failed to write the schematic to file '%s' (exception)
-litematica.error.schematic_write_to_file_failed.exists=Failed to write the schematic to file '%s', file already exists
+litematica.error.schematic_write_to_file_failed.exists=Failed to write the schematic to file §e'%s'§r, file already exists
 litematica.error.structure_write_to_file_failed.exception=Failed to write the structure to file '%s' (exception)
 litematica.error.structure_write_to_file_failed.exists=Failed to write the structure to file '%s', file already exists
 
