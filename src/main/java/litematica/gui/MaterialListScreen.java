@@ -33,6 +33,7 @@ import litematica.materials.MaterialListHudRenderer;
 import litematica.materials.MaterialListUtils;
 import litematica.render.infohud.InfoHud;
 import litematica.util.BlockInfoListType;
+import litematica.util.LitematicaDirectories;
 
 public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialListEntry>>
 {
@@ -214,7 +215,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
     {
         boolean csv = BaseScreen.isShiftDown();
         Format format = csv ? Format.CSV : Format.ASCII;
-        Path dir = DataManager.getDataBaseDirectory("material_lists");
+        Path dir = LitematicaDirectories.getMaterialListDirectory();
         Path file = DataDump.dumpDataToFile(dir, "material_list", csv ? ".csv" : ".txt",
                                             this.materialList.getMaterialListDump(format).getLines());
 

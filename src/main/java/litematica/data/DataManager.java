@@ -19,13 +19,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 
-import malilib.config.option.BooleanAndFileConfig.BooleanAndFile;
-import malilib.config.util.ConfigUtils;
 import malilib.gui.config.ConfigTab;
 import malilib.gui.tab.ScreenTab;
 import malilib.gui.widget.util.DirectoryCache;
 import malilib.overlay.message.MessageDispatcher;
-import malilib.util.FileUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.WorldUtils;
@@ -33,8 +30,6 @@ import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.LayerRange;
-import litematica.Litematica;
-import litematica.Reference;
 import litematica.config.Configs;
 import litematica.gui.ConfigScreen;
 import litematica.materials.MaterialListBase;
@@ -43,11 +38,11 @@ import litematica.render.infohud.InfoHud;
 import litematica.scheduler.TaskScheduler;
 import litematica.schematic.placement.SchematicPlacementManager;
 import litematica.schematic.projects.SchematicProjectsManager;
-import litematica.selection.AreaSelectionSimple;
 import litematica.selection.AreaSelectionManager;
+import litematica.selection.AreaSelectionSimple;
 import litematica.tool.ToolMode;
 import litematica.tool.ToolModeData;
-import litematica.util.DefaultDirectories;
+import litematica.util.LitematicaDirectories;
 import litematica.world.SchematicWorldHandler;
 import litematica.world.SchematicWorldRenderingNotifier;
 
@@ -371,112 +366,17 @@ public class DataManager implements DirectoryCache
         }
     }
 
-    public static Path getCurrentConfigDirectory()
-    {
-        return ConfigUtils.getConfigDirectory().resolve(Reference.MOD_ID);
-    }
-
-    public static Path getSchematicsBaseDirectory()
-    {
-        BooleanAndFile value = Configs.Generic.CUSTOM_SCHEMATIC_DIRECTORY.getValue();
-        boolean useCustom = value.booleanValue;
-        Path dir = null;
-
-        if (useCustom)
-        {
-            dir = value.fileValue;
-        }
-
-        if (useCustom == false || dir == null)
-        {
-            dir = DefaultDirectories.getDefaultSchematicDirectory();
-        }
-
-        if (FileUtils.createDirectoriesIfMissing(dir) == false)
-        {
-            Litematica.logger.warn("Failed to create the schematic directory '{}'",
-                                   dir.toAbsolutePath().toString());
-        }
-
-        return dir;
-    }
-
-    public static Path getAreaSelectionsBaseDirectory()
-    {
-        String name = StringUtils.getWorldOrServerName();
-        Path baseDir = getDataBaseDirectory("area_selections");
-        Path dir;
-
-        if (Configs.Generic.AREAS_PER_WORLD.getBooleanValue() && name != null)
-        {
-            // The 'area_selections' sub-directory is to prevent showing the world name or server IP in the browser,
-            // as the root directory name is shown in the navigation widget
-            dir = baseDir.resolve("per_world").resolve(name);
-        }
-        else
-        {
-            dir = baseDir.resolve("global");
-        }
-
-        if (FileUtils.createDirectoriesIfMissing(dir) == false)
-        {
-            Litematica.logger.warn("Failed to create the area selections base directory '{}'",
-                                   dir.toAbsolutePath().toString());
-        }
-
-        return dir;
-    }
-
-    public static Path getVCSProjectsBaseDirectory()
-    {
-        Path dir = getSchematicsBaseDirectory().resolve("VCS");
-
-        if (FileUtils.createDirectoriesIfMissing(dir) == false)
-        {
-            Litematica.logger.warn("Failed to create the VCS Projects base directory '{}'",
-                                   dir.toAbsolutePath().toString());
-        }
-
-        return dir;
-    }
-
-    public static Path getPerWorldDataBaseDirectory()
-    {
-        return getDataBaseDirectory("world_specific_data");
-    }
-
-    public static Path getDataBaseDirectory(String dirName)
-    {
-        Path dir = FileUtils.getMinecraftDirectory().resolve("litematica").resolve(dirName);
-
-        if (FileUtils.createDirectoriesIfMissing(dir) == false)
-        {
-            String key = "litematica.message.error.schematic_placement.failed_to_create_directory";
-            MessageDispatcher.error().translate(key, dir.toAbsolutePath().toString());
-        }
-
-        return dir;
-    }
-
     private static Path getCurrentStorageFile(boolean globalData)
     {
-        Path dir;
+        Path dir = LitematicaDirectories.getPerWorldDataBaseDirectory();
         String worldName = StringUtils.getWorldOrServerName();
 
         if (worldName != null)
         {
-            dir = getPerWorldDataBaseDirectory().resolve(worldName);
-        }
-        // Fall back to a common set of files at the base directory
-        else
-        {
-            dir = getPerWorldDataBaseDirectory();
+            dir = dir.resolve(worldName);
         }
 
-        if (FileUtils.createDirectoriesIfMissing(dir) == false)
-        {
-            Litematica.logger.warn("Failed to create the config directory '{}'", dir.toAbsolutePath().toString());
-        }
+        LitematicaDirectories.createDirectoriesIfMissingOrPrintError(dir);
 
         return dir.resolve(getStorageFileName(globalData));
     }

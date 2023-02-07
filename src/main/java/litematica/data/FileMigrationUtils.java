@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileUtils;
 import litematica.Litematica;
+import litematica.util.LitematicaDirectories;
 
 public class FileMigrationUtils
 {
@@ -21,8 +22,8 @@ public class FileMigrationUtils
 
     public static void tryMigrateOldPerWorldData()
     {
-        Path configDir = DataManager.getCurrentConfigDirectory();
-        Path newDataDirBase = DataManager.getPerWorldDataBaseDirectory();
+        Path configDir = LitematicaDirectories.getModConfigDirectory();
+        Path newDataDirBase = LitematicaDirectories.getPerWorldDataBaseDirectory();
 
         if (Files.isDirectory(configDir) == false || Files.isReadable(configDir) == false)
         {
@@ -79,8 +80,8 @@ public class FileMigrationUtils
 
     public static void tryMigrateOldAreaSelections()
     {
-        Path oldDirPerWorldBase = DataManager.getCurrentConfigDirectory().resolve("area_selections_per_world");
-        Path newDirPerWorldBase = DataManager.getDataBaseDirectory("area_selections").resolve("per_world");
+        Path oldDirPerWorldBase = LitematicaDirectories.getModConfigDirectory().resolve("area_selections_per_world");
+        Path newDirPerWorldBase = LitematicaDirectories.getDataDirectory("area_selections").resolve("per_world");
 
         if (Files.isDirectory(oldDirPerWorldBase) &&
             Files.isReadable(oldDirPerWorldBase))
@@ -131,8 +132,8 @@ public class FileMigrationUtils
             }
         }
 
-        Path oldDirGlobal = DataManager.getCurrentConfigDirectory().resolve("area_selections");
-        Path newDirGlobal = DataManager.getDataBaseDirectory("area_selections").resolve("global");
+        Path oldDirGlobal = LitematicaDirectories.getModConfigDirectory().resolve("area_selections");
+        Path newDirGlobal = LitematicaDirectories.getDataDirectory("area_selections").resolve("global");
 
         if (Files.isDirectory(oldDirGlobal) &&
             Files.isReadable(oldDirGlobal) &&

@@ -21,6 +21,7 @@ import litematica.schematic.placement.SchematicPlacement;
 import litematica.selection.AreaSelectionManager;
 import litematica.selection.AreaSelectionType;
 import litematica.util.FileType;
+import litematica.util.LitematicaDirectories;
 
 public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {
@@ -86,7 +87,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        Path dir = DataManager.getAreaSelectionsBaseDirectory();
+        Path dir = LitematicaDirectories.getAreaSelectionsBaseDirectory();
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE, "area_selections");
 
         listWidget.setListEntryWidgetFixedHeight(18);
@@ -106,7 +107,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
         if (currentSelection != null)
         {
-            int len = DataManager.getAreaSelectionsBaseDirectory().toAbsolutePath().toString().length();
+            int len = LitematicaDirectories.getAreaSelectionsBaseDirectory().toAbsolutePath().toString().length();
 
             if (currentSelection.length() > len + 1)
             {

@@ -23,6 +23,7 @@ import litematica.data.DataManager;
 import litematica.gui.widget.SchematicVcsProjectInfoWidget;
 import litematica.schematic.projects.SchematicProject;
 import litematica.util.FileType;
+import litematica.util.LitematicaDirectories;
 
 public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {
@@ -109,7 +110,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        Path dir = DataManager.getVCSProjectsBaseDirectory();
+        Path dir = LitematicaDirectories.getVCSProjectsBaseDirectory();
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE, "vcs_projects");
 
         listWidget.setParentScreen(this.getParent());

@@ -15,6 +15,7 @@ import litematica.gui.util.SchematicBrowserIconProvider;
 import litematica.gui.widget.SchematicInfoWidgetByPath;
 import litematica.schematic.ISchematic;
 import litematica.schematic.SchematicType;
+import litematica.util.LitematicaDirectories;
 
 public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
 {
@@ -64,7 +65,7 @@ public class BaseSchematicBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     @Override
     protected BaseFileBrowserWidget createListWidget()
     {
-        Path dir = DataManager.getSchematicsBaseDirectory();
+        Path dir = LitematicaDirectories.getSchematicsBaseDirectory();
         BaseFileBrowserWidget listWidget = new BaseFileBrowserWidget(dir, dir, DataManager.INSTANCE,
                                                                      this.browserContext, this.cachingIconProvider);
 

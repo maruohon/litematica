@@ -23,10 +23,10 @@ import malilib.overlay.message.MessageOutput;
 import malilib.util.position.Vec2i;
 import litematica.Reference;
 import litematica.gui.SaveSchematicFromAreaScreen.SaveSide;
-import litematica.selection.ToolSelectionMode;
 import litematica.selection.AreaSelectionType;
+import litematica.selection.ToolSelectionMode;
 import litematica.util.BlockInfoAlignment;
-import litematica.util.DefaultDirectories;
+import litematica.util.LitematicaDirectories;
 import litematica.util.ReplaceBehavior;
 
 public class Configs
@@ -42,7 +42,7 @@ public class Configs
         public static final HotkeyedBooleanConfig SIGN_TEXT_PASTE                   = new HotkeyedBooleanConfig("signTextPaste", true, "");
         public static final HotkeyedBooleanConfig TOOL_ITEM_ENABLED                 = new HotkeyedBooleanConfig("toolItemEnabled", true, "M,T");
 
-        public static final BooleanAndFileConfig CUSTOM_SCHEMATIC_DIRECTORY         = new BooleanAndFileConfig("customSchematicDirectory", false, DefaultDirectories.getDefaultSchematicDirectory());
+        public static final BooleanAndFileConfig CUSTOM_SCHEMATIC_DIRECTORY         = new BooleanAndFileConfig("customSchematicDirectory", false, LitematicaDirectories.getDefaultSchematicDirectory());
 
         public static final BooleanConfig AREAS_PER_WORLD                           = new BooleanConfig("areaSelectionsPerWorld", true);
         public static final BooleanConfig BETTER_RENDER_ORDER                       = new BooleanConfig("betterRenderOrder", true);

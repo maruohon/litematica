@@ -655,6 +655,7 @@ litematica.label.yes=yes
 
 litematica.message.error.area_deletion_aborted=Area Deletion interrupted or aborted
 litematica.message.error.empty_area_selection=Empty Area Selection (no boxes)
+litematica.message.error.failed_to_create_directory=Failed to create the directory §e'%s'§r
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.error.no_area_selected=§cNo area selected§r
 litematica.message.error.only_works_in_single_player=§cThis operation only works in single player§r
@@ -663,7 +664,6 @@ litematica.message.error.placement_grid_settings.open_gui_selected_is_grid=The s
 litematica.message.error.placement_paste_outside_world=The placement can't be pasted in the current position, because it goes outside the world bounds
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
 litematica.message.error.schematic_paste_failed_region=§cFailed to paste the region '%s'§r
-litematica.message.error.schematic_placement.failed_to_create_directory=Failed to create the directory '%s'
 litematica.message.error.schematic_placement.load_failed=Failed to load the placement '%s' from schematic file '%s'
 litematica.message.error.schematic_placement.save.failed_to_get_save_file=Failed to get the file to save this placement to
 litematica.message.error.schematic_placement.save.failed_to_serialize=Failed to serialize the placement data

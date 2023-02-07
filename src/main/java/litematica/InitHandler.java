@@ -7,7 +7,6 @@ import malilib.event.InitializationHandler;
 import malilib.registry.Registry;
 import litematica.config.Configs;
 import litematica.config.HotkeyCallbacks;
-import litematica.data.DataManager;
 import litematica.data.FileMigrationUtils;
 import litematica.event.ClientWorldChangeHandler;
 import litematica.event.RenderHandler;
@@ -17,6 +16,7 @@ import litematica.input.MouseScrollHandlerImpl;
 import litematica.network.SchematicSavePacketHandler;
 import litematica.render.infohud.StatusInfoRenderer;
 import litematica.scheduler.ClientTickHandler;
+import litematica.util.LitematicaDirectories;
 
 public class InitHandler implements InitializationHandler
 {
@@ -48,8 +48,9 @@ public class InitHandler implements InitializationHandler
         HotkeyCallbacks.init();
         StatusInfoRenderer.init();
 
-        DataManager.getAreaSelectionsBaseDirectory();
-        DataManager.getSchematicsBaseDirectory();
+        // This creates the directories if they don't exist yet
+        LitematicaDirectories.getAreaSelectionsBaseDirectory();
+        LitematicaDirectories.getSchematicsBaseDirectory();
 
         Registry.CLIENT_PACKET_CHANNEL_HANDLER.registerClientChannelHandler(SchematicSavePacketHandler.INSTANCE);
     }
