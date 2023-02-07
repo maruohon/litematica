@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import malilib.gui.BaseListScreen;
 import malilib.gui.BaseScreen;
 import malilib.gui.TextInputScreen;
+import malilib.gui.icon.DefaultFileBrowserIconProvider;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.BaseFileBrowserWidget;
@@ -31,6 +32,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
     protected final GenericButton selectionFromPlacementButton;
     protected final GenericButton unselectButton;
     protected final LabelWidget currentSelectionLabel;
+    protected boolean simpleModeWarningShown;
 
     public AreaSelectionBrowserScreen()
     {
@@ -96,7 +98,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         listWidget.getEntrySelectionHandler().setSelectionListener(this::onSelectionChange);
         listWidget.getEntrySelectionHandler().setAllowSelection(true);
         listWidget.setRootDirectoryDisplayName(StringUtils.translate("litematica.label.area_selection_browser.selections"));
-        listWidget.setDataListEntryWidgetFactory((d, cd) -> new AreaSelectionEntryWidget(d, cd, listWidget, null, this.areaSelectionManager));
+        listWidget.setDataListEntryWidgetFactory((d, cd) -> new AreaSelectionEntryWidget(d, cd, listWidget, new DefaultFileBrowserIconProvider(), this.areaSelectionManager));
 
         return listWidget;
     }
@@ -124,9 +126,11 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
 
     protected void printSimpleModeWarning()
     {
-        if (this.areaSelectionManager.getSelectionMode() == AreaSelectionType.SIMPLE)
+        if (this.simpleModeWarningShown == false &&
+            this.areaSelectionManager.getSelectionMode() == AreaSelectionType.SIMPLE)
         {
             MessageDispatcher.warning(5000).translate("litematica.message.warn.area_selection_browser.in_simple_mode");
+            this.simpleModeWarningShown = true;
         }
     }
 

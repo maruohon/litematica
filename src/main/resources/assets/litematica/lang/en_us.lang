@@ -323,7 +323,7 @@ litematica.label.schematic_placement_sub_region_settings.placement_name=Placemen
 litematica.label.schematic_placement_sub_region_settings.region_name=Sub-Region Name: §a%s
 litematica.label.schematic_placement_sub_region_settings.region_position=Region Position
 litematica.label.schematic_projects.current_version_date=Date: %s
-litematica.label.schematic_vcs.browser_root_dir_name=projects
+litematica.label.schematic_vcs.browser_root_dir_name=vcs
 litematica.label.schematic_vcs.current_project=Current Project: §e%s
 litematica.label.schematic_vcs.info_widget.current_version=<c=aaa>Version: §6%s <c=aaa>(of §6%s<c=aaa>)
 litematica.label.schematic_vcs.info_widget.origin=<c=aaa>Project Origin:\n  x: §6%s\n  <c=aaa>y: §6%s\n  <c=aaa>z: §6%s

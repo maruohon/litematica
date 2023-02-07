@@ -56,7 +56,6 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         this.fileType = FileType.fromFileName(file);
         this.areaSelectionManager = areaSelectionManager;
         this.isSelectionEntry = this.fileType == FileType.JSON && entry.getType() == DirectoryEntryType.FILE;
-        this.textOffset.setXOffset(5);
 
         this.configureButton = GenericButton.create(16, "litematica.button.misc.configure", this::openAreaEditor);
         this.copyButton      = GenericButton.create(16, "litematica.button.misc.copy", this::copySelection);
@@ -65,9 +64,11 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 
         if (this.isSelectionEntry)
         {
-            this.isSelected = this.selectionId.equals(this.areaSelectionManager.getCurrentMultiRegionSelectionId());
             this.addHoverTooltip();
+            this.updateWidgetState();
         }
+
+        this.getBorderRenderer().getHoverSettings().setEnabled(false);
     }
 
     @Override
