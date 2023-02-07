@@ -155,6 +155,7 @@ litematica.hover.button.schematic_manager.set_description=Set or edit the descri
 litematica.hover.button.schematic_manager.rename_schematic=Rename the schematic\n\nThe schematic name is shown on the right side info panel, and it's used as the default placement name.\n\n§eNote:§r This is different than the file name. Use the §eRename File§r button if you just want to rename the file. The file name is what is shown in the schematic browser on the left.
 litematica.hover.button.schematic_manager.set_preview=Set a preview image/thumbnail to the schematic\n\nThe image is shown on the right side info panel
 litematica.hover.button.schematic_placement_list.sort_mode_button=The sort mode allows dragging the entries to reorder the placement list\n\n§dNote:§r You must click on the button to leave the sort mode to actually save the changes!
+litematica.hover.button.schematic_placement_settings.change_bb_color=Change the placement bounding box color
 litematica.hover.button.schematic_placement_settings.change_schematic=Change the schematic file this placement uses
 litematica.hover.button.schematic_placement_settings.copy_paste_settings=§eCopy or Paste placement settings§r\n- Click to open a text field where you can copy\n   or paste the setting string to/from\n- Shift + Left click to copy to the clipboard\n- Ctrl + Shift + Right click to paste from the clipboard
 litematica.hover.button.schematic_placement_settings.enclosing_box.off=Enclosing box rendering: §cOFF

@@ -20,6 +20,7 @@ import malilib.gui.icon.Icon;
 import malilib.gui.widget.BaseTextFieldWidget;
 import malilib.gui.widget.BlockPosEditWidget;
 import malilib.gui.widget.CheckBoxWidget;
+import malilib.gui.widget.ColorIndicatorWidget;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
@@ -37,6 +38,7 @@ import litematica.data.DataManager;
 import litematica.gui.util.LitematicaIcons;
 import litematica.gui.widget.list.entry.SchematicPlacementSubRegionEntryWidget;
 import litematica.materials.MaterialListPlacement;
+import litematica.render.OverlayRenderer;
 import litematica.schematic.ISchematic;
 import litematica.schematic.SchematicType;
 import litematica.schematic.placement.SchematicPlacement;
@@ -75,6 +77,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     protected final CheckBoxWidget lockYCoordCheckbox;
     protected final CheckBoxWidget lockZCoordCheckbox;
     protected final BlockPosEditWidget originEditWidget;
+    protected final ColorIndicatorWidget bbColorWidget;
 
     public SchematicPlacementSettingsScreen(SchematicPlacement placement)
     {
@@ -117,6 +120,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.lockXCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockYCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
         this.lockZCoordCheckbox = new CheckBoxWidget(null, "litematica.hover.checkmark.schematic_placement_settings.lock_coordinate");
+        this.bbColorWidget = new ColorIndicatorWidget(16, 16, () -> this.placement.getBoundingBoxColor().intValue, this::setBoundingBoxColor);
 
         SchematicType<?> type = placement.getSchematic().getType();
         Icon icon = placement.isSchematicInMemoryOnly() ? type.getInMemoryIcon() : type.getIcon();
@@ -129,6 +133,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.nameTextField.translateAndAddHoverString("litematica.hover.schematic_placement_settings.rename_placement");
         this.nameResetButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.reset_name");
         this.toggleLockedButton.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.lock");
+        this.bbColorWidget.translateAndAddHoverString("litematica.hover.button.schematic_placement_settings.change_bb_color");
 
         this.toggleEnclosingBoxButton.getHoverInfoFactory().setStringListProvider("_default", this::getEnclosingBoxButtonHoverText);
         this.resetSubRegionsButton.setEnabledStatusSupplier(() -> this.placement.isRegionPlacementModified() && this.isNotLocked());
@@ -150,6 +155,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     {
         super.reAddActiveWidgets();
 
+        this.addWidget(this.bbColorWidget);
         this.addWidget(this.changeSchematicButton);
         this.addWidget(this.copyPasteSettingsButton);
         this.addWidget(this.gridSettingsButton);
@@ -213,6 +219,7 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
         this.toggleLockedButton.setPosition(x, this.togglePlacementEnabledButton.getBottom() + 1);
         this.toggleEnclosingBoxButton.setPosition(this.toggleLockedButton.getRight() + 2,
                                                   this.toggleLockedButton.getY() + 1);
+        this.bbColorWidget.setPosition(this.toggleEnclosingBoxButton.getRight() + 3, this.toggleEnclosingBoxButton.getY());
 
         this.toggleEntitiesButton.setPosition(x, this.toggleLockedButton.getBottom() + 1);
 
@@ -481,6 +488,12 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     protected void toggleIgnoreEntities()
     {
         this.manager.toggleIgnoreEntities(this.placement);
+    }
+
+    protected void setBoundingBoxColor(int color)
+    {
+        this.placement.setBoundingBoxColor(color);
+        OverlayRenderer.getInstance().updatePlacementCache();
     }
 
     protected void updateLabels()
