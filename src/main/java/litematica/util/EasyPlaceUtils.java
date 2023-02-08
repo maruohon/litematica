@@ -94,6 +94,7 @@ public class EasyPlaceUtils
         {
             try
             {
+                // TODO FIXME cross-MC-version fragile
                 String name = Block.class.getSimpleName().equals("Block") ? "onBlockActivated": "a";
                 Method method = block.getClass().getMethod(name, World.class, BlockPos.class, IBlockState.class, EntityPlayer.class, EnumHand.class, EnumFacing.class, float.class, float.class, float.class);
                 Method baseMethod = Block.class.getMethod(name, World.class, BlockPos.class, IBlockState.class, EntityPlayer.class, EnumHand.class, EnumFacing.class, float.class, float.class, float.class);
@@ -113,15 +114,16 @@ public class EasyPlaceUtils
 
     public static boolean shouldDoEasyPlaceActions()
     {
-        return Configs.Generic.EASY_PLACE_MODE.getBooleanValue() && DataManager.getToolMode() != ToolMode.SCHEMATIC_EDIT &&
+        return Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+               DataManager.getToolMode() != ToolMode.SCHEMATIC_EDIT &&
                Hotkeys.EASY_PLACE_ACTIVATION.getKeyBind().isKeyBindHeld();
     }
 
     public static void easyPlaceOnUseTick()
     {
-        if (GameUtils.getClientPlayer() != null && isHandling == false &&
-            shouldDoEasyPlaceActions() &&
+        if (isHandling == false &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
+            shouldDoEasyPlaceActions() &&
             Keys.isKeyDown(GameUtils.getOptions().keyBindUseItem.getKeyCode()))
         {
             isHandling = true;
@@ -145,7 +147,7 @@ public class EasyPlaceUtils
         if (isFirstClickEasyPlace && result == EnumActionResult.FAIL)
         {
             MessageOutput output = Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue();
-            MessageDispatcher.warning(1000).type(output).translate("litematica.message.easy_place_fail");
+            MessageDispatcher.warning(1500).type(output).translate("litematica.message.easy_place_fail");
         }
 
         isFirstClickEasyPlace = false;
@@ -663,10 +665,8 @@ public class EasyPlaceUtils
                 {
                     List<IntBoundingBox> boxes = manager.getTouchedBoxesInSubChunk(new ChunkSectionPos(cx, cy, cz));
 
-                    for (int i = 0; i < boxes.size(); ++i)
+                    for (IntBoundingBox box : boxes)
                     {
-                        IntBoundingBox box = boxes.get(i);
-
                         if (x >= box.minX - range && x <= box.maxX + range &&
                             y >= box.minY - range && y <= box.maxY + range &&
                             z >= box.minZ - range && z <= box.maxZ + range)

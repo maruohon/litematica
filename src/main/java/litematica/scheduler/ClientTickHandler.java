@@ -1,9 +1,10 @@
 package litematica.scheduler;
 
+import malilib.gui.util.GuiUtils;
 import malilib.util.game.wrap.GameUtils;
 import litematica.data.DataManager;
-import litematica.input.MouseScrollHandlerImpl;
 import litematica.schematic.verifier.SchematicVerifierManager;
+import litematica.util.EasyPlaceUtils;
 
 public class ClientTickHandler implements malilib.event.ClientTickHandler
 {
@@ -12,7 +13,11 @@ public class ClientTickHandler implements malilib.event.ClientTickHandler
     @Override
     public void onClientTick()
     {
-        MouseScrollHandlerImpl.onTick();
+        if (GameUtils.getClientPlayer() == null || GameUtils.getClientWorld() == null)
+        {
+            return;
+        }
+
         DataManager.getRenderLayerRange().followPlayerIfEnabled(GameUtils.getClientPlayer());
         DataManager.getSchematicPlacementManager().processQueuedChunks();
         TaskScheduler.getInstanceClient().runTasks();
@@ -20,6 +25,11 @@ public class ClientTickHandler implements malilib.event.ClientTickHandler
         if ((this.tickCounter) % 10 == 0)
         {
             SchematicVerifierManager.INSTANCE.scheduleReChecks();
+        }
+
+        if (GuiUtils.getCurrentScreen() == null)
+        {
+            EasyPlaceUtils.easyPlaceOnUseTick();
         }
 
         ++this.tickCounter;

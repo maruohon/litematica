@@ -16,7 +16,6 @@ import litematica.selection.AreaSelectionManager;
 import litematica.selection.BoxCorner;
 import litematica.selection.CornerDefinedBox;
 import litematica.tool.ToolMode;
-import litematica.util.EasyPlaceUtils;
 import litematica.util.EntityUtils;
 import litematica.util.PositionUtils;
 import litematica.util.ToolUtils;
@@ -138,14 +137,6 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
         }
 
         return true;
-    }
-
-    public static void onTick()
-    {
-        if (GuiUtils.getCurrentScreen() == null)
-        {
-            EasyPlaceUtils.easyPlaceOnUseTick();
-        }
     }
 
     private interface IBoxEditor

@@ -210,14 +210,14 @@ public class InventoryUtils
 
             if (hand == null)
             {
-                if (GameUtils.isCreativeMode())
+                if (GameUtils.isCreativeMode() && BaseScreen.isCtrlDown())
                 {
                     TileEntity te = world.getTileEntity(pos);
 
                     // The creative mode pick block with NBT only works correctly
                     // if the server world doesn't have a TileEntity in that position.
                     // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (BaseScreen.isCtrlDown() && te != null && GameUtils.getClientWorld().isAirBlock(pos))
+                    if (te != null && GameUtils.getClientWorld().isAirBlock(pos))
                     {
                         stack = stack.copy();
                         ItemUtils.storeBlockEntityInStack(stack, te);
@@ -265,10 +265,8 @@ public class InventoryUtils
 
         // If the current slot was not empty, then try to find
         // an empty slot among the allowed pick-blockable slots.
-        for (int i = 0; i < PICK_BLOCKABLE_SLOTS.size(); ++i)
+        for (int slotNum : PICK_BLOCKABLE_SLOTS)
         {
-            int slotNum = PICK_BLOCKABLE_SLOTS.get(i);
-
             if (slotNum >= 0 && slotNum < inventory.mainInventory.size())
             {
                 ItemStack stack = inventory.mainInventory.get(slotNum);
