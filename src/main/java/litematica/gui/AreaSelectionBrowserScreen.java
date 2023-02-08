@@ -10,6 +10,7 @@ import malilib.gui.icon.DefaultFileBrowserIconProvider;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.BaseFileBrowserWidget;
+import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileNameUtils;
 import malilib.util.FileUtils;
@@ -21,7 +22,6 @@ import litematica.gui.widget.list.entry.AreaSelectionEntryWidget;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.selection.AreaSelectionManager;
 import litematica.selection.AreaSelectionType;
-import litematica.util.FileType;
 import litematica.util.LitematicaDirectories;
 
 public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
@@ -201,8 +201,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
         {
             this.areaSelectionManager.setCurrentSelection(null);
         }
-        else if (entry.getType() == BaseFileBrowserWidget.DirectoryEntryType.FILE &&
-                 FileType.fromFileName(entry.getFullPath()) == FileType.JSON)
+        else if (entry.getType() == DirectoryEntryType.FILE && entry.getName().endsWith(".json"))
         {
             String selectionId = entry.getFullPath().toString();
 

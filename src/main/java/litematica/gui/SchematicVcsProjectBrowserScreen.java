@@ -22,7 +22,6 @@ import litematica.Reference;
 import litematica.data.DataManager;
 import litematica.gui.widget.SchematicVcsProjectInfoWidget;
 import litematica.schematic.projects.SchematicProject;
-import litematica.util.FileType;
 import litematica.util.LitematicaDirectories;
 
 public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBrowserWidget>
@@ -69,7 +68,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
         DirectoryEntry selected = this.getListWidget().getLastSelectedEntry();
         SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
         boolean projectOpen = project != null;
-        boolean projectSelected = selected != null && FileType.fromFileName(selected.getFullPath()) == FileType.JSON;
+        boolean projectSelected = selected != null && selected.getName().endsWith(".json");
 
         this.deleteProjectButton.setEnabled(projectSelected);
         this.loadProjectButton.setEnabled(projectSelected);

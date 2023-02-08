@@ -25,12 +25,10 @@ import litematica.gui.MultiRegionModeAreaEditorScreen;
 import litematica.selection.AreaSelection;
 import litematica.selection.AreaSelectionManager;
 import litematica.selection.AreaSelectionType;
-import litematica.util.FileType;
 
 public class AreaSelectionEntryWidget extends DirectoryEntryWidget
 {
     protected final AreaSelectionManager areaSelectionManager;
-    protected final FileType fileType;
     protected final String selectionId;
     protected final GenericButton configureButton;
     protected final GenericButton copyButton;
@@ -53,9 +51,8 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
         this.selectionId = file.toAbsolutePath().toString();
         // By default, load the selections as read-only, so that they won't unnecessarily get written back to the file
         this.selection = areaSelectionManager.getOrLoadSelectionReadOnly(this.selectionId);
-        this.fileType = FileType.fromFileName(file);
         this.areaSelectionManager = areaSelectionManager;
-        this.isSelectionEntry = this.fileType == FileType.JSON && entry.getType() == DirectoryEntryType.FILE;
+        this.isSelectionEntry = entry.getType() == DirectoryEntryType.FILE && entry.getName().endsWith(".json");
 
         this.configureButton = GenericButton.create(16, "litematica.button.misc.configure", this::openAreaEditor);
         this.copyButton      = GenericButton.create(16, "litematica.button.misc.copy", this::copySelection);

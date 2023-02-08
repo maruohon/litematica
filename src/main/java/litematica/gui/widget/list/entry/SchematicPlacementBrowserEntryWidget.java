@@ -17,7 +17,6 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileNameUtils;
 import malilib.util.FileUtils;
 import litematica.data.DataManager;
-import litematica.util.FileType;
 
 public class SchematicPlacementBrowserEntryWidget extends DirectoryEntryWidget
 {
@@ -32,7 +31,7 @@ public class SchematicPlacementBrowserEntryWidget extends DirectoryEntryWidget
     {
         super(entry, constructData, fileBrowserWidget, iconProvider);
 
-        this.isSelectionEntry = FileType.fromFileName(entry.getFullPath()) == FileType.JSON && entry.getType() == DirectoryEntryType.FILE;
+        this.isSelectionEntry = entry.getType() == DirectoryEntryType.FILE && entry.getName().endsWith(".json");
         this.loadButton   = GenericButton.create(18, "litematica.button.misc.load", this::loadSavedPlacement);
         this.removeButton = GenericButton.create(18, "litematica.button.misc.remove", this::removeSavedPlacement);
     }
