@@ -1,4 +1,4 @@
-package litematica.util;
+package litematica.util.value;
 
 import com.google.common.collect.ImmutableList;
 

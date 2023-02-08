@@ -43,8 +43,8 @@ import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.mixin.IMixinCompiledChunk;
 import litematica.render.RenderUtils;
-import litematica.util.OverlayType;
 import litematica.util.PositionUtils;
+import litematica.util.value.OverlayType;
 
 public class RenderChunkSchematicVbo extends RenderChunk
 {

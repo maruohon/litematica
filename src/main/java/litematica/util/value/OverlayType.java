@@ -1,4 +1,4 @@
-package litematica.util;
+package litematica.util.value;
 
 public enum OverlayType
 {
@@ -10,7 +10,7 @@ public enum OverlayType
 
     private final int priority;
 
-    private OverlayType(int priority)
+    OverlayType(int priority)
     {
         this.priority = priority;
     }

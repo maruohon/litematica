@@ -35,8 +35,8 @@ import litematica.scheduler.TaskScheduler;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.selection.SelectionBox;
 import litematica.task.SchematicVerifierTask;
-import litematica.util.BlockInfoListType;
 import litematica.util.PositionUtils;
+import litematica.util.value.BlockInfoListType;
 
 public class SchematicVerifier implements IInfoHudRenderer
 {

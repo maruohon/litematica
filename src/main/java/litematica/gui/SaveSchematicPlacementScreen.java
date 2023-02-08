@@ -2,7 +2,6 @@ package litematica.gui;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import javax.annotation.Nullable;
 
 import malilib.gui.widget.BaseTextFieldWidget;

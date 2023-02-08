@@ -33,8 +33,8 @@ import malilib.util.inventory.InventoryView;
 import malilib.util.position.IntBoundingBox;
 import litematica.config.Configs;
 import litematica.config.Hotkeys;
-import litematica.util.BlockInfoAlignment;
 import litematica.util.PositionUtils;
+import litematica.util.value.BlockInfoAlignment;
 
 public class RenderUtils
 {

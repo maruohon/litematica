@@ -2,7 +2,7 @@ package litematica.materials;
 
 import java.util.List;
 
-import litematica.util.BlockInfoListType;
+import litematica.util.value.BlockInfoListType;
 
 public interface IMaterialList
 {

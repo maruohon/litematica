@@ -25,14 +25,14 @@ import litematica.schematic.placement.SubRegionPlacement;
 import litematica.schematic.projects.SchematicProject;
 import litematica.schematic.projects.SchematicVersion;
 import litematica.selection.AreaSelection;
-import litematica.selection.CornerDefinedBox;
 import litematica.selection.AreaSelectionManager;
 import litematica.selection.AreaSelectionType;
+import litematica.selection.CornerDefinedBox;
 import litematica.tool.ToolMode;
 import litematica.tool.ToolModeData;
 import litematica.util.EntityUtils;
 import litematica.util.PositionUtils;
-import litematica.util.ReplaceBehavior;
+import litematica.util.value.ReplaceBehavior;
 
 public class ToolHud extends InfoHud
 {

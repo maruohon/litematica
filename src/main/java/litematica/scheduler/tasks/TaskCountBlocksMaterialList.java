@@ -13,7 +13,7 @@ import litematica.materials.IMaterialList;
 import litematica.materials.MaterialListEntry;
 import litematica.materials.MaterialListUtils;
 import litematica.render.infohud.InfoHud;
-import litematica.util.BlockInfoListType;
+import litematica.util.value.BlockInfoListType;
 import litematica.world.SchematicWorldRenderingNotifier;
 
 public abstract class TaskCountBlocksMaterialList extends TaskCountBlocksBase

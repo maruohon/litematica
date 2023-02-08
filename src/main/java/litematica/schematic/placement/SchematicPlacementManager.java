@@ -54,7 +54,7 @@ import litematica.util.PositionUtils;
 import litematica.util.RayTraceUtils;
 import litematica.util.RayTraceUtils.RayTraceWrapper;
 import litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
-import litematica.util.ReplaceBehavior;
+import litematica.util.value.ReplaceBehavior;
 import litematica.world.WorldSchematic;
 
 public class SchematicPlacementManager

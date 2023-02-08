@@ -25,9 +25,9 @@ import litematica.Reference;
 import litematica.gui.SaveSchematicFromAreaScreen.SaveSide;
 import litematica.selection.AreaSelectionType;
 import litematica.selection.ToolSelectionMode;
-import litematica.util.BlockInfoAlignment;
 import litematica.util.LitematicaDirectories;
-import litematica.util.ReplaceBehavior;
+import litematica.util.value.BlockInfoAlignment;
+import litematica.util.value.ReplaceBehavior;
 
 public class Configs
 {

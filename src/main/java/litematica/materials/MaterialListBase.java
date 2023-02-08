@@ -15,7 +15,7 @@ import malilib.config.value.BaseOptionListConfigValue;
 import malilib.listener.TaskCompletionListener;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.datadump.DataDump;
-import litematica.util.BlockInfoListType;
+import litematica.util.value.BlockInfoListType;
 
 public abstract class MaterialListBase implements IMaterialList
 {

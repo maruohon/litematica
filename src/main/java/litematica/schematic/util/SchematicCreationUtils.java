@@ -48,9 +48,9 @@ import litematica.schematic.SchematicType;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
 import litematica.schematic.projects.SchematicProject;
 import litematica.selection.AreaSelection;
+import litematica.selection.AreaSelectionManager;
 import litematica.selection.CornerDefinedBox;
 import litematica.selection.SelectionBox;
-import litematica.selection.AreaSelectionManager;
 import litematica.task.CreateSchematicTask;
 import litematica.util.PositionUtils;
 

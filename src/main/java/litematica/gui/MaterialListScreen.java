@@ -32,8 +32,8 @@ import litematica.materials.MaterialListEntry;
 import litematica.materials.MaterialListHudRenderer;
 import litematica.materials.MaterialListUtils;
 import litematica.render.infohud.InfoHud;
-import litematica.util.BlockInfoListType;
 import litematica.util.LitematicaDirectories;
+import litematica.util.value.BlockInfoListType;
 
 public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialListEntry>>
 {

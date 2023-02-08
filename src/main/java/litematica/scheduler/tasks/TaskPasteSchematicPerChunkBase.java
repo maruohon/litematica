@@ -23,7 +23,7 @@ import litematica.render.infohud.IInfoHudRenderer;
 import litematica.render.infohud.InfoHud;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.util.PositionUtils.ChunkPosComparator;
-import litematica.util.ReplaceBehavior;
+import litematica.util.value.ReplaceBehavior;
 import litematica.world.SchematicWorldHandler;
 
 public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements IInfoHudRenderer

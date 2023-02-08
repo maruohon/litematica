@@ -34,7 +34,7 @@ import litematica.schematic.verifier.BlockStatePairCount;
 import litematica.schematic.verifier.SchematicVerifier;
 import litematica.schematic.verifier.VerifierResultType;
 import litematica.schematic.verifier.VerifierStatus;
-import litematica.util.BlockInfoListType;
+import litematica.util.value.BlockInfoListType;
 
 public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<BlockStatePairCount>>
 {

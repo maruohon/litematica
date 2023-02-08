@@ -48,8 +48,8 @@ import litematica.schematic.placement.SubRegionPlacement;
 import litematica.selection.CornerDefinedBox;
 import litematica.util.EntityUtils;
 import litematica.util.PositionUtils;
-import litematica.util.ReplaceBehavior;
 import litematica.util.WorldUtils;
+import litematica.util.value.ReplaceBehavior;
 
 public class SchematicPlacingUtils
 {

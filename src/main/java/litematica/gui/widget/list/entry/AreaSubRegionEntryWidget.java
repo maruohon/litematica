@@ -17,8 +17,8 @@ import malilib.util.StringUtils;
 import litematica.data.DataManager;
 import litematica.gui.AreaSubRegionEditScreen;
 import litematica.selection.AreaSelection;
-import litematica.selection.SelectionBox;
 import litematica.selection.AreaSelectionManager;
+import litematica.selection.SelectionBox;
 import litematica.util.PositionUtils;
 
 public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>

@@ -12,7 +12,7 @@ import litematica.data.DataManager;
 import litematica.materials.IMaterialList;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.selection.SelectionBox;
-import litematica.util.BlockInfoListType;
+import litematica.util.value.BlockInfoListType;
 import litematica.world.SchematicWorldHandler;
 import litematica.world.WorldSchematic;
 

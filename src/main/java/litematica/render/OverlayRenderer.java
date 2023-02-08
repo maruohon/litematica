@@ -56,10 +56,10 @@ import litematica.selection.AreaSelectionManager;
 import litematica.selection.BoxCorner;
 import litematica.selection.CornerDefinedBox;
 import litematica.selection.SelectionBox;
-import litematica.util.BlockInfoAlignment;
 import litematica.util.ItemUtils;
 import litematica.util.RayTraceUtils;
 import litematica.util.RayTraceUtils.RayTraceWrapper;
+import litematica.util.value.BlockInfoAlignment;
 import litematica.world.SchematicWorldHandler;
 
 public class OverlayRenderer
