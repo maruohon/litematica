@@ -382,7 +382,7 @@ public class SchematicPlacingUtils
 
             if (range.isPositionWithinRange((int) Math.floor(pos.x), (int) Math.floor(pos.y), (int) Math.floor(pos.z)))
             {
-                Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
+                Entity entity = EntityUtils.createEntityAndPassengersFromNbt(info.nbt, world);
 
                 if (entity != null)
                 {
@@ -644,7 +644,7 @@ public class SchematicPlacingUtils
 
         for (EntityInfo info : entityList)
         {
-            Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
+            Entity entity = EntityUtils.createEntityAndPassengersFromNbt(info.nbt, world);
 
             if (entity != null)
             {

@@ -34,7 +34,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
             GameUtils.getClientPlayer() == null ||
             deltaY == 0 ||
             toolEnabled == false ||
-            EntityUtils.hasToolItem(GameUtils.getClientPlayer()) == false)
+            EntityUtils.hasToolItem() == false)
         {
             return false;
         }

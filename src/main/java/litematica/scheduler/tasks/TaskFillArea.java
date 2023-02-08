@@ -118,7 +118,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         if (removeEntities)
         {
             AxisAlignedBB aabb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
-            List<Entity> entities = this.world.getEntitiesInAABBexcluding(null, aabb, EntityUtils.NOT_PLAYER);
+            List<Entity> entities = this.world.getEntitiesInAABBexcluding(null, aabb, EntityUtils::testNotPlayer);
             entities.forEach(Entity::setDead);
         }
 
@@ -166,7 +166,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         {
             AxisAlignedBB aabb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
 
-            if (this.world.getEntitiesInAABBexcluding(null, aabb, EntityUtils.NOT_PLAYER).size() > 0)
+            if (this.world.getEntitiesInAABBexcluding(null, aabb, EntityUtils::testNotPlayer).size() > 0)
             {
                 String killCmd = String.format("/kill @e[type=!player,x=%d,y=%d,z=%d,dx=%d,dy=%d,dz=%d]",
                         box.minX               , box.minY               , box.minZ,
