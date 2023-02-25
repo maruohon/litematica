@@ -63,7 +63,8 @@ public class Configs
         public static final BooleanConfig PICK_BLOCK_AVOID_DAMAGEABLE               = new BooleanConfig("pickBlockAvoidDamageable", true);
         public static final BooleanConfig PICK_BLOCK_AVOID_TOOLS                    = new BooleanConfig("pickBlockAvoidTools", false);
         public static final BooleanConfig PICK_BLOCK_IGNORE_NBT                     = new BooleanConfig("pickBlockIgnoreNBT", true);
-        public static final StringConfig  PICK_BLOCKABLE_SLOTS                      = new StringConfig( "pickBlockableSlots", "6-9");
+        public static final BooleanConfig PICK_BLOCK_SHULKER_BOXES                  = new BooleanConfig("pickBlockShulkerBoxes", false);
+        public static final StringConfig  PICK_BLOCK_USABLE_SLOTS                   = new StringConfig("pickBlockUsableSlots", "1-9");
         public static final BooleanConfig PLACEMENTS_INFRONT                        = new BooleanConfig("placementInfrontOfPlayer", false);
         public static final BooleanConfig RENDER_MATERIALS_IN_GUI                   = new BooleanConfig("renderMaterialListInGuis", true);
         public static final BooleanConfig RENDER_THREAD_NO_TIMEOUT                  = new BooleanConfig("renderThreadNoTimeout", true);
@@ -100,8 +101,9 @@ public class Configs
                 PICK_BLOCK_AVOID_DAMAGEABLE,
                 PICK_BLOCK_AVOID_TOOLS,
                 PICK_BLOCK_ENABLED,
+                PICK_BLOCK_USABLE_SLOTS,
                 PICK_BLOCK_IGNORE_NBT,
-                PICK_BLOCKABLE_SLOTS,
+                PICK_BLOCK_SHULKER_BOXES,
                 PLACEMENT_RESTRICTION,
                 PLACEMENTS_INFRONT,
                 RENDER_MATERIALS_IN_GUI,

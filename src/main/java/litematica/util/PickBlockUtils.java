@@ -3,7 +3,6 @@ package litematica.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 import net.minecraft.block.state.IBlockState;
@@ -284,6 +283,11 @@ public class PickBlockUtils
         Container container = GameUtils.getCurrentInventoryContainer();
         boolean isCreativeMode = GameUtils.isCreativeMode();
         int slotWithItem = InventoryUtils.findSlotWithItemToPickBlock(container, stack, ignoreNbt);
+
+        if (slotWithItem == -1 && Configs.Generic.PICK_BLOCK_SHULKER_BOXES.getBooleanValue())
+        {
+            slotWithItem = InventoryUtils.findPlayerInventorySlotWithShulkerBoxWithItem(container, stack, ignoreNbt, false);
+        }
 
         // Item not found in the player's inventory, and not in creative mode so no way to just add it
         if (slotWithItem == -1 && isCreativeMode == false)
