@@ -4,7 +4,7 @@ import malilib.input.callback.HotkeyCallback;
 import malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 import malilib.listener.EventListener;
 import litematica.data.DataManager;
-import litematica.util.InventoryUtils;
+import litematica.util.PickBlockUtils;
 import litematica.world.SchematicWorldRenderingNotifier;
 
 public class HotkeyCallbacks
@@ -15,8 +15,8 @@ public class HotkeyCallbacks
         HotkeyCallback hotkeyCallbackOpenGui = new HotkeyCallbackOpenGui();
         HotkeyCallback hotkeyCallbackToolActions = new HotkeyCallbackToolActions();
 
-        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((newValue, oldValue) -> InventoryUtils.setPickBlockableSlots(newValue));
-        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueLoadCallback(InventoryUtils::setPickBlockableSlots);
+        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((newValue, oldValue) -> PickBlockUtils.setPickBlockUsableSlots(newValue));
+        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueLoadCallback(PickBlockUtils::setPickBlockUsableSlots);
         Configs.Generic.TOOL_ITEM.setValueChangeCallback((newValue, oldValue) -> DataManager.setToolItem(newValue));
         Configs.Generic.TOOL_ITEM.setValueLoadCallback(DataManager::setToolItem);
 

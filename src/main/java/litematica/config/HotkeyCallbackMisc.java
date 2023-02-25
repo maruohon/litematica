@@ -27,7 +27,7 @@ import litematica.selection.BoxCorner;
 import litematica.tool.ToolMode;
 import litematica.tool.ToolModeData;
 import litematica.util.EntityUtils;
-import litematica.util.InventoryUtils;
+import litematica.util.PickBlockUtils;
 import litematica.util.PositionUtils;
 import litematica.util.ToolUtils;
 import litematica.world.SchematicWorldRenderingNotifier;
@@ -215,7 +215,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeyBind())
         {
-            if (EntityUtils.shouldPickBlock() && InventoryUtils.pickBlockFirst())
+            if (PickBlockUtils.shouldPickBlock() && PickBlockUtils.pickBlockFirst())
             {
                 return ActionResult.SUCCESS;
             }
@@ -230,9 +230,9 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             // since in that case it's done from the vanilla right click handling code.
             if (DataManager.getToolMode() != ToolMode.SCHEMATIC_EDIT &&
                 Configs.Generic.PICK_BLOCK_AUTO.getBooleanValue() == false &&
-                EntityUtils.shouldPickBlock())
+                PickBlockUtils.shouldPickBlock())
             {
-                InventoryUtils.pickBlockLast(true);
+                PickBlockUtils.pickBlockLast();
                 return ActionResult.SUCCESS;
             }
 

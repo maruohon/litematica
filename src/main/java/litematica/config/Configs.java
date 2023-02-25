@@ -60,6 +60,8 @@ public class Configs
         public static final BooleanConfig MATERIALS_FROM_CONTAINER                  = new BooleanConfig("materialListFromContainer", true);
         public static final IntegerConfig PASTE_COMMAND_INTERVAL                    = new IntegerConfig("pasteCommandInterval", 1, 1, 1000);
         public static final IntegerConfig PASTE_COMMAND_LIMIT                       = new IntegerConfig("pasteCommandLimit", 64, 1, 1000);
+        public static final BooleanConfig PICK_BLOCK_AVOID_DAMAGEABLE               = new BooleanConfig("pickBlockAvoidDamageable", true);
+        public static final BooleanConfig PICK_BLOCK_AVOID_TOOLS                    = new BooleanConfig("pickBlockAvoidTools", false);
         public static final BooleanConfig PICK_BLOCK_IGNORE_NBT                     = new BooleanConfig("pickBlockIgnoreNBT", true);
         public static final StringConfig  PICK_BLOCKABLE_SLOTS                      = new StringConfig( "pickBlockableSlots", "6-9");
         public static final BooleanConfig PLACEMENTS_INFRONT                        = new BooleanConfig("placementInfrontOfPlayer", false);
@@ -95,6 +97,8 @@ public class Configs
                 PASTE_COMMAND_INTERVAL,
                 PASTE_COMMAND_LIMIT,
                 PICK_BLOCK_AUTO,
+                PICK_BLOCK_AVOID_DAMAGEABLE,
+                PICK_BLOCK_AVOID_TOOLS,
                 PICK_BLOCK_ENABLED,
                 PICK_BLOCK_IGNORE_NBT,
                 PICK_BLOCKABLE_SLOTS,

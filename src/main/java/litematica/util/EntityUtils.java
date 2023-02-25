@@ -20,23 +20,13 @@ import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.NbtWrap;
-import malilib.util.inventory.InventoryUtils;
-import litematica.config.Configs;
 import litematica.data.DataManager;
-import litematica.render.RenderUtils;
 
 public class EntityUtils
 {
     public static boolean testNotPlayer(Entity entity)
     {
         return (entity instanceof EntityPlayer) == false;
-    }
-
-    public static boolean shouldPickBlock()
-    {
-        return Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() &&
-               (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() == false || hasToolItem() == false) &&
-               RenderUtils.areSchematicBlocksCurrentlyRendered();
     }
 
     public static boolean hasToolItem()
@@ -65,27 +55,6 @@ public class EntityUtils
         }
 
         return false;
-    }
-
-    /**
-     * Checks if the requested item is currently in the player's hand such that it would be used for using/placing.
-     * This means, that it must either be in the main hand, or the main hand must be empty and the item is in the offhand.
-     * @param lenient if true, then NBT tags and also damage of damageable items are ignored
-     */
-    @Nullable
-    public static EnumHand getUsedHandForItem(EntityPlayer player, ItemStack stack, boolean lenient)
-    {
-        EnumHand hand = null;
-        EnumHand tmpHand = ItemWrap.isEmpty(EntityWrap.getMainHandItem(player)) ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND;
-        ItemStack handStack = EntityWrap.getHeldItem(player, tmpHand);
-
-        if ((lenient          && ItemStack.areItemsEqualIgnoreDurability(handStack, stack)) ||
-            (lenient == false && InventoryUtils.areStacksEqual(handStack, stack)))
-        {
-            hand = tmpHand;
-        }
-
-        return hand;
     }
 
     public static EnumFacing getHorizontalLookingDirection(Entity entity)

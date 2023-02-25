@@ -37,6 +37,7 @@ import malilib.registry.Registry;
 import malilib.util.game.BlockUtils;
 import malilib.util.game.PlacementUtils;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.position.ChunkSectionPos;
@@ -417,7 +418,7 @@ public class EasyPlaceUtils
         }
 
         HitPosition clickPosition = getClickPosition(targetPosition, stateSchematic, stateClient);
-        EnumHand hand = InventoryUtils.doPickBlockForStack(requiredStack);
+        EnumHand hand = PickBlockUtils.doPickBlockForStack(requiredStack);
 
         // Didn't find a valid or safe click position, or was unable to pick block
         if (clickPosition == null || hand == null)
@@ -638,7 +639,7 @@ public class EasyPlaceUtils
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
-            return ItemWrap.isEmpty(stack) || EntityUtils.getUsedHandForItem(GameUtils.getClientPlayer(), stack, true) == null;
+            return ItemWrap.isEmpty(stack) || EntityWrap.getUsedHandForItem(GameUtils.getClientPlayer(), stack, true) == null;
         }
 
         return false;

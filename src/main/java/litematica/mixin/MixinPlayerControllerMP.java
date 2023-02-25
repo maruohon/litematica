@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import litematica.config.Configs;
 import litematica.util.EasyPlaceUtils;
-import litematica.util.EntityUtils;
-import litematica.util.InventoryUtils;
+import litematica.util.PickBlockUtils;
 
 @Mixin(net.minecraft.client.multiplayer.PlayerControllerMP.class)
 public abstract class MixinPlayerControllerMP
@@ -36,9 +35,9 @@ public abstract class MixinPlayerControllerMP
             else
             {
                 if (Configs.Generic.PICK_BLOCK_AUTO.getBooleanValue() &&
-                    EntityUtils.shouldPickBlock())
+                    PickBlockUtils.shouldPickBlock())
                 {
-                    InventoryUtils.pickBlockLast(true);
+                    PickBlockUtils.pickBlockLast();
                 }
 
                 if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
