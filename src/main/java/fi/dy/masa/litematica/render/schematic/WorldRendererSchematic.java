@@ -380,7 +380,10 @@ public class WorldRendererSchematic
 
     public void updateChunks(long finishTimeNano)
     {
+        this.mc.getProfiler().push("litematica_run_chunk_uploads");
         this.displayListEntitiesDirty |= this.renderDispatcher.runChunkUploads(finishTimeNano);
+
+        this.mc.getProfiler().swap("litematica_check_update");
 
         if (this.chunksToUpdate.isEmpty() == false)
         {
@@ -393,12 +396,16 @@ public class WorldRendererSchematic
 
                 if (renderChunk.needsImmediateUpdate())
                 {
+                    this.mc.getProfiler().push("litematica_update_now");
                     flag = this.renderDispatcher.updateChunkNow(renderChunk);
                 }
                 else
                 {
+                    this.mc.getProfiler().push("litematica_update_later");
                     flag = this.renderDispatcher.updateChunkLater(renderChunk);
                 }
+
+                this.mc.getProfiler().pop();
 
                 if (!flag)
                 {
@@ -415,6 +422,8 @@ public class WorldRendererSchematic
                 }
             }
         }
+
+        this.mc.getProfiler().pop();
     }
 
     public int renderBlockLayer(RenderLayer renderLayer, MatrixStack matrices, Camera camera, Matrix4f projMatrix)
