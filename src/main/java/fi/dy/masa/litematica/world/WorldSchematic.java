@@ -225,21 +225,16 @@ public class WorldSchematic extends World
     @Override
     public List<Entity> getOtherEntities(@Nullable final Entity except, final Box box, Predicate<? super Entity> predicate)
     {
-        final int minY = MathHelper.floor(box.minY / 16.0);
-        final int maxY = MathHelper.floor(box.maxY / 16.0);
         final List<Entity> entities = new ArrayList<>();
         List<ChunkSchematic> chunks = this.getChunksWithinBox(box);
 
         for (ChunkSchematic chunk : chunks)
         {
-            for (int cy = minY; cy <= maxY; ++cy)
-            {
-                chunk.getEntityListForSectionIfExists(cy).forEach((e) -> {
-                    if (e != except && box.intersects(e.getBoundingBox()) && predicate.test(e)) {
-                        entities.add(e);
-                    }
-                });
-            }
+            chunk.getEntityList().forEach((e) -> {
+                if (e != except && box.intersects(e.getBoundingBox()) && predicate.test(e)) {
+                    entities.add(e);
+                }
+            });
         }
 
         return entities;
