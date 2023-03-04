@@ -667,7 +667,7 @@ public class WorldRendererSchematic
             {
                 BlockPos pos = chunkRenderer.getOrigin();
                 ChunkSchematic chunk = this.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-                List<Entity> list = chunk.getEntityListForSectionIfExists(pos.getY() >> 4);
+                List<Entity> list = chunk.getEntityList();
 
                 if (list.isEmpty() == false)
                 {

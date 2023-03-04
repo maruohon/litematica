@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.world;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -11,9 +10,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BuiltinBiomes;
 import net.minecraft.world.biome.source.FixedBiomeSource;
@@ -25,7 +21,7 @@ public class ChunkSchematic extends WorldChunk
 {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
 
-    private final Int2ObjectOpenHashMap<List<Entity>> entityLists = new Int2ObjectOpenHashMap<>();
+    private final List<Entity> entityList = new ArrayList<>();
     private final long timeCreated;
     private final int bottomY;
     private final int topY;
@@ -136,15 +132,13 @@ public class ChunkSchematic extends WorldChunk
     @Override
     public void addEntity(Entity entity)
     {
-        int chunkY = MathHelper.floor(entity.getY()) >> 4;
-        List<Entity> list = this.entityLists.computeIfAbsent(chunkY, (y) -> new ArrayList<>());
-        list.add(entity);
+        this.entityList.add(entity);
         ++this.entityCount;
     }
 
-    public List<Entity> getEntityListForSectionIfExists(int sectionY)
+    public List<Entity> getEntityList()
     {
-        return this.entityLists.getOrDefault(sectionY, Collections.emptyList());
+        return this.entityList;
     }
 
     public int getEntityCount()
