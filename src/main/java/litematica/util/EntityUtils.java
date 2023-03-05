@@ -57,25 +57,9 @@ public class EntityUtils
         return false;
     }
 
-    public static EnumFacing getHorizontalLookingDirection(Entity entity)
-    {
-        return EnumFacing.fromAngle(EntityWrap.getYaw(entity));
-    }
-
     public static EnumFacing getClosestLookingDirection(Entity entity)
     {
-        float pitch = EntityWrap.getPitch(entity);
-
-        if (pitch > 60.0f)
-        {
-            return EnumFacing.DOWN;
-        }
-        else if (-pitch > 60.0f)
-        {
-            return EnumFacing.UP;
-        }
-
-        return getHorizontalLookingDirection(entity);
+        return EntityWrap.getClosestLookingDirection(entity, 60F);
     }
 
     public static boolean setFakedSneakingState(boolean sneaking)
