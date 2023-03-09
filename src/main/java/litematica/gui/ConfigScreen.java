@@ -68,8 +68,9 @@ public class ConfigScreen
 
     public static BaseConfigScreen create()
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, ALL_TABS, GENERIC,
-                                                       "litematica.title.screen.configs", Reference.MOD_VERSION);
+        BaseConfigScreen screen = BaseConfigScreen.withExtensionModTabs(MOD_INFO, ALL_TABS, GENERIC,
+                                                                        "litematica.title.screen.configs",
+                                                                        Reference.MOD_VERSION);
         screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
         return screen;
     }
