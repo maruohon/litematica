@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -11,6 +12,7 @@ import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.painting.PaintingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
@@ -19,6 +21,8 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Direction.AxisDirection;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -393,6 +397,30 @@ public class SchematicPlacingUtils
                     if (entity instanceof LivingEntity living && living.isSleeping())
                     {
                         living.setSleepingPosition(new BlockPos(x, y, z));
+                    }
+
+                    // Hack fix to fix the painting position offsets.
+                    // The vanilla code will end up moving the position by one in two of the orientations,
+                    // because it sets the hanging position to the given position (floored)
+                    // and then it offsets the position from the hanging position
+                    // by 0.5 or 1.0 blocks depending on the painting size.
+                    if (entity instanceof PaintingEntity paintingEntity)
+                    {
+                        Direction right = paintingEntity.getHorizontalFacing().rotateYCounterclockwise();
+
+                        if ((paintingEntity.getWidthPixels() % 32) == 0 &&
+                            right.getDirection() == AxisDirection.POSITIVE)
+                        {
+                            x -= 1.0 * right.getOffsetX();
+                            z -= 1.0 * right.getOffsetZ();
+                        }
+
+                        if ((paintingEntity.getHeightPixels() % 32) == 0)
+                        {
+                            y -= 1.0;
+                        }
+
+                        entity.setPosition(x, y, z);
                     }
 
                     EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
