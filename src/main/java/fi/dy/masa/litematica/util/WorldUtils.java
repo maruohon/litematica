@@ -850,11 +850,10 @@ public class WorldUtils
         if (trace != null && trace.getType() == HitResult.Type.BLOCK)
         {
             BlockHitResult blockHitResult = (BlockHitResult) trace;
-            BlockPos pos = blockHitResult.getBlockPos();
             ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, blockHitResult));
 
             // Get the possibly offset position, if the targeted block is not replaceable
-            pos = ctx.getBlockPos();
+            BlockPos pos = ctx.getBlockPos();
 
             BlockState stateClient = mc.world.getBlockState(pos);
 
@@ -876,7 +875,7 @@ public class WorldUtils
             }
 
             blockHitResult = new BlockHitResult(blockHitResult.getPos(), blockHitResult.getSide(), pos, false);
-            ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, (BlockHitResult) trace));
+            ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, blockHitResult));
 
             // Placement position is already occupied
             if (stateClient.canReplace(ctx) == false)

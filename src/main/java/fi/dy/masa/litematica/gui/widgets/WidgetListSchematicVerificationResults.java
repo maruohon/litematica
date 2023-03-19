@@ -127,7 +127,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
                 }
 
                 ItemStack stack = ItemUtils.getItemForState(state);
-                ItemType itemType = new ItemType(stack, false, true);
+                ItemType itemType = new ItemType(stack, true, false);
 
                 if (itemCounts.containsKey(itemType) == false)
                 {

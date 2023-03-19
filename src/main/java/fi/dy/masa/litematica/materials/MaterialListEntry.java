@@ -13,7 +13,7 @@ public class MaterialListEntry
 
     public MaterialListEntry(ItemStack stack, int countTotal, int countMissing, int countMismatched, int countAvailable)
     {
-        this.item = new ItemType(stack, false, false);
+        this.item = new ItemType(stack, true, false);
         this.countTotal = countTotal;
         this.countMissing = countMissing;
         this.countMismatched = countMismatched;
