@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -18,12 +19,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InventoryUtils;
 
 public class EntityUtils
 {
@@ -73,12 +74,12 @@ public class EntityUtils
     {
         Hand hand = null;
 
-        if (InventoryUtils.areStacksEqual(player.getMainHandStack(), stack))
+        if (ItemStack.areItemsEqualIgnoreDamage(player.getMainHandStack(), stack))
         {
             hand = Hand.MAIN_HAND;
         }
         else if (player.getMainHandStack().isEmpty() &&
-                 InventoryUtils.areStacksEqual(player.getOffHandStack(), stack))
+                 ItemStack.areItemsEqualIgnoreDamage(player.getOffHandStack(), stack))
         {
             hand = Hand.OFF_HAND;
         }
