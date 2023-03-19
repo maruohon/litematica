@@ -251,7 +251,7 @@ public class WorldRendererSchematic
         this.renderDispatcher.setCameraPosition(cameraPos);
 
         this.world.getProfiler().swap("culling");
-        BlockPos viewPos = new BlockPos(cameraX, cameraY + (double) entity.getStandingEyeHeight(), cameraZ);
+        BlockPos viewPos = BlockPos.ofFloored(cameraX, cameraY + (double) entity.getStandingEyeHeight(), cameraZ);
         final int centerChunkX = (viewPos.getX() >> 4);
         final int centerChunkZ = (viewPos.getZ() >> 4);
         final int renderDistance = this.mc.options.getViewDistance().getValue();

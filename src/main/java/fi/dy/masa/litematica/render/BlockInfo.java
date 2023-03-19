@@ -76,8 +76,8 @@ public class BlockInfo
 
             //mc.getRenderItem().zLevel += 100;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
-            mc.getItemRenderer().renderInGui(this.stack, x1, y);
-            mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stack, x1, y, null);
+            mc.getItemRenderer().renderInGui(matrixStack, this.stack, x1, y);
+            mc.getItemRenderer().renderGuiItemOverlay(matrixStack, textRenderer, this.stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
 
             //RenderSystem.disableBlend();

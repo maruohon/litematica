@@ -343,7 +343,7 @@ public class SelectionManager
 
         if (selection != null && mc.player != null)
         {
-            BlockPos pos = new BlockPos(mc.player.getPos());
+            BlockPos pos = BlockPos.ofFloored(mc.player.getPos());
 
             if (selection.createNewSubRegionBox(pos, selection.getName()) != null)
             {
@@ -373,7 +373,7 @@ public class SelectionManager
                 return false;
             }
 
-            BlockPos pos = new BlockPos(mc.player.getPos());
+            BlockPos pos = BlockPos.ofFloored(mc.player.getPos());
 
             if (selection.createNewSubRegionBox(pos, name) != null)
             {
@@ -821,13 +821,13 @@ public class SelectionManager
 
             if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_1) && this.grabbedBox.getPos1() != null)
             {
-                BlockPos pos = this.originalBox.getPos1().add(change.x, change.y, change.z);
+                BlockPos pos = this.originalBox.getPos1().add((int)Math.floor(change.x), (int)Math.floor(change.y), (int)Math.floor(change.z));
                 this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_1, pos);
             }
 
             if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_2) && this.grabbedBox.getPos2() != null)
             {
-                BlockPos pos = this.originalBox.getPos2().add(change.x, change.y, change.z);
+                BlockPos pos = this.originalBox.getPos2().add((int)Math.floor(change.x), (int)Math.floor(change.y), (int)Math.floor(change.z));
                 this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_2, pos);
             }
         }

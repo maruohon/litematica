@@ -396,7 +396,7 @@ public class SchematicPlacingUtils
                     // Update the sleeping position to the current position
                     if (entity instanceof LivingEntity living && living.isSleeping())
                     {
-                        living.setSleepingPosition(new BlockPos(x, y, z));
+                        living.setSleepingPosition(BlockPos.ofFloored(x, y, z));
                     }
 
                     // Hack fix to fix the painting position offsets.

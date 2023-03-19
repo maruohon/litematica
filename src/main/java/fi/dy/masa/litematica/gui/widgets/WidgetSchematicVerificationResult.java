@@ -322,8 +322,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             }
             else
             {
-                this.mc.getItemRenderer().renderInGui(this.mismatchInfo.stackExpected, x1, y);
-                this.mc.getItemRenderer().renderGuiItemOverlay(this.textRenderer, this.mismatchInfo.stackExpected, x1, y, null);
+                this.mc.getItemRenderer().renderInGui(matrixStack, this.mismatchInfo.stackExpected, x1, y);
+                this.mc.getItemRenderer().renderGuiItemOverlay(matrixStack, this.textRenderer, this.mismatchInfo.stackExpected, x1, y, null);
             }
 
             if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
@@ -337,8 +337,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    this.mc.getItemRenderer().renderInGui(this.mismatchInfo.stackFound, x2, y);
-                    this.mc.getItemRenderer().renderGuiItemOverlay(this.textRenderer, this.mismatchInfo.stackFound, x2, y, null);
+                    this.mc.getItemRenderer().renderInGui(matrixStack, this.mismatchInfo.stackFound, x2, y);
+                    this.mc.getItemRenderer().renderGuiItemOverlay(matrixStack, this.textRenderer, this.mismatchInfo.stackFound, x2, y, null);
                 }
             }
 
@@ -508,8 +508,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    mc.getItemRenderer().renderInGui(this.stackExpected, x1, iconY);
-                    mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stackExpected, x1, iconY, null);
+                    mc.getItemRenderer().renderInGui(matrixStack, this.stackExpected, x1, iconY);
+                    mc.getItemRenderer().renderGuiItemOverlay(matrixStack, textRenderer, this.stackExpected, x1, iconY, null);
                 }
 
                 if (useBlockModelFound)
@@ -519,8 +519,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    mc.getItemRenderer().renderInGui(this.stackFound, x2, iconY);
-                    mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stackFound, x2, iconY, null);
+                    mc.getItemRenderer().renderInGui(matrixStack, this.stackFound, x2, iconY);
+                    mc.getItemRenderer().renderGuiItemOverlay(matrixStack, textRenderer, this.stackFound, x2, iconY, null);
                 }
 
                 //mc.getRenderItem().zLevel -= 100;

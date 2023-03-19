@@ -138,7 +138,6 @@ public class OverlayRenderer
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
-            RenderSystem.disableTexture();
 
             if (renderAreas)
             {
@@ -222,7 +221,6 @@ public class OverlayRenderer
                 }
             }
 
-            RenderSystem.enableTexture();
             RenderSystem.depthMask(true);
         }
     }
@@ -683,7 +681,6 @@ public class OverlayRenderer
 
             RenderSystem.depthMask(false);
             RenderSystem.disableCull();
-            RenderSystem.disableTexture();
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             RenderSystem.enablePolygonOffset();
             RenderSystem.polygonOffset(-0.8f, -1.8f);
@@ -700,7 +697,6 @@ public class OverlayRenderer
             }
 
             RenderSystem.disablePolygonOffset();
-            RenderSystem.enableTexture();
             RenderSystem.disableBlend();
             RenderSystem.enableCull();
             RenderSystem.depthMask(true);

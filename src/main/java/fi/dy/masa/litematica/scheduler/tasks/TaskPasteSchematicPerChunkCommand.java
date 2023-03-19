@@ -873,8 +873,8 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                     }
 
                     // Don't try to place a block intersecting the player
-                    if (MathHelper.absFloor(centerPos.getX() - x) < 2 &&
-                        MathHelper.absFloor(centerPos.getZ() - z) < 2 &&
+                    if (MathHelper.floor(MathHelper.abs((float)(centerPos.getX() - x))) < 2 &&
+                        MathHelper.floor(MathHelper.abs((float)(centerPos.getZ() - z))) < 2 &&
                         y >= centerPos.getY() - 2 && y <= centerPos.getY() + 2)
                     {
                         continue;

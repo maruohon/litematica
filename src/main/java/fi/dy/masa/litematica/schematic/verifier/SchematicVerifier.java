@@ -758,7 +758,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             int maxEntries = Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_MAX_POSITIONS.getIntegerValue();
 
             // This needs to happen first
-            BlockPos centerPos = new BlockPos(this.mc.player.getPos());
+            BlockPos centerPos = BlockPos.ofFloored(this.mc.player.getPos());
             this.updateClosestPositions(centerPos, maxEntries);
             this.combineClosestPositions(centerPos, maxEntries);
 
