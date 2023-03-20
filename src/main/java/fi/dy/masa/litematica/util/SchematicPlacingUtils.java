@@ -36,6 +36,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.malilib.util.NBTUtils;
 
 public class SchematicPlacingUtils
 {
@@ -377,18 +378,42 @@ public class SchematicPlacingUtils
 
         for (EntityInfo info : entityList)
         {
-            Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
+            Vec3d pos = info.posVec;
+            pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+            pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
+            double x = pos.x + offX;
+            double y = pos.y + offY;
+            double z = pos.z + offZ;
 
-            if (entity != null)
+            if (x >= minX && x < maxX && z >= minZ && z < maxZ)
             {
-                Vec3d pos = info.posVec;
-                pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-                pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
-                double x = pos.x + offX;
-                double y = pos.y + offY;
-                double z = pos.z + offZ;
+                NbtCompound tag = info.nbt.copy();
+                String id = tag.getString("id");
 
-                if (x >= minX && x < maxX && z >= minZ && z < maxZ)
+                // Avoid warning about invalid hanging position.
+                // Note that this position isn't technically correct, but it only needs to be within 16 blocks
+                // of the entity position to avoid the warning.
+                if (id.equals("minecraft:glow_item_frame") ||
+                    id.equals("minecraft:item_frame") ||
+                    id.equals("minecraft:leash_knot") ||
+                    id.equals("minecraft:painting"))
+                {
+                    Vec3d p = NBTUtils.readEntityPositionFromTag(tag);
+
+                    if (p == null)
+                    {
+                        p = new Vec3d(x, y, z);
+                        NBTUtils.writeEntityPositionToTag(p, tag);
+                    }
+
+                    tag.putInt("TileX", (int) p.x);
+                    tag.putInt("TileY", (int) p.y);
+                    tag.putInt("TileZ", (int) p.z);
+                }
+
+                Entity entity = EntityUtils.createEntityAndPassengersFromNBT(tag, world);
+
+                if (entity != null)
                 {
                     rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
                     //System.out.printf("post: %.1f - rot: %s, mm: %s, ms: %s\n", rotationYaw, rotationCombined, mirrorMain, mirrorSub);

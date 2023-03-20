@@ -13,12 +13,14 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
@@ -620,6 +622,17 @@ public class LitematicaSchematic
                     if (entity.saveNbt(tag))
                     {
                         Vec3d posVec = new Vec3d(entity.getX() - regionPosAbs.getX(), entity.getY() - regionPosAbs.getY(), entity.getZ() - regionPosAbs.getZ());
+
+                        // Annoying special case for any hanging/decoration entities, to avoid the console
+                        // warning about invalid hanging position when loading the entity from NBT
+                        if (entity instanceof AbstractDecorationEntity decorationEntity)
+                        {
+                            BlockPos p = decorationEntity.getDecorationBlockPos();
+                            tag.putInt("TileX", p.getX() - regionPosAbs.getX());
+                            tag.putInt("TileY", p.getY() - regionPosAbs.getY());
+                            tag.putInt("TileZ", p.getZ() - regionPosAbs.getZ());
+                        }
+
                         NBTUtils.writeEntityPositionToTag(posVec, tag);
                         list.add(new EntityInfo(posVec, tag));
                         existingEntities.add(uuid);
