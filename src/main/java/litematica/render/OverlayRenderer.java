@@ -28,7 +28,6 @@ import malilib.config.value.HudAlignment;
 import malilib.gui.util.GuiUtils;
 import malilib.gui.util.ScreenContext;
 import malilib.render.ShapeRenderUtils;
-import malilib.render.TextRenderUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.EnabledCondition;
@@ -479,7 +478,8 @@ public class OverlayRenderer
         boolean useBackground = true;
         boolean useShadow = false;
 
-        TextRenderUtils.renderText(x, y, 0, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
+        // TODO FIXME use a StringListRenderer
+        //TextRenderUtils.renderText(x, y, 0, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
     }
 
     private boolean renderVerifierOverlay()

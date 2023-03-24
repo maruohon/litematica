@@ -3,6 +3,7 @@ package litematica.event;
 import malilib.event.PostGameOverlayRenderer;
 import malilib.event.PostWorldRenderer;
 import malilib.gui.util.GuiUtils;
+import malilib.render.RenderContext;
 import litematica.config.Configs;
 import litematica.config.Hotkeys;
 import litematica.data.DataManager;
@@ -17,7 +18,7 @@ import litematica.tool.ToolMode;
 public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 {
     @Override
-    public void onPostWorldRender(float tickDelta)
+    public void onPostWorldRender(RenderContext ctx, float tickDelta)
     {
         if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue())
         {
@@ -55,7 +56,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
     }
 
     @Override
-    public void onPostGameOverlayRender()
+    public void onPostGameOverlayRender(RenderContext ctx)
     {
         if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue())
         {

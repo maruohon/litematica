@@ -23,6 +23,7 @@ import net.minecraft.world.World;
 import malilib.config.value.HorizontalAlignment;
 import malilib.config.value.VerticalAlignment;
 import malilib.gui.util.GuiUtils;
+import malilib.render.RenderContext;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.inventory.InventoryRenderDefinition;
 import malilib.render.inventory.InventoryRenderUtils;
@@ -667,7 +668,8 @@ public class RenderUtils
             final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
             int y = (align.getVerticalAlign() == VerticalAlignment.CENTER ? yCenter - height : 2) + offY;
 
-            InventoryRenderUtils.renderInventoryPreview(inv, renderer, xCenter, y, 300, 0xFFFFFFFF, side, VerticalAlignment.TOP);
+            InventoryRenderUtils.renderInventoryPreview(inv, renderer, xCenter, y, 300, 0xFFFFFFFF, side,
+                                                        VerticalAlignment.TOP, RenderContext.DUMMY);
 
             return height;
         }
