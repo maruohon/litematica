@@ -10,6 +10,8 @@ import net.minecraft.item.ItemStack;
 
 import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
+import malilib.render.text.StyledText;
+import malilib.render.text.TextRenderer;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
 import malilib.util.game.wrap.GameUtils;
@@ -69,7 +71,8 @@ public class BlockInfo
             int x1 = x + 10;
             y += 4;
 
-            textRenderer.drawString(this.title, x1, y, 0xFFFFFFFF);
+            // TODO FIXME use a StringListRenderer?
+            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFFFFFFFF, true, StyledText.parse(this.title));
 
             y += 12;
 
@@ -87,14 +90,13 @@ public class BlockInfo
             //GlStateManager.disableBlend();
             RenderUtils.disableItemLighting();
 
-            textRenderer.drawString(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
+            TextRenderer.INSTANCE.renderText(x1 + 20, y + 4, 0, 0xFFFFFFFF, true, StyledText.parse(this.stackName));
 
             y += 20;
-            textRenderer.drawString(this.blockRegistryname, x1, y, 0xFF4060FF);
-            y += textRenderer.FONT_HEIGHT + 4;
+            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFF4060FF, true, StyledText.parse(this.blockRegistryname));
+            y += TextRenderer.INSTANCE.getFontHeight() + 4;
 
-            // TODO FIXME use a StringListRenderer
-            //TextRenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props);
+            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFFB0B0B0, true, StyledText.parseList(this.props));
 
             GlStateManager.popMatrix();
         }

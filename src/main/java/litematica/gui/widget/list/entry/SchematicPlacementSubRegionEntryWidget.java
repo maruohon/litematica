@@ -48,7 +48,7 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
 
         String key = data.isEnabled() ? "litematica.button.schematic_placement_settings.entry_name.enabled" :
                                         "litematica.button.schematic_placement_settings.entry_name.disabled";
-        this.setText(StyledTextLine.translate(key, data.getDisplayName()));
+        this.setText(StyledTextLine.translateFirstLine(key, data.getDisplayName()));
 
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0xA0101010 : 0xA0303030);
         this.getBackgroundRenderer().getHoverSettings().setEnabledAndColor(true, 0xA0707070);

@@ -294,8 +294,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
                 String pctIncorrect = format.format(((double) mismatch / (double) total) * 100);
 
                 String key = "litematica.label.material_list.progress.incomplete";
-                StyledTextLine line = StyledTextLine.translate(key, total, pctDone, pctMissing, pctIncorrect);
-                this.progressLabel.setLabelStyledTextLines(line);
+                this.progressLabel.setLabelStyledTextLines(StyledTextLine.translate(key, total, pctDone, pctMissing, pctIncorrect));
             }
         }
     }

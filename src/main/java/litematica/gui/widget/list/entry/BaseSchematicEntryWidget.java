@@ -41,7 +41,7 @@ public class BaseSchematicEntryWidget extends BaseDataListEntryWidget<ISchematic
         this.setIcon(icon);
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0xA0101010 : 0xA0303030);
         this.getBackgroundRenderer().getHoverSettings().setEnabledAndColor(true, 0xA0707070);
-        this.setText(StyledTextLine.of(schematic.getMetadata().getName()));
+        this.setText(StyledTextLine.parseFirstLine(schematic.getMetadata().getName()));
         this.addHoverInfo(schematic);
     }
 

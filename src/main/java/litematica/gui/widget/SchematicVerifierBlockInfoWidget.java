@@ -202,7 +202,7 @@ public class SchematicVerifierBlockInfoWidget extends ContainerWidget
                             key = "litematica.label.schematic_verifier.modified_block_state_property.generic";
                         }
 
-                        lines.add(StyledTextLine.translate(key, prop.getName(), val.toString()));
+                        StyledTextLine.translate(lines, key, prop.getName(), val.toString());
                     }
                     else
                     {
@@ -228,7 +228,7 @@ public class SchematicVerifierBlockInfoWidget extends ContainerWidget
                             key = "malilib.label.block_state_properties.generic";
                         }
 
-                        lines.add(StyledTextLine.translate(key, prop.getName(), " = ", val.toString()));
+                        StyledTextLine.translate(lines, key, prop.getName(), " = ", val.toString());
                     }
                 }
             }

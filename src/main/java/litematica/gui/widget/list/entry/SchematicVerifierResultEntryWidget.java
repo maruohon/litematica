@@ -69,14 +69,14 @@ public class SchematicVerifierResultEntryWidget extends BaseDataListEntryWidget<
         BlockStatePair pair = data.getPair();
 
         this.ignoreButton = GenericButton.create(18, "litematica.button.schematic_verifier.ignore", this::ignoreEntry);
-        this.countText = StyledTextLine.of(String.valueOf(data.getCount()));
+        this.countText = StyledTextLine.parseFirstLine(String.valueOf(data.getCount()));
 
         if (Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue())
         {
             this.expectedModelWidget = new BlockModelWidget(pair.expectedState);
             this.foundModelWidget = new BlockModelWidget(pair.foundState);
-            this.expectedNameText = StyledTextLine.of(data.getExpectedBlockDisplayName());
-            this.foundNameText = StyledTextLine.of(data.getFoundBlockDisplayName());
+            this.expectedNameText = StyledTextLine.parseFirstLine(data.getExpectedBlockDisplayName());
+            this.foundNameText = StyledTextLine.parseFirstLine(data.getFoundBlockDisplayName());
         }
         else
         {
@@ -84,8 +84,8 @@ public class SchematicVerifierResultEntryWidget extends BaseDataListEntryWidget<
             ItemStack foundStack = MaterialCache.getInstance().getItemForDisplayNameForState(pair.foundState);
             this.expectedModelWidget = new ItemStackWidget(expectedStack);
             this.foundModelWidget = new ItemStackWidget(foundStack);
-            this.expectedNameText = StyledTextLine.of(expectedStack.getDisplayName());
-            this.foundNameText = StyledTextLine.of(foundStack.getDisplayName());
+            this.expectedNameText = StyledTextLine.parseFirstLine(expectedStack.getDisplayName());
+            this.foundNameText = StyledTextLine.parseFirstLine(foundStack.getDisplayName());
         }
 
         int color = 0xFF202020;

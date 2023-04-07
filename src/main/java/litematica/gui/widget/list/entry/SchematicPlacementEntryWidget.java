@@ -124,7 +124,7 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
 
         String key = placement.isEnabled() ? "litematica.button.schematic_placement_settings.entry_name.enabled" :
                                              "litematica.button.schematic_placement_settings.entry_name.disabled";
-        this.setText(StyledTextLine.translate(key, placement.getName()));
+        this.setText(StyledTextLine.translateFirstLine(key, placement.getName()));
 
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0xA0101010 : 0xA0303030);
         this.getBackgroundRenderer().getHoverSettings().setEnabledAndColor(true, 0xA0707070);

@@ -25,7 +25,7 @@ public class TaskEntryWidget extends BaseDataListEntryWidget<ITask>
             this.listWidget.refreshEntries();
         });
 
-        this.setText(StyledTextLine.of(data.getDisplayName()));
+        this.setText(StyledTextLine.parseFirstLine(data.getDisplayName()));
     }
 
     @Override

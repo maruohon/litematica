@@ -12,7 +12,7 @@ public class SchematicVcsVersionEntryWidget extends BaseDataListEntryWidget<Sche
         super(data, constructData);
 
         String key = "litematica.label.widget.schematic_vcs.version_entry";
-        this.setText(StyledTextLine.translate(key, data.getVersion(), data.getName()));
+        this.setText(StyledTextLine.translateFirstLine(key, data.getVersion(), data.getName()));
     }
 
     @Override

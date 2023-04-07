@@ -31,15 +31,15 @@ public class MaterialListEntryHoverInfoWidget extends ContainerWidget
         this.itemWidget.setPosition(this.headerLabel.getWidth() + 16, 4);
 
         this.itemNameLabel = new LabelWidget();
-        this.itemNameLabel.setLabelStyledTextLines(StyledTextLine.of(stack.getDisplayName()));
+        this.itemNameLabel.setLabelStyledTextLines(StyledTextLine.parseFirstLine(stack.getDisplayName()));
         this.itemNameLabel.setPosition(this.itemWidget.getRight() + 4, 8);
 
         int maxStackSize = stack.getMaxStackSize();
         String strTotal = getFormattedCountString(totalCount, maxStackSize);
         String strMissing = getFormattedCountString(missingCount, maxStackSize);
         this.itemCountsLabel = new LabelWidget();
-        this.itemCountsLabel.setLabelStyledTextLines(StyledTextLine.of(strTotal),
-                                                     StyledTextLine.of(strMissing));
+        this.itemCountsLabel.setLabelStyledTextLines(StyledTextLine.parseFirstLine(strTotal),
+                                                     StyledTextLine.parseFirstLine(strMissing));
         this.itemCountsLabel.setPosition(this.itemWidget.getX(), this.headerLabel.getY() + 16);
         this.itemCountsLabel.setLineHeight(16);
 

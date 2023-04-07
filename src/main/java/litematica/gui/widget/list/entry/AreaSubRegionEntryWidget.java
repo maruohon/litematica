@@ -45,7 +45,7 @@ public class AreaSubRegionEntryWidget extends BaseDataListEntryWidget<String>
         this.renameButton    = GenericButton.create(h, "litematica.button.misc.rename", this::renameRegion);
 
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, this.isOdd ? 0x70606060 : 0x70909090);
-        this.setText(StyledTextLine.of(data));
+        this.setText(StyledTextLine.parseFirstLine(data));
         this.addHoverInfo(selection, data);
     }
 

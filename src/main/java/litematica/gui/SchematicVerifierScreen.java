@@ -273,18 +273,19 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         DecimalFormat fmt = new DecimalFormat("#.#");
         VerifierStatus status = this.verifier.getCurrentStatus();
         double pct = status.totalBlocks > 0 ? (double) status.correctBlocks * 100 / (double) status.totalBlocks : 0.0;
+        List<StyledTextLine> lines = new ArrayList<>();
 
-        StyledTextLine line1 = StyledTextLine.translate("litematica.label.schematic_verifier.status.status",
-                                                        status.status.getColoredDisplayName(),
-                                                        status.processedChunks, status.totalChunks);
-        StyledTextLine line2 = StyledTextLine.translate("litematica.label.schematic_verifier.status.counts_1",
-                                                        status.totalBlocks, fmt.format(pct), status.correctBlocks);
-        StyledTextLine line3 = StyledTextLine.translate("litematica.label.schematic_verifier.status.counts_2",
-                                                        this.verifier.getTotalPositionCountFor(VerifierResultType.WRONG_BLOCK),
-                                                        this.verifier.getTotalPositionCountFor(VerifierResultType.WRONG_STATE),
-                                                        this.verifier.getTotalPositionCountFor(VerifierResultType.MISSING),
-                                                        this.verifier.getTotalPositionCountFor(VerifierResultType.EXTRA));
-        this.statusLabel.setLabelStyledTextLines(line1, line2, line3);
+        StyledTextLine.translate(lines, "litematica.label.schematic_verifier.status.status",
+                                 status.status.getColoredDisplayName(),
+                                 status.processedChunks, status.totalChunks);
+        StyledTextLine.translate(lines, "litematica.label.schematic_verifier.status.counts_1",
+                                 status.totalBlocks, fmt.format(pct), status.correctBlocks);
+        StyledTextLine.translate(lines, "litematica.label.schematic_verifier.status.counts_2",
+                                 this.verifier.getTotalPositionCountFor(VerifierResultType.WRONG_BLOCK),
+                                 this.verifier.getTotalPositionCountFor(VerifierResultType.WRONG_STATE),
+                                 this.verifier.getTotalPositionCountFor(VerifierResultType.MISSING),
+                                 this.verifier.getTotalPositionCountFor(VerifierResultType.EXTRA));
+        this.statusLabel.setLabelStyledTextLines(lines);
     }
 
     protected boolean isHudOn()
@@ -322,14 +323,14 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
 
         if (this.getVisibleCategoriesCount() > 1)
         {
-            list.add(StyledTextLine.translate("litematica.hover.schematic_verifier.visible_categories.title"));
+            StyledTextLine.translate(list, "litematica.hover.schematic_verifier.visible_categories.title");
             String key = "litematica.hover.schematic_verifier.visible_categories.entry";
 
             for (VerifierResultType type : VerifierResultType.SELECTABLE_CATEGORIES)
             {
                 if (this.isResultTypeVisible(type))
                 {
-                    list.add(StyledTextLine.translate(key, type.getDisplayName()));
+                    StyledTextLine.translate(list, key, type.getDisplayName());
                 }
             }
         }

@@ -78,11 +78,11 @@ public class MaterialListEntryWidget extends BaseDataListEntryWidget<MaterialLis
         int missingColor = missingCount == 0 ? green : (availableCount >= missingCount ? yellow : red);
         int availableColor = availableCount >= missingCount ? green : red;
 
-        this.totalText = StyledTextLine.of(String.valueOf(totalCount));
-        this.missingText = StyledTextLine.of(String.valueOf(data.getMissingCount()), TextStyle.normal(missingColor));
-        this.availableText = StyledTextLine.of(String.valueOf(data.getAvailableCount()), TextStyle.normal(availableColor));
+        this.totalText = StyledTextLine.parseFirstLine(String.valueOf(totalCount));
+        this.missingText = StyledTextLine.parseFirstLine(String.valueOf(data.getMissingCount()), TextStyle.normal(missingColor));
+        this.availableText = StyledTextLine.parseFirstLine(String.valueOf(data.getAvailableCount()), TextStyle.normal(availableColor));
 
-        this.setText(StyledTextLine.of(data.getStack().getDisplayName()));
+        this.setText(StyledTextLine.parseFirstLine(data.getStack().getDisplayName()));
         this.getTextOffset().setXOffset(22);
 
         this.getBackgroundRenderer().getNormalSettings().setColor(this.isOdd ? 0x80101010 : 0x80202020);
