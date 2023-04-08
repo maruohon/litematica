@@ -57,15 +57,15 @@ public class SchematicVerifierBlockInfoWidget extends ContainerWidget
         this.foundTitleLabel = new LabelWidget("litematica.label.schematic_verifier.column.found");
 
         int color = 0xFFE0E0E0;
-        this.expectedDisplayNameLabel = new LabelWidget(color, expectedStack.getDisplayName());
-        this.foundDisplayNameLabel = new LabelWidget(color, foundStack.getDisplayName());
+        this.expectedDisplayNameLabel = new LabelWidget(color).setLines(expectedStack.getDisplayName());
+        this.foundDisplayNameLabel = new LabelWidget(color).setLines(foundStack.getDisplayName());
 
         color = 0xFF8080FF;
-        this.expectedRegistryNameLabel = new LabelWidget(color, RegistryUtils.getBlockIdStr(expectedState));
-        this.foundRegistryNameLabel = new LabelWidget(color, RegistryUtils.getBlockIdStr(foundState));
+        this.expectedRegistryNameLabel = new LabelWidget(color).setLines(RegistryUtils.getBlockIdStr(expectedState));
+        this.foundRegistryNameLabel = new LabelWidget(color).setLines(RegistryUtils.getBlockIdStr(foundState));
         color = 0xFF909090;
-        this.expectedPropertiesLabel = new LabelWidget(-1, -1, color);
-        this.foundPropertiesLabel = new LabelWidget(-1, -1, color);
+        this.expectedPropertiesLabel = new LabelWidget(color);
+        this.foundPropertiesLabel = new LabelWidget(color);
 
         if (Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue())
         {
@@ -93,14 +93,14 @@ public class SchematicVerifierBlockInfoWidget extends ContainerWidget
 
         if (type == VerifierResultType.WRONG_STATE)
         {
-            this.foundPropertiesLabel.setLabelStyledTextLines(getFoundBlockStateProperties(type, expectedState, foundState));
+            this.foundPropertiesLabel.setLines(getFoundBlockStateProperties(type, expectedState, foundState));
         }
         else
         {
-            this.foundPropertiesLabel.setLabelStyledTextLines(BlockUtils.getBlockStatePropertyStyledTextLines(foundState, " = "));
+            this.foundPropertiesLabel.setLines(BlockUtils.getBlockStatePropertyStyledTextLines(foundState, " = "));
         }
 
-        this.expectedPropertiesLabel.setLabelStyledTextLines(BlockUtils.getBlockStatePropertyStyledTextLines(expectedState, " = "));
+        this.expectedPropertiesLabel.setLines(BlockUtils.getBlockStatePropertyStyledTextLines(expectedState, " = "));
 
         this.expectedColumnWidth = Math.max(getMaxWidthFrom(this.expectedTitleLabel, this.expectedRegistryNameLabel, this.expectedPropertiesLabel), this.expectedDisplayNameLabel.getWidth() + 22);
         int foundColumnWidth = Math.max(getMaxWidthFrom(this.foundTitleLabel, this.foundRegistryNameLabel, this.foundPropertiesLabel), this.foundDisplayNameLabel.getWidth() + 22);

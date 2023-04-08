@@ -15,7 +15,6 @@ import malilib.gui.widget.list.BaseFileBrowserWidget;
 import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import malilib.overlay.message.MessageDispatcher;
-import malilib.render.text.StyledText;
 import malilib.util.FileUtils;
 import malilib.util.StringUtils;
 import litematica.Reference;
@@ -78,7 +77,7 @@ public class SchematicVcsProjectBrowserScreen extends BaseListScreen<BaseFileBro
         if (projectOpen)
         {
             this.addWidget(this.projectNameLabel);
-            this.projectNameLabel.setLabelStyledText(StyledText.translate("litematica.label.schematic_vcs.current_project", project.getName()));
+            this.projectNameLabel.translateSetLines("litematica.label.schematic_vcs.current_project", project.getName());
         }
     }
 

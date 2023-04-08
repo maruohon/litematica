@@ -115,7 +115,7 @@ public class AreaSelectionBrowserScreen extends BaseListScreen<BaseFileBrowserWi
             {
                 currentSelection = FileNameUtils.getFileNameWithoutExtension(currentSelection.substring(len + 1));
                 String key = "litematica.label.area_selection_browser.current_selection";
-                this.currentSelectionLabel.setLabelText(key, currentSelection);
+                this.currentSelectionLabel.translateSetLines(key, currentSelection);
             }
         }
         else

@@ -10,7 +10,6 @@ import malilib.gui.util.GuiUtils;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.DataListWidget;
-import malilib.util.StringUtils;
 import malilib.util.game.wrap.EntityWrap;
 import litematica.Reference;
 import litematica.data.DataManager;
@@ -41,7 +40,7 @@ public class SchematicVcsProjectManagerScreen extends BaseListScreen<DataListWid
 
         this.project = project;
 
-        this.projectNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_vcs.current_project", project.getName()));
+        this.projectNameLabel = new LabelWidget("litematica.label.schematic_vcs.current_project", project.getName());
         this.closeProjectButton         = GenericButton.create("litematica.button.schematic_vcs.close_project", this::closeProject);
         this.deleteAreaButton           = GenericButton.create("litematica.button.schematic_vcs.delete_area", this::deleteArea);
         this.mainMenuScreenButton       = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);

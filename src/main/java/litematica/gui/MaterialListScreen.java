@@ -19,7 +19,6 @@ import malilib.gui.widget.list.DataListWidget;
 import malilib.gui.widget.list.header.ColumnizedDataListHeaderWidget;
 import malilib.gui.widget.list.header.DataListHeaderWidget;
 import malilib.overlay.message.MessageDispatcher;
-import malilib.render.text.StyledTextLine;
 import malilib.util.StringUtils;
 import malilib.util.datadump.DataDump;
 import malilib.util.datadump.DataDump.Format;
@@ -283,8 +282,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
 
             if (missing == 0 && mismatch == 0)
             {
-                String key = "litematica.label.material_list.progress.finished";
-                this.progressLabel.setLabelStyledTextLines(StyledTextLine.translate(key, total));
+                this.progressLabel.translateSetLines("litematica.label.material_list.progress.finished", total);
             }
             else
             {
@@ -294,7 +292,7 @@ public class MaterialListScreen extends BaseListScreen<DataListWidget<MaterialLi
                 String pctIncorrect = format.format(((double) mismatch / (double) total) * 100);
 
                 String key = "litematica.label.material_list.progress.incomplete";
-                this.progressLabel.setLabelStyledTextLines(StyledTextLine.translate(key, total, pctDone, pctMissing, pctIncorrect));
+                this.progressLabel.translateSetLines(key, total, pctDone, pctMissing, pctIncorrect);
             }
         }
     }

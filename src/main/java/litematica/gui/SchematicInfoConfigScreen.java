@@ -74,7 +74,7 @@ public class SchematicInfoConfigScreen extends BaseScreen
     protected void createLabelAndConfigWidgets(int labelWidth, BooleanConfig config)
     {
         int color = config.isModified() ? 0xFFFFFF55 : 0xFFAAAAAA;
-        LabelWidget label = new LabelWidget(color, config.getPrettyName());
+        LabelWidget label = new LabelWidget(color).setLines(config.getPrettyName());
         label.setSize(labelWidth + 4, 16);
         label.getPadding().setTop(3);
         config.getComment().ifPresent(label::addHoverStrings);

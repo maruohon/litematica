@@ -109,6 +109,6 @@ public class SavedSchematicPlacementInfoWidget extends ContainerWidget
                                      BaseFileBrowserWidget.DATE_FORMAT.format(new Date(time)));
         }
 
-        this.infoLabelWidget.setLabelStyledTextLines(lines);
+        this.infoLabelWidget.setLines(lines);
     }
 }

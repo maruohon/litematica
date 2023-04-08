@@ -28,7 +28,6 @@ import malilib.gui.widget.button.OnOffButton;
 import malilib.gui.widget.list.DataListWidget;
 import malilib.listener.EventListener;
 import malilib.overlay.message.MessageDispatcher;
-import malilib.render.text.StyledText;
 import malilib.util.StringUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.position.Coordinate;
@@ -500,15 +499,15 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     {
         String key = "litematica.label.schematic_placement_settings.sub_regions";
         int regionCount = this.placement.getSubRegionCount();
-        this.subRegionsLabel.setLabelStyledText(StyledText.translate(key, regionCount));
+        this.subRegionsLabel.translateSetLines(key, regionCount);
 
         ISchematic schematic = this.placement.getSchematic();
         Path file = schematic.getFile();
         String fileName = file != null ? file.getFileName().toString() :
                           StringUtils.translate("litematica.hover.schematic_list.in_memory_only");
-        StyledText name = StyledText.translate("litematica.label.schematic_placement_settings.schematic_name",
-                                               schematic.getMetadata().getName(), fileName);
-        this.schematicNameLabel.setLabelStyledText(name);
+
+        key = "litematica.label.schematic_placement_settings.schematic_name";
+        this.schematicNameLabel.translateSetLines(key, schematic.getMetadata().getName(), fileName);
     }
 
     protected Icon getEnclosingBoxButtonIcon()

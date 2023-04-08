@@ -7,7 +7,6 @@ import malilib.gui.BaseListScreen;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.list.BaseFileBrowserWidget;
 import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import malilib.render.text.StyledText;
 import malilib.util.FileUtils;
 import malilib.util.StringUtils;
 import litematica.data.DataManager;
@@ -25,7 +24,7 @@ public abstract class BaseSavedSchematicPlacementsBrowserScreen extends BaseList
     {
         super(listX, listY, totalListMarginX, totalListMarginY);
 
-        this.placementNameLabel = new LabelWidget(100, 45, 0xFFFFFFFF);
+        this.placementNameLabel = new LabelWidget(100, 45);
         this.placementNameLabel.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
         this.placementNameLabel.getBorderRenderer().getNormalSettings().setEnabled(true);
         this.placementNameLabel.getPadding().setAll(3, 3, 0, 3);
@@ -95,11 +94,10 @@ public abstract class BaseSavedSchematicPlacementsBrowserScreen extends BaseList
             String placementFile = placement.getSaveFile() != null ? placement.getSaveFile() : "-";
             String schematicName = schematicFile != null ? schematicFile.getFileName().toString() : "-";
             String schematicPath = schematicFile != null ? schematicFile.getParent().toAbsolutePath().toString() : "-";
-            StyledText text = StyledText.translate("litematica.label.saved_placement.names",
-                                                   placementName, schematicName, schematicPath, placementFile);
 
             this.placementNameLabel.setWidth(this.screenWidth - 20);
-            this.placementNameLabel.setLabelStyledText(text);
+            this.placementNameLabel.translateSetLines("litematica.label.saved_placement.names",
+                                                      placementName, schematicName, schematicPath, placementFile);
         }
         else
         {

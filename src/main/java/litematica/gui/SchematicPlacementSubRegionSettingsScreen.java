@@ -61,9 +61,9 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
 
         this.displayNameLabel   = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.display_name");
         this.originLabel        = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.region_position");
-        this.placementNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.placement_name", placement.getName()));
-        this.regionNameLabel    = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_sub_region_settings.region_name", subRegion.getName()));
-        this.schematicNameLabel = new LabelWidget(StringUtils.translate("litematica.label.schematic_placement_settings.schematic_name", schematic.getMetadata().getName(), fileName));
+        this.placementNameLabel = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.placement_name", placement.getName());
+        this.regionNameLabel    = new LabelWidget("litematica.label.schematic_placement_sub_region_settings.region_name", subRegion.getName());
+        this.schematicNameLabel = new LabelWidget("litematica.label.schematic_placement_settings.schematic_name", schematic.getMetadata().getName(), fileName);
         this.schematicNameLabel.setLineHeight(12);
 
         this.nameTextField = new BaseTextFieldWidget(300, 16, subRegion.getDisplayName());

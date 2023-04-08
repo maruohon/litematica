@@ -285,7 +285,7 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
                                  this.verifier.getTotalPositionCountFor(VerifierResultType.WRONG_STATE),
                                  this.verifier.getTotalPositionCountFor(VerifierResultType.MISSING),
                                  this.verifier.getTotalPositionCountFor(VerifierResultType.EXTRA));
-        this.statusLabel.setLabelStyledTextLines(lines);
+        this.statusLabel.setLines(lines);
     }
 
     protected boolean isHudOn()

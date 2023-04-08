@@ -114,7 +114,7 @@ public class SchematicVcsProjectInfoWidget extends ContainerWidget
         LabelWidget label = new LabelWidget();
         label.setPosition(x, y);
         label.setLineHeight(12);
-        label.setLabelStyledTextLines(lines);
+        label.setLines(lines);
 
         return label;
     }

@@ -183,8 +183,8 @@ public abstract class AbstractSchematicInfoWidget<T> extends ContainerWidget
     {
         if (this.currentInfo == null)
         {
-            this.infoTextLabel.setLabelStyledTextLines(Collections.emptyList());
-            this.descriptionLabel.setLabelStyledTextLines(Collections.emptyList());
+            this.infoTextLabel.setLines(Collections.emptyList());
+            this.descriptionLabel.setLines(Collections.emptyList());
             this.descriptionLabel.getHoverInfoFactory().setTextLines("desc", Collections.emptyList());
             return;
         }
@@ -319,7 +319,7 @@ public abstract class AbstractSchematicInfoWidget<T> extends ContainerWidget
                 StyledTextLine.translate(descriptionLines, "litematica.label.schematic_info.description.hover");
             }
 
-            this.descriptionLabel.setLabelStyledTextLines(descriptionLines);
+            this.descriptionLabel.setLines(descriptionLines);
 
             if (fitAll == false)
             {
@@ -327,6 +327,6 @@ public abstract class AbstractSchematicInfoWidget<T> extends ContainerWidget
             }
         }
 
-        this.infoTextLabel.setLabelStyledTextLines(lines);
+        this.infoTextLabel.setLines(lines);
     }
 }
