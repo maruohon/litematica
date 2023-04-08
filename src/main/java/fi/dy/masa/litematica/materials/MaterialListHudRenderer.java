@@ -78,7 +78,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         long currentTime = System.currentTimeMillis();
         List<MaterialListEntry> list;
         MatrixStack textStack = matrixStack;
-        matrixStack = RenderSystem.getModelViewStack();
+        matrixStack = new MatrixStack();
 
         if (currentTime - this.lastUpdateTime > 2000)
         {
