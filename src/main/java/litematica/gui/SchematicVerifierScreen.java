@@ -181,12 +181,19 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         this.setCurrentScrollbarPosition(scrollBarPosition);
     }
 
+    protected void updateVerifierScreenState()
+    {
+        this.getListWidget().refreshEntries();
+        this.updateWidgetStates();
+        this.updateWidgetPositions();
+        this.updateStatusLabel();
+    }
+
     protected void onVerifierFinished()
     {
         if (GuiUtils.getCurrentScreen() == this)
         {
-            this.getListWidget().refreshEntries();
-            this.updateStatusLabel();
+            this.updateVerifierScreenState();
         }
     }
 
@@ -213,18 +220,19 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
     protected void resetVerifier()
     {
         this.verifier.reset();
-        this.getListWidget().refreshEntries();
+        this.updateVerifierScreenState();
     }
 
     protected void startVerifier()
     {
         this.verifier.start(this::onVerifierFinished);
-        this.updateWidgetPositions();
+        this.updateVerifierScreenState();
     }
 
     protected void stopVerifier()
     {
         this.verifier.stop();
+        this.updateVerifierScreenState();
     }
 
     protected void toggleInfoHud()
@@ -247,9 +255,7 @@ public class SchematicVerifierScreen extends BaseListScreen<DataListWidget<Block
         type = type == BlockInfoListType.ALL ? BlockInfoListType.RENDER_LAYERS : BlockInfoListType.ALL;
         this.verifier.reset();
         this.verifier.setVerifierType(type);
-        this.rangeButton.updateButtonState();
-        this.updateWidgetPositions();
-        this.getListWidget().refreshEntries();
+        this.updateVerifierScreenState();
     }
 
     protected boolean isResultTypeVisible(VerifierResultType type)

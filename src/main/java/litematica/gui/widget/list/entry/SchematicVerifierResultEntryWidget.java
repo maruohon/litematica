@@ -187,7 +187,7 @@ public class SchematicVerifierResultEntryWidget extends BaseDataListEntryWidget<
                 for (BlockStatePairCount entry : dataListWidget.getNonFilteredDataList())
                 {
                     ItemStack expectedStack = MaterialCache.getInstance().getItemForDisplayNameForState(entry.getPair().expectedState);
-                    ItemStack foundStack = MaterialCache.getInstance().getItemForDisplayNameForState(entry.getPair().expectedState);
+                    ItemStack foundStack = MaterialCache.getInstance().getItemForDisplayNameForState(entry.getPair().foundState);
                     expectedNameColumnWidth = Math.max(expectedNameColumnWidth, StringUtils.getStringWidth(expectedStack.getDisplayName()));
                     foundNameColumnWidth = Math.max(foundNameColumnWidth, StringUtils.getStringWidth(foundStack.getDisplayName()));
                 }
