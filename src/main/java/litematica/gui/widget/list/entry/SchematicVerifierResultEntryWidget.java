@@ -68,6 +68,7 @@ public class SchematicVerifierResultEntryWidget extends BaseDataListEntryWidget<
         VerifierResultType type = data.getPair().type;
         BlockStatePair pair = data.getPair();
 
+        this.canBeClicked = true;
         this.ignoreButton = GenericButton.create(18, "litematica.button.schematic_verifier.ignore", this::ignoreEntry);
         this.countText = StyledTextLine.parseFirstLine(String.valueOf(data.getCount()));
 

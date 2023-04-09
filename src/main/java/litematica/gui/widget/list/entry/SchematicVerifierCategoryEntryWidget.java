@@ -22,6 +22,7 @@ public class SchematicVerifierCategoryEntryWidget extends BaseListEntryWidget
 
         this.type = type;
         this.verifier = verifier;
+        this.canBeClicked = true;
 
         this.selected = this.verifier.isTypeSelected(type);
         this.textSettings.setTextColor(type.getTextColor());
