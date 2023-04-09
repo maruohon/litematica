@@ -188,11 +188,13 @@ public class SchematicPlacementManager
 
                     if (placements.isEmpty() == false)
                     {
+                        ReplaceBehavior behavior = (ReplaceBehavior) Configs.Generic.PLACEMENT_REPLACE_BEHAVIOR.getOptionListValue();
+
                         for (SchematicPlacement placement : placements)
                         {
                             if (placement.isEnabled())
                             {
-                                SchematicPlacingUtils.placeToWorldWithinChunk(worldSchematic, pos, placement, ReplaceBehavior.WITH_NON_AIR, false);
+                                SchematicPlacingUtils.placeToWorldWithinChunk(worldSchematic, pos, placement, behavior, false);
                             }
                         }
 

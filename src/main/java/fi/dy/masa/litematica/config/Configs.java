@@ -79,6 +79,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       PICK_BLOCK_ENABLED      = new ConfigBoolean(    "pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
         public static final ConfigBoolean       PICK_BLOCK_SHULKERS     = new ConfigBoolean(    "pickBlockShulkers", false, "If enabled, then if the required item for the pick bloc\nis not found directly in the player's inventory, but there\nis a Shulker box that contains it, the Shulker Box\nwill be switched to the player's hand instead");
         public static final ConfigString        PICK_BLOCKABLE_SLOTS    = new ConfigString(     "pickBlockableSlots", "1,2,3,4,5", "The hotbar slots that are allowed to be\nused for the schematic pick block");
+        public static final ConfigOptionList    PLACEMENT_REPLACE_BEHAVIOR  = new ConfigOptionList( "placementReplaceBehavior", ReplaceBehavior.ALL, "The block replace behavior when adding blocks\nto the schematic world.\n\nThis allows using overlapped placements without the\nlater handled placement always ovewriting earlier ones with air.\nOn the other hand some blocks like light blocks are considered\nto be air, so they would need the \"All\" replace behavior\nto get placed at all.");
         public static final ConfigBoolean       PLACEMENT_RESTRICTION   = new ConfigBoolean(    "placementRestriction", false, "When enabled, the use key can only be used\nwhen holding the correct item for the targeted position,\nand the targeted position must have a missing block in the schematic", "Placement Restriction");
         public static final ConfigOptionList    PLACEMENT_RESTRICTION_WARN = new ConfigOptionList  ("placementRestrictionWarn", MessageOutputType.ACTIONBAR, "Selects which type of warning message to show (if any)\nwhen either the Easy Place mode or Placement Restriction prevent placing a block");
         public static final ConfigBoolean       RENDER_MATERIALS_IN_GUI = new ConfigBoolean(    "renderMaterialListInGuis", true, "Whether or not the material list should\nbe rendered inside GUIs");
@@ -126,6 +127,7 @@ public class Configs implements IConfigHandler
                 PICK_BLOCK_AVOID_TOOLS,
                 PICK_BLOCK_ENABLED,
                 PICK_BLOCK_SHULKERS,
+                PLACEMENT_REPLACE_BEHAVIOR,
                 PLACEMENT_RESTRICTION,
                 PLACEMENT_RESTRICTION_WARN,
                 RENDER_MATERIALS_IN_GUI,
