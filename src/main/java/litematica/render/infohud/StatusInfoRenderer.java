@@ -31,7 +31,7 @@ public class StatusInfoRenderer implements IInfoHudRenderer
     {
         if (this.shouldOverrideShowStatusHud())
         {
-            this.lastOverrideTime = System.currentTimeMillis();
+            this.lastOverrideTime = System.nanoTime();
             this.overrideEnabled = true;
             this.overrideDelay = 10000;
         }
@@ -91,7 +91,7 @@ public class StatusInfoRenderer implements IInfoHudRenderer
             lines.add(StringUtils.translate("litematica.hud.status_info.schematic_vcs_mode"));
         }
 
-        if (this.overrideEnabled && System.currentTimeMillis() - this.lastOverrideTime > this.overrideDelay)
+        if (this.overrideEnabled && System.nanoTime() - this.lastOverrideTime > this.overrideDelay * 1000000L)
         {
             this.overrideEnabled = false;
         }

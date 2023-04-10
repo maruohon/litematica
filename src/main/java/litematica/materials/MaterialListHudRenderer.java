@@ -70,9 +70,9 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
     protected void refreshList(long refreshInterval)
     {
-        long currentTime = System.currentTimeMillis();
+        long currentTime = System.nanoTime();
 
-        if (currentTime - this.lastUpdateTime > refreshInterval && GameUtils.getClientPlayer() != null)
+        if (currentTime - this.lastUpdateTime > refreshInterval * 1000000L && GameUtils.getClientPlayer() != null)
         {
             MaterialListUtils.updateAvailableCounts(this.materialList.getAllMaterials());
             List<MaterialListEntry> list = this.materialList.getMissingMaterials(true);

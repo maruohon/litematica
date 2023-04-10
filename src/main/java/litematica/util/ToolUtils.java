@@ -251,13 +251,13 @@ public class ToolUtils
         }
 
         TaskScheduler scheduler = TaskScheduler.getServerInstanceIfExistsOrClient();
-        long currentTime = System.currentTimeMillis();
+        long currentTime = System.nanoTime();
 
         // Add a delay from the previous move operation, to allow time for
         // server -> client chunk/block syncing, otherwise a subsequent move
         // might wipe the area before the new blocks have arrived on the
         // client and thus the new move schematic would just be air.
-        if ((currentTime - areaMovedTime) < 1000 ||
+        if ((currentTime - areaMovedTime) < 1000000000L ||
             scheduler.hasTask(CreateSchematicTask.class) ||
             scheduler.hasTask(TaskDeleteArea.class) ||
             scheduler.hasTask(TaskPasteSchematicPerChunkBase.class) ||
@@ -275,7 +275,7 @@ public class ToolUtils
             LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(selection);
             CreateSchematicTask taskSave = new CreateSchematicTask(schematic, selection, false,
                                                 () -> onAreaSavedForMove(schematic, selection, scheduler, pos));
-            areaMovedTime = System.currentTimeMillis();
+            areaMovedTime = System.nanoTime();
             taskSave.disableCompletionMessage();
             scheduler.scheduleTask(taskSave, 1);
         }
@@ -293,7 +293,7 @@ public class ToolUtils
         SchematicPlacement placement = SchematicPlacement.create(schematic, pos, "-", true);
         DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, false);
 
-        areaMovedTime = System.currentTimeMillis();
+        areaMovedTime = System.nanoTime();
 
         TaskDeleteArea taskDelete = new TaskDeleteArea(selection.getAllSelectionBoxes(), true);
         taskDelete.disableCompletionMessage();
@@ -319,7 +319,7 @@ public class ToolUtils
             taskPaste = new TaskPasteSchematicPerChunkCommand(ImmutableList.of(placement), range, false);
         }
 
-        areaMovedTime = System.currentTimeMillis();
+        areaMovedTime = System.nanoTime();
 
         taskPaste.disableCompletionMessage();
         taskPaste.setCompletionListener(() -> onMovedAreaPasted(schematic, selection, pos));
@@ -332,7 +332,7 @@ public class ToolUtils
     {
         SchematicHolder.getInstance().removeSchematic(schematic);
         selection.moveEntireAreaSelectionTo(pos, false);
-        areaMovedTime = System.currentTimeMillis();
+        areaMovedTime = System.nanoTime();
     }
 
     public static boolean cloneSelectionArea()
