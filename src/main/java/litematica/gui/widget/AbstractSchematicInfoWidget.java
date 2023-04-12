@@ -1,5 +1,6 @@
 package litematica.gui.widget;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -15,7 +16,6 @@ import malilib.gui.widget.ContainerWidget;
 import malilib.gui.widget.IconWidget;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
-import malilib.gui.widget.list.BaseFileBrowserWidget;
 import malilib.render.text.StyledText;
 import malilib.render.text.StyledTextLine;
 import malilib.render.text.StyledTextUtils;
@@ -191,6 +191,7 @@ public abstract class AbstractSchematicInfoWidget<T> extends ContainerWidget
 
         SchematicMetadata meta = this.currentInfo.schematicMetadata;
         List<StyledTextLine> lines = new ArrayList<>();
+        SimpleDateFormat dateFormat = createDateFormat();
 
         if (Configs.Internal.SCHEMATIC_INFO_SHOW_NAME.getBooleanValue())
         {
@@ -206,13 +207,13 @@ public abstract class AbstractSchematicInfoWidget<T> extends ContainerWidget
         if (Configs.Internal.SCHEMATIC_INFO_SHOW_CREATION_TIME.getBooleanValue())
         {
             StyledTextLine.translate(lines, "litematica.label.schematic_info.time_created",
-                                     BaseFileBrowserWidget.DATE_FORMAT.format(new Date(meta.getTimeCreated())));
+                                     dateFormat.format(new Date(meta.getTimeCreated())));
         }
 
         if (meta.hasBeenModified() && Configs.Internal.SCHEMATIC_INFO_SHOW_MODIFICATION_TIME.getBooleanValue())
         {
             StyledTextLine.translate(lines, "litematica.label.schematic_info.time_modified",
-                                     BaseFileBrowserWidget.DATE_FORMAT.format(new Date(meta.getTimeModified())));
+                                     dateFormat.format(new Date(meta.getTimeModified())));
         }
 
         if (Configs.Internal.SCHEMATIC_INFO_SHOW_MC_VERSION.getBooleanValue())
@@ -328,5 +329,21 @@ public abstract class AbstractSchematicInfoWidget<T> extends ContainerWidget
         }
 
         this.infoTextLabel.setLines(lines);
+    }
+
+    public static SimpleDateFormat createDateFormat()
+    {
+        SimpleDateFormat fmt;
+
+        try
+        {
+            fmt = new SimpleDateFormat(Configs.Generic.DATE_FORMAT.getValue());
+        }
+        catch (Exception ignore)
+        {
+            fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+
+        return fmt;
     }
 }

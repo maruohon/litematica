@@ -15,6 +15,7 @@ public class HotkeyCallbacks
         HotkeyCallback hotkeyCallbackOpenGui = new HotkeyCallbackOpenGui();
         HotkeyCallback hotkeyCallbackToolActions = new HotkeyCallbackToolActions();
 
+        Configs.Generic.DATE_FORMAT.setValueChangeCallback((n, o) -> DataManager.checkDateFormat(n));
         Configs.Generic.PICK_BLOCK_USABLE_SLOTS.setValueChangeCallback((newValue, oldValue) -> PickBlockUtils.setPickBlockUsableSlots(newValue));
         Configs.Generic.PICK_BLOCK_USABLE_SLOTS.setValueLoadCallback(PickBlockUtils::setPickBlockUsableSlots);
         Configs.Generic.TOOL_ITEM.setValueChangeCallback((newValue, oldValue) -> DataManager.setToolItem(newValue));

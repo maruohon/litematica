@@ -1,5 +1,6 @@
 package litematica.gui.widget;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.widget.ContainerWidget;
 import malilib.gui.widget.LabelWidget;
-import malilib.gui.widget.list.BaseFileBrowserWidget;
 import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import malilib.render.text.StyledTextLine;
 import malilib.util.StringUtils;
@@ -20,11 +20,13 @@ import litematica.schematic.projects.SchematicVersion;
 public class SchematicVcsProjectInfoWidget extends ContainerWidget
 {
     @Nullable protected SchematicProject currentProject;
+    protected SimpleDateFormat dateFormat;
 
     public SchematicVcsProjectInfoWidget(int width, int height)
     {
         super(width, height);
 
+        this.dateFormat = AbstractSchematicInfoWidget.createDateFormat();
         this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xC0000000);
         this.getBorderRenderer().getNormalSettings().setBorderWidthAndColor(1, 0xFFC0C0C0);
     }
@@ -104,7 +106,7 @@ public class SchematicVcsProjectInfoWidget extends ContainerWidget
                                      version.getName());
 
             StyledTextLine.translate(lines, "litematica.label.schematic_vcs.info_widget.version_time",
-                                     BaseFileBrowserWidget.DATE_FORMAT.format(new Date(version.getTimeStamp())));
+                                     this.dateFormat.format(new Date(version.getTimeStamp())));
 
             BlockPos o = project.getOrigin();
             StyledTextLine.translate(lines, "litematica.label.schematic_vcs.info_widget.origin",

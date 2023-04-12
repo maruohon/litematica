@@ -1,5 +1,6 @@
 package litematica.gui.widget;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.widget.ContainerWidget;
 import malilib.gui.widget.LabelWidget;
-import malilib.gui.widget.list.BaseFileBrowserWidget;
 import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import malilib.overlay.message.MessageHelpers;
 import malilib.render.text.StyledTextLine;
@@ -21,12 +21,14 @@ public class SavedSchematicPlacementInfoWidget extends ContainerWidget
 {
     protected final SchematicPlacementInfoCache infoCache = new SchematicPlacementInfoCache();
     protected final LabelWidget infoLabelWidget;
+    protected SimpleDateFormat dateFormat;
     @Nullable protected SchematicPlacement currentInfo;
 
     public SavedSchematicPlacementInfoWidget(int width, int height)
     {
         super(width, height);
 
+        this.dateFormat = AbstractSchematicInfoWidget.createDateFormat();
         this.infoLabelWidget = new LabelWidget();
         this.infoLabelWidget.setLineHeight(12);
 
@@ -106,7 +108,7 @@ public class SavedSchematicPlacementInfoWidget extends ContainerWidget
         if (time > 0)
         {
             StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.last_saved",
-                                     BaseFileBrowserWidget.DATE_FORMAT.format(new Date(time)));
+                                     this.dateFormat.format(new Date(time)));
         }
 
         this.infoLabelWidget.setLines(lines);

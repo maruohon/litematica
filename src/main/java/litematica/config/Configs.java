@@ -48,7 +48,8 @@ public class Configs
         public static final BooleanConfig BETTER_RENDER_ORDER                       = new BooleanConfig("betterRenderOrder", true);
         public static final BooleanConfig CHANGE_SELECTED_CORNER                    = new BooleanConfig("changeSelectedCornerOnMove", true);
         public static final BooleanConfig CLONE_AT_ORIGINAL_POS                     = new BooleanConfig("cloneAtOriginalPosition", true);
-        public static final StringConfig  COMMAND_NAME_SETBLOCK                     = new StringConfig("commandNameSetblock", "setblock");
+        public static final StringConfig  COMMAND_NAME_SETBLOCK                     = new StringConfig( "commandNameSetblock", "setblock");
+        public static final StringConfig  DATE_FORMAT                               = new StringConfig( "dateFormat", "yyyy-MM-dd HH:mm:ss");
         public static final BooleanConfig DEBUG_MESSAGES                            = new BooleanConfig("debugMessages", false);
         public static final BooleanConfig EASY_PLACE_CLICK_ADJACENT                 = new BooleanConfig("easyPlaceClickAdjacent", false);
         public static final BooleanConfig EASY_PLACE_HOLD_ENABLED                   = new BooleanConfig("easyPlaceHold", false);
@@ -64,7 +65,7 @@ public class Configs
         public static final BooleanConfig PICK_BLOCK_AVOID_TOOLS                    = new BooleanConfig("pickBlockAvoidTools", false);
         public static final BooleanConfig PICK_BLOCK_IGNORE_NBT                     = new BooleanConfig("pickBlockIgnoreNBT", true);
         public static final BooleanConfig PICK_BLOCK_SHULKER_BOXES                  = new BooleanConfig("pickBlockShulkerBoxes", false);
-        public static final StringConfig  PICK_BLOCK_USABLE_SLOTS                   = new StringConfig("pickBlockUsableSlots", "1-9");
+        public static final StringConfig  PICK_BLOCK_USABLE_SLOTS                   = new StringConfig( "pickBlockUsableSlots", "1-9");
         public static final BooleanConfig PLACEMENTS_INFRONT                        = new BooleanConfig("placementInfrontOfPlayer", false);
         public static final BooleanConfig RENDER_MATERIALS_IN_GUI                   = new BooleanConfig("renderMaterialListInGuis", true);
         public static final BooleanConfig RENDER_THREAD_NO_TIMEOUT                  = new BooleanConfig("renderThreadNoTimeout", true);
@@ -83,6 +84,7 @@ public class Configs
                 CLONE_AT_ORIGINAL_POS,
                 COMMAND_NAME_SETBLOCK,
                 CUSTOM_SCHEMATIC_DIRECTORY,
+                DATE_FORMAT,
                 DEBUG_MESSAGES,
                 DEFAULT_AREA_SELECTION_MODE,
                 EASY_PLACE_CLICK_ADJACENT,

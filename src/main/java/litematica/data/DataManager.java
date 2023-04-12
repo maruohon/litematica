@@ -3,6 +3,7 @@ package litematica.data;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -469,6 +470,19 @@ public class DataManager implements DirectoryCache
 
             Configs.Generic.TOOL_ITEM.setValue(cfgStr);
             MessageDispatcher.generic().customHotbar().translate("litematica.message.set_currently_held_item_as_tool");
+        }
+    }
+
+    public static void checkDateFormat(String value)
+    {
+        try
+        {
+            SimpleDateFormat fmt = new SimpleDateFormat(value);
+            assert fmt != null;
+        }
+        catch (Exception ignore)
+        {
+            MessageDispatcher.error("litematica.message.error.config.date_format_invalid");
         }
     }
 }

@@ -1,6 +1,7 @@
 package litematica.gui.widget.list.entry;
 
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,25 +10,27 @@ import java.util.Locale;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
 import malilib.gui.widget.IconWidget;
-import malilib.gui.widget.list.BaseFileBrowserWidget;
 import malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import malilib.render.text.StyledTextLine;
 import malilib.util.FileNameUtils;
 import malilib.util.StringUtils;
+import litematica.gui.widget.AbstractSchematicInfoWidget;
 import litematica.schematic.ISchematic;
 import litematica.schematic.SchematicType;
 
 public class BaseSchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
 {
     protected final IconWidget modificationNoticeIcon;
+    protected SimpleDateFormat dateFormat;
 
     public BaseSchematicEntryWidget(ISchematic schematic, DataListEntryWidgetData constructData)
     {
         super(schematic, constructData);
 
+        this.dateFormat = AbstractSchematicInfoWidget.createDateFormat();
         this.modificationNoticeIcon = new IconWidget(DefaultIcons.EXCLAMATION_11);
-        String timeStr = BaseFileBrowserWidget.DATE_FORMAT.format(new Date(schematic.getMetadata().getTimeModified()));
+        String timeStr = this.dateFormat.format(new Date(schematic.getMetadata().getTimeModified()));
         this.modificationNoticeIcon.translateAndAddHoverString("litematica.hover.schematic_list.modified_on", timeStr);
 
         SchematicType<?> type = schematic.getType();
@@ -78,7 +81,7 @@ public class BaseSchematicEntryWidget extends BaseDataListEntryWidget<ISchematic
 
         if (schematic.getMetadata().wasModifiedSinceSaved())
         {
-            String timeStr = BaseFileBrowserWidget.DATE_FORMAT.format(new Date(schematic.getMetadata().getTimeModified()));
+            String timeStr = this.dateFormat.format(new Date(schematic.getMetadata().getTimeModified()));
             lines.add(StringUtils.translate("litematica.hover.schematic_list.modified_on", timeStr));
         }
 
