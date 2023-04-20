@@ -50,6 +50,7 @@ public class SavedSchematicPlacementsBrowserScreen extends BaseSavedSchematicPla
     {
         BaseFileBrowserWidget listWidget = super.createListWidget();
         FileBrowserIconProvider iconProvider = new DefaultFileBrowserIconProvider();
+        listWidget.setAreEntriesFixedHeight(false);
         listWidget.setListEntryWidgetFixedHeight(20);
         listWidget.setDataListEntryWidgetFactory((d, cd) -> new SchematicPlacementBrowserEntryWidget(d, cd, listWidget, iconProvider));
         return listWidget;
