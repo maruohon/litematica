@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.world;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -51,14 +51,34 @@ public class SchematicWorldHandler
     public static WorldSchematic createSchematicWorld(@Nullable WorldRendererSchematic worldRenderer)
     {
         World world = MinecraftClient.getInstance().world;
+
         if (world == null)
         {
             return null;
         }
 
-        ClientWorld.Properties levelInfo = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
         RegistryEntryLookup.RegistryLookup lookup = world.getRegistryManager().createRegistryLookup();
-        RegistryEntry<DimensionType> entry = lookup.getOrThrow(RegistryKeys.DIMENSION_TYPE).getOrThrow(DimensionTypes.OVERWORLD);
+        Optional<RegistryEntryLookup<DimensionType>> entryLookup = lookup.getOptional(RegistryKeys.DIMENSION_TYPE);
+        RegistryEntry<DimensionType> entry = null;
+
+        if (entryLookup.isPresent())
+        {
+            Optional<? extends RegistryEntry<DimensionType>> dimOptional = entryLookup.get().getOptional(DimensionTypes.OVERWORLD);
+
+            if (dimOptional.isPresent())
+            {
+                entry = dimOptional.get();
+            }
+        }
+
+        // Use the DimensionType of the current client world as a fallback
+        if (entry == null)
+        {
+            entry = world.getDimensionEntry();
+        }
+
+        ClientWorld.Properties levelInfo = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
+
         return new WorldSchematic(levelInfo, entry, MinecraftClient.getInstance()::getProfiler, worldRenderer);
     }
 
