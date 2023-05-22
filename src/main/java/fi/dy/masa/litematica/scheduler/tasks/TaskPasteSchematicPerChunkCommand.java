@@ -176,7 +176,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                this.queuedCommands.size() < this.maxCommandsPerTick &&
                (ignoreLimit == false || this.sentCommandsThisTick < this.maxCommandsPerTick))
         {
-            BlockPos pos = this.positionIterator.next();
+            BlockPos pos = this.positionIterator.next().toImmutable();
             this.pasteBlock(pos, schematicChunk, clientChunk, ignoreLimit);
         }
 
@@ -425,7 +425,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                         World schematicWorld, ClientWorld clientWorld,
                                         Consumer<String> commandHandler)
     {
-        BlockPos placementPos = this.placeNbtPickedBlock(pos, state, be, schematicWorld, clientWorld);
+        BlockPos placementPos = this.placeNbtPickedBlock(pos, state, be, schematicWorld, clientWorld).toImmutable();
 
         if (placementPos != null)
         {
@@ -460,6 +460,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                       World schematicWorld, ClientWorld clientWorld,
                                       Consumer<String> commandHandler)
     {
+        pos = pos.toImmutable();
         BlockPos placementPos = this.placeNbtPickedBlock(pos, state, be, schematicWorld, clientWorld);
 
         if (placementPos != null)
@@ -519,7 +520,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             int endX = startX + endOffsetX;
             int endY = startY + endOffsetY;
             int endZ = startZ + endOffsetZ;
-            BlockState state = schematicChunk.getBlockState(this.mutablePos);
+            BlockState state = schematicChunk.getBlockState(this.mutablePos.toImmutable());
 
             //System.out.printf("fill @ [%d %d %d] -> [%d %d %d] (%d x %d x %d) %s\n", startX, startY, startZ, endX, endY, endZ, endOffsetX + 1, endOffsetY + 1, endOffsetZ + 1, state);
             this.pasteVolume(startX, startY, startZ, endX, endY, endZ, state);
@@ -527,7 +528,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         else
         {
             //System.out.printf("fill -> setblock @ [%d %d %d] %s\n", startX, startY, startZ, schematicChunk.getBlockState(this.mutablePos));
-            this.pasteBlock(this.mutablePos, schematicChunk, clientChunk, false);
+            this.pasteBlock(this.mutablePos.toImmutable(), schematicChunk, clientChunk, false);
         }
     }
 

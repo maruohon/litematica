@@ -402,7 +402,7 @@ public class LitematicaSchematic
                     }
 
                     posMutable.set(x, y, z);
-                    NbtCompound teNBT = tileMap.get(posMutable);
+                    NbtCompound teNBT = tileMap.get(posMutable.toImmutable());
 
                     posMutable.set( posMinRel.getX() + x - regionPos.getX(),
                                     posMinRel.getY() + y - regionPos.getY(),
