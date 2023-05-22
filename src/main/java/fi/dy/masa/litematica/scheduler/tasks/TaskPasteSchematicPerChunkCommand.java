@@ -425,10 +425,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                         World schematicWorld, ClientWorld clientWorld,
                                         Consumer<String> commandHandler)
     {
-        BlockPos placementPos = this.placeNbtPickedBlock(pos, state, be, schematicWorld, clientWorld).toImmutable();
+        BlockPos placementPos = this.placeNbtPickedBlock(pos, state, be, schematicWorld, clientWorld);
 
         if (placementPos != null)
         {
+            placementPos = placementPos.toImmutable();
             this.queueSetBlockCommand(pos.getX(), pos.getY(), pos.getZ(), state, commandHandler);
 
             try
@@ -460,11 +461,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                       World schematicWorld, ClientWorld clientWorld,
                                       Consumer<String> commandHandler)
     {
-        pos = pos.toImmutable();
         BlockPos placementPos = this.placeNbtPickedBlock(pos, state, be, schematicWorld, clientWorld);
 
         if (placementPos != null)
         {
+            placementPos = placementPos.toImmutable();
             String command = String.format("%s %d %d %d %d %d %d %d %d %d",
                                            this.cloneCommand,
                                            placementPos.getX(), placementPos.getY(), placementPos.getZ(),
