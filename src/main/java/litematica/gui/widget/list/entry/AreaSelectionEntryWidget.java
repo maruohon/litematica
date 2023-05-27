@@ -115,14 +115,14 @@ public class AreaSelectionEntryWidget extends DirectoryEntryWidget
     }
 
     @Override
-    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY)
     {
         if (this.isSelectionEntry && mouseX >= this.buttonsStartX)
         {
             return false;
         }
 
-        return super.canHoverAt(mouseX, mouseY, mouseButton);
+        return super.canHoverAt(mouseX, mouseY);
     }
 
     @Override

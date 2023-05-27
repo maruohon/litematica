@@ -87,9 +87,9 @@ public class SchematicEntryWidget extends BaseSchematicEntryWidget
     }
 
     @Override
-    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY)
     {
-        return mouseX <= this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
+        return mouseX <= this.buttonsStartX && super.canHoverAt(mouseX, mouseY);
     }
 
     public static GenericButton createIconButton20x20(Icon icon, EventListener listener)

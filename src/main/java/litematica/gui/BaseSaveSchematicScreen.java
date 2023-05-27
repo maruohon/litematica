@@ -92,11 +92,6 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
             this.getListWidget().clearSelection();
             return true;
         }
-        else if (keyCode == Keys.KEY_ESCAPE)
-        {
-            this.closeScreenOrShowParent();
-            return true;
-        }
 
         return super.onKeyTyped(keyCode, scanCode, modifiers);
     }

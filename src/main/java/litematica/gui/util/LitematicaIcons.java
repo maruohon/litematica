@@ -46,12 +46,12 @@ public class LitematicaIcons
     public static final BaseIcon TASK_MANAGER               = register(102, 112, 14, 14);
     public static final BaseIcon TRASH_CAN                  = register(102, 154, 14, 14);
 
-    public static BaseIcon register(int u, int v, int w, int h)
+    private static BaseIcon register(int u, int v, int w, int h)
     {
         return register(u, v, w, h, w, 0);
     }
 
-    public static BaseIcon register(int u, int v, int w, int h, int variantOffU, int variantOffV)
+    private static BaseIcon register(int u, int v, int w, int h, int variantOffU, int variantOffV)
     {
         BaseIcon icon = new BaseIcon(u, v, w, h, variantOffU, variantOffV, LITEMATICA_GUI_TEXTURES);
         return Registry.ICON.registerModIcon(icon);
