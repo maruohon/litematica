@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.VertexSorter;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -105,13 +106,13 @@ public class ChunkRendererSchematicVbo
 
     public VertexBuffer getBlocksVertexBufferByLayer(RenderLayer layer)
     {
-        return this.vertexBufferBlocks.computeIfAbsent(layer, l -> new VertexBuffer());
+        return this.vertexBufferBlocks.computeIfAbsent(layer, l -> new VertexBuffer(VertexBuffer.Usage.STATIC));
     }
 
     public VertexBuffer getOverlayVertexBuffer(OverlayRenderType type)
     {
         //if (GuiBase.isCtrlDown()) System.out.printf("getOverlayVertexBuffer: type: %s, buf: %s\n", type, this.vertexBufferOverlay[type.ordinal()]);
-        return this.vertexBufferOverlay.computeIfAbsent(type, l -> new VertexBuffer());
+        return this.vertexBufferOverlay.computeIfAbsent(type, l -> new VertexBuffer(VertexBuffer.Usage.STATIC));
     }
 
     public ChunkRenderDataSchematic getChunkRenderData()
@@ -664,11 +665,11 @@ public class ChunkRendererSchematicVbo
 
             if (schematicHasAir)
             {
-                return (clientHasAir || (this.ignoreClientWorldFluids && stateClient.getMaterial().isLiquid())) ? OverlayType.NONE : OverlayType.EXTRA;
+                return (clientHasAir || (this.ignoreClientWorldFluids && stateClient.isLiquid())) ? OverlayType.NONE : OverlayType.EXTRA;
             }
             else
             {
-                if (clientHasAir || (this.ignoreClientWorldFluids && stateClient.getMaterial().isLiquid()))
+                if (clientHasAir || (this.ignoreClientWorldFluids && stateClient.isLiquid()))
                 {
                     return OverlayType.MISSING;
                 }
@@ -752,7 +753,7 @@ public class ChunkRendererSchematicVbo
     {
         if (layer == RenderLayer.getTranslucent() && chunkRenderData.isBlockLayerEmpty(layer) == false)
         {
-            buffer.sortFrom(x, y, z);
+            buffer.setSorter(VertexSorter.byDistance(x, y, z));
             chunkRenderData.setBlockBufferState(layer, buffer.getSortingData());
         }
 
@@ -779,7 +780,7 @@ public class ChunkRendererSchematicVbo
         RenderSystem.applyModelViewMatrix();
         if (type == OverlayRenderType.QUAD && chunkRenderData.isOverlayTypeEmpty(type) == false)
         {
-            buffer.sortFrom(x, y, z);
+            buffer.setSorter(VertexSorter.byDistance(x, y, z));
             chunkRenderData.setOverlayBufferState(type, buffer.getSortingData());
         }
 

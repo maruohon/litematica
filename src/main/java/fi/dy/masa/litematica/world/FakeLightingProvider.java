@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.world;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
@@ -54,7 +55,7 @@ public class FakeLightingProvider extends LightingProvider
         }
 
         @Override
-        public void addLightSource(BlockPos pos, int i)
+        public void propagateLight(ChunkPos chunkPos)
         {
         }
 
@@ -65,7 +66,7 @@ public class FakeLightingProvider extends LightingProvider
         }
 
         @Override
-        public int doLightUpdates(int i, boolean bl, boolean bl2)
+        public int doLightUpdates()
         {
             return 0;
         }

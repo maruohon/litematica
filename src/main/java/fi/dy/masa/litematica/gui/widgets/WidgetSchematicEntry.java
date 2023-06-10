@@ -7,8 +7,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.util.math.MatrixStack;
+
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.BlockPos;
+
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
@@ -73,7 +75,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void render(int mouseX, int mouseY, boolean selected, DrawContext drawContext)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -95,7 +97,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         boolean modified = this.schematic.getMetadata().wasModifiedSinceSaved();
         String schematicName = this.schematic.getMetadata().getName();
         int color = modified ? 0xFFFF9010 : 0xFFFFFFFF;
-        this.drawString(this.x + 20, this.y + 7, color, schematicName, matrixStack);
+        this.drawString(this.x + 20, this.y + 7, color, schematicName, drawContext);
 
         RenderUtils.color(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
@@ -122,11 +124,11 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
             Icons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, this.y + 6, this.zLevel, false, false);
         }
 
-        this.drawSubWidgets(mouseX, mouseY, matrixStack);
+        this.drawSubWidgets(mouseX, mouseY, drawContext);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, DrawContext drawContext)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -135,7 +137,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         {
             String str = WidgetFileBrowserBase.DATE_FORMAT.format(new Date(this.schematic.getMetadata().getTimeModified()));
             List<String> strs = ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str));
-            RenderUtils.drawHoverText(mouseX, mouseY, strs, matrixStack);
+            RenderUtils.drawHoverText(mouseX, mouseY, strs, drawContext);
         }
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
         {
@@ -152,12 +154,12 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
                 lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.in_memory"));
             }
 
-            RenderUtils.drawHoverText(mouseX, mouseY, lines, matrixStack);
+            RenderUtils.drawHoverText(mouseX, mouseY, lines, drawContext);
         }
 
         RenderUtils.color(1f, 1f, 1f, 1f);
 
-        super.postRenderHovered(mouseX, mouseY, selected, matrixStack);
+        super.postRenderHovered(mouseX, mouseY, selected, drawContext);
     }
 
     private static class ButtonListener implements IButtonActionListener

@@ -8,8 +8,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.hit.BlockHitResult;
@@ -22,6 +23,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -701,7 +703,8 @@ public class RayTraceUtils
             boolean returnLastUncollidableBlock, boolean respectLayerRange)
     {
         if ((respectLayerRange == false || data.range.isPositionWithinRange(data.x, data.y, data.z)) &&
-            (ignoreBlockWithoutBoundingBox == false || blockState.getMaterial() == Material.PORTAL ||
+                (ignoreBlockWithoutBoundingBox == false || blockState.getBlock() == Blocks.NETHER_PORTAL ||
+                        blockState.getBlock() == Blocks.END_PORTAL || blockState.getBlock() ==Blocks.END_GATEWAY ||
              blockState.getCollisionShape(world, data.blockPos).isEmpty() == false))
         {
             VoxelShape blockShape = blockState.getOutlineShape(world, data.blockPos);

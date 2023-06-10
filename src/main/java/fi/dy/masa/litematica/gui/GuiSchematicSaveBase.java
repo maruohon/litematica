@@ -1,7 +1,9 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
-import net.minecraft.client.util.math.MatrixStack;
+
+import net.minecraft.client.gui.DrawContext;
+
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -136,11 +138,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void drawContents(DrawContext drawContext, int mouseX, int mouseY, float partialTicks)
     {
-        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
+        super.drawContents(drawContext, mouseX, mouseY, partialTicks);
 
-        this.textField.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.textField.render(drawContext, mouseX, mouseY, partialTicks);
     }
 
     @Override

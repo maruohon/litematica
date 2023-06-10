@@ -3,15 +3,18 @@ package fi.dy.masa.litematica.materials;
 import java.util.Collections;
 import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
+
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.mixin.IMixinHandledScreen;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
@@ -72,12 +75,12 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     }
 
     @Override
-    public int render(int xOffset, int yOffset, HudAlignment alignment, MatrixStack matrixStack)
+    public int render(int xOffset, int yOffset, HudAlignment alignment, DrawContext drawContext)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         long currentTime = System.currentTimeMillis();
         List<MaterialListEntry> list;
-        MatrixStack textStack = matrixStack;
+        MatrixStack matrixStack = drawContext.getMatrices();
         matrixStack = new MatrixStack();
 
         if (currentTime - this.lastUpdateTime > 2000)
@@ -157,8 +160,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             matrixStack.push();
             matrixStack.scale((float) scale, (float) scale, (float) scale);
 
-            textStack.push();
-            textStack.scale((float) scale, (float) scale, (float) scale);
+            matrixStack.push();
+            matrixStack.scale((float) scale, (float) scale, (float) scale);
 
             RenderSystem.applyModelViewMatrix();
         }
@@ -176,7 +179,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         for (int i = 0; i < size; ++i)
         {
-            mc.getItemRenderer().renderInGui(matrixStack, list.get(i).getStack(), x, y);
+            drawContext.drawItem(list.get(i).getStack(), x, y);
             y += lineHeight;
         }
 
@@ -188,14 +191,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         String title = GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + GuiBase.TXT_RST;
 
-        if (useShadow)
-        {
-            font.drawWithShadow(textStack, title, posX + 2, posY + 2, textColor);
-        }
-        else
-        {
-            font.draw(textStack, title, posX + 2, posY + 2, textColor);
-        }
+        drawContext.drawText(font, title, posX + 2, posY + 2, textColor, useShadow);
 
         final int itemCountTextColor = Configs.Colors.MATERIAL_LIST_HUD_ITEM_COUNTS.getIntegerValue();
         x = posX + 18;
@@ -212,23 +208,15 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             int cntLen = font.getWidth(strCount);
             int cntPosX = posX + maxLineLength - cntLen - 2;
 
-            if (useShadow)
-            {
-                font.drawWithShadow(textStack, text, x, y, textColor);
-                font.drawWithShadow(textStack, strCount, cntPosX, y, itemCountTextColor);
-            }
-            else
-            {
-                font.draw(textStack, text, x, y, textColor);
-                font.draw(textStack, strCount, cntPosX, y, itemCountTextColor);
-            }
+            drawContext.drawText(font, text, x, y, textColor, useShadow);
+            drawContext.drawText(font, strCount, cntPosX, y, itemCountTextColor, useShadow);
 
             y += lineHeight;
         }
 
         if (scale != 1d)
         {
-            textStack.pop();
+            matrixStack.pop();
         }
 
         return contentHeight + 4;

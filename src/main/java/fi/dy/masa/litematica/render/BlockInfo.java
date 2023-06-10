@@ -4,7 +4,7 @@ import java.util.List;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -58,7 +58,7 @@ public class BlockInfo
         return this.totalHeight;
     }
 
-    public void render(int x, int y, MinecraftClient mc, MatrixStack matrixStack)
+    public void render(int x, int y, MinecraftClient mc, DrawContext drawContext)
     {
         if (this.state != null)
         {
@@ -68,7 +68,7 @@ public class BlockInfo
             int x1 = x + 10;
             y += 4;
 
-            textRenderer.draw(matrixStack, this.title, x1, y, 0xFFFFFFFF);
+            drawContext.drawText(textRenderer, this.title, x1, y, 0xFFFFFFFF, false);
 
             y += 12;
 
@@ -76,20 +76,20 @@ public class BlockInfo
 
             //mc.getRenderItem().zLevel += 100;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
-            mc.getItemRenderer().renderInGui(matrixStack, this.stack, x1, y);
-            mc.getItemRenderer().renderGuiItemOverlay(matrixStack, textRenderer, this.stack, x1, y, null);
+            drawContext.drawItem(this.stack, x1, y);
+            drawContext.drawItemInSlot(textRenderer, this.stack, x1, y);
             //mc.getRenderItem().zLevel -= 100;
 
             //RenderSystem.disableBlend();
             RenderUtils.disableDiffuseLighting();
 
-            textRenderer.draw(matrixStack, this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
+            drawContext.drawText(textRenderer, this.stackName, x1 + 20, y + 4, 0xFFFFFFFF, false);
 
             y += 20;
-            textRenderer.draw(matrixStack, this.blockRegistryname, x1, y, 0xFF4060FF);
+            drawContext.drawText(textRenderer, this.blockRegistryname, x1, y, 0xFF4060FF, false);
             y += textRenderer.fontHeight + 4;
 
-            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props, matrixStack);
+            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props, drawContext);
         }
     }
 }

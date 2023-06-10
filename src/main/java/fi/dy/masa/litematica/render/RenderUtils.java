@@ -2,8 +2,10 @@ package fi.dy.masa.litematica.render;
 
 import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -19,14 +21,15 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.LocalRandom;
 import net.minecraft.world.World;
+
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.litematica.util.BlockInfoAlignment;
-import fi.dy.masa.litematica.util.PositionUtils;
 
 public class RenderUtils
 {
@@ -626,16 +629,16 @@ public class RenderUtils
         buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
     }
 
-    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, MinecraftClient mc)
+    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, MinecraftClient mc, DrawContext drawContext)
     {
-        int heightSch = renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc);
-        int heightCli = renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc);
+        int heightSch = renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc, drawContext);
+        int heightCli = renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc, drawContext);
 
         return Math.max(heightSch, heightCli);
     }
 
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
-            World world, BlockPos pos, MinecraftClient mc)
+            World world, BlockPos pos, MinecraftClient mc, DrawContext drawContext)
     {
         Inventory inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
 
@@ -644,14 +647,14 @@ public class RenderUtils
             final InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
             final InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, inv.size());
 
-            return renderInventoryOverlay(align, side, offY, inv, type, props, mc);
+            return renderInventoryOverlay(align, side, offY, inv, type, props, mc, drawContext);
         }
 
         return 0;
     }
 
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
-            Inventory inv, InventoryRenderType type, InventoryProperties props, MinecraftClient mc)
+             Inventory inv, InventoryRenderType type, InventoryProperties props, MinecraftClient mc, DrawContext drawContext)
     {
         int xInv = 0;
         int yInv = 0;
@@ -674,7 +677,7 @@ public class RenderUtils
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
         fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, props.totalSlots, mc);
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);
+        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc, drawContext);
 
         return props.height;
     }

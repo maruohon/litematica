@@ -34,6 +34,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
+import fi.dy.masa.litematica.mixin.IMixinEntity;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskBase;
 import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
@@ -325,13 +326,13 @@ public class SchematicUtils
                 if (stack.getItem() instanceof BlockItem)
                 {
                     // Smuggle in a reference to the Schematic world to the use context
-                    World worldClient = mc.player.world;
-                    mc.player.world = worldSchematic;
+                    World worldClient = mc.player.getWorld();
+                    ((IMixinEntity) mc.player).litematica_setWorld(worldSchematic);
 
                     BlockHitResult hit = new BlockHitResult(trace.getPos(), side, pos.offset(side), false);
                     ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, hit));
 
-                    mc.player.world = worldClient;
+                    ((IMixinEntity) mc.player).litematica_setWorld(worldClient);
 
                     stateNew = ((BlockItem) stack.getItem()).getBlock().getPlacementState(ctx);
                 }

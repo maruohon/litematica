@@ -3,8 +3,11 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListBase.SortCriteria;
@@ -177,7 +180,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void render(int mouseX, int mouseY, boolean selected, DrawContext drawContext)
     {
         // Draw a lighter background for the hovered and the selected entry
         if (this.header1 == null && (selected || this.isMouseOver(mouseX, mouseY)))
@@ -205,10 +208,10 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         {
             if (this.listWidget.getSearchBarWidget().isSearchOpen() == false)
             {
-                this.drawString(x1, y, color, this.header1, matrixStack);
-                this.drawString(x2, y, color, this.header2, matrixStack);
-                this.drawString(x3, y, color, this.header3, matrixStack);
-                this.drawString(x4, y, color, this.header4, matrixStack);
+                this.drawString(x1, y, color, this.header1, drawContext);
+                this.drawString(x2, y, color, this.header2, drawContext);
+                this.drawString(x3, y, color, this.header3, drawContext);
+                this.drawString(x4, y, color, this.header4, drawContext);
 
                 this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
             }
@@ -223,40 +226,41 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             String gold = GuiBase.TXT_GOLD;
             String red = GuiBase.TXT_RED;
             String pre;
-            this.drawString(x1 + 20, y, color, this.entry.getStack().getName().getString(), matrixStack);
+            this.drawString(x1 + 20, y, color, this.entry.getStack().getName().getString(), drawContext);
 
-            this.drawString(x2, y, color, String.valueOf(countTotal), matrixStack);
+            this.drawString(x2, y, color, String.valueOf(countTotal), drawContext);
 
             pre = countMissing == 0 ? green : (countAvailable >= countMissing ? gold : red);
-            this.drawString(x3, y, color, pre + String.valueOf(countMissing), matrixStack);
+            this.drawString(x3, y, color, pre + String.valueOf(countMissing), drawContext);
 
             pre = countAvailable >= countMissing ? green : red;
-            this.drawString(x4, y, color, pre + String.valueOf(countAvailable), matrixStack);
+            this.drawString(x4, y, color, pre + String.valueOf(countAvailable), drawContext);
 
-            matrixStack.push();
+            drawContext.getMatrices().push();
             //TODO: RenderSystem.disableLighting();
             RenderUtils.enableDiffuseLightingGui3D();
 
             //mc.getRenderItem().zLevel -= 110;
             y = this.y + 3;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
-            this.mc.getItemRenderer().renderInGui(matrixStack, this.entry.getStack(), x1, y);
+            drawContext.drawItem(this.entry.getStack(), x1, y);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
             //mc.getRenderItem().zLevel += 110;
 
             RenderSystem.disableBlend();
             RenderUtils.disableDiffuseLighting();
-            matrixStack.pop();
+            drawContext.getMatrices().pop();
 
-            super.render(mouseX, mouseY, selected, matrixStack);
+            super.render(mouseX, mouseY, selected, drawContext);
         }
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, DrawContext drawContext)
     {
         if (this.entry != null)
         {
+            MatrixStack matrixStack = drawContext.getMatrices();
             matrixStack.push();
             matrixStack.translate(0, 0, 200);
 
@@ -292,16 +296,16 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int y1 = y;
             y += 4;
 
-            this.drawString(x1     , y, 0xFFFFFFFF, header1  , matrixStack);
-            this.drawString(x2 + 20, y, 0xFFFFFFFF, stackName, matrixStack);
+            this.drawString(x1     , y, 0xFFFFFFFF, header1  , drawContext);
+            this.drawString(x2 + 20, y, 0xFFFFFFFF, stackName, drawContext);
             y += 16;
 
-            this.drawString(x1, y, 0xFFFFFFFF, header2      , matrixStack);
-            this.drawString(x2, y, 0xFFFFFFFF, strCountTotal, matrixStack);
+            this.drawString(x1, y, 0xFFFFFFFF, header2      , drawContext);
+            this.drawString(x2, y, 0xFFFFFFFF, strCountTotal, drawContext);
             y += 16;
 
-            this.drawString(x1, y, 0xFFFFFFFF, header3        , matrixStack);
-            this.drawString(x2, y, 0xFFFFFFFF, strCountMissing, matrixStack);
+            this.drawString(x1, y, 0xFFFFFFFF, header3        , drawContext);
+            this.drawString(x2, y, 0xFFFFFFFF, strCountMissing, drawContext);
 
             RenderUtils.drawRect(x2, y1, 16, 16, 0x20FFFFFF); // light background for the item
 
@@ -309,7 +313,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             RenderUtils.enableDiffuseLightingGui3D();
 
             //mc.getRenderItem().zLevel += 100;
-            this.mc.getItemRenderer().renderInGui(matrixStack, stack, x2, y1);
+            drawContext.drawItem(stack, x2, y1);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
             //RenderSystem.disableBlend();

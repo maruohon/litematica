@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
+
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -29,7 +30,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void render(int mouseX, int mouseY, boolean selected, DrawContext drawContext)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -49,9 +50,9 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         }
 
         String name = this.getEntry().getDisplayName();
-        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name, matrixStack);
+        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name, drawContext);
 
-        this.drawSubWidgets(mouseX, mouseY, matrixStack);
+        this.drawSubWidgets(mouseX, mouseY, drawContext);
     }
 
     private static class ButtonListener implements IButtonActionListener

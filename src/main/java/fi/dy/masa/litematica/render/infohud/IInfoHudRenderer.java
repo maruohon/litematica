@@ -1,8 +1,10 @@
 package fi.dy.masa.litematica.render.infohud;
 
 import java.util.List;
+
+import net.minecraft.client.gui.DrawContext;
+
 import fi.dy.masa.malilib.config.HudAlignment;
-import net.minecraft.client.util.math.MatrixStack;
 
 public interface IInfoHudRenderer
 {
@@ -42,7 +44,7 @@ public interface IInfoHudRenderer
      * @param alignment the screen position to render at
      * @return the required y height used up for the rendered content
      */
-    default int render(int xOffset, int yOffset, HudAlignment alignment, MatrixStack matrixStack)
+    default int render(int xOffset, int yOffset, HudAlignment alignment, DrawContext drawContext)
     {
         return 0;
     }

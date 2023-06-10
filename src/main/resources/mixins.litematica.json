@@ -5,6 +5,7 @@
 	"minVersion": "0.8",
 	"client": [
 		"IMixinChunkDeltaUpdateS2CPacket",
+		"IMixinEntity",
 		"IMixinFenceGateBlock",
 		"IMixinHandledScreen",
 		"IMixinRedstoneWireBlock",

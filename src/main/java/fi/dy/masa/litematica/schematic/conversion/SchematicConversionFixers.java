@@ -31,7 +31,6 @@ import net.minecraft.block.WallBannerBlock;
 import net.minecraft.block.WallSkullBlock;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.block.enums.Instrument;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.property.BooleanProperty;
@@ -40,11 +39,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
-import fi.dy.masa.malilib.util.Constants;
+
 import fi.dy.masa.litematica.mixin.IMixinFenceGateBlock;
 import fi.dy.masa.litematica.mixin.IMixinRedstoneWireBlock;
 import fi.dy.masa.litematica.mixin.IMixinStairsBlock;
 import fi.dy.masa.litematica.mixin.IMixinVineBlock;
+import fi.dy.masa.malilib.util.Constants;
 
 public class SchematicConversionFixers
 {
@@ -316,7 +316,7 @@ public class SchematicConversionFixers
             state = state
                         .with(NoteBlock.POWERED, tag.getBoolean("powered"))
                         .with(NoteBlock.NOTE, MathHelper.clamp(tag.getByte("note"), 0, 24))
-                        .with(NoteBlock.INSTRUMENT, Instrument.fromBelowState(reader.getBlockState(pos.down())));
+                        .with(NoteBlock.INSTRUMENT, reader.getBlockState(pos.down()).getInstrument());
         }
 
         return state;

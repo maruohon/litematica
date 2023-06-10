@@ -8,12 +8,13 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import net.minecraft.client.gui.DrawableHelper;
+
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
+
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicBrowserBase;
@@ -73,12 +74,12 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected void drawAdditionalContents(int mouseX, int mouseY, MatrixStack matrixStack)
+    protected void drawAdditionalContents(int mouseX, int mouseY, DrawContext drawContext)
     {
-        this.drawSelectedSchematicInfo(this.getLastSelectedEntry(), matrixStack);
+        this.drawSelectedSchematicInfo(this.getLastSelectedEntry(), drawContext);
     }
 
-    protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry, MatrixStack matrixStack)
+    protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry, DrawContext drawContext)
     {
         int x = this.posX + this.totalWidth - this.infoWidth;
         int y = this.posY;
@@ -103,62 +104,62 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             int valueColor = 0xFFFFFFFF;
 
             String str = StringUtils.translate("litematica.gui.label.schematic_info.name");
-            this.drawString(matrixStack, str, x, y, textColor);
+            this.drawString(drawContext, str, x, y, textColor);
             y += 12;
 
-            this.drawString(matrixStack, meta.getName(), x + 4, y, valueColor);
+            this.drawString(drawContext, meta.getName(), x + 4, y, valueColor);
             y += 12;
 
             str = StringUtils.translate("litematica.gui.label.schematic_info.schematic_author", meta.getAuthor());
-            this.drawString(matrixStack, str, x, y, textColor);
+            this.drawString(drawContext, str, x, y, textColor);
             y += 12;
 
             String strDate = DATE_FORMAT.format(new Date(meta.getTimeCreated()));
             str = StringUtils.translate("litematica.gui.label.schematic_info.time_created", strDate);
-            this.drawString(matrixStack, str, x, y, textColor);
+            this.drawString(drawContext, str, x, y, textColor);
             y += 12;
 
             if (meta.hasBeenModified())
             {
                 strDate = DATE_FORMAT.format(new Date(meta.getTimeModified()));
                 str = StringUtils.translate("litematica.gui.label.schematic_info.time_modified", strDate);
-                this.drawString(matrixStack, str, x, y, textColor);
+                this.drawString(drawContext, str, x, y, textColor);
                 y += 12;
             }
 
             str = StringUtils.translate("litematica.gui.label.schematic_info.region_count", meta.getRegionCount());
-            this.drawString(matrixStack, str, x, y, textColor);
+            this.drawString(drawContext, str, x, y, textColor);
             y += 12;
 
             if (this.parent.height >= 340)
             {
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_volume", meta.getTotalVolume());
-                this.drawString(matrixStack, str, x, y, textColor);
+                this.drawString(drawContext, str, x, y, textColor);
                 y += 12;
 
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_blocks", meta.getTotalBlocks());
-                this.drawString(matrixStack, str, x, y, textColor);
+                this.drawString(drawContext, str, x, y, textColor);
                 y += 12;
 
                 str = StringUtils.translate("litematica.gui.label.schematic_info.enclosing_size");
-                this.drawString(matrixStack, str, x, y, textColor);
+                this.drawString(drawContext, str, x, y, textColor);
                 y += 12;
 
                 Vec3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
-                this.drawString(matrixStack, tmp, x + 4, y, valueColor);
+                this.drawString(drawContext, tmp, x + 4, y, valueColor);
                 y += 12;
             }
             else
             {
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_blocks_and_volume", meta.getTotalBlocks(), meta.getTotalVolume());
-                this.drawString(matrixStack, str, x, y, textColor);
+                this.drawString(drawContext, str, x, y, textColor);
                 y += 12;
 
                 Vec3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
                 str = StringUtils.translate("litematica.gui.label.schematic_info.enclosing_size_value", tmp);
-                this.drawString(matrixStack, str, x, y, textColor);
+                this.drawString(drawContext, str, x, y, textColor);
                 y += 12;
             }
 
@@ -186,8 +187,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
                 RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
-                this.bindTexture(pair.getLeft());
-                DrawableHelper.drawTexture(matrixStack, x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+                drawContext.drawTexture(pair.getLeft(), x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
     }
