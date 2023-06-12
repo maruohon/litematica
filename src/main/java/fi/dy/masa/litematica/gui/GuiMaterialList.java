@@ -1,20 +1,11 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
-import fi.dy.masa.litematica.materials.MaterialCache;
-import fi.dy.masa.litematica.materials.MaterialListAreaAnalyzer;
-import fi.dy.masa.litematica.materials.MaterialListBase;
-import fi.dy.masa.litematica.materials.MaterialListEntry;
-import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
-import fi.dy.masa.litematica.materials.MaterialListSorter;
-import fi.dy.masa.litematica.materials.MaterialListUtils;
+import fi.dy.masa.litematica.materials.*;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.data.DataDump;
@@ -32,6 +23,9 @@ import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
                              implements ICompletionListener
@@ -128,7 +122,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         long missing = this.materialList.getCountMissing() - this.materialList.getCountMismatched();
         long mismatch = this.materialList.getCountMismatched();
 
-        if (total != 0 && (this.materialList instanceof MaterialListAreaAnalyzer) == false)
+        if (total != 0 && !(this.materialList instanceof MaterialListAreaAnalyzer))
         {
             double pctDone = ((double) (total - (missing + mismatch)) / (double) total) * 100;
             double pctMissing = ((double) missing / (double) total) * 100;
@@ -157,7 +151,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     private int createButton(int x, int y, int width, ButtonListener.Type type)
     {
         ButtonListener listener = new ButtonListener(type, this);
-        String label = "";
+        String label;
 
         if (type == ButtonListener.Type.LIST_TYPE)
         {
@@ -246,61 +240,43 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         {
             MaterialListBase materialList = this.parent.materialList;
 
-            switch (this.type)
-            {
-                case REFRESH_LIST:
-                    materialList.reCreateMaterialList();
-                    break;
-
-                case LIST_TYPE:
+            switch (this.type) {
+                case REFRESH_LIST -> materialList.reCreateMaterialList();
+                case LIST_TYPE -> {
                     BlockInfoListType type = materialList.getMaterialListType();
                     materialList.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
                     materialList.reCreateMaterialList();
-                    break;
-
-                case HIDE_AVAILABLE:
-                    materialList.setHideAvailable(! materialList.getHideAvailable());
+                }
+                case HIDE_AVAILABLE -> {
+                    materialList.setHideAvailable(!materialList.getHideAvailable());
                     materialList.refreshPreFilteredList();
                     materialList.recreateFilteredList();
-                    break;
-
-                case TOGGLE_INFO_HUD:
+                }
+                case TOGGLE_INFO_HUD -> {
                     MaterialListHudRenderer renderer = materialList.getHudRenderer();
                     renderer.toggleShouldRender();
-
-                    if (materialList.getHudRenderer().getShouldRenderCustom())
-                    {
+                    if (materialList.getHudRenderer().getShouldRenderCustom()) {
                         InfoHud.getInstance().addInfoHudRenderer(renderer, true);
-                    }
-                    else
-                    {
+                    } else {
                         InfoHud.getInstance().removeInfoHudRenderersOfType(renderer.getClass(), true);
                     }
-
-                    break;
-
-                case CLEAR_IGNORED:
-                    materialList.clearIgnored();
-                    break;
-
-                case CLEAR_CACHE:
+                }
+                case CLEAR_IGNORED -> materialList.clearIgnored();
+                case CLEAR_CACHE -> {
                     MaterialCache.getInstance().clearCache();
                     this.parent.addMessage(MessageType.SUCCESS, 3000, "litematica.message.material_list.material_cache_cleared");
-                    break;
-
-                case WRITE_TO_FILE:
+                }
+                case WRITE_TO_FILE -> {
                     File dir = new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
                     boolean csv = GuiBase.isShiftDown();
                     String ext = csv ? ".csv" : ".txt";
                     File file = DataDump.dumpDataToFile(dir, "material_list", ext, this.getMaterialListDump(materialList, csv).getLines());
-
-                    if (file != null)
-                    {
+                    if (file != null) {
                         String key = "litematica.message.material_list_written_to_file";
                         this.parent.addMessage(MessageType.SUCCESS, key, file.getName());
                         StringUtils.sendOpenFileChatMessage(this.parent.mc.player, key, file);
                     }
-                    break;
+                }
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
@@ -311,9 +287,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             DataDump dump = new DataDump(4, csv ? DataDump.Format.CSV : DataDump.Format.ASCII);
             int multiplier = materialList.getMultiplier();
 
-            ArrayList<MaterialListEntry> list = new ArrayList<>();
-            list.addAll(materialList.getMaterialsFiltered(false));
-            Collections.sort(list, new MaterialListSorter(materialList));
+            ArrayList<MaterialListEntry> list = new ArrayList<>(materialList.getMaterialsFiltered(false));
+            list.sort(new MaterialListSorter(materialList));
 
             for (MaterialListEntry entry : list)
             {
@@ -347,7 +322,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
             private final String translationKey;
 
-            private Type(String translationKey)
+            Type(String translationKey)
             {
                 this.translationKey = translationKey;
             }
