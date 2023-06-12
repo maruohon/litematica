@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import net.minecraft.client.util.math.MatrixStack;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -9,6 +8,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.gui.DrawContext;
 
 public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
 {
@@ -29,7 +29,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void render(int mouseX, int mouseY, boolean selected, DrawContext context)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -49,41 +49,29 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         }
 
         String name = this.getEntry().getDisplayName();
-        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name, matrixStack);
+        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name, context);
 
-        this.drawSubWidgets(mouseX, mouseY, matrixStack);
+        this.drawSubWidgets(mouseX, mouseY, context);
     }
 
-    private static class ButtonListener implements IButtonActionListener
-    {
-        private final Type type;
-        private final WidgetTaskEntry widget;
-
-        public ButtonListener(Type type, WidgetTaskEntry widget)
-        {
-            this.type = type;
-            this.widget = widget;
-        }
+    private record ButtonListener(WidgetTaskEntry.ButtonListener.Type type,
+                                  WidgetTaskEntry widget) implements IButtonActionListener {
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
-        {
-            if (this.type == Type.REMOVE)
-            {
-                ITask task = this.widget.getEntry();
+            public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
+                if (this.type == Type.REMOVE) {
+                    ITask task = this.widget.getEntry();
 
-                if (TaskScheduler.getInstanceClient().removeTask(task) == false)
-                {
-                    TaskScheduler.getInstanceServer().removeTask(task);
+                    if (!TaskScheduler.getInstanceClient().removeTask(task)) {
+                        TaskScheduler.getInstanceServer().removeTask(task);
+                    }
+
+                    this.widget.parent.refreshEntries();
                 }
+            }
 
-                this.widget.parent.refreshEntries();
+            public enum Type {
+                REMOVE
             }
         }
-
-        public enum Type
-        {
-            REMOVE;
-        }
-    }
 }

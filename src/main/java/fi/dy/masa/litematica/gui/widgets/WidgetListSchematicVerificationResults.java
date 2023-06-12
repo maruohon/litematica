@@ -1,11 +1,5 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
@@ -17,6 +11,12 @@ import fi.dy.masa.malilib.util.ItemType;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WidgetListSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
 {
@@ -37,9 +37,9 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
     }
 
     @Override
-    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void drawContents(DrawContext context, int mouseX, int mouseY, float partialTicks)
     {
-        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
+        super.drawContents(context, mouseX, mouseY, partialTicks);
         lastScrollbarPosition = this.scrollBar.getValue();
     }
 
@@ -98,7 +98,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
 
         this.reCreateListEntryWidgets();
 
-        if (this.scrollbarRestored == false && lastScrollbarPosition <= this.scrollBar.getMaxValue())
+        if (!this.scrollbarRestored && lastScrollbarPosition <= this.scrollBar.getMaxValue())
         {
             // This needs to happen after the setMaxValue() has been called in reCreateListEntryWidgets()
             this.scrollBar.setValue(lastScrollbarPosition);
@@ -129,7 +129,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
                 ItemStack stack = ItemUtils.getItemForState(state);
                 ItemType itemType = new ItemType(stack, true, false);
 
-                if (itemCounts.containsKey(itemType) == false)
+                if (!itemCounts.containsKey(itemType))
                 {
                     states.put(itemType, state);
                 }
@@ -151,7 +151,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
             list = this.guiSchematicVerifier.getPlacement().getSchematicVerifier().getMismatchOverviewFor(type);
         }
 
-        Collections.sort(list, this.sorter);
+        list.sort(this.sorter);
 
         for (BlockMismatch mismatch : list)
         {

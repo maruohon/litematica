@@ -1,20 +1,21 @@
 package fi.dy.masa.litematica.render.infohud;
 
-import java.util.List;
 import fi.dy.masa.malilib.config.HudAlignment;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
+
+import java.util.List;
 
 public interface IInfoHudRenderer
 {
     /**
      * Return true if this renderer should render its text in the indicated phase
-     * @return
+     * @return boolean
      */
     boolean getShouldRenderText(RenderPhase phase);
 
     /**
      * Return true if this renderer should render its custom content via render()
-     * @return
+     * @return boolean
      */
     default boolean getShouldRenderCustom()
     {
@@ -22,8 +23,8 @@ public interface IInfoHudRenderer
     }
 
     /**
-     * Whether or not this renderer should also be rendered when GUIs are open
-     * @return
+     * Whether this renderer should also be rendered when GUIs are open
+     * @return boolean
      */
     default boolean shouldRenderInGuis()
     {
@@ -32,7 +33,7 @@ public interface IInfoHudRenderer
 
     /**
      * Returns the text lines rendered by the InfoHud, if any
-     * @return
+     * @return boolean
      */
     List<String> getText(RenderPhase phase);
 
@@ -42,7 +43,7 @@ public interface IInfoHudRenderer
      * @param alignment the screen position to render at
      * @return the required y height used up for the rendered content
      */
-    default int render(int xOffset, int yOffset, HudAlignment alignment, MatrixStack matrixStack)
+    default int render(int xOffset, int yOffset, HudAlignment alignment, DrawContext context)
     {
         return 0;
     }

@@ -1,27 +1,7 @@
 package fi.dy.masa.litematica.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -34,6 +14,27 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.LayerRange;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class RayTraceUtils
 {
@@ -84,7 +85,7 @@ public class RayTraceUtils
 
         clearTraceVars();
 
-        if (DataManager.getToolMode().getUsesSchematic() == false && area != null)
+        if (!DataManager.getToolMode().getUsesSchematic() && area != null)
         {
             for (Box box : area.getAllSubRegionBoxes())
             {
@@ -92,7 +93,7 @@ public class RayTraceUtils
                 hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_1, eyesPos, lookEndPos);
                 hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_2, eyesPos, lookEndPos);
 
-                if (hitCorner == false)
+                if (!hitCorner)
                 {
                     traceToSelectionBoxBody(box, eyesPos, lookEndPos);
                 }
@@ -118,26 +119,20 @@ public class RayTraceUtils
             }
         }
 
-        double closestDistance = closestVanilla;
-
         if (closestBoxDistance >= 0 && (closestVanilla < 0 || closestBoxDistance <= closestVanilla))
         {
-            closestDistance = closestBoxDistance;
             wrapper = closestBox;
         }
 
         // Corners are preferred over box body hits, thus this being after the box check
         if (closestCornerDistance >= 0 && (closestVanilla < 0 || closestCornerDistance <= closestVanilla))
         {
-            closestDistance = closestCornerDistance;
             wrapper = closestCorner;
         }
 
         // Origins are preferred over everything else
         if (closestOriginDistance >= 0 && (closestVanilla < 0 || closestOriginDistance <= closestVanilla))
         {
-            closestDistance = closestOriginDistance;
-
             if (originType == HitType.PLACEMENT_ORIGIN)
             {
                 wrapper = closestOrigin;
@@ -150,7 +145,7 @@ public class RayTraceUtils
 
         clearTraceVars();
 
-        if (wrapper == null || closestDistance < 0)
+        if (wrapper == null)
         {
             wrapper = new RayTraceWrapper();
         }
@@ -194,7 +189,7 @@ public class RayTraceUtils
         return false;
     }
 
-    private static boolean traceToSelectionBoxBody(Box box, Vec3d start, Vec3d end)
+    private static void traceToSelectionBoxBody(Box box, Vec3d start, Vec3d end)
     {
         if (box.getPos1() != null && box.getPos2() != null)
         {
@@ -211,14 +206,12 @@ public class RayTraceUtils
                     closestBox = new RayTraceWrapper(box, Corner.NONE, optional.get());
                 }
 
-                return true;
             }
         }
 
-        return false;
     }
 
-    private static boolean traceToPlacementBox(SchematicPlacement placement, Vec3d start, Vec3d end)
+    private static void traceToPlacementBox(SchematicPlacement placement, Vec3d start, Vec3d end)
     {
         ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
         boolean hitSomething = false;
@@ -241,16 +234,14 @@ public class RayTraceUtils
                     {
                         closestBoxDistance = dist;
                         closestBox = new RayTraceWrapper(placement, optional.get(), boxName);
-                        hitSomething = true;
                     }
                 }
             }
         }
 
-        return hitSomething;
     }
 
-    private static boolean traceToOrigin(BlockPos pos, Vec3d start, Vec3d end, HitType type, @Nullable SchematicPlacement placement)
+    private static void traceToOrigin(BlockPos pos, Vec3d start, Vec3d end, HitType type, @Nullable SchematicPlacement placement)
     {
         if (pos != null)
         {
@@ -271,12 +262,10 @@ public class RayTraceUtils
                         closestOrigin = new RayTraceWrapper(placement, optional.get(), null);
                     }
 
-                    return true;
                 }
             }
         }
 
-        return false;
     }
 
     /**
@@ -330,7 +319,7 @@ public class RayTraceUtils
         boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
 
         if (respectRenderRange &&
-            (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false ||
+            (!Configs.Visuals.ENABLE_RENDERING.getBooleanValue() ||
              Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == invert))
         {
             return null;
@@ -373,15 +362,12 @@ public class RayTraceUtils
         {
             double dist = eyesPos.squaredDistanceTo(traceSchematic.getPos());
 
-            if (distClosest < 0 || dist < distClosest)
-            {
-                trace = traceSchematic;
-                distClosest = eyesPos.squaredDistanceTo(traceSchematic.getPos());
-                type = HitType.SCHEMATIC_BLOCK;
-            }
+            trace = traceSchematic;
+            distClosest = eyesPos.squaredDistanceTo(traceSchematic.getPos());
+            type = HitType.SCHEMATIC_BLOCK;
         }
 
-        if (traceClient != null && traceClient.getType() == HitResult.Type.BLOCK)
+        if (traceClient.getType() == HitResult.Type.BLOCK)
         {
             double dist = eyesPos.squaredDistanceTo(traceClient.getPos());
 
@@ -469,7 +455,7 @@ public class RayTraceUtils
         BlockHitResult furthestTrace = null;
         double furthestDist = -1.0;
 
-        if (list.isEmpty() == false)
+        if (!list.isEmpty())
         {
             for (BlockHitResult trace : list)
             {
@@ -477,7 +463,7 @@ public class RayTraceUtils
 
                 if ((furthestDist < 0 || dist > furthestDist) &&
                     (dist < closestVanilla || closestVanilla < 0) &&
-                    trace.getBlockPos().equals(closestVanillaPos) == false)
+                        !trace.getBlockPos().equals(closestVanillaPos))
                 {
                     furthestDist = dist;
                     furthestTrace = trace;
@@ -503,7 +489,7 @@ public class RayTraceUtils
             LayerRange layerRange = DataManager.getRenderLayerRange();
 
             if (layerRange.isPositionWithinRange(pos) &&
-                worldSchematic.getBlockState(pos).isAir() == false &&
+                    !worldSchematic.getBlockState(pos).isAir() &&
                 worldClient.getBlockState(pos).isAir())
             {
                 return pos;
@@ -539,7 +525,7 @@ public class RayTraceUtils
         BlockHitResult furthestTrace = null;
         double furthestDist = -1.0;
 
-        if (list.isEmpty() == false)
+        if (!list.isEmpty())
         {
             for (BlockHitResult trace : list)
             {
@@ -547,7 +533,7 @@ public class RayTraceUtils
 
                 if ((furthestDist < 0 || dist > furthestDist) &&
                     (dist < closestVanilla || closestVanilla < 0) &&
-                    trace.getBlockPos().equals(closestVanillaPos) == false)
+                        !trace.getBlockPos().equals(closestVanillaPos))
                 {
                     furthestDist = dist;
                     furthestTrace = trace;
@@ -580,17 +566,13 @@ public class RayTraceUtils
         Entity targetEntity = null;
         Optional<Vec3d> optional = Optional.empty();
 
-        for (int i = 0; i < list.size(); i++)
-        {
-            Entity entityTmp = list.get(i);
+        for (Entity entityTmp : list) {
             Optional<Vec3d> optionalTmp = entityTmp.getBoundingBox().raycast(eyesPos, lookEndPos);
 
-            if (optionalTmp.isPresent())
-            {
+            if (optionalTmp.isPresent()) {
                 double distance = eyesPos.distanceTo(optionalTmp.get());
 
-                if (distance <= closest)
-                {
+                if (distance <= closest) {
                     targetEntity = entityTmp;
                     optional = optionalTmp;
                     closest = distance;
@@ -663,8 +645,8 @@ public class RayTraceUtils
             boolean ignoreBlockWithoutBoundingBox,
             boolean returnLastUncollidableBlock, boolean respectLayerRange)
     {
-        if ((respectLayerRange == false || data.range.isPositionWithinRange(data.x, data.y, data.z)) &&
-            (ignoreBlockWithoutBoundingBox == false || blockState.getCollisionShape(world, data.blockPos).isEmpty() == false))
+        if ((!respectLayerRange || data.range.isPositionWithinRange(data.x, data.y, data.z)) &&
+            (!ignoreBlockWithoutBoundingBox || !blockState.getCollisionShape(world, data.blockPos).isEmpty()))
         {
             VoxelShape blockShape = blockState.getOutlineShape(world, data.blockPos);
             boolean blockCollidable = ! blockShape.isEmpty();
@@ -684,31 +666,27 @@ public class RayTraceUtils
                     trace = fluidState.getShape(world, data.blockPos).raycast(data.start, data.end, data.blockPos);
                 }
 
-                if (trace != null)
-                {
-                    return trace;
-                }
+                return trace;
             }
         }
 
         return null;
     }
 
-    @Nullable
     private static boolean traceLoopSteps(RayTraceCalcsData data,
             World world, BlockState blockState, FluidState fluidState,
             boolean ignoreBlockWithoutBoundingBox,
             boolean returnLastUncollidableBlock, boolean respectLayerRange)
     {
-        if ((respectLayerRange == false || data.range.isPositionWithinRange(data.x, data.y, data.z)) &&
-            (ignoreBlockWithoutBoundingBox == false || blockState.getMaterial() == Material.PORTAL ||
-             blockState.getCollisionShape(world, data.blockPos).isEmpty() == false))
+        if ((!respectLayerRange || data.range.isPositionWithinRange(data.x, data.y, data.z)) &&
+            (!ignoreBlockWithoutBoundingBox || blockState.getBlock() == Blocks.NETHER_PORTAL ||
+                    !blockState.getCollisionShape(world, data.blockPos).isEmpty()))
         {
             VoxelShape blockShape = blockState.getOutlineShape(world, data.blockPos);
             boolean blockCollidable = ! blockShape.isEmpty();
             boolean fluidCollidable = data.fluidMode.handled(fluidState);
 
-            if (blockCollidable == false && fluidCollidable == false)
+            if (!blockCollidable && !fluidCollidable)
             {
                 Vec3d pos = new Vec3d(data.currentX, data.currentY, data.currentZ);
                 data.trace = BlockHitResult.createMissed(pos, data.facing, data.blockPos);
@@ -803,7 +781,7 @@ public class RayTraceUtils
 
         if (data.x == data.xEnd && data.y == data.yEnd && data.z == data.zEnd)
         {
-            if (returnLastNonCollidableBlock == false)
+            if (!returnLastNonCollidableBlock)
             {
                 data.trace = null;
             }
@@ -991,7 +969,7 @@ public class RayTraceUtils
             this.traceEntity = trace;
         }
 
-        public RayTraceWrapper(Box box, Corner corner, Vec3d hitVec)
+        public RayTraceWrapper(@org.jetbrains.annotations.Nullable Box box, Corner corner, Vec3d hitVec)
         {
             this.type = corner == Corner.NONE ? HitType.SELECTION_BOX_BODY : HitType.SELECTION_BOX_CORNER;
             this.corner = corner;
@@ -999,7 +977,7 @@ public class RayTraceUtils
             this.box = box;
         }
 
-        public RayTraceWrapper(SchematicPlacement placement, Vec3d hitVec, @Nullable String regionName)
+        public RayTraceWrapper(@org.jetbrains.annotations.Nullable SchematicPlacement placement, Vec3d hitVec, @Nullable String regionName)
         {
             this.type = regionName != null ? HitType.PLACEMENT_SUBREGION : HitType.PLACEMENT_ORIGIN;
             this.hitVec = hitVec;
@@ -1064,7 +1042,7 @@ public class RayTraceUtils
             PLACEMENT_ORIGIN,
             SCHEMATIC_BLOCK,
             SCHEMATIC_ENTITY,
-            MISMATCH_OVERLAY;
+            MISMATCH_OVERLAY
         }
     }
 }

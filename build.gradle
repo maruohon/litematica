@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.1-SNAPSHOT'
+	id 'fabric-loom' version '1.2-SNAPSHOT'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -56,5 +56,9 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 
 	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+	it.options.release.set(17)
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/litematica.accesswidener")
 }

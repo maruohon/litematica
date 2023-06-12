@@ -1,7 +1,5 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.Collection;
-import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
 import fi.dy.masa.litematica.gui.Icons;
@@ -14,8 +12,11 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Collection;
+import java.util.List;
 
 public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion, WidgetSchematicVersion>
 {
@@ -34,17 +35,17 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
     }
 
     @Override
-    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void drawContents(DrawContext context, int mouseX, int mouseY, float partialTicks)
     {
         // Draw an outline around the entire entry list
         RenderUtils.drawOutlinedBox(this.posX, this.posY, this.browserWidth, this.browserHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
 
-        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
+        super.drawContents(context, mouseX, mouseY, partialTicks);
 
-        this.drawAdditionalContents(mouseX, mouseY, matrixStack);
+        this.drawAdditionalContents(mouseX, mouseY, context);
     }
 
-    protected void drawAdditionalContents(int mouseX, int mouseY, MatrixStack matrixStack)
+    protected void drawAdditionalContents(int mouseX, int mouseY, DrawContext context)
     {
         int x = this.posX + this.totalWidth - this.infoWidth + 4;
         int y = this.posY + 4;
@@ -57,14 +58,14 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
         RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
         str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
-        this.drawString(matrixStack, str, x, y, color);
+        this.drawString(context, str, x, y, color);
         y += 12;
-        this.drawString(matrixStack, w + this.project.getName() + r, x + 4, y, color);
+        this.drawString(context, w + this.project.getName() + r, x + 4, y, color);
         y += 12;
         int versionId = this.project.getCurrentVersionId();
         String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
         str = StringUtils.translate("litematica.gui.label.schematic_projects.version", strVer, w + this.project.getVersionCount() + r);
-        this.drawString(matrixStack, str, x, y, color);
+        this.drawString(context, str, x, y, color);
         y += 12;
         SchematicVersion version = this.project.getCurrentVersion();
 
@@ -73,21 +74,21 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
             ToolHud.DATE.setTime(version.getTimeStamp());
             str = ToolHud.SIMPLE_DATE_FORMAT.format(ToolHud.DATE);
             str = StringUtils.translate("litematica.hud.schematic_projects.current_version_date", w + str + r);
-            this.drawString(matrixStack, str, x, y, color);
+            this.drawString(context, str, x, y, color);
             y += 12;
 
             str = StringUtils.translate("litematica.gui.label.schematic_projects.version_name");
-            this.drawString(matrixStack, str, x, y, color);
+            this.drawString(context, str, x, y, color);
             y += 12;
-            this.drawString(matrixStack, w + version.getName() + r, x + 4, y, color);
+            this.drawString(context, w + version.getName() + r, x + 4, y, color);
             y += 12;
             str = StringUtils.translate("litematica.gui.label.schematic_projects.origin");
-            this.drawString(matrixStack, str, x, y, color);
+            this.drawString(context, str, x, y, color);
             y += 12;
 
             BlockPos o = this.project.getOrigin();
             str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
-            this.drawString(matrixStack, str, x, y, color);
+            this.drawString(context, str, x, y, color);
         }
     }
 

@@ -1,14 +1,17 @@
 package fi.dy.masa.litematica.util;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
-
+import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.NBTUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -19,24 +22,16 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.tick.OrderedTick;
 import net.minecraft.world.tick.WorldTickScheduler;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.litematica.Litematica;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.malilib.util.NBTUtils;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SchematicPlacingUtils
 {
@@ -53,7 +48,7 @@ public class SchematicPlacingUtils
 
         try
         {
-            if (notifyNeighbors == false)
+            if (!notifyNeighbors)
             {
                 WorldUtils.setShouldPreventBlockUpdates(world, true);
             }
@@ -76,9 +71,9 @@ public class SchematicPlacingUtils
                     Map<BlockPos, OrderedTick<Block>> scheduledBlockTicks = schematic.getScheduledBlockTicksForRegion(regionName);
                     Map<BlockPos, OrderedTick<Fluid>> scheduledFluidTicks = schematic.getScheduledFluidTicksForRegion(regionName);
 
-                    if (placeBlocksWithinChunk(world, chunkPos, regionName, container, blockEntityMap,
-                                               origin, schematicPlacement, placement, scheduledBlockTicks,
-                                               scheduledFluidTicks, replace, notifyNeighbors) == false)
+                    if (!placeBlocksWithinChunk(world, chunkPos, regionName, container, blockEntityMap,
+                            origin, schematicPlacement, placement, scheduledBlockTicks,
+                            scheduledFluidTicks, replace, notifyNeighbors))
                     {
                         allSuccess = false;
                         Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
@@ -86,8 +81,8 @@ public class SchematicPlacingUtils
 
                     List<EntityInfo> entityList = schematic.getEntityListForRegion(regionName);
 
-                    if (schematicPlacement.ignoreEntities() == false &&
-                        placement.ignoreEntities() == false && entityList != null)
+                    if (!schematicPlacement.ignoreEntities() &&
+                            !placement.ignoreEntities() && entityList != null)
                     {
                         placeEntitiesToWorldWithinChunk(world, chunkPos, entityList, origin, schematicPlacement, placement);
                     }
@@ -207,8 +202,8 @@ public class SchematicPlacingUtils
 
                     BlockState stateOld = world.getBlockState(pos);
 
-                    if ((replace == ReplaceBehavior.NONE && stateOld.getMaterial() != Material.AIR) ||
-                        (replace == ReplaceBehavior.WITH_NON_AIR && state.getMaterial() == Material.AIR))
+                    if ((replace == ReplaceBehavior.NONE && stateOld.isOf(Blocks.AIR)) ||
+                        (replace == ReplaceBehavior.WITH_NON_AIR && state.isOf(Blocks.AIR)))
                     {
                         continue;
                     }
@@ -268,7 +263,7 @@ public class SchematicPlacingUtils
         {
             IntBoundingBox box = new IntBoundingBox(startX, startY, startZ, endX, endY, endZ);
 
-            if (scheduledBlockTicks != null && scheduledBlockTicks.isEmpty() == false)
+            if (scheduledBlockTicks != null && !scheduledBlockTicks.isEmpty())
             {
                 WorldTickScheduler<Block> scheduler = serverWorld.getBlockTickScheduler();
 
@@ -294,7 +289,7 @@ public class SchematicPlacingUtils
                 }
             }
 
-            if (scheduledFluidTicks != null && scheduledFluidTicks.isEmpty() == false)
+            if (scheduledFluidTicks != null && !scheduledFluidTicks.isEmpty())
             {
                 WorldTickScheduler<Fluid> scheduler = serverWorld.getFluidTickScheduler();
 

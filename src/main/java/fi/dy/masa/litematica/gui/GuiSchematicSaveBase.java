@@ -1,7 +1,5 @@
 package fi.dy.masa.litematica.gui;
 
-import javax.annotation.Nullable;
-import net.minecraft.client.util.math.MatrixStack;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -14,6 +12,9 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.KeyCodes;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.gui.DrawContext;
+
+import javax.annotation.Nullable;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
@@ -90,7 +91,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         this.checkboxSaveFromSchematicWorld.setPosition(20 + this.checkboxVisibleOnly.getWidth(), y + 24);
         this.addWidget(this.checkboxSaveFromSchematicWorld);
 
-        x = this.createButton(x, y, ButtonType.SAVE);
+        this.createButton(x, y);
     }
 
     protected void setTextFieldText(String text)
@@ -105,27 +106,19 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         return this.textField.getText();
     }
 
-    protected abstract IButtonActionListener createButtonListener(ButtonType type);
+    protected abstract IButtonActionListener createButtonListener();
 
-    private int createButton(int x, int y, ButtonType type)
+    private void createButton(int x, int y)
     {
-        String label = StringUtils.translate(type.getLabelKey());
+        String label = StringUtils.translate(ButtonType.SAVE.getLabelKey());
         int width = this.getStringWidth(label) + 10;
 
         ButtonGeneric button;
 
-        if (type == ButtonType.SAVE)
-        {
-            button = new ButtonGeneric(x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
-        }
-        else
-        {
-            button = new ButtonGeneric(x, y, width, 20, label);
-        }
+        button = new ButtonGeneric(x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
 
-        this.addButton(button, this.createButtonListener(type));
+        this.addButton(button, this.createButtonListener());
 
-        return x + width + 4;
     }
 
     @Override
@@ -136,11 +129,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void drawContents(DrawContext context, int mouseX, int mouseY, float partialTicks)
     {
-        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
+        super.drawContents(context, mouseX, mouseY, partialTicks);
 
-        this.textField.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.textField.render(context, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -204,7 +197,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         private final String labelKey;
 
-        private ButtonType(String labelKey)
+        ButtonType(String labelKey)
         {
             this.labelKey = labelKey;
         }

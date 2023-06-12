@@ -1,14 +1,18 @@
 package fi.dy.masa.litematica.render;
 
-import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.LeftRight;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
@@ -19,14 +23,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.LocalRandom;
 import net.minecraft.world.World;
-import fi.dy.masa.malilib.gui.LeftRight;
-import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
-import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.litematica.util.BlockInfoAlignment;
-import fi.dy.masa.litematica.util.PositionUtils;
+
+import java.util.List;
 
 public class RenderUtils
 {
@@ -113,7 +111,7 @@ public class RenderUtils
     }
 
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
-            Color4f color1, Color4f color2, Color4f color3, MatrixStack matrices, MinecraftClient mc)
+            Color4f color1, Color4f color2, Color4f color3, MatrixStack matrixStack, MinecraftClient mc)
     {
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
@@ -469,9 +467,8 @@ public class RenderUtils
     {
         final int size = quads.size();
 
-        for (int i = 0; i < size; i++)
-        {
-            renderQuadOutlinesBatched(pos, buffer, color, quads.get(i).getVertexData());
+        for (BakedQuad quad : quads) {
+            renderQuadOutlinesBatched(pos, buffer, color, quad.getVertexData());
         }
     }
 
@@ -481,9 +478,9 @@ public class RenderUtils
         final int y = pos.getY();
         final int z = pos.getZ();
         final int vertexSize = vertexData.length / 4;
-        final float fx[] = new float[4];
-        final float fy[] = new float[4];
-        final float fz[] = new float[4];
+        final float[] fx = new float[4];
+        final float[] fy = new float[4];
+        final float[] fz = new float[4];
 
         for (int index = 0; index < 4; ++index)
         {
@@ -528,9 +525,8 @@ public class RenderUtils
     {
         final int size = quads.size();
 
-        for (int i = 0; i < size; i++)
-        {
-            renderModelQuadOverlayBatched(pos, buffer, color, quads.get(i).getVertexData());
+        for (BakedQuad quad : quads) {
+            renderModelQuadOverlayBatched(pos, buffer, color, quad.getVertexData());
         }
     }
 
@@ -564,49 +560,43 @@ public class RenderUtils
         double maxY = pos.getY() + expand + 1;
         double maxZ = pos.getZ() + expand + 1;
 
-        switch (side)
-        {
-            case DOWN:
+        switch (side) {
+            case DOWN -> {
                 buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case UP:
+            }
+            case UP -> {
                 buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case NORTH:
+            }
+            case NORTH -> {
                 buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case SOUTH:
+            }
+            case SOUTH -> {
                 buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case WEST:
+            }
+            case WEST -> {
                 buffer.vertex(minX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
-                break;
-
-            case EAST:
+            }
+            case EAST -> {
                 buffer.vertex(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).next();
                 buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
-                break;
+            }
         }
     }
 
@@ -626,16 +616,16 @@ public class RenderUtils
         buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
     }
 
-    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, MinecraftClient mc)
+    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, MinecraftClient mc, DrawContext context)
     {
-        int heightSch = renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc);
-        int heightCli = renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc);
+        int heightSch = renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc, context);
+        int heightCli = renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc, context);
 
         return Math.max(heightSch, heightCli);
     }
 
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
-            World world, BlockPos pos, MinecraftClient mc)
+            World world, BlockPos pos, MinecraftClient mc, DrawContext context)
     {
         Inventory inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
 
@@ -644,28 +634,27 @@ public class RenderUtils
             final InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
             final InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, inv.size());
 
-            return renderInventoryOverlay(align, side, offY, inv, type, props, mc);
+            return renderInventoryOverlay(align, side, offY, inv, type, props, mc, context);
         }
 
         return 0;
     }
 
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
-            Inventory inv, InventoryRenderType type, InventoryProperties props, MinecraftClient mc)
+            Inventory inv, InventoryRenderType type, InventoryProperties props, MinecraftClient mc, DrawContext context)
     {
         int xInv = 0;
         int yInv = 0;
 
-        switch (align)
-        {
-            case CENTER:
+        switch (align) {
+            case CENTER -> {
                 xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
                 yInv = GuiUtils.getScaledWindowHeight() / 2 - props.height - offY;
-                break;
-            case TOP_CENTER:
+            }
+            case TOP_CENTER -> {
                 xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
                 yInv = offY;
-                break;
+            }
         }
 
         if      (side == LeftRight.LEFT)  { xInv -= (props.width / 2 + 4); }
@@ -674,7 +663,7 @@ public class RenderUtils
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
         fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, props.totalSlots, mc);
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);
+        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc, context);
 
         return props.height;
     }

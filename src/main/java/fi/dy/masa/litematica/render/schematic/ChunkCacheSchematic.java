@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import javax.annotation.Nullable;
+import fi.dy.masa.litematica.world.FakeLightingProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,8 +16,10 @@ import net.minecraft.world.biome.ColorResolver;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkProvider;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.light.LightSourceView;
 import net.minecraft.world.chunk.light.LightingProvider;
-import fi.dy.masa.litematica.world.FakeLightingProvider;
+
+import javax.annotation.Nullable;
 
 public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
 {
@@ -54,7 +56,7 @@ public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
                 this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = chunk;
 
                 if (cx == chunkX && cz == chunkZ &&
-                    chunk.areSectionsEmptyBetween(worldIn.getBottomY(), worldIn.getTopY() - 1) == false)
+                        !chunk.areSectionsEmptyBetween(worldIn.getBottomY(), worldIn.getTopY() - 1))
                 {
                     this.empty = false;
                 }
@@ -69,8 +71,7 @@ public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
     }
 
     @Override
-    @org.jetbrains.annotations.Nullable
-    public BlockView getChunk(int chunkX, int chunkZ)
+    public LightSourceView getChunk(int chunkX, int chunkZ)
     {
         return null; // TODO 1.17 this shouldn't be needed since the lighting provider does nothing
     }

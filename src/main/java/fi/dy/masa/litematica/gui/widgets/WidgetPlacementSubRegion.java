@@ -1,12 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -21,6 +15,13 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlacement>
 {
@@ -28,7 +29,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
     private final WidgetListPlacementSubRegions parent;
     private final SubRegionPlacement placement;
     private final boolean isOdd;
-    private int buttonsStartX;
+    private final int buttonsStartX;
 
     public WidgetPlacementSubRegion(int x, int y, int width, int height, boolean isOdd,
             SchematicPlacement schematicPlacement, SubRegionPlacement placement, int listIndex,
@@ -46,26 +47,26 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
 
         // Note: These are placed from right to left
 
-        posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED);
-        posX = this.createButtonGeneric(posX, posY, WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE);
+        posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled());
+        posX = this.createButtonGeneric(posX, posY);
 
         this.buttonsStartX = posX;
     }
 
-    private int createButtonGeneric(int xRight, int y, WidgetSchematicPlacement.ButtonListener.ButtonType type)
+    private int createButtonGeneric(int xRight, int y)
     {
-        String label = StringUtils.translate(type.getTranslationKey());
+        String label = StringUtils.translate(WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE.getTranslationKey());
         int len = this.getStringWidth(label) + 10;
         xRight -= len;
-        this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this));
+        this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE, this));
 
         return xRight - 2;
     }
 
-    private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, WidgetSchematicPlacement.ButtonListener.ButtonType type)
+    private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn)
     {
-        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
-        this.addButton(button, new ButtonListener(type, this));
+        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED.getTranslationKey(), isCurrentlyOn);
+        this.addButton(button, new ButtonListener(WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED, this));
 
         return xRight - button.getWidth() - 2;
     }
@@ -77,7 +78,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void render(int mouseX, int mouseY, boolean selected, DrawContext context)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -107,7 +108,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
 
         String name = this.placement.getName();
         String pre = this.placement.isEnabled() ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
-        this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name, matrixStack);
+        this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name, context);
 
         Icons icon;
 
@@ -131,11 +132,11 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             icon.renderAt(this.buttonsStartX - icon.getWidth() - 2, this.y + 6, this.zLevel, false, false);
         }
 
-        super.render(mouseX, mouseY, placementSelected, matrixStack);
+        super.render(mouseX, mouseY, placementSelected, context);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, DrawContext context)
     {
         LitematicaSchematic schematic = this.schematicPlacement.getSchematic();
         File schematicFile = schematic.getFile();
@@ -145,7 +146,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 25, this.y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_sub_region_modified");
-            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str), matrixStack);
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str), context);
         }
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 14, this.height))
         {
@@ -167,35 +168,22 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
                 text.add(StringUtils.translate("litematica.gui.label.placement_sub.region_size", strSize));
             }
 
-            RenderUtils.drawHoverText(mouseX, mouseY, text, matrixStack);
+            RenderUtils.drawHoverText(mouseX, mouseY, text, context);
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener
-    {
-        private final WidgetSchematicPlacement.ButtonListener.ButtonType type;
-        private final WidgetPlacementSubRegion widget;
-
-        public ButtonListener(WidgetSchematicPlacement.ButtonListener.ButtonType type, WidgetPlacementSubRegion widget)
-        {
-            this.type = type;
-            this.widget = widget;
-        }
+    private record ButtonListener(WidgetSchematicPlacement.ButtonListener.ButtonType type, WidgetPlacementSubRegion widget) implements IButtonActionListener {
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
-        {
-            if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE)
-            {
-                GuiSubRegionConfiguration gui = new GuiSubRegionConfiguration(this.widget.schematicPlacement, this.widget.placement);
-                gui.setParent(this.widget.parent.getParentGui());
-                GuiBase.openGui(gui);
-            }
-            else if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED)
-            {
-                this.widget.schematicPlacement.toggleSubRegionEnabled(this.widget.placement.getName(), this.widget.parent.getParentGui());
-                this.widget.parent.refreshEntries();
+            public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
+                if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE) {
+                    GuiSubRegionConfiguration gui = new GuiSubRegionConfiguration(this.widget.schematicPlacement, this.widget.placement);
+                    gui.setParent(this.widget.parent.getParentGui());
+                    GuiBase.openGui(gui);
+                } else if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED) {
+                    this.widget.schematicPlacement.toggleSubRegionEnabled(this.widget.placement.getName(), this.widget.parent.getParentGui());
+                    this.widget.parent.refreshEntries();
+                }
             }
         }
-    }
 }

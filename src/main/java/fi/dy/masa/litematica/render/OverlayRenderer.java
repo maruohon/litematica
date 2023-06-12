@@ -1,34 +1,7 @@
 package fi.dy.masa.litematica.render;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import fi.dy.masa.malilib.config.HudAlignment;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.LeftRight;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.malilib.util.InventoryUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -49,6 +22,31 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.LeftRight;
+import fi.dy.masa.malilib.util.*;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class OverlayRenderer
 {
@@ -81,19 +79,19 @@ public class OverlayRenderer
 
     private final MinecraftClient mc;
     private final Map<SchematicPlacement, ImmutableMap<String, Box>> placements = new HashMap<>();
-    private Color4f colorPos1 = new Color4f(1f, 0.0625f, 0.0625f);
-    private Color4f colorPos2 = new Color4f(0.0625f, 0.0625f, 1f);
-    private Color4f colorOverlapping = new Color4f(1f, 0.0625f, 1f);
-    private Color4f colorX = new Color4f(   1f, 0.25f, 0.25f);
-    private Color4f colorY = new Color4f(0.25f,    1f, 0.25f);
-    private Color4f colorZ = new Color4f(0.25f, 0.25f,    1f);
-    private Color4f colorArea = new Color4f(1f, 1f, 1f);
-    private Color4f colorBoxPlacementSelected = new Color4f(0x16 / 255f, 1f, 1f);
-    private Color4f colorSelectedCorner = new Color4f(0f, 1f, 1f);
-    private Color4f colorAreaOrigin = new Color4f(1f, 0x90 / 255f, 0x10 / 255f);
+    private final Color4f colorPos1 = new Color4f(1f, 0.0625f, 0.0625f);
+    private final Color4f colorPos2 = new Color4f(0.0625f, 0.0625f, 1f);
+    private final Color4f colorOverlapping = new Color4f(1f, 0.0625f, 1f);
+    private final Color4f colorX = new Color4f(   1f, 0.25f, 0.25f);
+    private final Color4f colorY = new Color4f(0.25f,    1f, 0.25f);
+    private final Color4f colorZ = new Color4f(0.25f, 0.25f,    1f);
+    private final Color4f colorArea = new Color4f(1f, 1f, 1f);
+    private final Color4f colorBoxPlacementSelected = new Color4f(0x16 / 255f, 1f, 1f);
+    private final Color4f colorSelectedCorner = new Color4f(0f, 1f, 1f);
+    private final Color4f colorAreaOrigin = new Color4f(1f, 0x90 / 255f, 0x10 / 255f);
 
     private long infoUpdateTime;
-    private List<String> blockInfoLines = new ArrayList<>();
+    private final List<String> blockInfoLines = new ArrayList<>();
     private int blockInfoX;
     private int blockInfoY;
 
@@ -121,12 +119,12 @@ public class OverlayRenderer
         }
     }
 
-    public void renderBoxes(MatrixStack matrices)
+    public void renderBoxes(MatrixStack matrixStack)
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         boolean renderAreas = currentSelection != null && Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue();
-        boolean renderPlacements = this.placements.isEmpty() == false && Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING.getBooleanValue();
+        boolean renderPlacements = !this.placements.isEmpty() && Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING.getBooleanValue();
         boolean isProjectMode = DataManager.getSchematicProjectsManager().hasProjectOpen();
         float expand = 0.001f;
         float lineWidthBlockBox = 2f;
@@ -149,7 +147,7 @@ public class OverlayRenderer
                 for (Box box : currentSelection.getAllSubRegionBoxes())
                 {
                     BoxType type = box == currentBox ? BoxType.AREA_SELECTED : BoxType.AREA_UNSELECTED;
-                    this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, null, matrices);
+                    this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, null, matrixStack);
                 }
 
                 BlockPos origin = currentSelection.getExplicitOrigin();
@@ -159,7 +157,7 @@ public class OverlayRenderer
                     if (currentSelection.isOriginSelected())
                     {
                         Color4f colorTmp = Color4f.fromColor(this.colorAreaOrigin, 0.4f);
-                        RenderUtils.renderAreaSides(origin, origin, colorTmp, matrices, this.mc);
+                        RenderUtils.renderAreaSides(origin, origin, colorTmp, matrixStack, this.mc);
                     }
 
                     Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
@@ -186,7 +184,7 @@ public class OverlayRenderer
                         String boxName = entryBox.getKey();
                         boolean boxSelected = schematicPlacement == currentPlacement && (origin || boxName.equals(schematicPlacement.getSelectedSubRegionName()));
                         BoxType type = boxSelected ? BoxType.PLACEMENT_SELECTED : BoxType.PLACEMENT_UNSELECTED;
-                        this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, schematicPlacement, matrices);
+                        this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, schematicPlacement, matrixStack);
                     }
 
                     Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
@@ -204,7 +202,7 @@ public class OverlayRenderer
                             {
                                 float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
                                 color = new Color4f(color.r, color.g, color.b, alpha);
-                                RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, matrices, this.mc);
+                                RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, matrixStack, this.mc);
                             }
                         }
                     }
@@ -226,7 +224,7 @@ public class OverlayRenderer
     }
 
     public void renderSelectionBox(Box box, BoxType boxType, float expand,
-            float lineWidthBlockBox, float lineWidthArea, @Nullable SchematicPlacement placement, MatrixStack matrices)
+            float lineWidthBlockBox, float lineWidthArea, @Nullable SchematicPlacement placement, MatrixStack matrixStack)
     {
         BlockPos pos1 = box.getPos1();
         BlockPos pos2 = box.getPos2();
@@ -242,31 +240,31 @@ public class OverlayRenderer
         Color4f colorY;
         Color4f colorZ;
 
-        switch (boxType)
-        {
-            case AREA_SELECTED:
+        switch (boxType) {
+            case AREA_SELECTED -> {
                 colorX = this.colorX;
                 colorY = this.colorY;
                 colorZ = this.colorZ;
-                break;
-            case AREA_UNSELECTED:
+            }
+            case AREA_UNSELECTED -> {
                 colorX = this.colorArea;
                 colorY = this.colorArea;
                 colorZ = this.colorArea;
-                break;
-            case PLACEMENT_SELECTED:
+            }
+            case PLACEMENT_SELECTED -> {
                 colorX = this.colorBoxPlacementSelected;
                 colorY = this.colorBoxPlacementSelected;
                 colorZ = this.colorBoxPlacementSelected;
-                break;
-            case PLACEMENT_UNSELECTED:
+            }
+            case PLACEMENT_UNSELECTED -> {
                 Color4f color = placement.getBoxesBBColor();
                 colorX = color;
                 colorY = color;
                 colorZ = color;
-                break;
-            default:
+            }
+            default -> {
                 return;
+            }
         }
 
         Color4f sideColor;
@@ -294,7 +292,7 @@ public class OverlayRenderer
 
         if (pos1 != null && pos2 != null)
         {
-            if (pos1.equals(pos2) == false)
+            if (!pos1.equals(pos2))
             {
                 RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, this.mc);
 
@@ -304,18 +302,18 @@ public class OverlayRenderer
                      ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
                        Configs.Visuals.RENDER_PLACEMENT_BOX_SIDES.getBooleanValue()))
                 {
-                    RenderUtils.renderAreaSides(pos1, pos2, sideColor, matrices, this.mc);
+                    RenderUtils.renderAreaSides(pos1, pos2, sideColor, matrixStack, this.mc);
                 }
 
                 if (box.getSelectedCorner() == Corner.CORNER_1)
                 {
                     Color4f color = Color4f.fromColor(this.colorPos1, 0.4f);
-                    RenderUtils.renderAreaSides(pos1, pos1, color, matrices, this.mc);
+                    RenderUtils.renderAreaSides(pos1, pos1, color, matrixStack, this.mc);
                 }
                 else if (box.getSelectedCorner() == Corner.CORNER_2)
                 {
                     Color4f color = Color4f.fromColor(this.colorPos2, 0.4f);
-                    RenderUtils.renderAreaSides(pos2, pos2, color, matrices, this.mc);
+                    RenderUtils.renderAreaSides(pos2, pos2, color, matrixStack, this.mc);
                 }
 
                 RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, this.mc);
@@ -323,7 +321,7 @@ public class OverlayRenderer
             }
             else
             {
-                RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, color1, color2, this.colorOverlapping, matrices, this.mc);
+                RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, color1, color2, this.colorOverlapping, matrixStack, this.mc);
             }
         }
         else
@@ -350,7 +348,7 @@ public class OverlayRenderer
 
             List<MismatchRenderPos> list = verifier.getSelectedMismatchPositionsForRender();
 
-            if (list.isEmpty() == false)
+            if (!list.isEmpty())
             {
                 Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
                 List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
@@ -379,7 +377,7 @@ public class OverlayRenderer
         {
             Color4f color = entry.type.getColor();
 
-            if (entry.pos.equals(lookPos) == false)
+            if (!entry.pos.equals(lookPos))
             {
                 RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.pos, color, 0.002, buffer, this.mc);
             }
@@ -398,7 +396,7 @@ public class OverlayRenderer
 
         if (lookedEntry != null)
         {
-            if (connections && prevEntry != null)
+            if (connections)
             {
                 RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, lookedEntry.pos, false, lookedEntry.type.getColor(), buffer, this.mc);
             }
@@ -437,7 +435,7 @@ public class OverlayRenderer
         RenderSystem.enableDepthTest();
     }
 
-    public void renderHoverInfo(MinecraftClient mc, MatrixStack matrixStack)
+    public void renderHoverInfo(MinecraftClient mc, DrawContext context)
     {
         if (mc.world != null && mc.player != null)
         {
@@ -446,11 +444,11 @@ public class OverlayRenderer
 
             if (infoOverlayKeyActive && Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue())
             {
-                verifierOverlayRendered = this.renderVerifierOverlay(mc, matrixStack);
+                verifierOverlayRendered = this.renderVerifierOverlay(mc, context);
             }
 
             boolean renderBlockInfoLines = Configs.InfoOverlays.BLOCK_INFO_LINES_ENABLED.getBooleanValue();
-            boolean renderBlockInfoOverlay = verifierOverlayRendered == false && infoOverlayKeyActive && Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue();
+            boolean renderBlockInfoOverlay = !verifierOverlayRendered && infoOverlayKeyActive && Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue();
             RayTraceWrapper traceWrapper = null;
 
             if (renderBlockInfoLines || renderBlockInfoOverlay)
@@ -466,18 +464,18 @@ public class OverlayRenderer
             {
                 if (renderBlockInfoLines)
                 {
-                    this.renderBlockInfoLines(traceWrapper, mc, matrixStack);
+                    this.renderBlockInfoLines(traceWrapper, mc, context);
                 }
 
                 if (renderBlockInfoOverlay)
                 {
-                    this.renderBlockInfoOverlay(traceWrapper, mc, matrixStack);
+                    this.renderBlockInfoOverlay(traceWrapper, mc, context);
                 }
             }
         }
     }
 
-    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, MinecraftClient mc, MatrixStack matrixStack)
+    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, MinecraftClient mc, DrawContext context)
     {
         long currentTime = System.currentTimeMillis();
 
@@ -497,10 +495,10 @@ public class OverlayRenderer
         boolean useBackground = true;
         boolean useShadow = false;
 
-        fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines, matrixStack);
+        fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines, context);
     }
 
-    private boolean renderVerifierOverlay(MinecraftClient mc, MatrixStack matrixStack)
+    private boolean renderVerifierOverlay(MinecraftClient mc, DrawContext context)
     {
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -522,9 +520,9 @@ public class OverlayRenderer
                     BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
                     int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
                     BlockPos pos = trace.getBlockPos();
-                    int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, mc.world, pos, mc);
+                    int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, mc.world, pos, mc, context);
                     this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-                    info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
+                    info.render(this.blockInfoX, this.blockInfoY, mc, context);
                     return true;
                 }
             }
@@ -533,7 +531,7 @@ public class OverlayRenderer
         return false;
     }
 
-    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, MinecraftClient mc, MatrixStack matrixStack)
+    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, MinecraftClient mc, DrawContext context)
     {
         BlockState air = Blocks.AIR.getDefaultState();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
@@ -554,15 +552,15 @@ public class OverlayRenderer
 
         if (hasInvClient && hasInvSchematic)
         {
-            invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
+            invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc, context);
         }
         else if (hasInvClient)
         {
-            invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc);
+            invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc, context);
         }
         else if (hasInvSchematic)
         {
-            invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc);
+            invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc, context);
         }
 
         // Not just a missing block
@@ -570,34 +568,33 @@ public class OverlayRenderer
         {
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
             this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-            info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
+            info.render(this.blockInfoX, this.blockInfoY, mc, context);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA_BLOCK)
         {
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
             this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-            info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
+            info.render(this.blockInfoX, this.blockInfoY, mc, context);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
             BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
             this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-            info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
+            info.render(this.blockInfoX, this.blockInfoY, mc, context);
         }
     }
 
     protected void getOverlayPosition(BlockInfoAlignment align, int width, int height, int offY, int invHeight, MinecraftClient mc)
     {
-        switch (align)
-        {
-            case CENTER:
+        switch (align) {
+            case CENTER -> {
                 this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
                 this.blockInfoY = GuiUtils.getScaledWindowHeight() / 2 + offY;
-                break;
-            case TOP_CENTER:
+            }
+            case TOP_CENTER -> {
                 this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
                 this.blockInfoY = invHeight + offY + (invHeight > 0 ? offY : 0);
-                break;
+            }
         }
     }
 
@@ -612,7 +609,7 @@ public class OverlayRenderer
         BlockState stateSchematic = worldSchematic.getBlockState(pos);
         String ul = GuiBase.TXT_UNDERLINE;
 
-        if (stateSchematic != stateClient && stateClient.isAir() == false && stateSchematic.isAir() == false)
+        if (stateSchematic != stateClient && !stateClient.isAir() && !stateSchematic.isAir())
         {
             this.blockInfoLines.add(ul + "Schematic:");
             this.addBlockInfoLines(stateSchematic);
@@ -719,6 +716,6 @@ public class OverlayRenderer
         AREA_SELECTED,
         AREA_UNSELECTED,
         PLACEMENT_SELECTED,
-        PLACEMENT_UNSELECTED;
+        PLACEMENT_UNSELECTED
     }
 }

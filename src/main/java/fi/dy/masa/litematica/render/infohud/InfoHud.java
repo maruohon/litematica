@@ -1,12 +1,13 @@
 package fi.dy.masa.litematica.render.infohud;
 
-import java.util.ArrayList;
-import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.util.GuiUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class InfoHud
 {
@@ -58,7 +59,7 @@ public class InfoHud
         return Configs.InfoOverlays.INFO_HUD_OFFSET_Y.getIntegerValue();
     }
 
-    public void renderHud(MatrixStack matrixStack)
+    public void renderHud(DrawContext context)
     {
         if (this.mc.player != null && this.shouldRender())
         {
@@ -74,20 +75,20 @@ public class InfoHud
             this.updateHudText();
             this.getLinesForPhase(RenderPhase.POST, maxLines, isGui);
 
-            if (this.lineList.isEmpty() == false)
+            if (!this.lineList.isEmpty())
             {
-                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(xOffset, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList, matrixStack);
+                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(xOffset, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList, context);
                 yOffset += (int) Math.ceil(ySize * scale);
             }
 
-            if (this.renderers.isEmpty() == false)
+            if (!this.renderers.isEmpty())
             {
                 for (IInfoHudRenderer renderer : this.renderers)
                 {
-                    if (renderer.getShouldRenderCustom() && (isGui == false || renderer.shouldRenderInGuis()))
+                    if (renderer.getShouldRenderCustom() && (!isGui || renderer.shouldRenderInGuis()))
                     {
                         // FIXME: This is technically wrong, the yOffset should be separate per hud alignment
-                        yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment(), matrixStack);
+                        yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment(), context);
                     }
                 }
             }
@@ -96,23 +97,17 @@ public class InfoHud
 
     protected void getLinesForPhase(RenderPhase phase, int maxLines, boolean isGui)
     {
-        if (this.renderers.isEmpty() == false)
+        if (!this.renderers.isEmpty())
         {
-            for (int rendererIndex = 0; rendererIndex < this.renderers.size(); ++rendererIndex)
-            {
-                IInfoHudRenderer renderer = this.renderers.get(rendererIndex);
-
-                if (renderer.getShouldRenderText(phase) && (isGui == false || renderer.shouldRenderInGuis()))
-                {
+            for (IInfoHudRenderer renderer : this.renderers) {
+                if (renderer.getShouldRenderText(phase) && (!isGui || renderer.shouldRenderInGuis())) {
                     List<String> lines = renderer.getText(phase);
 
-                    for (int i = 0; i < lines.size() && this.lineList.size() < maxLines; ++i)
-                    {
+                    for (int i = 0; i < lines.size() && this.lineList.size() < maxLines; ++i) {
                         this.lineList.add(lines.get(i));
                     }
 
-                    if (this.lineList.size() >= maxLines)
-                    {
+                    if (this.lineList.size() >= maxLines) {
                         break;
                     }
                 }
@@ -122,7 +117,7 @@ public class InfoHud
 
     public void addInfoHudRenderer(IInfoHudRenderer renderer, boolean enable)
     {
-        if (this.renderers.contains(renderer) == false)
+        if (!this.renderers.contains(renderer))
         {
             this.renderers.add(renderer);
         }

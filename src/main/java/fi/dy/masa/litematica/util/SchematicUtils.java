@@ -1,45 +1,12 @@
 package fi.dy.masa.litematica.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import javax.annotation.Nullable;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
-
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.litematica.scheduler.tasks.TaskBase;
-import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkDirect;
-import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
+import fi.dy.masa.litematica.scheduler.tasks.*;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
@@ -63,6 +30,29 @@ import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.state.property.Property;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.*;
+import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 public class SchematicUtils
 {
@@ -305,7 +295,7 @@ public class SchematicUtils
     {
         ItemStack stack = mc.player.getMainHandStack();
 
-        if ((stack.isEmpty() == false && (stack.getItem() instanceof BlockItem)) ||
+        if ((!stack.isEmpty() && (stack.getItem() instanceof BlockItem)) ||
             (stack.isEmpty() && ToolMode.REBUILD.getPrimaryBlock() != null))
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
@@ -325,7 +315,7 @@ public class SchematicUtils
                 if (stack.getItem() instanceof BlockItem)
                 {
                     // Smuggle in a reference to the Schematic world to the use context
-                    World worldClient = mc.player.world;
+                    World worldClient = mc.player.getWorld();
                     mc.player.world = worldSchematic;
 
                     BlockHitResult hit = new BlockHitResult(trace.getPos(), side, pos.offset(side), false);
@@ -364,8 +354,8 @@ public class SchematicUtils
         {
             posMutable.move(direction);
 
-            if (range.isPositionWithinRange(posMutable) == false ||
-                world.getChunkProvider().isChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4) == false ||
+            if (!range.isPositionWithinRange(posMutable) ||
+                    !world.getChunkProvider().isChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4) ||
                 world.getBlockState(posMutable) != stateStart)
             {
                 posMutable.move(direction.getOpposite());
@@ -399,7 +389,7 @@ public class SchematicUtils
             SubChunkPos cpos = new SubChunkPos(pos);
             List<PlacementPart> list = DataManager.getSchematicPlacementManager().getAllPlacementsTouchingChunk(pos);
 
-            if (list.isEmpty() == false)
+            if (!list.isEmpty())
             {
                 for (PlacementPart part : list)
                 {
@@ -418,15 +408,15 @@ public class SchematicUtils
                             BlockState stateOriginal = container.get(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ());
 
                             int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
-                            int increment = 0;
+                            int increment;
 
-                            if (stateOriginal.isAir() == false)
+                            if (!stateOriginal.isAir())
                             {
-                                increment = state.isAir() == false ? 0 : -1;
+                                increment = !state.isAir() ? 0 : -1;
                             }
                             else
                             {
-                                increment = state.isAir() == false ? 1 : 0;
+                                increment = !state.isAir() ? 1 : 0;
                             }
 
                             totalBlocks += increment;
@@ -458,7 +448,7 @@ public class SchematicUtils
         {
             List<PlacementPart> list = DataManager.getSchematicPlacementManager().getAllPlacementsTouchingChunk(posStart);
 
-            if (list.isEmpty() == false)
+            if (!list.isEmpty())
             {
                 for (PlacementPart part : list)
                 {
@@ -483,7 +473,7 @@ public class SchematicUtils
                             final int maxY = Math.min(posMax.getY(), container.getSize().getY() - 1);
                             final int maxZ = Math.min(posMax.getZ(), container.getSize().getZ() - 1);
                             int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
-                            int increment = 0;
+                            int increment;
 
                             state = getUntransformedBlockState(state, placement, regionName);
 
@@ -495,13 +485,13 @@ public class SchematicUtils
                                     {
                                         BlockState stateOriginal = container.get(x, y, z);
 
-                                        if (stateOriginal.isAir() == false)
+                                        if (!stateOriginal.isAir())
                                         {
-                                            increment = state.isAir() == false ? 0 : -1;
+                                            increment = !state.isAir() ? 0 : -1;
                                         }
                                         else
                                         {
-                                            increment = state.isAir() == false ? 1 : 0;
+                                            increment = !state.isAir() ? 1 : 0;
                                         }
 
                                         totalBlocks += increment;
@@ -552,7 +542,7 @@ public class SchematicUtils
             SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             List<PlacementPart> list = manager.getAllPlacementsTouchingChunk(posStart);
 
-            if (list.isEmpty() == false)
+            if (!list.isEmpty())
             {
                 for (PlacementPart part : list)
                 {
@@ -581,7 +571,7 @@ public class SchematicUtils
             SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             List<PlacementPart> list = manager.getAllPlacementsTouchingChunk(pos);
 
-            if (list.isEmpty() == false)
+            if (!list.isEmpty())
             {
                 for (PlacementPart part : list)
                 {
@@ -696,7 +686,7 @@ public class SchematicUtils
                     {
                         BlockState oldState = container.get(x, y, z);
 
-                        if (oldState != stateOriginal && oldState.isAir() == false)
+                        if (oldState != stateOriginal && !oldState.isAir())
                         {
                             container.set(x, y, z, air);
                             --totalBlocks;
@@ -743,15 +733,15 @@ public class SchematicUtils
         LayerRange range = DataManager.getRenderLayerRange();
 
         int totalBlocks = schematicPlacement.getSchematic().getMetadata().getTotalBlocks();
-        int increment = 0;
+        int increment;
 
-        if (stateOriginalIn.isAir() == false)
+        if (!stateOriginalIn.isAir())
         {
-            increment = stateNewIn.isAir() == false ? 0 : -1;
+            increment = !stateNewIn.isAir() ? 0 : -1;
         }
         else
         {
-            increment = stateNewIn.isAir() == false ? 1 : 0;
+            increment = !stateNewIn.isAir() ? 1 : 0;
         }
 
         for (String regionName : regions)
@@ -798,10 +788,7 @@ public class SchematicUtils
             //System.out.printf("DEBUG == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
             //        regionName, startX, startY, startZ, endX, endY, endZ, container.getSize().getX(), container.getSize().getY(), container.getSize().getZ());
 
-            if (startX < 0 || startY < 0 || startZ < 0 ||
-                endX >= size.getX() ||
-                endY >= size.getY() ||
-                endZ >= size.getZ())
+            if (endX >= size.getX() || endY >= size.getY() || endZ >= size.getZ())
             {
                 System.out.printf("OUT OF BOUNDS == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
                         regionName, startX, startY, startZ, endX, endY, endZ, size.getX(), size.getY(), size.getZ());
@@ -855,7 +842,7 @@ public class SchematicUtils
 
     public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos, MinecraftClient mc)
     {
-        if (mc.player == null || EntityUtils.isCreativeMode(mc.player) == false)
+        if (mc.player == null || !EntityUtils.isCreativeMode(mc.player))
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
             return;

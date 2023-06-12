@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
@@ -11,6 +10,8 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+
+import java.io.File;
 
 public class GuiSchematicSaveImported extends GuiSchematicSaveBase
 {
@@ -43,9 +44,9 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
     }
 
     @Override
-    protected IButtonActionListener createButtonListener(ButtonType type)
+    protected IButtonActionListener createButtonListener()
     {
-        return new ButtonListener(type, this);
+        return new ButtonListener(ButtonType.SAVE, this);
     }
 
     private static class ButtonListener implements IButtonActionListener
@@ -67,7 +68,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String fileName = this.gui.getTextFieldText();
 
-                if (dir.isDirectory() == false)
+                if (!dir.isDirectory())
                 {
                     this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
                     return;

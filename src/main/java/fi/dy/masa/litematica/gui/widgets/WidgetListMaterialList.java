@@ -1,21 +1,22 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import fi.dy.masa.malilib.gui.LeftRight;
-import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListSorter;
+import fi.dy.masa.malilib.gui.LeftRight;
+import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
 {
@@ -38,9 +39,9 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     }
 
     @Override
-    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void drawContents(DrawContext context, int mouseX, int mouseY, float partialTicks)
     {
-        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
+        super.drawContents(context, mouseX, mouseY, partialTicks);
         lastScrollbarPosition = this.scrollBar.getValue();
     }
 
@@ -82,14 +83,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
         ItemStack stack = entry.getStack();
         Identifier rl = Registries.ITEM.getId(stack.getItem());
 
-        if (rl != null)
-        {
-            return ImmutableList.of(stack.getName().getString().toLowerCase(), rl.toString().toLowerCase());
-        }
-        else
-        {
-            return ImmutableList.of(stack.getName().getString().toLowerCase());
-        }
+        return ImmutableList.of(stack.getName().getString().toLowerCase(), rl.toString().toLowerCase());
     }
 
     @Override
@@ -97,7 +91,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     {
         super.refreshBrowserEntries();
 
-        if (this.scrollbarRestored == false && lastScrollbarPosition <= this.scrollBar.getMaxValue())
+        if (!this.scrollbarRestored && lastScrollbarPosition <= this.scrollBar.getMaxValue())
         {
             // This needs to happen after the setMaxValue() has been called in reCreateListEntryWidgets()
             this.scrollBar.setValue(lastScrollbarPosition);

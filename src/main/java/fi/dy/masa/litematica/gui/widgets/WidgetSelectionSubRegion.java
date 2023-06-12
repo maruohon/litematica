@@ -1,7 +1,5 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.ArrayList;
-import java.util.List;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSubRegion;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
@@ -16,8 +14,11 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 {
@@ -59,7 +60,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void render(int mouseX, int mouseY, boolean selected, DrawContext context)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -85,13 +86,13 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0, 0.001f);
         }
 
-        this.drawString(this.x + 2, this.y + 7, 0xFFFFFFFF, this.entry, matrixStack);
+        this.drawString(this.x + 2, this.y + 7, 0xFFFFFFFF, this.entry, context);
 
-        super.render(mouseX, mouseY, selected, matrixStack);
+        super.render(mouseX, mouseY, selected, context);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, DrawContext context)
     {
         List<String> text = new ArrayList<>();
 
@@ -124,7 +125,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, text, matrixStack);
+            RenderUtils.drawHoverText(mouseX, mouseY, text, context);
         }
     }
 
@@ -170,7 +171,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
             private final String labelKey;
 
-            private ButtonType(String labelKey)
+            ButtonType(String labelKey)
             {
                 this.labelKey = labelKey;
             }
@@ -182,22 +183,12 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         }
     }
 
-    private static class BoxRenamer implements IStringConsumerFeedback
-    {
-        private final WidgetSelectionSubRegion widget;
-        private final AreaSelection selection;
-
-        public BoxRenamer(AreaSelection selection, WidgetSelectionSubRegion widget)
-        {
-            this.widget = widget;
-            this.selection = selection;
-        }
+    private record BoxRenamer(AreaSelection selection,
+                              WidgetSelectionSubRegion widget) implements IStringConsumerFeedback {
 
         @Override
-        public boolean setString(String string)
-        {
-            String oldName = this.widget.entry;
-            return this.selection.renameSubRegionBox(oldName, string, this.widget.parent.getEditorGui());
+            public boolean setString(String string) {
+            return this.selection.renameSubRegionBox(this.widget.entry, string, this.widget.parent.getEditorGui());
+            }
         }
-    }
 }

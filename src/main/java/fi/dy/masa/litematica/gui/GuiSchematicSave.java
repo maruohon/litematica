@@ -1,8 +1,5 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.File;
-import javax.annotation.Nullable;
-import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
@@ -19,6 +16,10 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.MinecraftClient;
+
+import javax.annotation.Nullable;
+import java.io.File;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
@@ -70,9 +71,9 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     }
 
     @Override
-    protected IButtonActionListener createButtonListener(ButtonType type)
+    protected IButtonActionListener createButtonListener()
     {
-        return new ButtonListener(type, this.selectionManager, this);
+        return new ButtonListener(ButtonType.SAVE, this.selectionManager, this);
     }
 
     @Override
@@ -118,7 +119,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String fileName = this.gui.getTextFieldText();
 
-                if (dir.isDirectory() == false)
+                if (!dir.isDirectory())
                 {
                     this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
                     return;
@@ -152,12 +153,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                         String fileNameTmp = fileName;
 
                         // The file name extension gets added in the schematic write method, so need to add it here for the check
-                        if (fileNameTmp.endsWith(LitematicaSchematic.FILE_EXTENSION) == false)
+                        if (!fileNameTmp.endsWith(LitematicaSchematic.FILE_EXTENSION))
                         {
                             fileNameTmp += LitematicaSchematic.FILE_EXTENSION;
                         }
 
-                        if (FileUtils.canWriteToFile(dir, fileNameTmp, overwrite) == false)
+                        if (!FileUtils.canWriteToFile(dir, fileNameTmp, overwrite))
                         {
                             this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", fileNameTmp);
                             return;
