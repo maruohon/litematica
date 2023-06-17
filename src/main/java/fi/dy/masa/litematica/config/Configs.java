@@ -79,6 +79,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       PASTE_IGNORE_INVENTORY      = new ConfigBoolean("pasteIgnoreInventories", false, "Don't paste inventory contents when pasting a schematic");
         public static final ConfigBoolean       PASTE_TO_MCFUNCTION         = new ConfigBoolean("pasteToMcFunctionFiles", false, "If enabled, then instead of actually pasting schematics to the world,\nthey are written as setblock commands into text files.");
         public static final ConfigBoolean       PASTE_USE_FILL_COMMAND      = new ConfigBoolean("pasteUseFillCommand", true, "If enabled, then instead of only using individual /setblock commands,\nthe command-based Paste operation (which is used on servers)\nwill also try to use /fill commands for any continuous areas of the same block.\nThis has no effect in single player, since the mod sets the blocks directly\nin the integrated server's world in and doesn't use commands at all.");
+        public static final ConfigBoolean       PASTE_USING_COMMANDS_IN_SP  = new ConfigBoolean("pasteUsingCommandsInSp", false, "This is a temporary hack workaround to use the command-based pasting\nalso in single player, which allows using the render layer limited\npasting in single player, which currently doesn't work with\nthe direct world access pasting that single player normally uses.\n\nNote that this will have all the same NBT data restoration\nlimitations that multiplayer pasting has normally.");
         public static final ConfigBoolean       PICK_BLOCK_AVOID_DAMAGEABLE = new ConfigBoolean("pickBlockAvoidDamageable", true, "Avoids replacing any damageable items in the hotbar");
         public static final ConfigBoolean       PICK_BLOCK_AVOID_TOOLS      = new ConfigBoolean("pickBlockAvoidTools", false, "Avoids replacing any tool items in the hotbar.\n\nThis means any items that extend the vanilla ToolItem class.");
         public static final ConfigBoolean       PICK_BLOCK_ENABLED          = new ConfigBoolean("pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
@@ -125,6 +126,7 @@ public class Configs implements IConfigHandler
                 PASTE_NBT_BEHAVIOR,
                 PASTE_TO_MCFUNCTION,
                 PASTE_USE_FILL_COMMAND,
+                PASTE_USING_COMMANDS_IN_SP,
                 PICK_BLOCK_AVOID_DAMAGEABLE,
                 PICK_BLOCK_AVOID_TOOLS,
                 PICK_BLOCK_ENABLED,
