@@ -777,7 +777,7 @@ public class LitematicaSchematic
             BlockState stateAdj = world.getBlockState(posAdj);
 
             if (stateAdj.isOpaque() == false ||
-                stateAdj.isSideSolidFullSquare(world, posAdj, dir) == false)
+                stateAdj.isSideSolidFullSquare(world, posAdj, dir.getOpposite()) == false)
             {
                 return true;
             }
