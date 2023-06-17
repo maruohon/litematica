@@ -13,6 +13,7 @@ import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.argument.BlockArgumentParser;
@@ -22,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.SkullItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -62,6 +64,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected final boolean useFillCommand;
     protected final boolean useWorldEdit;
     protected int[][][] workArr;
+    protected int maxCommandLength = 255;
     protected int sentFillCommands;
     protected int sentSetblockCommands;
 
@@ -248,6 +251,12 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (this.shouldSetBlock(stateSchematic, stateClient))
         {
+            if (this.useSpecialPasting(stateSchematic))
+            {
+                this.specialPasteBlock(pos, stateSchematic, this.schematicWorld, this.queuedCommands::offer);
+                return;
+            }
+
             PasteNbtBehavior nbtBehavior = this.nbtBehavior;
             BlockEntity be = schematicChunk.getBlockEntity(pos);
 
@@ -270,6 +279,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                 this.queueSetBlockCommand(pos.getX(), pos.getY(), pos.getZ(), stateSchematic);
             }
         }
+    }
+
+    protected boolean useSpecialPasting(BlockState state)
+    {
+        return state.isIn(BlockTags.ALL_SIGNS);
     }
 
     protected boolean shouldSetBlock(BlockState stateSchematic, BlockState stateClient)
@@ -454,6 +468,59 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                            cmdName, placementPos.getX(), placementPos.getY(), placementPos.getZ());
             commandHandler.accept(command);
         }
+    }
+
+    protected void specialPasteBlock(BlockPos pos, BlockState state, World schematicWorld, Consumer<String> commandHandler)
+    {
+        if (state.isIn(BlockTags.ALL_SIGNS))
+        {
+            this.specialPasteSignBlock(pos, state, schematicWorld, commandHandler);
+        }
+    }
+
+    protected void specialPasteSignBlock(BlockPos pos, BlockState state, World schematicWorld, Consumer<String> commandHandler)
+    {
+        BlockEntity be = schematicWorld.getBlockEntity(pos);
+        String cmdName = this.setBlockCommand;
+        String blockString = BlockArgumentParser.stringifyBlockState(state);
+
+        if (be instanceof SignBlockEntity signBe)
+        {
+            NbtCompound tag = be.createNbt();
+
+            if (tag != null)
+            {
+                // Remove redundant tags to save on the command string length
+                if (signBe.getBackText().hasText(this.mc.player) == false)
+                {
+                    tag.remove("back_text");
+                }
+
+                if (signBe.getFrontText().hasText(this.mc.player) == false)
+                {
+                    tag.remove("front_text");
+                }
+
+                if (signBe.isWaxed() == false)
+                {
+                    tag.remove("is_waxed");
+                }
+
+                String cmd = String.format("%s %d %d %d %s%s",
+                                           cmdName, pos.getX(), pos.getY(), pos.getZ(), blockString, tag);
+
+                if (cmd.length() <= this.maxCommandLength)
+                {
+                    commandHandler.accept(cmd);
+                    ++this.sentSetblockCommands;
+                    return;
+                }
+            }
+        }
+
+        commandHandler.accept(String.format("%s %d %d %d %s",
+                                            cmdName, pos.getX(), pos.getY(), pos.getZ(), blockString));
+        ++this.sentSetblockCommands;
     }
 
     protected void placeBlockViaClone(BlockPos pos, BlockState state, BlockEntity be,
