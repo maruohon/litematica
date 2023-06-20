@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.materials;
 
 import java.util.Collections;
 import java.util.List;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -80,8 +79,6 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         MinecraftClient mc = MinecraftClient.getInstance();
         long currentTime = System.currentTimeMillis();
         List<MaterialListEntry> list;
-        MatrixStack matrixStack = drawContext.getMatrices();
-        matrixStack = new MatrixStack();
 
         if (currentTime - this.lastUpdateTime > 2000)
         {
@@ -155,21 +152,23 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         posY = RenderUtils.getHudPosY(posY, yOffset, contentHeight, scale, alignment);
         posY += RenderUtils.getHudOffsetForPotions(alignment, scale, mc.player);
 
+        MatrixStack matrixStack = drawContext.getMatrices();
+
         if (scale != 1d)
         {
             matrixStack.push();
             matrixStack.scale((float) scale, (float) scale, (float) scale);
-
-            matrixStack.push();
-            matrixStack.scale((float) scale, (float) scale, (float) scale);
-
-            RenderSystem.applyModelViewMatrix();
+            //RenderSystem.applyModelViewMatrix();
         }
 
         if (useBackground)
         {
-            RenderUtils.drawRect(posX - bgMargin, posY - bgMargin,
-                                 maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor);
+            int x1 = posX - bgMargin;
+            int y1 = posY - bgMargin;
+            int x2 = x1 + maxLineLength + bgMargin * 2;
+            int y2 = y1 + contentHeight + bgMargin;
+
+            drawContext.fill(x1, y1, x2, y2, bgColor);
         }
 
         int x = posX;
@@ -181,12 +180,6 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         {
             drawContext.drawItem(list.get(i).getStack(), x, y);
             y += lineHeight;
-        }
-
-        if (scale != 1d)
-        {
-            matrixStack.pop();
-            RenderSystem.applyModelViewMatrix();
         }
 
         String title = GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + GuiBase.TXT_RST;
@@ -217,6 +210,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         if (scale != 1d)
         {
             matrixStack.pop();
+            //RenderSystem.applyModelViewMatrix();
         }
 
         return contentHeight + 4;
