@@ -373,13 +373,11 @@ public class SchematicaSchematic
                     {
                         try
                         {
-                            NbtCompound nbt = te.createNbt();
+                            NbtCompound nbt = te.createNbtWithId();
+                            BlockPos pos = new BlockPos(relX, relY, relZ);
+                            NBTUtils.writeBlockPosToTag(pos, nbt);
 
-                            nbt.putInt("x", relX);
-                            nbt.putInt("y", relY);
-                            nbt.putInt("z", relZ);
-
-                            this.tiles.put(new BlockPos(relX, relY, relZ), nbt);
+                            this.tiles.put(pos, nbt);
                         }
                         catch (Exception e)
                         {
