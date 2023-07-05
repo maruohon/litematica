@@ -450,6 +450,11 @@ public class WorldUtils
         else
         {
             traceWrapper = RayTraceUtils.getFurthestSchematicWorldTraceBeforeVanilla(mc.world, mc.player, traceMaxRange);
+
+            if (traceWrapper == null && placementRestrictionInEffect(mc))
+            {
+                return ActionResult.FAIL;
+            }
         }
 
         if (traceWrapper == null)
