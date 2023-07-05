@@ -33,6 +33,7 @@ import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
@@ -349,6 +350,35 @@ public class SchematicConversionFixers
         if (state.with(RedstoneWireBlock.POWER, 0) == REDSTONE_WIRE_DOT)
         {
             state = REDSTONE_WIRE_CROSS.with(RedstoneWireBlock.POWER, state.get(RedstoneWireBlock.POWER));
+        }
+
+        return state;
+    };
+
+    public static final IStateFixer FIXER_SIGN = (reader, state, pos) -> {
+        NbtCompound tag = reader.getBlockEntityData(pos);
+
+        if (tag != null && tag.contains("Text1", Constants.NBT.TAG_STRING))
+        {
+            NbtList textList = new NbtList();
+            textList.add(tag.get("Text1"));
+            textList.add(tag.get("Text2"));
+            textList.add(tag.get("Text3"));
+            textList.add(tag.get("Text4"));
+
+            NbtCompound frontTextTag = new NbtCompound();
+            frontTextTag.put("messages", textList);
+            frontTextTag.putString("color", tag.getString("Color"));
+            frontTextTag.putByte("has_glowing_text", tag.getByte("GlowingText"));
+
+            tag.put("front_text", frontTextTag);
+
+            tag.remove("Color");
+            tag.remove("GlowingText");
+            tag.remove("Text1");
+            tag.remove("Text2");
+            tag.remove("Text3");
+            tag.remove("Text4");
         }
 
         return state;
