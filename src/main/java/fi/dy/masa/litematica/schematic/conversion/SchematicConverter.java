@@ -36,6 +36,7 @@ import net.minecraft.block.TripwireBlock;
 import net.minecraft.block.VineBlock;
 import net.minecraft.block.WallBannerBlock;
 import net.minecraft.block.WallBlock;
+import net.minecraft.block.WallSignBlock;
 import net.minecraft.block.WallSkullBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.fluid.FluidState;
@@ -244,6 +245,7 @@ public class SchematicConverter
         this.fixersPerBlock.put(NoteBlock.class,                    SchematicConversionFixers.FIXER_NOTE_BLOCK);
         this.fixersPerBlock.put(SignBlock.class,                    SchematicConversionFixers.FIXER_SIGN);
         this.fixersPerBlock.put(SkullBlock.class,                   SchematicConversionFixers.FIXER_SKULL);
+        this.fixersPerBlock.put(WallSignBlock.class,                SchematicConversionFixers.FIXER_SIGN);
         this.fixersPerBlock.put(WallSkullBlock.class,               SchematicConversionFixers.FIXER_SKULL_WALL);
     }
 
@@ -278,6 +280,7 @@ public class SchematicConverter
         this.fixersPerBlock.put(NoteBlock.class,                    SchematicConversionFixers.FIXER_NOTE_BLOCK);
         this.fixersPerBlock.put(SignBlock.class,                    SchematicConversionFixers.FIXER_SIGN);
         this.fixersPerBlock.put(SkullBlock.class,                   SchematicConversionFixers.FIXER_SKULL);
+        this.fixersPerBlock.put(WallSignBlock.class,                SchematicConversionFixers.FIXER_SIGN);
         this.fixersPerBlock.put(WallSkullBlock.class,               SchematicConversionFixers.FIXER_SKULL_WALL);
     }
 
