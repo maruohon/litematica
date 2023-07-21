@@ -81,6 +81,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             if (type == FileType.LITEMATICA_SCHEMATIC)
             {
                 x = this.createButton(x, y, ButtonListener.Type.RENAME_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.EDIT_DESCRIPTION);
                 x = this.createButton(x, y, ButtonListener.Type.SET_PREVIEW);
                 x = this.createButton(x, y, ButtonListener.Type.EXPORT_SCHEMATIC);
                 x = this.createButton(x, y, ButtonListener.Type.EXPORT_TYPE);
@@ -254,6 +255,12 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 String oldName = schematic != null ? schematic.getMetadata().getName() : "";
                 GuiBase.openGui(new GuiTextInputFeedback(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), this.gui)));
             }
+            else if (this.type == Type.EDIT_DESCRIPTION)
+            {
+                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
+                String oldDesc = schematic != null ? schematic.getMetadata().getDescription().replace("\n", "\\n") : "";
+                GuiBase.openGui(new GuiTextInputFeedback(256, "litematica.gui.title.edit_description", oldDesc, this.gui, new SchematicDescriptionEditor(entry.getDirectory(), entry.getName(), this.gui)));
+            }
             else if (this.type == Type.DELETE_SCHEMATIC)
             {
                 FileDeleter deleter = new FileDeleter(entry.getFullPath());
@@ -316,6 +323,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             IMPORT_SCHEMATIC            ("litematica.gui.button.import"),
             EXPORT_SCHEMATIC            ("litematica.gui.button.schematic_manager.export_as"),
             RENAME_SCHEMATIC            ("litematica.gui.button.rename"),
+            EDIT_DESCRIPTION            ("litematica.gui.button.edit_description"),
             DELETE_SCHEMATIC            ("litematica.gui.button.delete"),
             SET_PREVIEW                 ("litematica.gui.button.set_preview", "litematica.info.schematic_manager.preview.right_click_to_cancel"),
             EXPORT_TYPE                 ("");
@@ -369,6 +377,44 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             if (schematic != null)
             {
                 schematic.getMetadata().setName(string);
+                schematic.getMetadata().setTimeModifiedToNow();
+
+                if (schematic.writeToFile(this.dir, this.fileName, true))
+                {
+                    this.gui.getListWidget().clearSchematicMetadataCache();
+                    return true;
+                }
+            }
+            else
+            {
+                this.gui.setString(StringUtils.translate("litematica.error.schematic_rename.read_failed"));
+            }
+
+            return false;
+        }
+    }
+
+    private static class SchematicDescriptionEditor implements IStringConsumerFeedback
+    {
+        private final File dir;
+        private final String fileName;
+        private final GuiSchematicManager gui;
+
+        public SchematicDescriptionEditor(File dir, String fileName, GuiSchematicManager gui)
+        {
+            this.dir = dir;
+            this.fileName = fileName;
+            this.gui = gui;
+        }
+
+        @Override
+        public boolean setString(String string)
+        {
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName);
+
+            if (schematic != null)
+            {
+                schematic.getMetadata().setDescription(string.replace("\\n", "\n"));
                 schematic.getMetadata().setTimeModifiedToNow();
 
                 if (schematic.writeToFile(this.dir, this.fileName, true))

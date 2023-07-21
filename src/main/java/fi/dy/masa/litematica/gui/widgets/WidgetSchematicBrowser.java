@@ -34,7 +34,6 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     protected final Map<File, Pair<Identifier, NativeImageBackedTexture>> cachedPreviewImages = new HashMap<>();
     protected final GuiSchematicBrowserBase parent;
     protected final int infoWidth;
-    protected final int infoHeight;
 
     public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
@@ -43,7 +42,6 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
         this.title = StringUtils.translate("litematica.gui.title.schematic_browser");
         this.infoWidth = 170;
-        this.infoHeight = 290;
         this.parent = parent;
     }
 
@@ -83,9 +81,8 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     {
         int x = this.posX + this.totalWidth - this.infoWidth;
         int y = this.posY;
-        int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, this.totalHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
         if (entry == null)
         {
@@ -163,32 +160,33 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 y += 12;
             }
 
-            /*
-            str = StringUtils.translate("litematica.gui.label.schematic_info.description");
-            this.drawString(x, y, textColor, str);
-            */
-            //y += 12;
+            if (!meta.getDescription().isBlank()) {
+                str = StringUtils.translate("litematica.gui.label.schematic_info.description");
+                this.drawString(drawContext, str, x, y, textColor);
+                y += 12;
+
+                str = meta.getDescription();
+                String[] split = str.split("[\n\r]|\r\n");
+                for (String line : split) {
+                    this.drawString(drawContext, line, x + 4, y, valueColor);
+                    y += 12;
+                }
+            }
 
             Pair<Identifier, NativeImageBackedTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
 
             if (pair != null)
             {
-                y += 14;
-
-                int iconSize = pair.getRight().getImage().getWidth();
-                boolean needsScaling = height < this.infoHeight;
+                int iconSize = Math.min(this.infoWidth - 14, this.totalHeight + 18 - y);
 
                 RenderUtils.color(1f, 1f, 1f, 1f);
+                x += this.infoWidth - 8 - iconSize;
 
-                if (needsScaling)
-                {
-                    iconSize = height - y + this.posY - 6;
-                }
+                RenderUtils.drawOutlinedBox(x, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
-                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
-
-                drawContext.drawTexture(pair.getLeft(), x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+                drawContext.drawTexture(pair.getLeft(), x, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
+
         }
     }
 
