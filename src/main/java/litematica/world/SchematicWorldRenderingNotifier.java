@@ -2,6 +2,7 @@ package litematica.world;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -29,16 +30,17 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public void updateBetweenX(int minX, int maxX)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
+        WorldClient clientWorld = GameUtils.getClientWorld();
 
-        if (world != null)
+        if (world != null && clientWorld != null)
         {
             final int xMin = Math.min(minX, maxX);
             final int xMax = Math.max(minX, maxX);
             final int cxMin = (xMin >> 4);
             final int cxMax = (xMax >> 4);
             RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) clientWorld.getChunkProvider()).getLoadedChunks();
 
             for (Chunk chunk : schematicChunks.values())
             {
@@ -58,12 +60,13 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public void updateBetweenY(int minY, int maxY)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
+        WorldClient clientWorld = GameUtils.getClientWorld();
 
-        if (world != null)
+        if (world != null && clientWorld != null)
         {
             RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) clientWorld.getChunkProvider()).getLoadedChunks();
 
             for (Chunk chunk : schematicChunks.values())
             {
@@ -80,16 +83,17 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public void updateBetweenZ(int minZ, int maxZ)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
+        WorldClient clientWorld = GameUtils.getClientWorld();
 
-        if (world != null)
+        if (world != null && clientWorld != null)
         {
             final int zMin = Math.min(minZ, maxZ);
             final int zMax = Math.max(minZ, maxZ);
             final int czMin = (zMin >> 4);
             final int czMax = (zMax >> 4);
             RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) clientWorld.getChunkProvider()).getLoadedChunks();
 
             for (Chunk chunk : schematicChunks.values())
             {
@@ -108,11 +112,12 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public static void markSchematicChunkForRenderUpdate(ChunkSectionPos chunkPos)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
+        WorldClient clientWorld = GameUtils.getClientWorld();
 
-        if (world != null)
+        if (world != null && clientWorld != null)
         {
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) clientWorld.getChunkProvider()).getLoadedChunks();
             long key = ChunkPos.asLong(chunkPos.getX(), chunkPos.getZ());
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
@@ -127,11 +132,12 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public static void markSchematicChunksForRenderUpdate(int chunkX, int chunkZ)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
+        WorldClient clientWorld = GameUtils.getClientWorld();
 
-        if (world != null)
+        if (world != null && clientWorld != null)
         {
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) clientWorld.getChunkProvider()).getLoadedChunks();
             long key = ChunkPos.asLong(chunkX, chunkZ);
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
@@ -146,11 +152,12 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public static void markSchematicChunkForRenderUpdate(BlockPos pos)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
+        WorldClient clientWorld = GameUtils.getClientWorld();
 
-        if (world != null)
+        if (world != null && clientWorld != null)
         {
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) GameUtils.getClientWorld().getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) clientWorld.getChunkProvider()).getLoadedChunks();
             long key = ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
