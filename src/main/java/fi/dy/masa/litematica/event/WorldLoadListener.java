@@ -1,12 +1,19 @@
 package fi.dy.masa.litematica.event;
 
 import javax.annotation.Nullable;
+
+import fi.dy.masa.litematica.Reference;
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionMaps;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.util.Identifier;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
@@ -33,6 +40,13 @@ public class WorldLoadListener implements IWorldLoadListener
         else
         {
             DataManager.clear();
+        }
+
+        ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
+        if (networkHandler != null)
+        {
+            Identifier identifier = new Identifier(Reference.MOD_ID, "hello");
+            networkHandler.sendPacket(new CustomPayloadC2SPacket(identifier, new PacketByteBuf(Unpooled.buffer())));
         }
     }
 }
