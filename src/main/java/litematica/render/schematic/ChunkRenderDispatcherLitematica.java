@@ -14,20 +14,16 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.VertexBufferUploader;
-import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.MathHelper;
 
+import malilib.render.buffer.VertexBuilder;
 import litematica.Litematica;
 import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
@@ -36,12 +32,10 @@ public class ChunkRenderDispatcherLitematica
     private static final Logger LOGGER = Litematica.logger;
     private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setNameFormat("Litematica Chunk Batcher %d").setDaemon(true).build();
 
-    private final List<Thread> listWorkerThreads = Lists.<Thread>newArrayList();
+    private final List<Thread> listWorkerThreads = Lists.newArrayList();
     private final List<ChunkRenderWorkerLitematica> listThreadedWorkers = new ArrayList<>();
     private final PriorityBlockingQueue<ChunkCompileTaskGeneratorSchematic> queueChunkUpdates = Queues.newPriorityBlockingQueue();
-    private final BlockingQueue<BufferBuilderCache> queueFreeRenderBuilders;
-    private final WorldVertexBufferUploader displayListUploader = new WorldVertexBufferUploader();
-    private final VertexBufferUploader vertexBufferUploader = new VertexBufferUploader();
+    private final BlockingQueue<VertexBuilderCache> queueFreeRenderBuilders;
     private final Queue<ChunkRenderDispatcherLitematica.PendingUpload> queueChunkUploads = Queues.newPriorityQueue();
     private final ChunkRenderWorkerLitematica renderWorker;
     private final int countRenderBuilders;
@@ -72,10 +66,10 @@ public class ChunkRenderDispatcherLitematica
 
         for (int i = 0; i < this.countRenderBuilders; ++i)
         {
-            this.queueFreeRenderBuilders.add(new BufferBuilderCache());
+            this.queueFreeRenderBuilders.add(new VertexBuilderCache());
         }
 
-        this.renderWorker = new ChunkRenderWorkerLitematica(this, new BufferBuilderCache());
+        this.renderWorker = new ChunkRenderWorkerLitematica(this, new VertexBuilderCache());
     }
 
     public String getDebugInfo()
@@ -194,7 +188,7 @@ public class ChunkRenderDispatcherLitematica
     public void stopChunkUpdates()
     {
         this.clearChunkUpdates();
-        List<BufferBuilderCache> list = new ArrayList<>();
+        List<VertexBuilderCache> list = new ArrayList<>();
 
         while (list.size() != this.countRenderBuilders)
         {
@@ -212,12 +206,12 @@ public class ChunkRenderDispatcherLitematica
         this.queueFreeRenderBuilders.addAll(list);
     }
 
-    public void freeRenderBuilder(BufferBuilderCache builderCache)
+    public void freeRenderBuilder(VertexBuilderCache builderCache)
     {
         this.queueFreeRenderBuilders.add(builderCache);
     }
 
-    public BufferBuilderCache allocateRenderBuilder() throws InterruptedException
+    public VertexBuilderCache allocateRenderBuilder() throws InterruptedException
     {
         return this.queueFreeRenderBuilders.take();
     }
@@ -261,7 +255,7 @@ public class ChunkRenderDispatcherLitematica
         return flag;
     }
 
-    public ListenableFuture<Object> uploadChunkBlocks(final BlockRenderLayer layer, final BufferBuilder buffer,
+    public ListenableFuture<Object> uploadChunkBlocks(final BlockRenderLayer layer, final VertexBuilder builder,
             final RenderChunkSchematicVbo renderChunk, final CompiledChunk compiledChunk, final double distanceSq)
     {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
@@ -269,16 +263,14 @@ public class ChunkRenderDispatcherLitematica
             //if (GuiBase.isCtrlDown()) System.out.printf("uploadChunkBlocks()\n");
             if (OpenGlHelper.useVbo())
             {
-                this.uploadVertexBuffer(buffer, renderChunk.getVertexBufferByLayer(layer.ordinal()));
+                this.uploadVertexBuffer(builder, renderChunk.getVertexBufferByLayer(layer.ordinal()));
             }
             else
             {
-                this.uploadDisplayList(buffer, ((RenderChunkSchematicList) renderChunk).getDisplayList(layer, compiledChunk), renderChunk);
+                this.uploadDisplayList(builder, ((RenderChunkSchematicList) renderChunk).getDisplayList(layer, compiledChunk), renderChunk);
             }
 
-            buffer.setTranslation(0.0D, 0.0D, 0.0D);
-
-            return Futures.<Object>immediateFuture(null);
+            return Futures.immediateFuture(null);
         }
         else
         {
@@ -287,7 +279,7 @@ public class ChunkRenderDispatcherLitematica
                 @Override
                 public void run()
                 {
-                    ChunkRenderDispatcherLitematica.this.uploadChunkBlocks(layer, buffer, renderChunk, compiledChunk, distanceSq);
+                    ChunkRenderDispatcherLitematica.this.uploadChunkBlocks(layer, builder, renderChunk, compiledChunk, distanceSq);
                 }
             }, null);
 
@@ -299,7 +291,7 @@ public class ChunkRenderDispatcherLitematica
         }
     }
 
-    public ListenableFuture<Object> uploadChunkOverlay(final OverlayRenderType type, final BufferBuilder buffer,
+    public ListenableFuture<Object> uploadChunkOverlay(final OverlayRenderType type, final VertexBuilder builder,
             final RenderChunkSchematicVbo renderChunk, final CompiledChunkSchematic compiledChunk, final double distanceSq)
     {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
@@ -307,25 +299,23 @@ public class ChunkRenderDispatcherLitematica
             //if (GuiBase.isCtrlDown()) System.out.printf("uploadChunkOverlay()\n");
             if (OpenGlHelper.useVbo())
             {
-                this.uploadVertexBuffer(buffer, renderChunk.getOverlayVertexBuffer(type));
+                this.uploadVertexBuffer(builder, renderChunk.getOverlayVertexBuffer(type));
             }
             else
             {
-                this.uploadDisplayList(buffer, ((RenderChunkSchematicList) renderChunk).getOverlayDisplayList(type, compiledChunk), renderChunk);
+                this.uploadDisplayList(builder, ((RenderChunkSchematicList) renderChunk).getOverlayDisplayList(type, compiledChunk), renderChunk);
             }
 
-            buffer.setTranslation(0.0D, 0.0D, 0.0D);
-
-            return Futures.<Object>immediateFuture(null);
+            return Futures.immediateFuture(null);
         }
         else
         {
-            ListenableFutureTask<Object> futureTask = ListenableFutureTask.<Object>create(new Runnable()
+            ListenableFutureTask<Object> futureTask = ListenableFutureTask.create(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    ChunkRenderDispatcherLitematica.this.uploadChunkOverlay(type, buffer, renderChunk, compiledChunk, distanceSq);
+                    ChunkRenderDispatcherLitematica.this.uploadChunkOverlay(type, builder, renderChunk, compiledChunk, distanceSq);
                 }
             }, null);
 
@@ -337,22 +327,24 @@ public class ChunkRenderDispatcherLitematica
         }
     }
 
-    private void uploadDisplayList(BufferBuilder bufferBuilderIn, int list, RenderChunk renderChunk)
+    private void uploadDisplayList(VertexBuilder builder, int list, RenderChunk renderChunk)
     {
+        /*
         GlStateManager.glNewList(list, GL11.GL_COMPILE);
         GlStateManager.pushMatrix();
 
         //chunkRenderer.multModelviewMatrix();
-        this.displayListUploader.draw(bufferBuilderIn);
+        this.displayListUploader.draw(builder);
 
         GlStateManager.popMatrix();
         GlStateManager.glEndList();
+        */
     }
 
-    private void uploadVertexBuffer(BufferBuilder bufferBuilder, VertexBuffer vertexBufferIn)
+    private void uploadVertexBuffer(VertexBuilder builder, VertexBuffer vertexBuffer)
     {
-        this.vertexBufferUploader.setVertexBuffer(vertexBufferIn);
-        this.vertexBufferUploader.draw(bufferBuilder);
+        builder.reset();
+        vertexBuffer.bufferData(builder.getByteBuffer());
     }
 
     public void clearChunkUpdates()

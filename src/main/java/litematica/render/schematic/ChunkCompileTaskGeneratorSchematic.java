@@ -5,8 +5,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 
-import net.minecraft.client.renderer.chunk.CompiledChunk;
-
 public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompileTaskGeneratorSchematic>
 {
     private final RenderChunkSchematicVbo renderChunk;
@@ -14,8 +12,8 @@ public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompi
     private final List<Runnable> listFinishRunnables = Lists.<Runnable>newArrayList();
     private final ChunkCompileTaskGeneratorSchematic.Type type;
     private final double distanceSq;
-    private BufferBuilderCache bufferBuilderCache;
-    private CompiledChunk compiledChunk;
+    private VertexBuilderCache vertexBuilderCache;
+    private CompiledChunkSchematic compiledChunk;
     private ChunkCompileTaskGeneratorSchematic.Status status = ChunkCompileTaskGeneratorSchematic.Status.PENDING;
     private boolean finished;
 
@@ -36,24 +34,24 @@ public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompi
         return this.renderChunk;
     }
 
-    public CompiledChunk getCompiledChunk()
+    public CompiledChunkSchematic getCompiledChunk()
     {
         return this.compiledChunk;
     }
 
-    public void setCompiledChunk(CompiledChunk compiledChunkIn)
+    public void setCompiledChunk(CompiledChunkSchematic compiledChunkIn)
     {
         this.compiledChunk = compiledChunkIn;
     }
 
-    public BufferBuilderCache getBufferCache()
+    public VertexBuilderCache getBufferCache()
     {
-        return this.bufferBuilderCache;
+        return this.vertexBuilderCache;
     }
 
-    public void setRegionRenderCacheBuilder(BufferBuilderCache cache)
+    public void setRegionRenderCacheBuilder(VertexBuilderCache cache)
     {
-        this.bufferBuilderCache = cache;
+        this.vertexBuilderCache = cache;
     }
 
     public void setStatus(ChunkCompileTaskGeneratorSchematic.Status statusIn)

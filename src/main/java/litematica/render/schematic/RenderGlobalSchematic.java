@@ -16,7 +16,6 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -49,6 +48,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.RenderUtils;
+import malilib.render.buffer.VertexBuilder;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.ChunkSectionPos;
@@ -664,7 +664,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         this.mc.entityRenderer.disableLightmap();
     }
 
-    public boolean renderBlock(IBlockState state, BlockPos pos, IBlockAccess blockAccess, BufferBuilder bufferBuilderIn)
+    public boolean renderBlock(IBlockState state, BlockPos pos, IBlockAccess blockAccess, VertexBuilder builder)
     {
         try
         {
@@ -679,11 +679,12 @@ public class RenderGlobalSchematic extends RenderGlobal
                 switch (renderType)
                 {
                     case MODEL:
-                        return this.blockModelRenderer.renderModel(blockAccess, this.getModelForState(state), state, pos, bufferBuilderIn);
+                        return this.blockModelRenderer.renderModel(this.getModelForState(state), state, pos, blockAccess, builder);
                     case ENTITYBLOCK_ANIMATED:
                         return false;
                     case LIQUID:
-                        return this.fluidRenderer.renderFluid(blockAccess, state, pos, bufferBuilderIn);
+                        // TODO FIXME add a custom fluid renderer that uses the VertexBuilder
+                        //return this.fluidRenderer.renderFluid(blockAccess, state, pos, builder);
                     default:
                         return false;
                 }

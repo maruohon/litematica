@@ -11,9 +11,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -28,6 +26,8 @@ import malilib.config.value.HudAlignment;
 import malilib.gui.util.GuiUtils;
 import malilib.gui.util.ScreenContext;
 import malilib.render.ShapeRenderUtils;
+import malilib.render.buffer.VanillaWrappingVertexBuilder;
+import malilib.render.buffer.VertexBuilder;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.EnabledCondition;
@@ -337,28 +337,25 @@ public class OverlayRenderer
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
         GlStateManager.disableLighting();
-        GlStateManager.disableTexture2D();
         GlStateManager.pushMatrix();
 
         GlStateManager.glLineWidth(2f);
 
         Entity entity = GameUtils.getCameraEntity();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
         BlockPairTypePosition lookedEntry = null;
         BlockPairTypePosition prevEntry = null;
         long lookPosLong = lookPos != null ? lookPos.posLong : -1;
         boolean connections = Configs.Visuals.VERIFIER_HIGHLIGHT_CONNECTIONS.getBooleanValue();
 
+        VertexBuilder lineBuilder = VanillaWrappingVertexBuilder.coloredLines();
+
         for (BlockPairTypePosition entry : posList)
         {
-            Color4f color = entry.type.getOverlayColor();
+            Color4f color = entry.type.getOverlayColor().withAlpha(1f);
 
             if (entry.posLong != lookPosLong)
             {
-                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.posLong, color, 0.002, buffer, entity, partialTicks);
+                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.posLong, color, 0.002, lineBuilder, entity, partialTicks);
             }
             else
             {
@@ -367,7 +364,8 @@ public class OverlayRenderer
 
             if (connections && prevEntry != null)
             {
-                RenderUtils.drawConnectingLineBatchedLines(prevEntry.posLong, entry.posLong, false, color, buffer, entity, partialTicks);
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.posLong, entry.posLong, false, color,
+                                                           lineBuilder, entity, partialTicks);
             }
 
             prevEntry = entry;
@@ -375,36 +373,39 @@ public class OverlayRenderer
 
         if (lookedEntry != null)
         {
+            Color4f color = lookedEntry.type.getOverlayColor().withAlpha(1f);
+
             if (connections && prevEntry != null)
             {
-                RenderUtils.drawConnectingLineBatchedLines(prevEntry.posLong, lookedEntry.posLong, false, lookedEntry.type.getOverlayColor(), buffer, entity, partialTicks);
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.posLong, lookedEntry.posLong, false,
+                                                           color, lineBuilder, entity, partialTicks);
             }
 
-            tessellator.draw();
-            buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+            lineBuilder.draw();
+            lineBuilder.start();
 
             GlStateManager.glLineWidth(6f);
-            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPosLong, lookedEntry.type.getOverlayColor(), 0.002, buffer, entity, partialTicks);
+            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPosLong, color, 0.002, lineBuilder, entity, partialTicks);
         }
 
-        tessellator.draw();
+        lineBuilder.draw();
 
         if (Configs.Visuals.VERIFIER_HIGHLIGHT_SIDES.getBooleanValue())
         {
             GlStateManager.enableBlend();
             GlStateManager.disableCull();
 
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+            VertexBuilder quadBuilder = VanillaWrappingVertexBuilder.coloredQuads();
             float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HIGHLIGHT_ALPHA.getDoubleValue();
 
             for (BlockPairTypePosition entry : posList)
             {
                 Color4f color = entry.type.getOverlayColor();
                 color = new Color4f(color.r, color.g, color.b, alpha);
-                RenderUtils.renderAreaSidesBatched(entry.posLong, entry.posLong, color, 0.002, entity, partialTicks, buffer);
+                RenderUtils.renderAreaSidesBatched(entry.posLong, entry.posLong, color, 0.002, entity, partialTicks, quadBuilder);
             }
 
-            tessellator.draw();
+            quadBuilder.draw();
 
             GlStateManager.disableBlend();
         }
@@ -725,14 +726,11 @@ public class OverlayRenderer
                 GlStateManager.disableDepth();
                 GlStateManager.depthMask(false);
 
-                Tessellator tessellator = Tessellator.getInstance();
-                BufferBuilder buffer = tessellator.getBuffer();
-
                 LitematicaRenderer.enableAlphaShader(Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING.getFloatValue());
 
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-                LitematicaRenderer.getInstance().getWorldRenderer().renderBlock(stateSchematic, pos, worldSchematic, buffer);
-                tessellator.draw();
+                VertexBuilder builder = VanillaWrappingVertexBuilder.create(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                LitematicaRenderer.getInstance().getWorldRenderer().renderBlock(stateSchematic, pos, worldSchematic, builder);
+                builder.draw();
 
                 LitematicaRenderer.disableAlphaShader();
 

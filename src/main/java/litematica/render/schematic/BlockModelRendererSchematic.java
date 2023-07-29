@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -22,6 +21,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 
+import malilib.render.buffer.VertexBuilder;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 
@@ -36,7 +36,8 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         this.blockColors = blockColorsIn;
     }
 
-    public boolean renderModel(IBlockAccess worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer)
+    public boolean renderModel(IBakedModel modelIn, IBlockState stateIn, BlockPos posIn,
+                               IBlockAccess worldIn, VertexBuilder builder)
     {
         boolean ao = Minecraft.isAmbientOcclusionEnabled() && stateIn.getLightValue() == 0 && modelIn.isAmbientOcclusion();
         long rand = MathHelper.getPositionRandom(posIn);
@@ -45,11 +46,11 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         {
             if (ao)
             {
-                return this.renderModelSmooth(worldIn, modelIn, stateIn, posIn, buffer, rand);
+                return this.renderModelSmooth(modelIn, stateIn, posIn, worldIn, builder, rand);
             }
             else
             {
-                return this.renderModelFlat(worldIn, modelIn, stateIn, posIn, buffer, rand);
+                return this.renderModelFlat(modelIn, stateIn, posIn, worldIn, builder, rand);
             }
         }
         catch (Throwable throwable)
@@ -57,12 +58,13 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block model");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Block model being tesselated");
             CrashReportCategory.addBlockInfo(crashreportcategory, posIn, stateIn);
-            crashreportcategory.addCrashSection("Using AO", Boolean.valueOf(ao));
+            crashreportcategory.addCrashSection("Using AO", ao);
             throw new ReportedException(crashreport);
         }
     }
 
-    public boolean renderModelSmooth(IBlockAccess worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
+    public boolean renderModelSmooth(IBakedModel modelIn, IBlockState stateIn, BlockPos posIn,
+                                     IBlockAccess worldIn, VertexBuilder builder, long rand)
     {
         boolean renderedSomething = false;
         float[] quadBounds = new float[EnumFacing.values().length * 2];
@@ -77,24 +79,25 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             {
                 if (this.shouldRenderModelSide(worldIn, stateIn, posIn, side))
                 {
-                    this.renderQuadsSmooth(worldIn, stateIn, posIn, buffer, quads, quadBounds, bitset, aoFace);
+                    this.renderQuadsSmooth(stateIn, posIn, worldIn, quads, quadBounds, bitset, aoFace, builder);
                     renderedSomething = true;
                 }
             }
         }
 
-        List<BakedQuad> quads = modelIn.getQuads(stateIn, (EnumFacing)null, rand);
+        List<BakedQuad> quads = modelIn.getQuads(stateIn, null, rand);
 
         if (quads.isEmpty() == false)
         {
-            this.renderQuadsSmooth(worldIn, stateIn, posIn, buffer, quads, quadBounds, bitset, aoFace);
+            this.renderQuadsSmooth(stateIn, posIn, worldIn, quads, quadBounds, bitset, aoFace, builder);
             renderedSomething = true;
         }
 
         return renderedSomething;
     }
 
-    public boolean renderModelFlat(IBlockAccess worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
+    public boolean renderModelFlat(IBakedModel modelIn, IBlockState stateIn, BlockPos posIn,
+                                   IBlockAccess worldIn, VertexBuilder builder, long rand)
     {
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
@@ -108,7 +111,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
                 if (this.shouldRenderModelSide(worldIn, stateIn, posIn, side))
                 {
                     int lightMapCoords = stateIn.getPackedLightmapCoords(worldIn, posIn.offset(side));
-                    this.renderQuadsFlat(worldIn, stateIn, posIn, lightMapCoords, false, buffer, quads, bitset);
+                    this.renderQuadsFlat(stateIn, posIn, worldIn, lightMapCoords, false, quads, bitset, builder);
                     renderedSomething = true;
                 }
             }
@@ -118,7 +121,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
         if (quads.isEmpty() == false)
         {
-            this.renderQuadsFlat(worldIn, stateIn, posIn, -1, true, buffer, quads, bitset);
+            this.renderQuadsFlat(stateIn, posIn, worldIn, -1, true, quads, bitset, builder);
             renderedSomething = true;
         }
 
@@ -132,57 +135,60 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
                stateIn.shouldSideBeRendered(worldIn, posIn, side);
     }
 
-    private void renderQuadsSmooth(IBlockAccess blockAccessIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, List<BakedQuad> list, float[] quadBounds, BitSet bitSet, AmbientOcclusionFace aoFace)
+    private void renderQuadsSmooth(IBlockState stateIn, BlockPos posIn, IBlockAccess blockAccessIn,
+                                   List<BakedQuad> list, float[] quadBounds, BitSet bitSet,
+                                   AmbientOcclusionFace aoFace, VertexBuilder builder)
     {
-        Vec3d vec3d = stateIn.getOffset(blockAccessIn, posIn);
-        double x = (double)posIn.getX() + vec3d.x;
-        double y = (double)posIn.getY() + vec3d.y;
-        double z = (double)posIn.getZ() + vec3d.z;
-        int i = 0;
+        Vec3d modelOffset = stateIn.getOffset(blockAccessIn, posIn);
+        double x = (double) (posIn.getX() & 0xF) + modelOffset.x;
+        double y = (double) (posIn.getY() & 0xF) + modelOffset.y;
+        double z = (double) (posIn.getZ() & 0xF) + modelOffset.z;
 
-        for (int j = list.size(); i < j; ++i)
+        for (BakedQuad quad : list)
         {
-            BakedQuad bakedquad = list.get(i);
-            this.fillQuadBounds(stateIn, bakedquad.getVertexData(), bakedquad.getFace(), quadBounds, bitSet);
-            aoFace.updateVertexBrightness(blockAccessIn, stateIn, posIn, bakedquad.getFace(), quadBounds, bitSet);
-            buffer.addVertexData(bakedquad.getVertexData());
-            buffer.putBrightness4(aoFace.vertexBrightness[0], aoFace.vertexBrightness[1], aoFace.vertexBrightness[2], aoFace.vertexBrightness[3]);
+            this.fillQuadBounds(stateIn, quad.getVertexData(), quad.getFace(), quadBounds, bitSet);
+            aoFace.updateVertexBrightness(blockAccessIn, stateIn, posIn, quad.getFace(), quadBounds, bitSet);
 
-            if (bakedquad.hasTintIndex())
+            builder.addVertexData(quad.getVertexData());
+            builder.putBrightness(aoFace.vertexBrightness[0], aoFace.vertexBrightness[1], aoFace.vertexBrightness[2], aoFace.vertexBrightness[3]);
+
+            if (quad.hasTintIndex())
             {
-                int k = this.blockColors.colorMultiplier(stateIn, blockAccessIn, posIn, bakedquad.getTintIndex());
+                int k = this.blockColors.colorMultiplier(stateIn, blockAccessIn, posIn, quad.getTintIndex());
 
                 if (EntityRenderer.anaglyphEnable)
                 {
                     k = TextureUtil.anaglyphColor(k);
                 }
 
-                float f = (float)(k >> 16 & 255) / 255.0F;
-                float f1 = (float)(k >> 8 & 255) / 255.0F;
-                float f2 = (float)(k & 255) / 255.0F;
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[0] * f, aoFace.vertexColorMultiplier[0] * f1, aoFace.vertexColorMultiplier[0] * f2, 4);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[1] * f, aoFace.vertexColorMultiplier[1] * f1, aoFace.vertexColorMultiplier[1] * f2, 3);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[2] * f, aoFace.vertexColorMultiplier[2] * f1, aoFace.vertexColorMultiplier[2] * f2, 2);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[3] * f, aoFace.vertexColorMultiplier[3] * f1, aoFace.vertexColorMultiplier[3] * f2, 1);
+                float r = (float) ((k >> 16) & 255) / 255.0F;
+                float g = (float) ((k >>  8) & 255) / 255.0F;
+                float b = (float) ( k        & 255) / 255.0F;
+                builder.putColorMultiplier(aoFace.vertexColorMultiplier[0] * r, aoFace.vertexColorMultiplier[0] * g, aoFace.vertexColorMultiplier[0] * b, 4);
+                builder.putColorMultiplier(aoFace.vertexColorMultiplier[1] * r, aoFace.vertexColorMultiplier[1] * g, aoFace.vertexColorMultiplier[1] * b, 3);
+                builder.putColorMultiplier(aoFace.vertexColorMultiplier[2] * r, aoFace.vertexColorMultiplier[2] * g, aoFace.vertexColorMultiplier[2] * b, 2);
+                builder.putColorMultiplier(aoFace.vertexColorMultiplier[3] * r, aoFace.vertexColorMultiplier[3] * g, aoFace.vertexColorMultiplier[3] * b, 1);
             }
             else
             {
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[0], aoFace.vertexColorMultiplier[0], aoFace.vertexColorMultiplier[0], 4);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[1], aoFace.vertexColorMultiplier[1], aoFace.vertexColorMultiplier[1], 3);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[2], aoFace.vertexColorMultiplier[2], aoFace.vertexColorMultiplier[2], 2);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[3], aoFace.vertexColorMultiplier[3], aoFace.vertexColorMultiplier[3], 1);
+                builder.putColorMultiplier(aoFace.vertexColorMultiplier[0], aoFace.vertexColorMultiplier[0], aoFace.vertexColorMultiplier[0], 4);
+                builder.putColorMultiplier(aoFace.vertexColorMultiplier[1], aoFace.vertexColorMultiplier[1], aoFace.vertexColorMultiplier[1], 3);
+                builder.putColorMultiplier(aoFace.vertexColorMultiplier[2], aoFace.vertexColorMultiplier[2], aoFace.vertexColorMultiplier[2], 2);
+                builder.putColorMultiplier(aoFace.vertexColorMultiplier[3], aoFace.vertexColorMultiplier[3], aoFace.vertexColorMultiplier[3], 1);
             }
 
-            buffer.putPosition(x, y, z);
+            builder.putPosition(x, y, z);
         }
     }
 
-    private void renderQuadsFlat(IBlockAccess blockAccessIn, IBlockState stateIn, BlockPos posIn, int brightnessIn, boolean ownBrightness, BufferBuilder buffer, List<BakedQuad> list, BitSet bitSet)
+    private void renderQuadsFlat(IBlockState stateIn, BlockPos posIn, IBlockAccess blockAccessIn,
+                                 int brightnessIn, boolean ownBrightness,
+                                 List<BakedQuad> list, BitSet bitSet, VertexBuilder builder)
     {
-        Vec3d vec3d = stateIn.getOffset(blockAccessIn, posIn);
-        double d0 = (double)posIn.getX() + vec3d.x;
-        double d1 = (double)posIn.getY() + vec3d.y;
-        double d2 = (double)posIn.getZ() + vec3d.z;
+        Vec3d modelOffset = stateIn.getOffset(blockAccessIn, posIn);
+        double x = (double) (posIn.getX() & 0xF) + modelOffset.x;
+        double y = (double) (posIn.getY() & 0xF) + modelOffset.y;
+        double z = (double) (posIn.getZ() & 0xF) + modelOffset.z;
         int i = 0;
 
         for (int j = list.size(); i < j; ++i)
@@ -196,8 +202,8 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
                 brightnessIn = stateIn.getPackedLightmapCoords(blockAccessIn, blockpos);
             }
 
-            buffer.addVertexData(bakedquad.getVertexData());
-            buffer.putBrightness4(brightnessIn, brightnessIn, brightnessIn, brightnessIn);
+            builder.addVertexData(bakedquad.getVertexData());
+            builder.putBrightness(brightnessIn, brightnessIn, brightnessIn, brightnessIn);
 
             if (bakedquad.hasTintIndex())
             {
@@ -208,20 +214,21 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
                     k = TextureUtil.anaglyphColor(k);
                 }
 
-                float f = (float)(k >> 16 & 255) / 255.0F;
-                float f1 = (float)(k >> 8 & 255) / 255.0F;
-                float f2 = (float)(k & 255) / 255.0F;
-                buffer.putColorMultiplier(f, f1, f2, 4);
-                buffer.putColorMultiplier(f, f1, f2, 3);
-                buffer.putColorMultiplier(f, f1, f2, 2);
-                buffer.putColorMultiplier(f, f1, f2, 1);
+                float r = (float) ((k >> 16) & 255) / 255.0F;
+                float g = (float) ((k >>  8) & 255) / 255.0F;
+                float b = (float) ( k        & 255) / 255.0F;
+                builder.putColorMultiplier(r, g, b, 4);
+                builder.putColorMultiplier(r, g, b, 3);
+                builder.putColorMultiplier(r, g, b, 2);
+                builder.putColorMultiplier(r, g, b, 1);
             }
 
-            buffer.putPosition(d0, d1, d2);
+            builder.putPosition(x, y, z);
         }
     }
 
-    private void fillQuadBounds(IBlockState stateIn, int[] vertexData, EnumFacing face, @Nullable float[] quadBounds, BitSet boundsFlags)
+    private void fillQuadBounds(IBlockState stateIn, int[] vertexData, EnumFacing face,
+                                @Nullable float[] quadBounds, BitSet boundsFlags)
     {
         float f = 32.0F;
         float f1 = 32.0F;
@@ -251,7 +258,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             quadBounds[EnumFacing.UP.getIndex()] = f4;
             quadBounds[EnumFacing.NORTH.getIndex()] = f2;
             quadBounds[EnumFacing.SOUTH.getIndex()] = f5;
-            int j = EnumFacing.values().length;
+            int j = 6;
             quadBounds[EnumFacing.WEST.getIndex() + j] = 1.0F - f;
             quadBounds[EnumFacing.EAST.getIndex() + j] = 1.0F - f3;
             quadBounds[EnumFacing.DOWN.getIndex() + j] = 1.0F - f1;
@@ -293,7 +300,8 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         private final float[] vertexColorMultiplier = new float[4];
         private final int[] vertexBrightness = new int[4];
 
-        public void updateVertexBrightness(IBlockAccess worldIn, IBlockState state, BlockPos centerPos, EnumFacing direction, float[] faceShape, BitSet shapeState)
+        public void updateVertexBrightness(IBlockAccess worldIn, IBlockState state, BlockPos centerPos,
+                                           EnumFacing direction, float[] faceShape, BitSet shapeState)
         {
             /*
             BlockPos blockpos = shapeState.get(0) ? centerPos.offset(direction) : centerPos;
@@ -480,7 +488,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
     }
 
-    public static enum EnumNeighborInfo
+    public enum EnumNeighborInfo
     {
         DOWN(new EnumFacing[]{EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH}, 0.5F, true, new Orientation[]{Orientation.FLIP_WEST, Orientation.SOUTH, Orientation.FLIP_WEST, Orientation.FLIP_SOUTH, Orientation.WEST, Orientation.FLIP_SOUTH, Orientation.WEST, Orientation.SOUTH}, new Orientation[]{Orientation.FLIP_WEST, Orientation.NORTH, Orientation.FLIP_WEST, Orientation.FLIP_NORTH, Orientation.WEST, Orientation.FLIP_NORTH, Orientation.WEST, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_EAST, Orientation.NORTH, Orientation.FLIP_EAST, Orientation.FLIP_NORTH, Orientation.EAST, Orientation.FLIP_NORTH, Orientation.EAST, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_EAST, Orientation.SOUTH, Orientation.FLIP_EAST, Orientation.FLIP_SOUTH, Orientation.EAST, Orientation.FLIP_SOUTH, Orientation.EAST, Orientation.SOUTH}),
         UP(new EnumFacing[]{EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.SOUTH}, 1.0F, true, new Orientation[]{Orientation.EAST, Orientation.SOUTH, Orientation.EAST, Orientation.FLIP_SOUTH, Orientation.FLIP_EAST, Orientation.FLIP_SOUTH, Orientation.FLIP_EAST, Orientation.SOUTH}, new Orientation[]{Orientation.EAST, Orientation.NORTH, Orientation.EAST, Orientation.FLIP_NORTH, Orientation.FLIP_EAST, Orientation.FLIP_NORTH, Orientation.FLIP_EAST, Orientation.NORTH}, new Orientation[]{Orientation.WEST, Orientation.NORTH, Orientation.WEST, Orientation.FLIP_NORTH, Orientation.FLIP_WEST, Orientation.FLIP_NORTH, Orientation.FLIP_WEST, Orientation.NORTH}, new Orientation[]{Orientation.WEST, Orientation.SOUTH, Orientation.WEST, Orientation.FLIP_SOUTH, Orientation.FLIP_WEST, Orientation.FLIP_SOUTH, Orientation.FLIP_WEST, Orientation.SOUTH}),
@@ -498,7 +506,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         private final Orientation[] vert3Weights;
         private static final EnumNeighborInfo[] VALUES = new EnumNeighborInfo[6];
 
-        private EnumNeighborInfo(EnumFacing[] p_i46236_3_, float p_i46236_4_, boolean p_i46236_5_, Orientation[] p_i46236_6_, Orientation[] p_i46236_7_, Orientation[] p_i46236_8_, Orientation[] p_i46236_9_)
+        EnumNeighborInfo(EnumFacing[] p_i46236_3_, float p_i46236_4_, boolean p_i46236_5_, Orientation[] p_i46236_6_, Orientation[] p_i46236_7_, Orientation[] p_i46236_8_, Orientation[] p_i46236_9_)
         {
             //this.corners = p_i46236_3_;
             //this.shadeWeight = p_i46236_4_;
@@ -525,7 +533,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
     }
 
-    public static enum Orientation
+    public enum Orientation
     {
         DOWN(EnumFacing.DOWN, false),
         UP(EnumFacing.UP, false),
@@ -542,13 +550,13 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
         private final int shape;
 
-        private Orientation(EnumFacing p_i46233_3_, boolean p_i46233_4_)
+        Orientation(EnumFacing p_i46233_3_, boolean p_i46233_4_)
         {
             this.shape = p_i46233_3_.getIndex() + (p_i46233_4_ ? EnumFacing.values().length : 0);
         }
     }
 
-    static enum VertexTranslations
+    enum VertexTranslations
     {
         DOWN(0, 1, 2, 3),
         UP(2, 3, 0, 1),
@@ -563,7 +571,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         private final int vert3;
         private static final VertexTranslations[] VALUES = new VertexTranslations[6];
 
-        private VertexTranslations(int p_i46234_3_, int p_i46234_4_, int p_i46234_5_, int p_i46234_6_)
+        VertexTranslations(int p_i46234_3_, int p_i46234_4_, int p_i46234_5_, int p_i46234_6_)
         {
             this.vert0 = p_i46234_3_;
             this.vert1 = p_i46234_4_;

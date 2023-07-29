@@ -2,16 +2,11 @@ package litematica.render;
 
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -25,6 +20,8 @@ import malilib.config.value.VerticalAlignment;
 import malilib.gui.util.GuiUtils;
 import malilib.render.RenderContext;
 import malilib.render.ShapeRenderUtils;
+import malilib.render.buffer.VanillaWrappingVertexBuilder;
+import malilib.render.buffer.VertexBuilder;
 import malilib.render.inventory.InventoryRenderDefinition;
 import malilib.render.inventory.InventoryRenderUtils;
 import malilib.util.StringUtils;
@@ -84,13 +81,13 @@ public class RenderUtils
         GlStateManager.glLineWidth(lineWidth);
 
         AxisAlignedBB aabb = createAABB(pos.getX(), pos.getY(), pos.getZ(), expand, partialTicks, renderViewEntity);
-        RenderGlobal.drawSelectionBoundingBox(aabb, color.r, color.g, color.b, color.a);
+        drawBoundingBoxEdges(aabb, color, color, color);
     }
 
     public static void drawBlockBoundingBoxOutlinesBatchedLines(long posLong,
                                                                 Color4f color,
                                                                 double expand,
-                                                                BufferBuilder buffer,
+                                                                VertexBuilder builder,
                                                                 Entity renderViewEntity,
                                                                 float partialTicks)
     {
@@ -104,14 +101,14 @@ public class RenderUtils
         double maxY = malilib.util.position.PositionUtils.unpackY(posLong) - dy + expand + 1;
         double maxZ = malilib.util.position.PositionUtils.unpackZ(posLong) - dz + expand + 1;
 
-        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
+        ShapeRenderUtils.renderBoxEdgeLines(minX, minY, minZ, maxX, maxY, maxZ, color, builder);
     }
 
     public static void drawConnectingLineBatchedLines(long pos1,
                                                       long pos2,
                                                       boolean center,
                                                       Color4f color,
-                                                      BufferBuilder buffer,
+                                                      VertexBuilder builder,
                                                       Entity renderViewEntity,
                                                       float partialTicks)
     {
@@ -135,8 +132,8 @@ public class RenderUtils
             z2 += 0.5;
         }
 
-        buffer.pos(x1, y1, z1).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(x2, y2, z2).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(x1, y1, z1, color);
+        builder.posColor(x2, y2, z2, color);
     }
 
     public static void renderBlockOutlineOverlapping(BlockPos pos,
@@ -161,50 +158,48 @@ public class RenderUtils
 
         GlStateManager.glLineWidth(lineWidth);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+        VertexBuilder builder = VanillaWrappingVertexBuilder.coloredLines();
 
         // Min corner
-        buffer.pos(minX, minY, minZ).color(color1.ri, color1.gi, color1.bi, color1.ai).endVertex();
-        buffer.pos(maxX, minY, minZ).color(color1.ri, color1.gi, color1.bi, color1.ai).endVertex();
+        builder.posColor(minX, minY, minZ, color1);
+        builder.posColor(maxX, minY, minZ, color1);
 
-        buffer.pos(minX, minY, minZ).color(color1.ri, color1.gi, color1.bi, color1.ai).endVertex();
-        buffer.pos(minX, maxY, minZ).color(color1.ri, color1.gi, color1.bi, color1.ai).endVertex();
+        builder.posColor(minX, minY, minZ, color1);
+        builder.posColor(minX, maxY, minZ, color1);
 
-        buffer.pos(minX, minY, minZ).color(color1.ri, color1.gi, color1.bi, color1.ai).endVertex();
-        buffer.pos(minX, minY, maxZ).color(color1.ri, color1.gi, color1.bi, color1.ai).endVertex();
+        builder.posColor(minX, minY, minZ, color1);
+        builder.posColor(minX, minY, maxZ, color1);
 
         // Max corner
-        buffer.pos(minX, maxY, maxZ).color(color2.ri, color2.gi, color2.bi, color2.ai).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color2.ri, color2.gi, color2.bi, color2.ai).endVertex();
+        builder.posColor(minX, maxY, maxZ, color2);
+        builder.posColor(maxX, maxY, maxZ, color2);
 
-        buffer.pos(maxX, minY, maxZ).color(color2.ri, color2.gi, color2.bi, color2.ai).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color2.ri, color2.gi, color2.bi, color2.ai).endVertex();
+        builder.posColor(maxX, minY, maxZ, color2);
+        builder.posColor(maxX, maxY, maxZ, color2);
 
-        buffer.pos(maxX, maxY, minZ).color(color2.ri, color2.gi, color2.bi, color2.ai).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color2.ri, color2.gi, color2.bi, color2.ai).endVertex();
+        builder.posColor(maxX, maxY, minZ, color2);
+        builder.posColor(maxX, maxY, maxZ, color2);
 
         // The rest of the edges
-        buffer.pos(minX, maxY, minZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
-        buffer.pos(maxX, maxY, minZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
+        builder.posColor(minX, maxY, minZ, color3);
+        builder.posColor(maxX, maxY, minZ, color3);
 
-        buffer.pos(minX, minY, maxZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
-        buffer.pos(maxX, minY, maxZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
+        builder.posColor(minX, minY, maxZ, color3);
+        builder.posColor(maxX, minY, maxZ, color3);
 
-        buffer.pos(maxX, minY, minZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
-        buffer.pos(maxX, maxY, minZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
+        builder.posColor(maxX, minY, minZ, color3);
+        builder.posColor(maxX, maxY, minZ, color3);
 
-        buffer.pos(minX, minY, maxZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
-        buffer.pos(minX, maxY, maxZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
+        builder.posColor(minX, minY, maxZ, color3);
+        builder.posColor(minX, maxY, maxZ, color3);
 
-        buffer.pos(maxX, minY, minZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
-        buffer.pos(maxX, minY, maxZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
+        builder.posColor(maxX, minY, minZ, color3);
+        builder.posColor(maxX, minY, maxZ, color3);
 
-        buffer.pos(minX, maxY, minZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
-        buffer.pos(minX, maxY, maxZ).color(color3.ri, color3.gi, color3.bi, color3.ai).endVertex();
+        builder.posColor(minX, maxY, minZ, color3);
+        builder.posColor(minX, maxY, maxZ, color3);
 
-        tessellator.draw();
+        builder.draw();
     }
 
     public static void renderAreaOutline(IntBoundingBox box, float lineWidth,
@@ -228,88 +223,83 @@ public class RenderUtils
                                              double maxX, double maxY, double maxZ,
                                              Color4f colorX, Color4f colorY, Color4f colorZ)
     {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+        VertexBuilder builder = VanillaWrappingVertexBuilder.coloredLines();
 
-        drawBoundingBoxLinesX(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorX);
-        drawBoundingBoxLinesY(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorY);
-        drawBoundingBoxLinesZ(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorZ);
+        drawBoundingBoxLinesX(minX, minY, minZ, maxX, maxY, maxZ, colorX, builder);
+        drawBoundingBoxLinesY(minX, minY, minZ, maxX, maxY, maxZ, colorY, builder);
+        drawBoundingBoxLinesZ(minX, minY, minZ, maxX, maxY, maxZ, colorZ, builder);
 
-        tessellator.draw();
+        builder.draw();
     }
 
-    private static void drawBoundingBoxLinesX(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f color)
+    private static void drawBoundingBoxLinesX(double minX, double minY, double minZ,
+                                              double maxX, double maxY, double maxZ,
+                                              Color4f color, VertexBuilder builder)
     {
-        buffer.pos(minX, minY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, minY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, minY, minZ, color);
+        builder.posColor(maxX, minY, minZ, color);
 
-        buffer.pos(minX, maxY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, maxY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, maxY, minZ, color);
+        builder.posColor(maxX, maxY, minZ, color);
 
-        buffer.pos(minX, minY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, minY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, minY, maxZ, color);
+        builder.posColor(maxX, minY, maxZ, color);
 
-        buffer.pos(minX, maxY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, maxY, maxZ, color);
+        builder.posColor(maxX, maxY, maxZ, color);
     }
 
-    private static void drawBoundingBoxLinesY(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f color)
+    private static void drawBoundingBoxLinesY(double minX, double minY, double minZ,
+                                              double maxX, double maxY, double maxZ,
+                                              Color4f color, VertexBuilder builder)
     {
-        buffer.pos(minX, minY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(minX, maxY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, minY, minZ, color);
+        builder.posColor(minX, maxY, minZ, color);
 
-        buffer.pos(maxX, minY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, maxY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(maxX, minY, minZ, color);
+        builder.posColor(maxX, maxY, minZ, color);
 
-        buffer.pos(minX, minY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(minX, maxY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, minY, maxZ, color);
+        builder.posColor(minX, maxY, maxZ, color);
 
-        buffer.pos(maxX, minY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(maxX, minY, maxZ, color);
+        builder.posColor(maxX, maxY, maxZ, color);
     }
 
-    private static void drawBoundingBoxLinesZ(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f color)
+    private static void drawBoundingBoxLinesZ(double minX, double minY, double minZ,
+                                              double maxX, double maxY, double maxZ,
+                                              Color4f color, VertexBuilder builder)
     {
-        buffer.pos(minX, minY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(minX, minY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, minY, minZ, color);
+        builder.posColor(minX, minY, maxZ, color);
 
-        buffer.pos(maxX, minY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, minY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(maxX, minY, minZ, color);
+        builder.posColor(maxX, minY, maxZ, color);
 
-        buffer.pos(minX, maxY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(minX, maxY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, maxY, minZ, color);
+        builder.posColor(minX, maxY, maxZ, color);
 
-        buffer.pos(maxX, maxY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(maxX, maxY, minZ, color);
+        builder.posColor(maxX, maxY, maxZ, color);
     }
 
-    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, Entity renderViewEntity, float partialTicks)
+    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color,
+                                       Entity renderViewEntity, float partialTicks)
     {
         GlStateManager.enableBlend();
         GlStateManager.disableCull();
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
-        renderAreaSidesBatched(pos1, pos2, color, 0.002, renderViewEntity, partialTicks, buffer);
-
-        tessellator.draw();
+        VertexBuilder builder = VanillaWrappingVertexBuilder.coloredQuads();
+        renderAreaSidesBatched(pos1, pos2, color, 0.002, renderViewEntity, partialTicks, builder);
+        builder.draw();
 
         GlStateManager.enableCull();
         GlStateManager.disableBlend();
     }
 
-    public static void renderAreaSides(IntBoundingBox box, Color4f color, Entity renderViewEntity, float partialTicks)
+    public static void renderAreaSides(IntBoundingBox box, Color4f color,
+                                       Entity renderViewEntity, float partialTicks)
     {
-        GlStateManager.enableBlend();
-        GlStateManager.disableCull();
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
         double expand = 0.002;
         double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
         double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
@@ -321,24 +311,19 @@ public class RenderUtils
         double maxY = box.maxY - dy + expand + 1;
         double maxZ = box.maxZ - dz + expand + 1;
 
-        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
+        VertexBuilder builder = VanillaWrappingVertexBuilder.coloredQuads();
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, builder);
 
-        tessellator.draw();
-
+        GlStateManager.disableCull();
+        builder.draw();
         GlStateManager.enableCull();
-        GlStateManager.disableBlend();
     }
 
     /**
      * Assumes a BufferBuilder in GL_QUADS mode has been initialized
      */
-    public static void renderAreaSidesBatched(BlockPos pos1,
-                                              BlockPos pos2,
-                                              Color4f color,
-                                              double expand,
-                                              Entity renderViewEntity,
-                                              float partialTicks,
-                                              BufferBuilder buffer)
+    public static void renderAreaSidesBatched(BlockPos pos1, BlockPos pos2, Color4f color, double expand,
+                                              Entity renderViewEntity, float partialTicks, VertexBuilder builder)
     {
         double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
         double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
@@ -350,19 +335,14 @@ public class RenderUtils
         double maxY = Math.max(pos1.getY(), pos2.getY()) + 1 - dy + expand;
         double maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1 - dz + expand;
 
-        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, builder);
     }
 
     /**
      * Assumes a BufferBuilder in GL_QUADS mode has been initialized
      */
-    public static void renderAreaSidesBatched(long pos1,
-                                              long pos2,
-                                              Color4f color,
-                                              double expand,
-                                              Entity renderViewEntity,
-                                              float partialTicks,
-                                              BufferBuilder buffer)
+    public static void renderAreaSidesBatched(long pos1, long pos2, Color4f color, double expand,
+                                              Entity renderViewEntity, float partialTicks, VertexBuilder builder)
     {
         double dx = EntityWrap.lerpX(renderViewEntity, partialTicks);
         double dy = EntityWrap.lerpY(renderViewEntity, partialTicks);
@@ -380,11 +360,12 @@ public class RenderUtils
         double maxY = Math.max(y1, y2) + 1 - dy + expand;
         double maxZ = Math.max(z1, z2) + 1 - dz + expand;
 
-        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
+        ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, builder);
     }
 
-    public static void renderAreaOutlineNoCorners(BlockPos pos1, BlockPos pos2,
-            float lineWidth, Color4f colorX, Color4f colorY, Color4f colorZ, Entity renderViewEntity, float partialTicks)
+    public static void renderAreaOutlineNoCorners(BlockPos pos1, BlockPos pos2, float lineWidth,
+                                                  Color4f colorX, Color4f colorY, Color4f colorZ,
+                                                  Entity renderViewEntity, float partialTicks)
     {
         final int xMin = Math.min(pos1.getX(), pos2.getX());
         final int yMin = Math.min(pos1.getY(), pos2.getY());
@@ -414,11 +395,7 @@ public class RenderUtils
 
         int start, end;
 
-        GlStateManager.glLineWidth(lineWidth);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+        VertexBuilder builder = VanillaWrappingVertexBuilder.coloredLines();
 
         // Edges along the X-axis
         start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMin) ? xMin + 1 : xMin;
@@ -426,8 +403,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(start + dxMin, minY, minZ).color(colorX.ri, colorX.gi, colorX.bi, colorX.ai).endVertex();
-            buffer.pos(end   + dxMax, minY, minZ).color(colorX.ri, colorX.gi, colorX.bi, colorX.ai).endVertex();
+            builder.posColor(start + dxMin, minY, minZ, colorX);
+            builder.posColor(end   + dxMax, minY, minZ, colorX);
         }
 
         start = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMin) ? xMin + 1 : xMin;
@@ -435,8 +412,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(start + dxMin, maxY + 1, minZ).color(colorX.ri, colorX.gi, colorX.bi, colorX.ai).endVertex();
-            buffer.pos(end   + dxMax, maxY + 1, minZ).color(colorX.ri, colorX.gi, colorX.bi, colorX.ai).endVertex();
+            builder.posColor(start + dxMin, maxY + 1, minZ, colorX);
+            builder.posColor(end   + dxMax, maxY + 1, minZ, colorX);
         }
 
         start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMax) ? xMin + 1 : xMin;
@@ -444,8 +421,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(start + dxMin, minY, maxZ + 1).color(colorX.ri, colorX.gi, colorX.bi, colorX.ai).endVertex();
-            buffer.pos(end   + dxMax, minY, maxZ + 1).color(colorX.ri, colorX.gi, colorX.bi, colorX.ai).endVertex();
+            builder.posColor(start + dxMin, minY, maxZ + 1, colorX);
+            builder.posColor(end   + dxMax, minY, maxZ + 1, colorX);
         }
 
         start = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMax) ? xMin + 1 : xMin;
@@ -453,8 +430,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(start + dxMin, maxY + 1, maxZ + 1).color(colorX.ri, colorX.gi, colorX.bi, colorX.ai).endVertex();
-            buffer.pos(end   + dxMax, maxY + 1, maxZ + 1).color(colorX.ri, colorX.gi, colorX.bi, colorX.ai).endVertex();
+            builder.posColor(start + dxMin, maxY + 1, maxZ + 1, colorX);
+            builder.posColor(end   + dxMax, maxY + 1, maxZ + 1, colorX);
         }
 
         // Edges along the Y-axis
@@ -463,8 +440,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(minX, start + dyMin, minZ).color(colorY.ri, colorY.gi, colorY.bi, colorY.ai).endVertex();
-            buffer.pos(minX, end   + dyMax, minZ).color(colorY.ri, colorY.gi, colorY.bi, colorY.ai).endVertex();
+            builder.posColor(minX, start + dyMin, minZ, colorY);
+            builder.posColor(minX, end   + dyMax, minZ, colorY);
         }
 
         start = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMin) ? yMin + 1 : yMin;
@@ -472,8 +449,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(maxX + 1, start + dyMin, minZ).color(colorY.ri, colorY.gi, colorY.bi, colorY.ai).endVertex();
-            buffer.pos(maxX + 1, end   + dyMax, minZ).color(colorY.ri, colorY.gi, colorY.bi, colorY.ai).endVertex();
+            builder.posColor(maxX + 1, start + dyMin, minZ, colorY);
+            builder.posColor(maxX + 1, end   + dyMax, minZ, colorY);
         }
 
         start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMax) ? yMin + 1 : yMin;
@@ -481,8 +458,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(minX, start + dyMin, maxZ + 1).color(colorY.ri, colorY.gi, colorY.bi, colorY.ai).endVertex();
-            buffer.pos(minX, end   + dyMax, maxZ + 1).color(colorY.ri, colorY.gi, colorY.bi, colorY.ai).endVertex();
+            builder.posColor(minX, start + dyMin, maxZ + 1, colorY);
+            builder.posColor(minX, end   + dyMax, maxZ + 1, colorY);
         }
 
         start = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMax) ? yMin + 1 : yMin;
@@ -490,8 +467,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(maxX + 1, start + dyMin, maxZ + 1).color(colorY.ri, colorY.gi, colorY.bi, colorY.ai).endVertex();
-            buffer.pos(maxX + 1, end   + dyMax, maxZ + 1).color(colorY.ri, colorY.gi, colorY.bi, colorY.ai).endVertex();
+            builder.posColor(maxX + 1, start + dyMin, maxZ + 1, colorY);
+            builder.posColor(maxX + 1, end   + dyMax, maxZ + 1, colorY);
         }
 
         // Edges along the Z-axis
@@ -500,8 +477,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(minX, minY, start + dzMin).color(colorZ.ri, colorZ.gi, colorZ.bi, colorZ.ai).endVertex();
-            buffer.pos(minX, minY, end   + dzMax).color(colorZ.ri, colorZ.gi, colorZ.bi, colorZ.ai).endVertex();
+            builder.posColor(minX, minY, start + dzMin, colorZ);
+            builder.posColor(minX, minY, end   + dzMax, colorZ);
         }
 
         start = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMin) ? zMin + 1 : zMin;
@@ -509,8 +486,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(maxX + 1, minY, start + dzMin).color(colorZ.ri, colorZ.gi, colorZ.bi, colorZ.ai).endVertex();
-            buffer.pos(maxX + 1, minY, end   + dzMax).color(colorZ.ri, colorZ.gi, colorZ.bi, colorZ.ai).endVertex();
+            builder.posColor(maxX + 1, minY, start + dzMin, colorZ);
+            builder.posColor(maxX + 1, minY, end   + dzMax, colorZ);
         }
 
         start = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMin) ? zMin + 1 : zMin;
@@ -518,8 +495,8 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(minX, maxY + 1, start + dzMin).color(colorZ.ri, colorZ.gi, colorZ.bi, colorZ.ai).endVertex();
-            buffer.pos(minX, maxY + 1, end   + dzMax).color(colorZ.ri, colorZ.gi, colorZ.bi, colorZ.ai).endVertex();
+            builder.posColor(minX, maxY + 1, start + dzMin, colorZ);
+            builder.posColor(minX, maxY + 1, end   + dzMax, colorZ);
         }
 
         start = (pos1.getX() == xMax && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMax && pos2.getZ() == zMin) ? zMin + 1 : zMin;
@@ -527,37 +504,39 @@ public class RenderUtils
 
         if (end > start)
         {
-            buffer.pos(maxX + 1, maxY + 1, start + dzMin).color(colorZ.ri, colorZ.gi, colorZ.bi, colorZ.ai).endVertex();
-            buffer.pos(maxX + 1, maxY + 1, end   + dzMax).color(colorZ.ri, colorZ.gi, colorZ.bi, colorZ.ai).endVertex();
+            builder.posColor(maxX + 1, maxY + 1, start + dzMin, colorZ);
+            builder.posColor(maxX + 1, maxY + 1, end   + dzMax, colorZ);
         }
 
-        tessellator.draw();
+        GlStateManager.glLineWidth(lineWidth);
+        builder.draw();
     }
 
     /**
      * Assumes a BufferBuilder in the GL_LINES mode has been initialized
      */
-    public static void drawBlockModelOutlinesBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, BufferBuilder buffer)
+    public static void drawBlockModelOutlinesBatched(IBakedModel model, IBlockState state,
+                                                     BlockPos pos, Color4f color, VertexBuilder builder)
     {
         long rand = MathHelper.getPositionRandom(pos);
 
         for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
-            renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, rand));
+            renderModelQuadOutlines(pos, color, model.getQuads(state, side, rand), builder);
         }
 
-        renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, null, rand));
+        renderModelQuadOutlines(pos, color, model.getQuads(state, null, rand), builder);
     }
 
-    private static void renderModelQuadOutlines(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
+    private static void renderModelQuadOutlines(BlockPos pos, Color4f color, List<BakedQuad> quads, VertexBuilder builder)
     {
         for (BakedQuad quad : quads)
         {
-            renderQuadOutlinesBatched(pos, buffer, color, quad.getVertexData());
+            renderQuadOutlinesBatched(pos, color, quad.getVertexData(), builder);
         }
     }
 
-    private static void renderQuadOutlinesBatched(BlockPos pos, BufferBuilder buffer, Color4f color, int[] vertexData)
+    private static void renderQuadOutlinesBatched(BlockPos pos, Color4f color, int[] vertexData, VertexBuilder builder)
     {
         final int x = pos.getX();
         final int y = pos.getY();
@@ -573,46 +552,50 @@ public class RenderUtils
             fz[index] = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
         }
 
-        buffer.pos(fx[0], fy[0], fz[0]).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(fx[1], fy[1], fz[1]).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(fx[0], fy[0], fz[0], color);
+        builder.posColor(fx[1], fy[1], fz[1], color);
 
-        buffer.pos(fx[1], fy[1], fz[1]).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(fx[2], fy[2], fz[2]).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(fx[1], fy[1], fz[1], color);
+        builder.posColor(fx[2], fy[2], fz[2], color);
 
-        buffer.pos(fx[2], fy[2], fz[2]).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(fx[3], fy[3], fz[3]).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(fx[2], fy[2], fz[2], color);
+        builder.posColor(fx[3], fy[3], fz[3], color);
 
-        buffer.pos(fx[3], fy[3], fz[3]).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(fx[0], fy[0], fz[0]).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(fx[3], fy[3], fz[3], color);
+        builder.posColor(fx[0], fy[0], fz[0], color);
     }
 
-    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
+    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos,
+                                                        Color4f color, double expand, VertexBuilder builder)
     {
         long rand = MathHelper.getPositionRandom(pos);
 
         for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
-            renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, rand));
+            renderModelQuadOverlayBatched(pos, color, model.getQuads(state, side, rand), builder);
         }
 
-        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, rand));
+        renderModelQuadOverlayBatched(pos, color, model.getQuads(state, null, rand), builder);
     }
 
-    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, EnumFacing side, Color4f color, double expand, BufferBuilder buffer)
+    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state,
+                                                        BlockPos pos, EnumFacing side,
+                                                        Color4f color, double expand, long rand, VertexBuilder builder)
     {
-        long rand = MathHelper.getPositionRandom(pos);
-        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, rand));
+        renderModelQuadOverlayBatched(pos, color, model.getQuads(state, side, rand), builder);
     }
 
-    private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
+    private static void renderModelQuadOverlayBatched(BlockPos pos, Color4f color,
+                                                      List<BakedQuad> quads, VertexBuilder builder)
     {
         for (BakedQuad quad : quads)
         {
-            renderModelQuadOverlayBatched(pos, buffer, color, quad.getVertexData());
+            renderModelQuadOverlayBatched(pos, color, quad.getVertexData(), builder);
         }
     }
 
-    private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, int[] vertexData)
+    private static void renderModelQuadOverlayBatched(BlockPos pos, Color4f color,
+                                                      int[] vertexData, VertexBuilder builder)
     {
         final int x = pos.getX();
         final int y = pos.getY();
@@ -625,11 +608,12 @@ public class RenderUtils
             fy = y + Float.intBitsToFloat(vertexData[index * 7 + 1]);
             fz = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
 
-            buffer.pos(fx, fy, fz).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+            builder.posColor(fx, fy, fz, color);
         }
     }
 
-    public static void drawBlockBoxEdgeBatchedLines(BlockPos pos, EnumFacing.Axis axis, int cornerIndex, Color4f color, BufferBuilder buffer)
+    public static void drawBlockBoxEdgeBatchedLines(BlockPos pos, EnumFacing.Axis axis,
+                                                    int cornerIndex, Color4f color, VertexBuilder builder)
     {
         Vec3i offset = PositionUtils.getEdgeNeighborOffsets(axis, cornerIndex)[cornerIndex];
 
@@ -641,11 +625,12 @@ public class RenderUtils
         double maxZ = pos.getZ() + offset.getZ() + (axis == EnumFacing.Axis.Z ? 1 : 0);
 
         //System.out.printf("pos: %s, axis: %s, ind: %d\n", pos, axis, cornerIndex);
-        buffer.pos(minX, minY, minZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color.ri, color.gi, color.bi, color.ai).endVertex();
+        builder.posColor(minX, minY, minZ, color);
+        builder.posColor(maxX, maxY, maxZ, color);
     }
 
-    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos)
+    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY,
+                                              World worldSchematic, World worldClient, BlockPos pos)
     {
         int heightSch = renderInventoryOverlay(align, HorizontalAlignment.RIGHT, offY, worldSchematic, pos);
         int heightCli = renderInventoryOverlay(align, HorizontalAlignment.LEFT, offY, worldClient, pos);

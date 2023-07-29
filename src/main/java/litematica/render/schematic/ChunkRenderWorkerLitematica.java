@@ -10,13 +10,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
 
+import malilib.render.buffer.VertexBuilder;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.GameUtils;
 import litematica.Litematica;
 import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
@@ -25,7 +25,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
     private static final Logger LOGGER = Litematica.logger;
 
     private final ChunkRenderDispatcherLitematica chunkRenderDispatcher;
-    @Nullable private final BufferBuilderCache bufferCache;
+    @Nullable private final VertexBuilderCache bufferCache;
     private boolean shouldRun;
 
     public ChunkRenderWorkerLitematica(ChunkRenderDispatcherLitematica chunkRenderDispatcherIn)
@@ -33,7 +33,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
         this(chunkRenderDispatcherIn, null);
     }
 
-    public ChunkRenderWorkerLitematica(ChunkRenderDispatcherLitematica chunkRenderDispatcherIn, @Nullable BufferBuilderCache bufferCache)
+    public ChunkRenderWorkerLitematica(ChunkRenderDispatcherLitematica chunkRenderDispatcherIn, @Nullable VertexBuilderCache bufferCache)
     {
         this.shouldRun = true;
         this.chunkRenderDispatcher = chunkRenderDispatcherIn;
@@ -57,7 +57,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Batching chunks");
-                Minecraft.getMinecraft().crashed(Minecraft.getMinecraft().addGraphicsAndWorldToCrashReport(crashreport));
+                GameUtils.getClient().crashed(GameUtils.getClient().addGraphicsAndWorldToCrashReport(crashreport));
                 return;
             }
         }
@@ -86,7 +86,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             generator.getLock().unlock();
         }
 
-        Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
+        Entity entity = GameUtils.getCameraEntity();
 
         if (entity == null)
         {
@@ -132,10 +132,10 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 generator.getLock().unlock();
             }
 
-            final CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) generator.getCompiledChunk();
+            final CompiledChunkSchematic compiledChunk = generator.getCompiledChunk();
             ArrayList<ListenableFuture<Object>> futuresList = Lists.newArrayList();
-            BufferBuilderCache buffers = generator.getBufferCache();
-            RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) generator.getRenderChunk();
+            VertexBuilderCache buffers = generator.getBufferCache();
+            RenderChunkSchematicVbo renderChunk = generator.getRenderChunk();
 
             if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK)
             {
@@ -145,7 +145,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     if (compiledChunk.isLayerEmpty(layer) == false)
                     {
                         //if (GuiBase.isCtrlDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkBlocks()\n");
-                        BufferBuilder buffer = buffers.getWorldRendererByLayer(layer);
+                        VertexBuilder buffer = buffers.getWorldRendererByLayer(layer);
                         futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(layer, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                     }
                 }
@@ -155,14 +155,14 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     if (compiledChunk.isOverlayTypeEmpty(type) == false)
                     {
                         //if (GuiBase.isCtrlDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkOverlay()\n");
-                        BufferBuilder buffer = buffers.getOverlayBuffer(type);
+                        VertexBuilder buffer = buffers.getOverlayBuffer(type);
                         futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(type, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                     }
                 }
             }
             else if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.RESORT_TRANSPARENCY)
             {
-                BufferBuilder buffer = buffers.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
+                VertexBuilder buffer = buffers.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
                 futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
 
                 if (compiledChunk.isOverlayTypeEmpty(OverlayRenderType.QUAD) == false)
@@ -226,14 +226,14 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
                     if ((throwable instanceof CancellationException) == false && (throwable instanceof InterruptedException) == false)
                     {
-                        Minecraft.getMinecraft().crashed(CrashReport.makeCrashReport(throwable, "Rendering Litematica chunk"));
+                        GameUtils.getClient().crashed(CrashReport.makeCrashReport(throwable, "Rendering Litematica chunk"));
                     }
                 }
             });
         }
     }
 
-    private BufferBuilderCache getRegionRenderCacheBuilder() throws InterruptedException
+    private VertexBuilderCache getRegionRenderCacheBuilder() throws InterruptedException
     {
         return this.bufferCache != null ? this.bufferCache : this.chunkRenderDispatcher.allocateRenderBuilder();
     }

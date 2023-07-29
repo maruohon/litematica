@@ -8,10 +8,10 @@ import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public class CompiledChunkSchematic extends CompiledChunk
 {
-    private final boolean[] overlayLayersUsed = new boolean[OverlayRenderType.values().length];
-    private final boolean[] overlayLayersStarted = new boolean[OverlayRenderType.values().length];
+    private final boolean[] overlayLayersUsed = new boolean[OverlayRenderType.COUNT];
+    private final boolean[] overlayLayersStarted = new boolean[OverlayRenderType.COUNT];
     private final BufferBuilder.State[] blockBufferStates = new BufferBuilder.State[BlockRenderLayer.values().length];
-    private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.values().length];
+    private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.COUNT];
     private boolean overlayEmpty = true;
 
     public boolean isOverlayEmpty()
