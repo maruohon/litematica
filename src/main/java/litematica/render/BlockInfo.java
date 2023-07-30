@@ -8,8 +8,11 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 
+import malilib.render.RenderContext;
 import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
+import malilib.render.buffer.VanillaWrappingVertexBuilder;
+import malilib.render.buffer.VertexBuilder;
 import malilib.render.text.StyledText;
 import malilib.render.text.TextRenderer;
 import malilib.util.StringUtils;
@@ -58,28 +61,34 @@ public class BlockInfo
         return this.totalHeight;
     }
 
-    public void render(int x, int y, int zLevel)
+    public void render(int x, int y, int zLevel, RenderContext ctx)
     {
         if (this.state != null)
         {
-            GlStateManager.pushMatrix();
-
-            ShapeRenderUtils.renderOutlinedRectangle(x, y, zLevel, this.totalWidth, this.totalHeight, 0xFF000000, 0xFF999999);
-
             Minecraft mc = GameUtils.getClient();
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;
+
+            GlStateManager.pushMatrix();
+
+            VertexBuilder builder = VanillaWrappingVertexBuilder.coloredQuads();
+
+            // Dark background box
+            ShapeRenderUtils.renderOutlinedRectangle(x, y, zLevel, this.totalWidth, this.totalHeight, 0xFF000000, 0xFF999999, builder);
+
+            // Light background for the item
+            ShapeRenderUtils.renderRectangle(x1, y + 16, zLevel, 16, 16, 0x20FFFFFF, builder);
+            builder.draw();
+
             y += 4;
 
             // TODO FIXME use a StringListRenderer?
-            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFFFFFFFF, true, StyledText.parse(this.title));
+            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFFFFFFFF, true, StyledText.parse(this.title), ctx);
 
             y += 12;
 
             GlStateManager.disableLighting();
             RenderUtils.enableGuiItemLighting();
-
-            ShapeRenderUtils.renderRectangle(x1, y, zLevel, 16, 16, 0x20FFFFFF); // light background for the item
 
             float origZ = mc.getRenderItem().zLevel;
             mc.getRenderItem().zLevel = zLevel + 1;
@@ -90,13 +99,13 @@ public class BlockInfo
             //GlStateManager.disableBlend();
             RenderUtils.disableItemLighting();
 
-            TextRenderer.INSTANCE.renderText(x1 + 20, y + 4, 0, 0xFFFFFFFF, true, StyledText.parse(this.stackName));
+            TextRenderer.INSTANCE.renderText(x1 + 20, y + 4, 0, 0xFFFFFFFF, true, StyledText.parse(this.stackName), ctx);
 
             y += 20;
-            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFF4060FF, true, StyledText.parse(this.blockRegistryname));
+            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFF4060FF, true, StyledText.parse(this.blockRegistryname), ctx);
             y += TextRenderer.INSTANCE.getFontHeight() + 4;
 
-            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFFB0B0B0, true, StyledText.parseList(this.props));
+            TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFFB0B0B0, true, StyledText.parseList(this.props), ctx);
 
             GlStateManager.popMatrix();
         }

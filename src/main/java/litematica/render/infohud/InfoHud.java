@@ -6,7 +6,7 @@ import java.util.List;
 import malilib.config.value.HorizontalAlignment;
 import malilib.config.value.HudAlignment;
 import malilib.gui.util.GuiUtils;
-import malilib.gui.util.ScreenContext;
+import malilib.render.RenderContext;
 import malilib.render.text.StringListRenderer;
 import litematica.config.Configs;
 
@@ -59,7 +59,7 @@ public class InfoHud
         return Configs.InfoOverlays.INFO_HUD_OFFSET.getValue().y;
     }
 
-    public void renderHud()
+    public void renderHud(RenderContext ctx)
     {
         if (this.shouldRender())
         {
@@ -113,7 +113,6 @@ public class InfoHud
                     y = GuiUtils.getScaledWindowHeight() - this.stringListRenderer.getTotalRenderHeight() - this.getOffsetY() + 2;
                 }
 
-                ScreenContext ctx = new ScreenContext(0, 0, 0, false);
                 this.stringListRenderer.renderAt(x, y, 0, false, ctx);
                 y += this.stringListRenderer.getTotalRenderHeight();
             }
@@ -125,7 +124,7 @@ public class InfoHud
                     if (renderer.getShouldRenderCustom() && (isGui == false || renderer.shouldRenderInGuis()))
                     {
                         // FIXME: This is technically wrong, the yOffset should be separate per hud alignment
-                        y += renderer.render(x, y, this.getHudAlignment());
+                        y += renderer.render(x, y, this.getHudAlignment(), ctx);
                     }
                 }
             }

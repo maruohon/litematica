@@ -3,6 +3,7 @@ package litematica.render.infohud;
 import java.util.List;
 
 import malilib.config.value.HudAlignment;
+import malilib.render.RenderContext;
 
 public interface IInfoHudRenderer
 {
@@ -42,7 +43,7 @@ public interface IInfoHudRenderer
      * @param alignment the screen position to render at
      * @return the required y height used up for the rendered content
      */
-    default int render(int xOffset, int yOffset, HudAlignment alignment)
+    default int render(int xOffset, int yOffset, HudAlignment alignment, RenderContext ctx)
     {
         return 0;
     }

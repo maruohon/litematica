@@ -14,8 +14,11 @@ import net.minecraft.inventory.Slot;
 
 import malilib.config.value.HudAlignment;
 import malilib.gui.util.GuiUtils;
+import malilib.render.RenderContext;
 import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
+import malilib.render.buffer.VanillaWrappingVertexBuilder;
+import malilib.render.buffer.VertexBuilder;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.ItemType;
@@ -82,7 +85,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     }
 
     @Override
-    public int render(int xOffset, int yOffset, HudAlignment alignment)
+    public int render(int xOffset, int yOffset, HudAlignment alignment, RenderContext ctx)
     {
         this.refreshList(2000L);
 
@@ -154,7 +157,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         if (useBackground)
         {
             ShapeRenderUtils.renderRectangle(posX - bgMargin, posY - bgMargin,
-                                             0, maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor);
+                                             0, maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor, ctx);
         }
 
         String title = StringUtils.translate("litematica.title.hud.material_list");
@@ -272,14 +275,17 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                     RenderUtils.setupBlend();
                     int guiX = InventoryScreenUtils.getGuiPosX(gui);
                     int guiY = InventoryScreenUtils.getGuiPosY(gui);
+                    VertexBuilder builder = VanillaWrappingVertexBuilder.coloredQuads();
 
                     for (Pair<Slot, Color4f> pair : highlightedSlots)
                     {
                         Slot slot = pair.getLeft();
                         Color4f color = pair.getRight();
-                        ShapeRenderUtils.renderOutlinedRectangle(guiX + slot.xPos, guiY + slot.yPos, 1f, 16, 16, color.intValue, color.intValue | 0xFF000000);
+                        ShapeRenderUtils.renderOutlinedRectangle(guiX + slot.xPos, guiY + slot.yPos, 1f,
+                                                                 16, 16, color.intValue, color.intValue | 0xFF000000, builder);
                     }
 
+                    builder.draw();
                     GlStateManager.enableTexture2D();
                 }
             }

@@ -50,7 +50,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 
             if (DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT)
             {
-                OverlayRenderer.getInstance().renderSchematicRebuildTargetingOverlay(tickDelta);
+                OverlayRenderer.getInstance().renderSchematicRebuildTargetingOverlay(tickDelta, ctx);
             }
         }
     }
@@ -61,18 +61,18 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
         if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue())
         {
             // The Info HUD renderers can decide if they want to be rendered in GUIs
-            InfoHud.getInstance().renderHud();
+            InfoHud.getInstance().renderHud(ctx);
 
             if (GuiUtils.getCurrentScreen() == null)
             {
-                ToolHud.getInstance().renderHud();
-                OverlayRenderer.getInstance().renderHoverInfo();
+                ToolHud.getInstance().renderHud(ctx);
+                OverlayRenderer.getInstance().renderHoverInfo(ctx);
 
                 SetSchematicPreviewTask task = TaskScheduler.getInstanceClient().getFirstTaskOfType(SetSchematicPreviewTask.class);
 
                 if (task != null)
                 {
-                    OverlayRenderer.getInstance().renderPreviewFrame();
+                    OverlayRenderer.getInstance().renderPreviewFrame(ctx);
                 }
             }
         }

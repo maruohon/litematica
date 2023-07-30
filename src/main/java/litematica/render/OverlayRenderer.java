@@ -25,6 +25,7 @@ import malilib.config.value.HorizontalAlignment;
 import malilib.config.value.HudAlignment;
 import malilib.gui.util.GuiUtils;
 import malilib.gui.util.ScreenContext;
+import malilib.render.RenderContext;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.buffer.VanillaWrappingVertexBuilder;
 import malilib.render.buffer.VertexBuilder;
@@ -417,7 +418,7 @@ public class OverlayRenderer
         GlStateManager.enableDepth();
     }
 
-    public void renderHoverInfo()
+    public void renderHoverInfo(RenderContext ctx)
     {
         World world = GameUtils.getClientWorld();
 
@@ -447,18 +448,18 @@ public class OverlayRenderer
             {
                 if (renderBlockInfoLines)
                 {
-                    this.renderBlockInfoLines(traceWrapper);
+                    this.renderBlockInfoLines(traceWrapper, ctx);
                 }
 
                 if (renderInfoOverlay)
                 {
-                    this.renderBlockInfoOverlay(traceWrapper);
+                    this.renderBlockInfoOverlay(traceWrapper, ctx);
                 }
             }
         }
     }
 
-    private void renderBlockInfoLines(RayTraceWrapper traceWrapper)
+    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, RenderContext ctx)
     {
         long currentTime = System.nanoTime();
 
@@ -519,7 +520,7 @@ public class OverlayRenderer
         return false;
     }
 
-    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper)
+    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, RenderContext ctx)
     {
         IBlockState air = Blocks.AIR.getDefaultState();
         World schematicWorld = SchematicWorldHandler.getSchematicWorld();
@@ -552,7 +553,7 @@ public class OverlayRenderer
         {
             BlockInfo info = new BlockInfo(stateClient, "litematica.title.hud.block_info_overlay.state_client");
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
-            info.render(this.blockInfoX, this.blockInfoY, 0);
+            info.render(this.blockInfoX, this.blockInfoY, 0, ctx);
 
             RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, bestWorld, pos);
         }
@@ -564,7 +565,7 @@ public class OverlayRenderer
             {
                 BlockInfo info = new BlockInfo(stateClient, "litematica.title.hud.block_info_overlay.state_client");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
-                info.render(this.blockInfoX, this.blockInfoY, 0);
+                info.render(this.blockInfoX, this.blockInfoY, 0, ctx);
 
                 RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, schematicWorld, bestWorld, pos);
             }
@@ -572,7 +573,7 @@ public class OverlayRenderer
             {
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.title.hud.block_info_overlay.state_schematic");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY);
-                info.render(this.blockInfoX, this.blockInfoY, 0);
+                info.render(this.blockInfoX, this.blockInfoY, 0, ctx);
 
                 RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, schematicWorld, pos);
             }
@@ -638,7 +639,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSchematicRebuildTargetingOverlay(float partialTicks)
+    public void renderSchematicRebuildTargetingOverlay(float partialTicks, RenderContext ctx)
     {
         RayTraceWrapper traceWrapper = null;
         Entity entity = GameUtils.getCameraEntity();
@@ -683,12 +684,12 @@ public class OverlayRenderer
             if (direction)
             {
                 malilib.render.RenderUtils.renderBlockTargetingOverlay(
-                        entity, pos, trace.sideHit, trace.hitVec, color, partialTicks);
+                        entity, pos, trace.sideHit, trace.hitVec, color, partialTicks, ctx);
             }
             else
             {
                 malilib.render.RenderUtils.renderBlockTargetingOverlaySimple(
-                        entity, pos, trace.sideHit, color, partialTicks);
+                        entity, pos, trace.sideHit, color, partialTicks, ctx);
             }
 
             GlStateManager.enableTexture2D();
@@ -743,7 +744,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderPreviewFrame()
+    public void renderPreviewFrame(RenderContext ctx)
     {
         int width = GuiUtils.getScaledWindowWidth();
         int height = GuiUtils.getScaledWindowHeight();
@@ -751,7 +752,7 @@ public class OverlayRenderer
         int y = height >= width ? (height - width) / 2 : 0;
         int longerSide = Math.min(width, height);
 
-        ShapeRenderUtils.renderOutline(x, y, 0, longerSide, longerSide, 2, 0xFFFFFFFF);
+        ShapeRenderUtils.renderOutline(x, y, 0, longerSide, longerSide, 2, 0xFFFFFFFF, ctx);
     }
 
     private enum BoxType
