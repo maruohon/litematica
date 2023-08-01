@@ -25,6 +25,7 @@ import malilib.config.value.HorizontalAlignment;
 import malilib.config.value.HudAlignment;
 import malilib.gui.util.GuiUtils;
 import malilib.gui.util.ScreenContext;
+import malilib.render.BlockTargetingRenderUtils;
 import malilib.render.RenderContext;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.buffer.VanillaWrappingVertexBuilder;
@@ -683,13 +684,13 @@ public class OverlayRenderer
 
             if (direction)
             {
-                malilib.render.RenderUtils.renderBlockTargetingOverlay(
-                        entity, pos, trace.sideHit, trace.hitVec, color, partialTicks, ctx);
+                BlockTargetingRenderUtils.render5WayBlockTargetingOverlay(entity, pos, trace.sideHit,
+                                                                          trace.hitVec, color, partialTicks, ctx);
             }
             else
             {
-                malilib.render.RenderUtils.renderBlockTargetingOverlaySimple(
-                        entity, pos, trace.sideHit, color, partialTicks, ctx);
+                BlockTargetingRenderUtils.renderSimpleSquareBlockTargetingOverlay(entity, pos, trace.sideHit,
+                                                                                  color, partialTicks, ctx);
             }
 
             GlStateManager.enableTexture2D();
