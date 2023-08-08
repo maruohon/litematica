@@ -19,14 +19,15 @@ public class MixinAbstractSignEditScreen
 {
     @Shadow @Final private SignBlockEntity blockEntity;
 
-    @Shadow private SignText text;
+    @Shadow @Final private String[] messages;
+    @Shadow @Final private boolean front;
 
     @Inject(method = "init", at = @At("HEAD"))
     private void insertSignText(CallbackInfo ci)
     {
         if (Configs.Generic.SIGN_TEXT_PASTE.getBooleanValue())
         {
-            WorldUtils.insertSignTextFromSchematic(this.blockEntity, this.text);
+            WorldUtils.insertSignTextFromSchematic(this.blockEntity, this.messages, this.front);
         }
     }
 }

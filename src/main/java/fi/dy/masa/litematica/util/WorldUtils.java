@@ -370,7 +370,7 @@ public class WorldUtils
         return false;
     }
 
-    public static void insertSignTextFromSchematic(SignBlockEntity beClient, SignText screenTextArr)
+    public static void insertSignTextFromSchematic(SignBlockEntity beClient, String[] screenTextArr, boolean front)
     {
         WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
@@ -380,17 +380,16 @@ public class WorldUtils
 
             if (beSchem instanceof SignBlockEntity)
             {
-                SignText frontTextSchematic = ((IMixinSignBlockEntity) beSchem).litematica_getFrontText();
-                SignText backTextSchematic = ((IMixinSignBlockEntity) beSchem).litematica_getBackText();
+                IMixinSignBlockEntity beMixinSchem = (IMixinSignBlockEntity) beSchem;
+                SignText textSchematic = front ? beMixinSchem.litematica_getFrontText() : beMixinSchem.litematica_getBackText();
 
-                if (frontTextSchematic != null)
+                if (textSchematic != null)
                 {
-                    beClient.setText(frontTextSchematic, true);
-                }
-
-                if (backTextSchematic != null)
-                {
-                    beClient.setText(backTextSchematic, false);
+                    for (int i = 0; i < screenTextArr.length; ++i)
+                    {
+                        screenTextArr[i] = textSchematic.getMessage(i, false).getString();
+                    }
+                    beClient.setText(textSchematic, front);
                 }
             }
         }
