@@ -696,8 +696,8 @@ litematica.message.error.schematic_save_no_area_selected=§cSchematic saving fai
 litematica.message.error.schematic_write.schematica.palette.invalid_id=SchematicaSchematic: Block id %s for block '%s' is out of range, max = %s
 litematica.message.error.update_blocks_aborted=Aborted updating the blocks in the area
 
-litematica.message.nag.info.disable_helpful_nags=<c=bbb>You can disable all helpful nag messages by turning off the config §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow Helpful Nags<c=bbb>. You can disable just this reminder message by turning off the config §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow Nag Disable Reminder
-litematica.message.nag.new_user_extra_nag=§d<b>EYES HERE YOU CRAFTER</b> §eIf you ignore the above reminder/warning<c=bbb> and <i>go and post an issue report</i> about a simple question when stuff <i>doesn't seem to work</i>, when you have been clearly told in the above message what the issue is, you shall be §dSHAMED SO HARD <c=bbb>that your ears will fall off! §eYou have been warned! <c=bbb>(/j, but still)\n\nAlso in general §eplease prefer Discord <c=bbb>for questions/user support, or if you don't use Discord, then use CurseForge or Modrinth comments or the §eDiscussion<c=bbb> area on GitHub instead of Issues.\nI'll repeat: §ePlease don't post questions as issue reports!\n\n<c=bbb>This message can be disabled at §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow New User Nag
+litematica.message.nag.info.disable_helpful_nags=<c=bbb>You can disable all helpful nag messages by turning off the config §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow Helpful Reminders<c=bbb>. You can disable just this reminder message by turning off the config §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow Nag Disable Reminder
+litematica.message.nag.new_user_extra_nag=§d<b>EYES HERE YOU CRAFTER</b>\n§eIf you ignore the above reminder/warning<c=bbb> and go and create an §f<b>issue report</b><c=bbb> about a question on how stuff works or when stuff doesn't <i>seem to</i> work, when you have been told in the above message what the issue is and how to solve it, you shall be §dSHAMED SO HARD<c=bbb> that your ears will fall off! §eYou have been warned! <c=bbb>(/j, but still... please don't do it >_>)\n\nAlso in general §eplease prefer Discord <c=bbb>for questions/user support, or if you don't use Discord, then use CurseForge or Modrinth comments or the §eDiscussions<c=bbb> area on GitHub instead of Issues.\nI'll repeat: §ePlease don't post questions as issue reports!\n\n<c=bbb>This message can be disabled at §fGeneric<c=bbb> -> §fNags<c=bbb> -> §eShow New User Extra Nags
 
 litematica.message.success.save_schematic_convert=Successfully saved the schematic as §e'%s'§r (and possibly converted it to the new format)
 litematica.message.success.save_schematic_new=Successfully saved the schematic as §e'%s'§r
@@ -756,11 +756,13 @@ litematica.config_group.comment.hotkey.render_layer=Render Layer Hotkeys
 litematica.config_group.comment.hotkey.schematic_edit=Schematic Edit Hotkeys
 litematica.config_group.comment.hotkey.selection=Selection Related Hotkeys
 litematica.config_group.comment.hotkey.tool=Tool Related Hotkeys
+litematica.config_group.comment.nags=Nag/reminder message related options
 litematica.config_group.name.hotkey.open_screen=Open Screen Hotkeys
 litematica.config_group.name.hotkey.render_layer=Render Layer Hotkeys
 litematica.config_group.name.hotkey.schematic_edit=Schematic Edit Hotkeys
 litematica.config_group.name.hotkey.selection=Selection Related Hotkeys
 litematica.config_group.name.hotkey.tool=Tool Related Hotkeys
+litematica.config_group.name.nags=Nags
 
 litematica.config.comment.areaselectionsperworld=Use per-world or per-server save directories for the area selections (in the §eArea Browser§r). If disabled, then the same "global" save directory is used for all worlds.\n\n§eWARNING:§r Don't switch this §cOFF§r while you are for example live streaming, as then the §eArea Browser§r will show the server IP in the navigation widget and also in the current selection name/path until you change the current directory and selection again.
 litematica.config.comment.betterrenderorder=If enabled, then the schematic rendering is done by injecting the different render call into the vanilla rendering code.\n\nThis should result in better translucent block rendering/ordering and schematic blocks not getting rendered through the client world blocks/terrain.\n\nIf the rendering doesn't work (for example with Optifine), then try disabling this option. But in most cases you want to keep this enabled.
@@ -796,6 +798,9 @@ litematica.config.comment.rendermateriallistinguis=Whether or not the §fMateria
 litematica.config.comment.renderthreadnotimeout=Removes the timeout from the rendering worker threads.\n\nIf you get very stuttery rendering when moving around or dealing with large schematics, try disabling this. It will however make the schematic (re-)rendering a lot slower in some cases (which means that newly loaded chunks or changes to the schmematic will get processed slower).
 litematica.config.comment.requireadjacentchunks=Whether the adjacent chunks around the target chunk need to be loaded for it to get processed.\n\nThis mostly affects whether you can use the Schematic Verifier next to missing chunks. This is mostly only useful when working on very technical projects that require working next to empty/missing/non-synced-to-client chunks.
 litematica.config.comment.schematicbrowsercolumns=The "extra" columns that should be enabled by default in all the schematic browser screens.\n\nThese columns can also be toggled temporarily by right clicking on the list widget, but not on a list entry, so for example by right clicking on the header widget/search bar area.\n\nNote: The file name column is always enabled.
+litematica.config.comment.showhelpfulreminders=Show some reminder messages
+litematica.config.comment.shownewuserextranags=Show extra nags/reminders for new users
+litematica.config.comment.showreminderdisable=Show an extra message with the nag messages on how to turn the nag messages off
 litematica.config.comment.signtextpaste=Automatically add the stored sign text from the schematic to the sign GUI when placing a sign
 litematica.config.comment.toolitemenabled=If enabled, then the "tool item" can be used to control area selections, placements etc.\n\nYou can toggle this ON/OFF as needed to be able to use for example your regular food item as the tool, so that you don't need to carry around unnecessary extra items like sticks.\n\nSee Hotkeys -> §eTool Set Primary/Secondary Position§r and §eTool Select *§r etc. for the related hotkeys and modifier hotkeys that are used while holding the "tool item".
 litematica.config.comment.toolitem=The item to use as the "tool item" for the mod actions such as controlling area selection boxes.\n\n§6Tip:§r You can use an empty hand as the "tool" by leaving this textfield empty or putting in the literal word §aempty§r.\n\nBy default the item check ignores NBT data, but if you for some reason want to use a special (for example renamed) item as the tool, you can append the required NBT tags and their values after the item name and metadata, like: §aminecraft:stick@0{display:{name:"Foo Bar"}}§r.\n\nHowever in most cases I would recommend just using whatever item you always have on you, and toggle the tool functionality ON/OFF as needed. Dealing with "special items" is just pointless extra effort and annoyance IMO.
@@ -909,6 +914,9 @@ litematica.config.name.rendermateriallistinguis=Render Material List in GUIs
 litematica.config.name.renderthreadnotimeout=Render Thread No Timeout
 litematica.config.name.requireadjacentchunks=Require Adjacent Chunks
 litematica.config.name.schematicbrowsercolumns=Schematic Browser Columns
+litematica.config.name.showhelpfulreminders=Show Helpful Reminders
+litematica.config.name.shownewuserextranags=Show New User Extra Nags
+litematica.config.name.showreminderdisable=Show Nag Disable Reminder
 litematica.config.name.signtextpaste=Sign Text Paste
 litematica.config.name.toolitem=Tool Item
 litematica.config.name.toolitemenabled=Tool Item Functionality
