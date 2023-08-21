@@ -34,7 +34,7 @@
 	],
 
 	"depends": {
-		"minecraft": "1.20.x",
-		"malilib": "0.16.x"
+		"minecraft": ">=1.20.2-alpha.23.33.a",
+		"malilib": ">=0.16.1-nyan.1"
 	}
 }

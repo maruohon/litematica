@@ -86,7 +86,7 @@ public class NbtUtils
                 {
                     is.close();
                     is = new FileInputStream(file);
-                    nbt = NbtIo.read(new DataInputStream(is));
+                    nbt = NbtIo.read(file);
                 }
                 catch (Exception ignore) {}
             }

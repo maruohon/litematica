@@ -208,7 +208,7 @@ public class EntityUtils
             {
                 passenger.refreshPositionAndAngles(
                         entity.getX(),
-                        entity.getY() + entity.getMountedHeightOffset() + passenger.getHeightOffset(),
+                        entity.getY() + entity.getPassengerRidingPos(passenger).getY(),
                         entity.getZ(),
                         passenger.getYaw(), passenger.getPitch());
                 setEntityRotations(passenger, passenger.getYaw(), passenger.getPitch());
