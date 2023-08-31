@@ -47,7 +47,7 @@ public class PlacementHandler
             // DOOR_HINGE - Door
             // SLAB_TYPE - Slab - PARTIAL ONLY: TOP and BOTTOM, not DOUBLE
             // STAIR_SHAPE - Stairs (needed to get the correct state, otherwise the player facing would be a factor)
-            // WALL_MOUNT_LOCATION - Button, Grindstone, Lever
+            // BLOCK_FACE - Button, Grindstone, Lever
             Properties.AXIS,
             Properties.BLOCK_HALF,
             Properties.CHEST_TYPE,
@@ -55,7 +55,7 @@ public class PlacementHandler
             Properties.DOOR_HINGE,
             Properties.SLAB_TYPE,
             Properties.STAIR_SHAPE,
-            Properties.WALL_MOUNT_LOCATION,
+            Properties.BLOCK_FACE,
             // IntProperty:
             // BITES - Cake
             // DELAY - Repeater
