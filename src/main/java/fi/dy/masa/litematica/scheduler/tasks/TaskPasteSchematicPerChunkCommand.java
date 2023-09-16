@@ -20,7 +20,7 @@ import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.SkullItem;
+import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
@@ -1005,7 +1005,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     {
         NbtCompound tag = be.createNbt();
 
-        if (stack.getItem() instanceof SkullItem && tag.contains("SkullOwner"))
+        if (stack.getItem() instanceof PlayerHeadItem && tag.contains("SkullOwner"))
         {
             NbtCompound ownerTag = tag.getCompound("SkullOwner");
             stack.getOrCreateNbt().put("SkullOwner", ownerTag);
