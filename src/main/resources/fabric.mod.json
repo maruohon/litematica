@@ -34,7 +34,7 @@
 	],
 
 	"depends": {
-		"minecraft": ">=1.20.2-rc.1",
-		"malilib": ">=0.16.2-nyan.5"
+		"minecraft": ">=1.20.2",
+		"malilib": ">=0.16.2-nyan.6"
 	}
 }
