@@ -35,7 +35,6 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
         super(listX, listY, totalListMarginX, totalListMarginY, browserContext);
 
         this.fileNameTextField = new BaseTextFieldWidget(320, 16);
-        this.fileNameTextField.setFocused(true);
 
         this.revertNameButton = GenericButton.create(DefaultIcons.RESET_12, this::revertName);
         this.saveButton = GenericButton.create(18, "litematica.button.save_schematic.save_schematic", this::saveSchematic);
@@ -45,6 +44,8 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
 
         this.revertNameButton.translateAndAddHoverString("litematica.hover.button.save_schematic.revert_name");
         this.saveButton.translateAndAddHoverString("litematica.hover.button.save_file.hold_shift_to_overwrite");
+
+        this.addPostInitListener(this::focusFileNameTextField);
     }
 
     @Override
@@ -96,10 +97,15 @@ public abstract class BaseSaveSchematicScreen extends BaseSchematicBrowserScreen
         return super.onKeyTyped(keyCode, scanCode, modifiers);
     }
 
+    protected void focusFileNameTextField()
+    {
+        this.setFocusedWidget(this.fileNameTextField);
+    }
+
     protected void revertName()
     {
         this.fileNameTextField.setText(this.originalName);
-        this.fileNameTextField.setFocused(true);
+        this.setFocusedWidget(this.fileNameTextField);
     }
 
     protected abstract void saveSchematic();
