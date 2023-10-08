@@ -217,7 +217,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
     protected boolean readBlocksFromTag(NBTTagCompound tag)
     {
         // This method was implemented based on
-        // https://minecraft.gamepedia.com/Schematic_file_format
+        // https://minecraft.wiki/w/Schematic_file_format
         // as it was on 2018-04-18.
 
         Vec3i size = this.getSize();
