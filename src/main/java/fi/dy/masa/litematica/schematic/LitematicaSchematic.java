@@ -775,7 +775,10 @@ public class LitematicaSchematic
         {
             BlockPos posAdj = pos.offset(dir);
             BlockState stateAdj = world.getBlockState(posAdj);
-
+            if (dir == Direction.UP && stateAdj.getBlock() instanceof net.minecraft.block.CarpetBlock) 
+            {
+                return true;
+            }
             if (stateAdj.isOpaque() == false ||
                 stateAdj.isSideSolidFullSquare(world, posAdj, dir.getOpposite()) == false)
             {
