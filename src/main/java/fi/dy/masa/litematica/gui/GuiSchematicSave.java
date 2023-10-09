@@ -166,8 +166,9 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                         String author = this.gui.mc.player.getName().getString();
                         boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
                         boolean visibleOnly = this.gui.checkboxVisibleOnly.isChecked();
+                        boolean includeSupportBlocks = this.gui.checkboxIncludeSupportBlocks.isChecked();
                         boolean fromSchematicWorld = this.gui.checkboxSaveFromSchematicWorld.isChecked();
-                        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(visibleOnly, ignoreEntities, fromSchematicWorld);
+                        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(visibleOnly, includeSupportBlocks, ignoreEntities, fromSchematicWorld);
                         LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
                         TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, info, overwrite);
                         task.setCompletionListener(this.gui);

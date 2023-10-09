@@ -22,6 +22,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     protected GuiTextFieldGeneric textField;
     protected WidgetCheckBox checkboxIgnoreEntities;
     protected WidgetCheckBox checkboxVisibleOnly;
+    protected WidgetCheckBox checkboxIncludeSupportBlocks;
     protected final WidgetCheckBox checkboxSaveFromSchematicWorld;
     protected String lastText = "";
     protected String defaultText = "";
@@ -29,7 +30,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
     public GuiSchematicSaveBase(@Nullable LitematicaSchematic schematic)
     {
-        super(10, 70);
+        super(10, 80);
 
         this.schematic = schematic;
 
@@ -54,7 +55,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         boolean focused = this.textField.isFocused();
         String text = this.textField.getText();
         int pos = this.textField.getCursorPosition();
-        this.textField = new GuiTextFieldGeneric(10, 32, this.width - 196, 20, this.textRenderer);
+        this.textField = new GuiTextFieldGeneric(10, 32, this.width - 260, 18, this.textRenderer);
         this.textField.setText(text);
         this.textField.setCursorPosition(pos);
         this.textField.setFocused(focused);
@@ -79,20 +80,23 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
             }
         }
 
-        int x = this.textField.getX() + this.textField.getWidth() + 12;
-        int y = 32;
+        int x = this.textField.getX() + this.textField.getWidth() + 4;
+        int y = 28;
 
         String str = StringUtils.translate("litematica.gui.label.schematic_save.checkbox.ignore_entities");
-        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, str);
+        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, str);
         this.addWidget(this.checkboxIgnoreEntities);
 
-        this.checkboxVisibleOnly = new WidgetCheckBox(12, y + 24, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "Visible blocks only [experimental quick hax]");
-        this.addWidget(this.checkboxVisibleOnly);
-
-        this.checkboxSaveFromSchematicWorld.setPosition(20 + this.checkboxVisibleOnly.getWidth(), y + 24);
+        this.checkboxSaveFromSchematicWorld.setPosition(x, y + 12);
         this.addWidget(this.checkboxSaveFromSchematicWorld);
 
-        x = this.createButton(x, y, ButtonType.SAVE);
+        this.checkboxVisibleOnly = new WidgetCheckBox(x, y + 24, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "Visible blocks only [experimental quick hax]");
+        this.addWidget(this.checkboxVisibleOnly);
+
+        this.checkboxIncludeSupportBlocks = new WidgetCheckBox(x, y + 36, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "Support blocks", "Include any necessary support blocks in \"Visible blocks only\" mode,\nfor things like Repeaters, Comparators, Carpets or gravity blocks that would be visible");
+        this.addWidget(this.checkboxIncludeSupportBlocks);
+
+        this.createButton(10, 54, ButtonType.SAVE);
     }
 
     protected void setTextFieldText(String text)
