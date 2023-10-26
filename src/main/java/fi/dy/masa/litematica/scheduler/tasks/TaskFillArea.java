@@ -30,10 +30,11 @@ import fi.dy.masa.litematica.util.WorldUtils;
 public class TaskFillArea extends TaskProcessChunkMultiPhase
 {
     protected final Queue<String> queuedCommands = Queues.newArrayDeque();
-    protected final BlockState fillState;
-    @Nullable protected final BlockState replaceState;
     protected final String fillCommand;
+    protected final BlockState fillState;
     protected final String blockString;
+    @Nullable protected final BlockState replaceState;
+    @Nullable protected final String replaceBlockString;
     protected final int maxBoxVolume;
     protected final boolean removeEntities;
 
@@ -52,15 +53,17 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
         this.maxBoxVolume = Configs.Generic.COMMAND_FILL_MAX_VOLUME.getIntegerValue();
         this.maxCommandsPerTick = Configs.Generic.COMMAND_LIMIT.getIntegerValue();
         this.fillCommand = Configs.Generic.COMMAND_NAME_FILL.getStringValue();
-
-        String blockString = BlockArgumentParser.stringifyBlockState(fillState);
+        this.blockString = BlockArgumentParser.stringifyBlockState(fillState);
 
         if (replaceState != null)
         {
-            blockString += " replace " + BlockArgumentParser.stringifyBlockState(replaceState);
+            this.replaceBlockString = BlockArgumentParser.stringifyBlockState(replaceState);
+        }
+        else
+        {
+            this.replaceBlockString = null;
         }
 
-        this.blockString = blockString;
         this.processBoxBlocksTask = this::sendQueuedCommands;
 
         if (Configs.Generic.COMMAND_FILL_NO_CHUNK_CLAMP.getBooleanValue())
@@ -323,12 +326,32 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
         {
             this.queuedCommands.offer(String.format("/pos1 %d,%d,%d", minX, minY, minZ));
             this.queuedCommands.offer(String.format("/pos2 %d,%d,%d", maxX, maxY, maxZ));
-            this.queuedCommands.offer("/set " + this.blockString);
+
+            if (this.replaceState != null)
+            {
+                this.queuedCommands.offer(String.format("/replace %s %s", this.replaceBlockString, this.blockString));
+            }
+            else
+            {
+                this.queuedCommands.offer("/set " + this.blockString);
+            }
         }
         else
         {
-            String fillCmd = String.format("%s %d %d %d %d %d %d %s", this.fillCommand,
-                                           minX, minY, minZ, maxX, maxY, maxZ, this.blockString);
+            String fillCmd;
+
+            if (this.replaceState != null)
+            {
+                fillCmd = String.format("%s %d %d %d %d %d %d %s replace %s", this.fillCommand,
+                                        minX, minY, minZ, maxX, maxY, maxZ,
+                                        this.blockString, this.replaceBlockString);
+            }
+            else
+            {
+                fillCmd = String.format("%s %d %d %d %d %d %d %s", this.fillCommand,
+                                        minX, minY, minZ, maxX, maxY, maxZ, this.blockString);
+            }
+
             this.queuedCommands.offer(fillCmd);
         }
     }
