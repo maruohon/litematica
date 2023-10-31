@@ -1,14 +1,16 @@
 package fi.dy.masa.litematica.util;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import javax.annotation.Nullable;
+
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtTagSizeTracker;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.malilib.util.Constants;
 
@@ -78,7 +80,7 @@ public class NbtUtils
         {
             try
             {
-                nbt = NbtIo.readCompressed(is);
+                nbt = NbtIo.readCompressed(is, NbtTagSizeTracker.ofUnlimitedBytes());
             }
             catch (Exception e)
             {

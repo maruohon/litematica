@@ -34,7 +34,7 @@
 	],
 
 	"depends": {
-		"minecraft": ">=1.20.2",
-		"malilib": ">=0.17.0"
+		"minecraft": ">1.20.2",
+		"malilib": "0.18.x"
 	}
 }

@@ -48,7 +48,7 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
         }
 
         MinecraftServer server = this.mc.getServer();
-        final long vanillaTickTime = server.lastTickLengths[server.getTicks() % 100];
+        final long vanillaTickTime = server.getTickTimes()[server.getTicks() % 100];
         final long timeStart = Util.getMeasuringTimeNano();
 
         this.sortChunkList();
