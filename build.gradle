@@ -1,14 +1,21 @@
 plugins {
-	id 'fabric-loom' version '1.3-SNAPSHOT'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
-	maven { url 'https://masa.dy.fi/maven' }
+//	maven { url 'https://masa.dy.fi/maven' }
 	maven { url 'https://maven.terraformersmc.com/releases/' }
 	// maven { url 'https://maven.quiltmc.org/repository/release/' }
+
+	// TEMPORARY FOR LOCAL MAVEN REPO
+	maven {
+		url 'https://masa.dy.fi/maven'
+		mavenLocal()
+		}
+	flatDir { dirs 'libs' }
 }
 
 dependencies {
@@ -16,12 +23,10 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.mappings_version}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 	implementation "com.google.code.findbugs:jsr305:3.0.2"
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	modImplementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version_out}:${project.malilib_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	//modCompile "net.fabricmc.fabric-api:fabric-api:" + project.fabric_version
-
 	modCompileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
 }
 
