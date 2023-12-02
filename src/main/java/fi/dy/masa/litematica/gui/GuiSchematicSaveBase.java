@@ -146,7 +146,8 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         super.drawContents(drawContext, mouseX, mouseY, partialTicks);
 
-        this.textField.render(drawContext, mouseX, mouseY, partialTicks);
+        // FIXME:  See malilib GuiTextFieldGeneric.java
+        this.textField.renderZ(drawContext, mouseX, mouseY, partialTicks);
     }
 
     @Override
