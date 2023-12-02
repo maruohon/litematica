@@ -68,7 +68,7 @@ public class InfoHud
             final int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
             int x = this.getOffsetX();
             int y = this.getOffsetY();
-            boolean isGui = GuiUtils.getCurrentScreen() != null;
+            boolean isGui = GuiUtils.isScreenOpen();
 
             // TODO FIXME all of this junk needs to be rewritten and cleaned up...
 

@@ -27,7 +27,7 @@ public class ClientTickHandler implements malilib.event.ClientTickHandler
             SchematicVerifierManager.INSTANCE.scheduleReChecks();
         }
 
-        if (GuiUtils.getCurrentScreen() == null)
+        if (GuiUtils.noScreenOpen())
         {
             EasyPlaceUtils.easyPlaceOnUseTick();
         }

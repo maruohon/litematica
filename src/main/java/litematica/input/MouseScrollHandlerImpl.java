@@ -28,7 +28,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
         boolean toolEnabled = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
                               Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
-        if (GuiUtils.getCurrentScreen() != null ||
+        if (GuiUtils.isScreenOpen() ||
             GameUtils.getClientWorld() == null ||
             GameUtils.getClientPlayer() == null ||
             deltaY == 0 ||

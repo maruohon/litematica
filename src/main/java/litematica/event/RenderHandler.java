@@ -63,7 +63,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
             // The Info HUD renderers can decide if they want to be rendered in GUIs
             InfoHud.getInstance().renderHud(ctx);
 
-            if (GuiUtils.getCurrentScreen() == null)
+            if (GuiUtils.noScreenOpen())
             {
                 ToolHud.getInstance().renderHud(ctx);
                 OverlayRenderer.getInstance().renderHoverInfo(ctx);
