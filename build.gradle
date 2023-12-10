@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.3-SNAPSHOT'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -57,4 +57,9 @@ tasks.withType(JavaCompile).configureEach {
 
 	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
 	it.options.release = 17
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+	preserveFileTimestamps = true
+	//reproducibleFileOrder = true
 }
