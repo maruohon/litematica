@@ -1,11 +1,8 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Queue;
-import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
-import com.google.common.collect.Queues;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -15,21 +12,20 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerMode;
-import fi.dy.masa.malilib.util.LayerRange;
+import net.minecraft.world.World;
+
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public class TaskFillArea extends TaskProcessChunkMultiPhase
 {
-    protected final Queue<String> queuedCommands = Queues.newArrayDeque();
     protected final String fillCommand;
     protected final BlockState fillState;
     protected final String blockString;
@@ -118,83 +114,6 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
         }
     }
 
-    protected void addNonChunkClampedBoxes(Collection<Box> allBoxes)
-    {
-        this.addNonChunkClampedBoxes(allBoxes, new LayerRange(null));
-    }
-
-    protected void addNonChunkClampedBoxes(Collection<Box> allBoxes, LayerRange range)
-    {
-        this.boxesInChunks.clear();
-        this.pendingChunks.clear();
-
-        if (range.getLayerMode() == LayerMode.ALL)
-        {
-            addBoxes(allBoxes, this::clampToWorldHeightAndAddBox);
-        }
-        else
-        {
-            getLayerRangeClampedBoxes(allBoxes, range, this::clampToWorldHeightAndAddBox);
-        }
-
-        this.pendingChunks.addAll(this.boxesInChunks.keySet());
-
-        this.sortChunkList();
-    }
-
-    protected static void addBoxes(Collection<Box> boxes, BiConsumer<ChunkPos, IntBoundingBox> consumer)
-    {
-        for (Box box : boxes)
-        {
-            int boxMinX = Math.min(box.getPos1().getX(), box.getPos2().getX());
-            int boxMinY = Math.min(box.getPos1().getY(), box.getPos2().getY());
-            int boxMinZ = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
-            int boxMaxX = Math.max(box.getPos1().getX(), box.getPos2().getX());
-            int boxMaxY = Math.max(box.getPos1().getY(), box.getPos2().getY());
-            int boxMaxZ = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
-
-            consumer.accept(new ChunkPos(boxMinX >> 4, boxMinZ >> 4), new IntBoundingBox(boxMinX, boxMinY, boxMinZ, boxMaxX, boxMaxY, boxMaxZ));
-        }
-    }
-
-    protected static void getLayerRangeClampedBoxes(Collection<Box> boxes,
-                                                    LayerRange range,
-                                                    BiConsumer<ChunkPos, IntBoundingBox> consumer)
-    {
-        for (Box box : boxes)
-        {
-            final int rangeMin = range.getLayerMin();
-            final int rangeMax = range.getLayerMax();
-            int boxMinX = Math.min(box.getPos1().getX(), box.getPos2().getX());
-            int boxMinY = Math.min(box.getPos1().getY(), box.getPos2().getY());
-            int boxMinZ = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
-            int boxMaxX = Math.max(box.getPos1().getX(), box.getPos2().getX());
-            int boxMaxY = Math.max(box.getPos1().getY(), box.getPos2().getY());
-            int boxMaxZ = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
-
-            switch (range.getAxis())
-            {
-                case X:
-                    if (rangeMax < boxMinX || rangeMin > boxMaxX) { continue; }
-                    boxMinX = Math.max(boxMinX, rangeMin);
-                    boxMaxX = Math.min(boxMaxX, rangeMax);
-                    break;
-                case Y:
-                    if (rangeMax < boxMinY || rangeMin > boxMaxY) { continue; }
-                    boxMinY = Math.max(boxMinY, rangeMin);
-                    boxMaxY = Math.min(boxMaxY, rangeMax);
-                    break;
-                case Z:
-                    if (rangeMax < boxMinZ || rangeMin > boxMaxZ) { continue; }
-                    boxMinZ = Math.max(boxMinZ, rangeMin);
-                    boxMaxZ = Math.min(boxMaxZ, rangeMax);
-                    break;
-            }
-
-            consumer.accept(new ChunkPos(boxMinX >> 4, boxMinZ >> 4), new IntBoundingBox(boxMinX, boxMinY, boxMinZ, boxMaxX, boxMaxY, boxMaxZ));
-        }
-    }
-
     protected void queueCommandsForBoxesInChunk(ChunkPos pos)
     {
         for (IntBoundingBox box : this.getBoxesInChunk(pos))
@@ -210,40 +129,17 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
     {
         for (IntBoundingBox box : this.getBoxesInChunk(pos))
         {
-            this.fillBoxDirect(box, this.removeEntities);
+            this.directFillBox(box, this.removeEntities);
         }
 
         this.finishProcessingChunk(pos);
     }
 
-    protected void sendQueuedCommands()
-    {
-        while (this.sentCommandsThisTick < this.maxCommandsPerTick &&
-               this.queuedCommands.isEmpty() == false)
-        {
-            this.sendCommand(this.queuedCommands.poll());
-        }
-
-        if (this.queuedCommands.isEmpty())
-        {
-            this.finishProcessingChunk(this.currentChunkPos);
-        }
-    }
-
-    protected void fillBoxDirect(IntBoundingBox box, boolean removeEntities)
+    protected void directFillBox(IntBoundingBox box, boolean removeEntities)
     {
         if (removeEntities)
         {
-            net.minecraft.util.math.Box aabb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
-            List<Entity> entities = this.world.getOtherEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER);
-
-            for (Entity entity : entities)
-            {
-                if ((entity instanceof PlayerEntity) == false)
-                {
-                    entity.discard();
-                }
-            }
+            directRemoveEntities(box, this.world);
         }
 
         WorldUtils.setShouldPreventBlockUpdates(this.world, true);
@@ -277,6 +173,20 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
         }
 
         WorldUtils.setShouldPreventBlockUpdates(this.world, false);
+    }
+
+    public static void directRemoveEntities(IntBoundingBox box, World world)
+    {
+        net.minecraft.util.math.Box aabb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+        List<Entity> entities = world.getOtherEntities(null, aabb, EntityUtils.NOT_PLAYER);
+
+        for (Entity entity : entities)
+        {
+            if ((entity instanceof PlayerEntity) == false)
+            {
+                entity.discard();
+            }
+        }
     }
 
     protected void queueFillCommandsForBox(IntBoundingBox box, boolean removeEntities)

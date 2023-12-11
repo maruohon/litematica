@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
+import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteBlocksByPlacement;
 import fi.dy.masa.litematica.scheduler.tasks.TaskFillArea;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -117,5 +118,41 @@ public class ToolUtils
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
         }
+    }
+
+    public static void deleteBlocksByPlacement()
+    {
+        if (DataManager.getToolMode() == ToolMode.DELETE &&
+            ToolModeData.DELETE.getUsePlacement())
+        {
+            SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+            if (placement != null)
+            {
+                PlacementDeletionMode mode = (PlacementDeletionMode) Configs.Generic.SCHEMATIC_VCS_DELETE_MODE.getOptionListValue();
+                deleteBlocksByPlacement(placement, mode, null);
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "Select a placement either by looking at one in the world, holding the tool item and using the §etoolSelectElements§r hotkey (middle click by default), or alternatively by clicking on a placement in the Schematic Placements menu, so that it has the white outline indicating it's selected. The selected placement's name will also appear on the Tool HUD.");
+            }
+        }
+    }
+
+    public static void deleteBlocksByPlacement(SchematicPlacement placement,
+                                               PlacementDeletionMode mode,
+                                               @Nullable ICompletionListener listener)
+    {
+        int interval = Configs.Generic.COMMAND_TASK_INTERVAL.getIntegerValue();
+        TaskDeleteBlocksByPlacement task = new TaskDeleteBlocksByPlacement(ImmutableList.of(placement), mode, DataManager.getRenderLayerRange());
+
+        if (listener != null)
+        {
+            task.setCompletionListener(listener);
+        }
+
+        TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, interval);
+        InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
     }
 }

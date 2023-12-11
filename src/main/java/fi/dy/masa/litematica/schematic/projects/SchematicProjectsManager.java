@@ -182,6 +182,19 @@ public class SchematicProjectsManager
         return false;
     }
 
+    public boolean deleteBlocksByPlacement()
+    {
+        SchematicProject project = this.getCurrentProject();
+
+        if (project != null)
+        {
+            project.deleteBlocksByPlacement();
+            return true;
+        }
+
+        return false;
+    }
+
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();

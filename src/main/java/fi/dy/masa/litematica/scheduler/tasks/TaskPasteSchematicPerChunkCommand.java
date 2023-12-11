@@ -160,6 +160,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         this.phase = TaskPhase.PROCESS_BOX_ENTITIES;
     }
 
+    @Override
     protected void sendQueuedCommands()
     {
         while (this.sentCommandsThisTick < this.maxCommandsPerTick && this.queuedCommands.isEmpty() == false)
