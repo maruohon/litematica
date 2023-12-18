@@ -73,14 +73,14 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
             this.duplicateButton     = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.DUPLICATE,     this::duplicatePlacement);
             //this.removeButton        = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.TRASH_CAN,     this::removePlacement);
             this.saveToFileButton    = SchematicEntryWidget.createIconButton20x20(LitematicaIcons.SAVE_TO_DISK,  this::saveToFile);
-            this.toggleEnabledButton = OnOffButton.onOff(20, "%s", placement::isEnabled, this::toggleEnabled);
+            this.toggleEnabledButton = OnOffButton.onOff(20, "%s", placement::isEnabled, this::togglePlacementEnabled);
         }
         else
         {
             this.configureButton     = GenericButton.create("litematica.button.schematic_placements_list.configure", this::openConfigurationMenu);
             this.duplicateButton     = GenericButton.create("litematica.button.schematic_placements_list.duplicate", this::duplicatePlacement);
             this.saveToFileButton    = GenericButton.create("litematica.button.schematic_placements_list.save", this::saveToFile);
-            this.toggleEnabledButton = OnOffButton.onOff(20, "litematica.button.schematic_placements_list.enabled", placement::isEnabled, this::toggleEnabled);
+            this.toggleEnabledButton = OnOffButton.onOff(20, "litematica.button.schematic_placements_list.enabled", placement::isEnabled, this::togglePlacementEnabled);
         }
 
         this.removeButton = GenericButton.create("litematica.button.schematic_placements_list.remove", this::removePlacement);
@@ -324,7 +324,7 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
         this.listWidget.reCreateListEntryWidgets();
     }
 
-    protected void toggleEnabled()
+    protected void togglePlacementEnabled()
     {
         DataManager.getSchematicPlacementManager().toggleEnabled(this.getData());
         this.listWidget.reCreateListEntryWidgets();

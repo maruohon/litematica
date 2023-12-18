@@ -42,7 +42,7 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
         this.placement = placement;
 
         this.configureButton     = GenericButton.create(18, "litematica.button.schematic_placements_list.configure", this::openConfigurationMenu);
-        this.toggleEnabledButton = OnOffButton.onOff(18, "litematica.button.schematic_placements_list.enabled", data::isEnabled, this::toggleEnabled);
+        this.toggleEnabledButton = OnOffButton.onOff(18, "litematica.button.schematic_placements_list.enabled", data::isEnabled, this::toggleSubRegionEnabled);
         this.modificationNoticeIcon = new IconWidget(DefaultIcons.EXCLAMATION_11);
         this.modificationNoticeIcon.translateAndAddHoverString("litematica.hover.placement_list.icon.placement_modified");
 
@@ -103,7 +103,7 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
         BaseScreen.openScreenWithParent(new SchematicPlacementSubRegionSettingsScreen(this.placement, this.data));
     }
 
-    protected void toggleEnabled()
+    protected void toggleSubRegionEnabled()
     {
         DataManager.getSchematicPlacementManager().toggleSubRegionEnabled(this.placement, this.data.getName());
         this.listWidget.refreshEntries();
