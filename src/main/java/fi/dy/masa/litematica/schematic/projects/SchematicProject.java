@@ -25,8 +25,10 @@ import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.PlacementDeletionMode;
 import fi.dy.masa.litematica.util.ToolUtils;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -209,7 +211,33 @@ public class SchematicProject
             {
                 this.removeCurrentPlacement();
 
-                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.directory, version.getFileName());
+                String fileName = version.getFileName();
+                FileType fileType = FileType.fromFile(new File(this.directory, fileName));
+
+                if (fileType == FileType.UNKNOWN)
+                {
+                    fileName += ".litematic";
+                    fileType = FileType.LITEMATICA_SCHEMATIC;
+                }
+
+                LitematicaSchematic schematic = null;
+
+                if (fileType == FileType.LITEMATICA_SCHEMATIC)
+                {
+                    schematic = LitematicaSchematic.createFromFile(this.directory, fileName);
+                }
+                else if (fileType == FileType.SCHEMATICA_SCHEMATIC)
+                {
+                    schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(this.directory, fileName, false, f -> {});
+                }
+                else if (fileType == FileType.VANILLA_STRUCTURE)
+                {
+                    schematic = WorldUtils.convertStructureToLitematicaSchematic(this.directory, fileName);
+                }
+                else if (fileType == FileType.SPONGE_SCHEMATIC)
+                {
+                    schematic = WorldUtils.convertSpongeSchematicToLitematicaSchematic(this.directory, fileName);
+                }
 
                 if (schematic != null)
                 {
