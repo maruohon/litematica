@@ -67,7 +67,7 @@
     "litematica.hotkeys.category.generic_hotkeys": "Основные клавиши",
 
     "litematica.info.schematic_load.schematic_loaded": "Схема \"%s\" успешно загружена в память",
-    "litematica.info.schematic_manager.preview.right_click_to_cancel": "- Нажмите ПКМ по кнопке, чтобы прервать операцию создания миниатюры\n- Удерживайте Ctrl+Alt+Shift при нажатии, чтобы загрузить картинку из существующего\n PNG-файла с именем \"thumb.png\", лежащего в той же директории, что и файл схемы.",
+    "litematica.info.schematic_manager.preview.right_click_to_cancel": "- Нажмите ПКМ по кнопке, чтобы прервать операцию создания миниатюры\n- Удерживайте Ctrl при нажатии, чтобы загрузить картинку из существующего\n PNG-файла.",
     "litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot": "Используйте обычную клавишу создания скриншота, чтобы установить миниатюру. Нажмите ПКМ по этой кнопке, чтобы прервать операцию.",
     "litematica.info.schematic_manager.preview.success": "Миниатюра успешно установлена",
 

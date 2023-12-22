@@ -28,6 +28,7 @@ import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
@@ -261,46 +262,50 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else if (this.type == Type.SET_PREVIEW)
             {
-                if (GuiBase.isShiftDown() && GuiBase.isCtrlDown() && GuiBase.isAltDown() && fileType == FileType.LITEMATICA_SCHEMATIC)
+                if (GuiBase.isCtrlDown() && fileType == FileType.LITEMATICA_SCHEMATIC)
                 {
-                    File imageFile = new File(entry.getDirectory(), "thumb.png");
-                    if (imageFile.isFile() && imageFile.canRead())
-                    {
-                        LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
+                    String val = TinyFileDialogs.tinyfd_openFileDialog(
+                            "Select a preview image",
+                            entry.getDirectory().getAbsolutePath(),
+                            null,
+                            null,
+                            false
+                    );
 
-                        if (schematic != null)
-                        {
-                            try
-                            {
-                                InputStream inputStream = Files.newInputStream(imageFile.toPath());
-                                NativeImage image = NativeImage.read(inputStream);
-                                int x = image.getWidth() >= image.getHeight() ? (image.getWidth() - image.getHeight()) / 2 : 0;
-                                int y = image.getHeight() >= image.getWidth() ? (image.getHeight() - image.getWidth()) / 2 : 0;
-                                int longerSide = Math.min(image.getWidth(), image.getHeight());
-                                //System.out.printf("w: %d, h: %d, x: %d, y: %d\n", screenshot.getWidth(), screenshot.getHeight(), x, y);
-                                int previewDimensions = 140;
-                                NativeImage scaled = new NativeImage(previewDimensions, previewDimensions, false);
-                                image.resizeSubRectTo(x, y, longerSide, longerSide, scaled);
-                                @SuppressWarnings("deprecation")
-                                int[] pixels = scaled.makePixelArray();
-    
-                                schematic.getMetadata().setPreviewImagePixelData(pixels);
-                                schematic.getMetadata().setTimeModifiedToNow();
-    
-                                if (schematic.writeToFile(entry.getDirectory(), entry.getName(), true))
-                                {
-                                    InfoUtils.showGuiAndInGameMessage(MessageType.SUCCESS, "Custom preview image set");
-                                }
-
-                                return;
-                            }
-                            catch (Exception ignore) {}
-                        }
-                    }
-                    else
-                    {
-                        InfoUtils.showGuiAndInGameMessage(MessageType.ERROR, "Image 'thumb.png' not found");
+                    if (val == null) {
+                        InfoUtils.showGuiAndInGameMessage(MessageType.ERROR, "Image not selected");
                         return;
+                    }
+                    File imageFile = new File(val);
+                    LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
+
+                    if (schematic != null)
+                    {
+                        try
+                        {
+                            InputStream inputStream = Files.newInputStream(imageFile.toPath());
+                            NativeImage image = NativeImage.read(inputStream);
+                            int x = image.getWidth() >= image.getHeight() ? (image.getWidth() - image.getHeight()) / 2 : 0;
+                            int y = image.getHeight() >= image.getWidth() ? (image.getHeight() - image.getWidth()) / 2 : 0;
+                            int longerSide = Math.min(image.getWidth(), image.getHeight());
+                            //System.out.printf("w: %d, h: %d, x: %d, y: %d\n", screenshot.getWidth(), screenshot.getHeight(), x, y);
+                            int previewDimensions = 140;
+                            NativeImage scaled = new NativeImage(previewDimensions, previewDimensions, false);
+                            image.resizeSubRectTo(x, y, longerSide, longerSide, scaled);
+                            @SuppressWarnings("deprecation")
+                            int[] pixels = scaled.makePixelArray();
+
+                            schematic.getMetadata().setPreviewImagePixelData(pixels);
+                            schematic.getMetadata().setTimeModifiedToNow();
+
+                            if (schematic.writeToFile(entry.getDirectory(), entry.getName(), true))
+                            {
+                                InfoUtils.showGuiAndInGameMessage(MessageType.SUCCESS, "Custom preview image set");
+                            }
+
+                            return;
+                        }
+                        catch (Exception ignore) {}
                     }
                     InfoUtils.showGuiAndInGameMessage(MessageType.ERROR, "Failed to set custom preview image");
                     return;
