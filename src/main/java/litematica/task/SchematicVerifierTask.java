@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 
+import malilib.util.game.WorldUtils;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.PositionUtils;
 import litematica.config.Configs;
@@ -65,7 +66,7 @@ public class SchematicVerifierTask extends TaskProcessChunkBase
     {
         int radius = Configs.Generic.REQUIRE_ADJACENT_CHUNKS.getBooleanValue() ? 1 : 0;
         return this.areSurroundingChunksLoaded(pos, this.worldClient, radius) &&
-               this.schematicWorld.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z);
+               WorldUtils.isClientChunkLoaded(pos.x, pos.z, this.schematicWorld);
     }
 
     @Override

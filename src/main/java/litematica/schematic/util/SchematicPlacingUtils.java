@@ -29,6 +29,7 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
@@ -303,7 +304,7 @@ public class SchematicPlacingUtils
 
                         if (te != null)
                         {
-                            teNBT = teNBT.copy();
+                            teNBT = NbtWrap.copy(teNBT);
                             NbtUtils.putVec3i(teNBT, pos);
 
                             try
@@ -569,7 +570,7 @@ public class SchematicPlacingUtils
 
                         if (te != null)
                         {
-                            teNBT = teNBT.copy();
+                            teNBT = NbtWrap.copy(teNBT);
                             NbtUtils.putVec3i(teNBT, pos);
 
                             try

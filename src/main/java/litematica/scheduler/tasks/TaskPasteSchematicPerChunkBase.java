@@ -9,10 +9,10 @@ import it.unimi.dsi.fastutil.longs.LongSet;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
+import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
@@ -25,6 +25,7 @@ import litematica.schematic.placement.SchematicPlacement;
 import litematica.util.PositionUtils.ChunkPosComparator;
 import litematica.util.value.ReplaceBehavior;
 import litematica.world.SchematicWorldHandler;
+import litematica.world.WorldSchematic;
 
 public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements IInfoHudRenderer
 {
@@ -113,9 +114,9 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
                SchematicWorldHandler.getSchematicWorld() != null;
     }
 
-    protected boolean canProcessChunk(ChunkPos pos, World worldSchematic, WorldClient worldClient)
+    protected boolean canProcessChunk(ChunkPos pos, WorldSchematic worldSchematic, WorldClient worldClient)
     {
-        if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z) == false ||
+        if (WorldUtils.isClientChunkLoaded(pos.x, pos.z, worldSchematic) == false ||
             DataManager.getSchematicPlacementManager().hasPendingRebuildForChunk(pos.x, pos.z))
         {
             return false;

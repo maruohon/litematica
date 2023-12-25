@@ -24,6 +24,7 @@ import net.minecraft.world.World;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.position.ChunkSectionPos;
@@ -338,7 +339,7 @@ public class SchematicEditUtils
             posMutable.move(direction);
 
             if (range.isPositionWithinRange(posMutable) == false ||
-                world.getChunkProvider().isChunkGeneratedAt(posMutable.getX() >> 4, posMutable.getZ() >> 4) == false ||
+                WorldUtils.isClientChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4, world) == false ||
                 world.getBlockState(posMutable) != stateStart)
             {
                 posMutable.move(direction.getOpposite());

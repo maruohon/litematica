@@ -254,7 +254,7 @@ public class SpongeSchematic extends SingleRegionSchematic
 
         for (Map.Entry<BlockPos, NBTTagCompound> entry : this.blockEntities.entrySet())
         {
-            NBTTagCompound beTag = entry.getValue().copy();
+            NBTTagCompound beTag = NbtWrap.copy(entry.getValue());
             NbtUtils.writeBlockPosToArrayTag(entry.getKey(), beTag, "Pos");
 
             // Add the Sponge tag and remove the vanilla/Litematica tag
@@ -278,7 +278,7 @@ public class SpongeSchematic extends SingleRegionSchematic
 
         for (EntityInfo info : this.entities)
         {
-            NBTTagCompound entityData = info.nbt.copy();
+            NBTTagCompound entityData = NbtWrap.copy(info.nbt);
             NbtUtils.writeVec3dToListTag(info.pos, entityData);
 
             // Add the Sponge tag and remove the vanilla/Litematica tag

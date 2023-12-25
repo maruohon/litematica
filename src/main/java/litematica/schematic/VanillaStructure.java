@@ -230,7 +230,7 @@ public class VanillaStructure extends SingleRegionSchematic
 
         if (beTag != null)
         {
-            NbtWrap.putTag(blockTag, "nbt", beTag.copy());
+            NbtWrap.putTag(blockTag, "nbt", NbtWrap.copy(beTag));
         }
 
         NbtWrap.addTag(blockList, blockTag);
@@ -245,7 +245,7 @@ public class VanillaStructure extends SingleRegionSchematic
             NBTTagCompound entityData = new NBTTagCompound();
             NbtUtils.writeVec3dToListTag(info.pos, entityData, "pos");
             NbtUtils.writeBlockPosToListTag(new BlockPos(info.pos), entityData, "blockPos");
-            NBTTagCompound entityTag = info.nbt.copy();
+            NBTTagCompound entityTag = NbtWrap.copy(info.nbt);
 
             NbtWrap.remove(entityTag, "Pos");
             NbtWrap.putTag(entityData, "nbt", entityTag);

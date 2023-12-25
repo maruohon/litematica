@@ -11,6 +11,7 @@ import net.minecraft.util.math.ChunkPos;
 
 import malilib.listener.TaskCompletionListener;
 import malilib.util.StringUtils;
+import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import litematica.config.Configs;
@@ -111,7 +112,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     {
         if (radius <= 0)
         {
-            return world.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z);
+            return WorldUtils.isClientChunkLoaded(pos.x, pos.z, world);
         }
 
         int chunkX = pos.x;
@@ -121,7 +122,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
         {
             for (int cz = chunkZ - radius; cz <= chunkZ + radius; ++cz)
             {
-                if (world.getChunkProvider().isChunkGeneratedAt(cx, cz) == false)
+                if (WorldUtils.isClientChunkLoaded(cx, cz, world) == false)
                 {
                     return false;
                 }

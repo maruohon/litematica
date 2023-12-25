@@ -35,6 +35,7 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.EnabledCondition;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
+import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.ChunkSectionPos;
@@ -170,20 +171,20 @@ public class SchematicPlacementManager
                 int chunkZ = malilib.util.position.PositionUtils.getChunkPosZ(chunkPosLong);
 
                 if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() ||
-                    clientWorld.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
+                    WorldUtils.isClientChunkLoaded(chunkX, chunkZ, clientWorld))
                 {
                     // Wipe the old chunk if it exists
-                    if (schematicWorld.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
+                    if (WorldUtils.isClientChunkLoaded(chunkX, chunkZ, schematicWorld))
                     {
                         //System.out.printf("wiping chunk at %s\n", pos);
                         this.unloadSchematicChunk(schematicWorld, chunkX, chunkZ);
                     }
 
                     //System.out.printf("loading chunk at %s\n", pos);
-                    schematicWorld.getChunkProvider().loadChunk(chunkX, chunkZ);
+                    WorldUtils.loadClientChunk(chunkX, chunkZ, schematicWorld);
                 }
 
-                if (schematicWorld.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
+                if (WorldUtils.isClientChunkLoaded(chunkX, chunkZ, schematicWorld))
                 {
                     //System.out.printf("placing at %s\n", pos);
                     List<SchematicPlacement> placements = this.placementsTouchingChunk.get(chunkPosLong);
@@ -238,12 +239,12 @@ public class SchematicPlacementManager
 
     protected void unloadSchematicChunk(WorldSchematic worldSchematic, int chunkX, int chunkZ)
     {
-        if (worldSchematic.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
+        if (WorldUtils.isClientChunkLoaded(chunkX, chunkZ, worldSchematic))
         {
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
             worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4) - 1 ,   0, (chunkZ << 4) - 1,
                                                          (chunkX << 4) + 16, 256, (chunkZ << 4) + 16);
-            worldSchematic.getChunkProvider().unloadChunk(chunkX, chunkZ);
+            WorldUtils.unloadClientChunk(chunkX, chunkZ, worldSchematic);
         }
     }
 

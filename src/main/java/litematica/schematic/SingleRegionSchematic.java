@@ -17,6 +17,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
 import litematica.Litematica;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
@@ -229,7 +230,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
             // No offset for this sub-region, use the positions in the maps without modifications
             if (region.getPosition().equals(BlockPos.ORIGIN))
             {
-                region.getBlockEntityMap().forEach((key, value) -> this.blockEntities.put(key, value.copy()));
+                region.getBlockEntityMap().forEach((key, value) -> this.blockEntities.put(key, NbtWrap.copy(value)));
                 this.pendingBlockTicks.putAll(region.getBlockTickMap());
                 region.getEntityList().forEach((info) -> this.entities.add(info.copy()));
             }
@@ -240,7 +241,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
                 region.getBlockEntityMap().forEach((key, value) -> {
                     BlockPos pos = key.add(regionOffsetBlocks);
-                    this.blockEntities.put(pos, value.copy());
+                    this.blockEntities.put(pos, NbtWrap.copy(value));
                 });
 
                 region.getBlockTickMap().forEach((key, value) -> {
@@ -254,7 +255,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
                 region.getEntityList().forEach((info) -> {
                     Vec3d pos = info.pos.add(regionOffsetEntities.getX(), regionOffsetEntities.getY(), regionOffsetEntities.getZ());
-                    NBTTagCompound nbt = info.nbt.copy();
+                    NBTTagCompound nbt = NbtWrap.copy(info.nbt);
                     NbtUtils.writeVec3dToListTag(pos, nbt);
                     this.entities.add(new EntityInfo(pos, nbt));
                 });

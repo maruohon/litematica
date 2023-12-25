@@ -41,7 +41,7 @@ public class WorldUtils
         {
             for (int cx = cxMin; cx <= cxMax; ++cx)
             {
-                world.getChunkProvider().loadChunk(cx, cz);
+                malilib.util.game.WorldUtils.loadClientChunk(cx, cz, world);
             }
         }
     }

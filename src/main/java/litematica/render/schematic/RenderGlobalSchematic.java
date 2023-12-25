@@ -49,6 +49,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.RenderUtils;
 import malilib.render.buffer.VertexBuilder;
+import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.position.ChunkSectionPos;
@@ -278,7 +279,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     @Override
     public void setupTerrain(Entity viewEntity, double partialTicks, ICamera camera, int frameCount, boolean playerSpectator)
     {
-        World world = this.world;
+        WorldClient world = this.world;
         GameUtils.profilerPush("setup_terrain");
 
         if (this.viewFrustum == null || GameUtils.getRenderDistanceChunks() != this.renderDistanceChunks)
@@ -383,7 +384,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                 // have been already properly loaded on the client
                 if (Math.abs(subChunk.getX() - centerChunkX) <= renderDistance &&
                     Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance &&
-                    world.getChunkProvider().isChunkGeneratedAt(subChunk.getX(), subChunk.getZ()))
+                    WorldUtils.isClientChunkLoaded(subChunk.getX(), subChunk.getZ(), world))
                 {
                     BlockPos subChunkCornerPos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
                     RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(subChunkCornerPos);

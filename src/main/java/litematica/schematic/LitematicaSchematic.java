@@ -200,7 +200,7 @@ public class LitematicaSchematic extends SchematicBase
                 Map<BlockPos, NextTickListEntry> blockTickMap = new HashMap<>(region.getBlockTickMap());
                 List<EntityInfo> entities = new ArrayList<>();
 
-                region.getBlockEntityMap().forEach((key, value) -> blockEntityMap.put(key, value.copy()));
+                region.getBlockEntityMap().forEach((key, value) -> blockEntityMap.put(key, NbtWrap.copy(value)));
                 region.getEntityList().forEach((info) -> entities.add(info.copy()));
 
                 this.blockEntities.put(regionName, blockEntityMap);
