@@ -414,7 +414,7 @@ public class SchematicCreationUtils
 
             if (box == null || region == null)
             {
-                Litematica.logger.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
+                Litematica.LOGGER.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }
 
@@ -425,7 +425,7 @@ public class SchematicCreationUtils
             if (container == null || blockEntityMap == null || tickMap == null)
             {
                 MessageDispatcher.error().translate("litematica.message.error.schematic_save.missing_container", regionName);
-                Litematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
+                Litematica.LOGGER.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }
 

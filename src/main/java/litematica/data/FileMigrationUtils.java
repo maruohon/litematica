@@ -67,7 +67,7 @@ public class FileMigrationUtils
             try
             {
                 FileUtils.move(file, newFile);
-                Litematica.logger.info("Moving '{}' => '{}'\n", file, newFile);
+                Litematica.LOGGER.info("Moving '{}' => '{}'\n", file, newFile);
             }
             catch (Exception e)
             {
@@ -105,7 +105,7 @@ public class FileMigrationUtils
                         {
                             try
                             {
-                                Litematica.logger.info("Moving '{}' => '%s'\n", oldDir, newDir);
+                                Litematica.LOGGER.info("Moving '{}' => '%s'\n", oldDir, newDir);
                                 Files.move(oldDir, newDir);
                             }
                             catch (Exception e)
@@ -118,7 +118,7 @@ public class FileMigrationUtils
 
                         if (FileUtils.isDirectoryEmpty(file))
                         {
-                            Litematica.logger.info("Deleting '{}'\n", file);
+                            Litematica.LOGGER.info("Deleting '{}'\n", file);
                             FileUtils.delete(file);
                         }
                     }
@@ -126,7 +126,7 @@ public class FileMigrationUtils
 
                 if (FileUtils.isDirectoryEmpty(oldDirPerWorldBase))
                 {
-                    Litematica.logger.info("Deleting '{}'\n", oldDirPerWorldBase);
+                    Litematica.LOGGER.info("Deleting '{}'\n", oldDirPerWorldBase);
                     FileUtils.delete(oldDirPerWorldBase);
                 }
             }
@@ -141,7 +141,7 @@ public class FileMigrationUtils
         {
             try
             {
-                Litematica.logger.info("Moving '{}' => '{}'\n", oldDirGlobal, newDirGlobal);
+                Litematica.LOGGER.info("Moving '{}' => '{}'\n", oldDirGlobal, newDirGlobal);
                 Files.move(oldDirGlobal, newDirGlobal);
             }
             catch (Exception e)

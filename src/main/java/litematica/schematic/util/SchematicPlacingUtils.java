@@ -178,7 +178,7 @@ public class SchematicPlacingUtils
                     }
                     else
                     {
-                        Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
+                        Litematica.LOGGER.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
                     }
 
                     if (schematicPlacement.ignoreEntities() == false && regionPlacement.ignoreEntities() == false && entityList != null)
@@ -317,7 +317,7 @@ public class SchematicPlacingUtils
                             }
                             catch (Exception e)
                             {
-                                Litematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                Litematica.LOGGER.warn("Failed to load TileEntity data for {} @ {}", state, pos);
                             }
                         }
                     }
@@ -428,7 +428,7 @@ public class SchematicPlacingUtils
                     if (placeBlocksWithinChunk(world, chunkPos, regionName, region, origin, schematicPlacement, placement, replace, notifyNeighbors) == false)
                     {
                         allSuccess = false;
-                        Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
+                        Litematica.LOGGER.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
                     }
 
                     if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false)
@@ -583,7 +583,7 @@ public class SchematicPlacingUtils
                             }
                             catch (Exception e)
                             {
-                                Litematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                Litematica.LOGGER.warn("Failed to load TileEntity data for {} @ {}", state, pos);
                             }
                         }
                     }

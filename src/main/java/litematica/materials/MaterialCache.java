@@ -374,7 +374,7 @@ public class MaterialCache
         {
             if (FileUtils.createDirectoriesIfMissing(dir) == false)
             {
-                Litematica.logger.warn("Failed to write the material list cache to file '{}'",
+                Litematica.LOGGER.warn("Failed to write the material list cache to file '{}'",
                                        file.toAbsolutePath().toString());
                 return false;
             }
@@ -388,7 +388,7 @@ public class MaterialCache
         }
         catch (Exception e)
         {
-            Litematica.logger.warn("Failed to write the material list cache to file '{}'",
+            Litematica.LOGGER.warn("Failed to write the material list cache to file '{}'",
                                    file.toAbsolutePath().toString(), e);
         }
 
@@ -419,7 +419,7 @@ public class MaterialCache
         }
         catch (Exception e)
         {
-            Litematica.logger.warn("Failed to read the material list cache from file '{}'",
+            Litematica.LOGGER.warn("Failed to read the material list cache from file '{}'",
                                    file.toAbsolutePath().toString(), e);
         }
     }

@@ -159,7 +159,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
                 }
                 catch (Exception e)
                 {
-                    Litematica.logger.warn("Exception while reading schematic contents from another schematic", e);
+                    Litematica.LOGGER.warn("Exception while reading schematic contents from another schematic", e);
                 }
             }
         }

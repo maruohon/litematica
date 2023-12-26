@@ -133,7 +133,7 @@ public interface ISchematic
         {
             String name = file.toAbsolutePath().toString();
             MessageDispatcher.error("litematica.error.schematic_write_to_file_failed.exception", name);
-            Litematica.logger.warn("Failed to write schematic to file '{}'", name, e);
+            Litematica.LOGGER.warn("Failed to write schematic to file '{}'", name, e);
         }
 
         return false;

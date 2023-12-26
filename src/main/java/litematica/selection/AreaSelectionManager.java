@@ -719,7 +719,7 @@ public class AreaSelectionManager
         }
         catch (Exception e)
         {
-            Litematica.logger.warn("Exception while writing area selections to file", e);
+            Litematica.LOGGER.warn("Exception while writing area selections to file", e);
         }
 
         AreaSelection current = this.currentSelectionId != null ? this.selections.get(this.currentSelectionId) : null;

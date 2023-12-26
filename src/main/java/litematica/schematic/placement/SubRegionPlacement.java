@@ -116,13 +116,13 @@ public class SubRegionPlacement extends BasePlacement
 
         if (pos == null)
         {
-            Litematica.logger.warn("SubRegionPlacement.fromJson(): Error, no position");
+            Litematica.LOGGER.warn("SubRegionPlacement.fromJson(): Error, no position");
             return null;
         }
 
         if (name == null)
         {
-            Litematica.logger.warn("SubRegionPlacement.fromJson(): Error, no region name");
+            Litematica.LOGGER.warn("SubRegionPlacement.fromJson(): Error, no region name");
             return null;
         }
 

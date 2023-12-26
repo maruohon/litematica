@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.apache.logging.log4j.Logger;
 
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.Entity;
@@ -22,8 +21,6 @@ import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public class ChunkRenderWorkerLitematica implements Runnable
 {
-    private static final Logger LOGGER = Litematica.logger;
-
     private final ChunkRenderDispatcherLitematica chunkRenderDispatcher;
     @Nullable private final VertexBuilderCache bufferCache;
     private boolean shouldRun;
@@ -51,7 +48,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             }
             catch (InterruptedException e)
             {
-                LOGGER.debug("Stopping chunk worker due to interrupt");
+                Litematica.LOGGER.debug("Stopping chunk worker due to interrupt");
                 return;
             }
             catch (Throwable throwable)
@@ -73,7 +70,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             {
                 if (generator.isFinished() == false)
                 {
-                    LOGGER.warn("Chunk render task was {} when I expected it to be pending; ignoring task", (Object)generator.getStatus());
+                    Litematica.LOGGER.warn("Chunk render task was {} when I expected it to be pending; ignoring task", (Object)generator.getStatus());
                 }
 
                 return;
@@ -118,7 +115,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 {
                     if (generator.isFinished() == false)
                     {
-                        LOGGER.warn("Chunk render task was {} when I expected it to be compiling; aborting task", (Object)generator.getStatus());
+                        Litematica.LOGGER.warn("Chunk render task was {} when I expected it to be compiling; aborting task", (Object)generator.getStatus());
                     }
 
                     this.freeRenderBuilder(generator);
@@ -205,7 +202,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
                             if (generator.isFinished() == false)
                             {
-                                ChunkRenderWorkerLitematica.LOGGER.warn("Chunk render task was {} when I expected it to be uploading; aborting task", (Object)generator.getStatus());
+                                Litematica.LOGGER.warn("Chunk render task was {} when I expected it to be uploading; aborting task", (Object)generator.getStatus());
                             }
                         }
                         finally

@@ -29,7 +29,7 @@ import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public class ChunkRenderDispatcherLitematica
 {
-    private static final Logger LOGGER = Litematica.logger;
+    private static final Logger LOGGER = Litematica.LOGGER;
     private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setNameFormat("Litematica Chunk Batcher %d").setDaemon(true).build();
 
     private final List<Thread> listWorkerThreads = Lists.newArrayList();
@@ -48,7 +48,7 @@ public class ChunkRenderDispatcherLitematica
 
         if (threadLimitCPU > 1)
         {
-            Litematica.logger.info("Creating {} render threads", threadLimitCPU);
+            Litematica.LOGGER.info("Creating {} render threads", threadLimitCPU);
 
             for (int i = 0; i < threadLimitCPU; ++i)
             {
@@ -60,7 +60,7 @@ public class ChunkRenderDispatcherLitematica
             }
         }
 
-        Litematica.logger.info("Using {} total BufferBuilder caches", this.countRenderBuilders + 1);
+        Litematica.LOGGER.info("Using {} total BufferBuilder caches", this.countRenderBuilders + 1);
 
         this.queueFreeRenderBuilders = Queues.newArrayBlockingQueue(this.countRenderBuilders);
 

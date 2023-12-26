@@ -158,7 +158,7 @@ public class LitematicaSchematic extends SchematicBase
             catch (Exception e)
             {
                 MessageDispatcher.error().translate("TODO - Failed to create the block state container for sub-region: " + regionName);
-                Litematica.logger.warn("Failed to create the block state container for sub-region '{}'", regionName, e.getMessage());
+                Litematica.LOGGER.warn("Failed to create the block state container for sub-region '{}'", regionName, e.getMessage());
             }
 
             this.blockEntities.put(regionName, new HashMap<>());

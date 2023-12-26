@@ -103,7 +103,7 @@ public class EasyPlaceUtils
             }
             catch (Exception e)
             {
-                Litematica.logger.warn("EasyPlaceUtils: Failed to reflect method Block::onBlockActivated", e);
+                Litematica.LOGGER.warn("EasyPlaceUtils: Failed to reflect method Block::onBlockActivated", e);
                 val = false;
             }
 

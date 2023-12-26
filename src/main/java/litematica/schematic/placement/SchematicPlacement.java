@@ -352,7 +352,7 @@ public class SchematicPlacement extends BasePlacement
                 }
                 else
                 {
-                    Litematica.logger.warn("SchematicPlacement.getSubRegionBoxes(): Subregion '{}' not found in the schematic '{}'",
+                    Litematica.LOGGER.warn("SchematicPlacement.getSubRegionBoxes(): Subregion '{}' not found in the schematic '{}'",
                                            regionName, this.schematic.getMetadata().getName());
                 }
             }
@@ -376,7 +376,7 @@ public class SchematicPlacement extends BasePlacement
             }
             else
             {
-                Litematica.logger.warn("SchematicPlacement.getSubRegionBoxFor(): Sub-region '{}' not found in the schematic '{}'", regionName, this.schematic.getMetadata().getName());
+                Litematica.LOGGER.warn("SchematicPlacement.getSubRegionBoxFor(): Sub-region '{}' not found in the schematic '{}'", regionName, this.schematic.getMetadata().getName());
             }
         }
 
@@ -807,7 +807,7 @@ public class SchematicPlacement extends BasePlacement
         {
             MessageDispatcher.error().translate("litematica.error.schematic_placements.settings_load.missing_data");
             String name = this.schematicFile != null ? this.schematicFile.toAbsolutePath().toString() : "<null>";
-            Litematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", name);
+            Litematica.LOGGER.warn("Failed to load schematic placement for '{}', invalid origin position", name);
             return false;
         }
 
