@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "litematica",
+	"name": "Litematica",
+	"version": "${mod_version}",
+
+	"description": "A modern schematic mod with extra creative mode features",
+	"license": "LGPLv3",
+	"authors": [ "masa" ],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/litematica",
+		"issues": "https://github.com/maruohon/litematica/issues",
+		"sources": "https://github.com/maruohon/litematica",
+		"discord": "https://discordapp.com/channels/169369095538606080/566649314001158165"
+	},
+
+	"icon": "assets/litematica/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client-init": [
+			"litematica.Litematica"
+		],
+		"modmenu": [
+			"litematica.compat.modmenu.ModMenuImpl"
+		]
+	},
+
+	"mixins": [
+		{
+			"config": "mixins.litematica.json",
+			"environment": "client"
+		}
+	],
+
+	"depends": {
+		"minecraft": "1.12.x",
+		"malilib": ">=0.55.0",
+		"osl-entrypoints": "*",
+		"osl-resource-loader": "*"
+	}
+}
