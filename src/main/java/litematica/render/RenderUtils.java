@@ -11,7 +11,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
@@ -24,6 +23,7 @@ import malilib.render.buffer.VanillaWrappingVertexBuilder;
 import malilib.render.buffer.VertexBuilder;
 import malilib.render.inventory.InventoryRenderDefinition;
 import malilib.render.inventory.InventoryRenderUtils;
+import malilib.util.MathUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
@@ -518,7 +518,7 @@ public class RenderUtils
     public static void drawBlockModelOutlinesBatched(IBakedModel model, IBlockState state,
                                                      BlockPos pos, Color4f color, VertexBuilder builder)
     {
-        long rand = MathHelper.getPositionRandom(pos);
+        long rand = MathUtils.getPositionRandom(pos);
 
         for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
@@ -568,7 +568,7 @@ public class RenderUtils
     public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos,
                                                         Color4f color, double expand, VertexBuilder builder)
     {
-        long rand = MathHelper.getPositionRandom(pos);
+        long rand = MathUtils.getPositionRandom(pos);
 
         for (final EnumFacing side : PositionUtils.FACING_ALL)
         {

@@ -42,13 +42,13 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.RenderUtils;
 import malilib.render.buffer.VertexBuilder;
+import malilib.util.MathUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
@@ -318,9 +318,9 @@ public class RenderGlobalSchematic extends RenderGlobal
         y = y + (double) viewEntity.getEyeHeight();
 
         GameUtils.profilerSwap("culling");
-        final int centerChunkX = MathHelper.floor(x) >> 4;
-        final int centerChunkY = MathHelper.floor(y) >> 4;
-        final int centerChunkZ = MathHelper.floor(z) >> 4;
+        final int centerChunkX = MathUtils.floor(x) >> 4;
+        final int centerChunkY = MathUtils.floor(y) >> 4;
+        final int centerChunkZ = MathUtils.floor(z) >> 4;
         final int renderDistance = GameUtils.getRenderDistanceChunks();
         ChunkSectionPos viewSubChunk = new ChunkSectionPos(centerChunkX, centerChunkY, centerChunkZ);
         this.viewPosSubChunk.setPos(centerChunkX << 4, centerChunkY << 4, centerChunkZ << 4);
@@ -346,7 +346,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             this.displayListEntitiesDirty = false;
             this.renderInfos.clear();
 
-            Entity.setRenderDistanceWeight(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
+            Entity.setRenderDistanceWeight(MathUtils.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
 
             if (this.lastSubChunkUpdatePos == null ||
                 Math.abs(this.viewPosSubChunk.getX() - this.lastSubChunkUpdatePos.getX()) > 32 ||

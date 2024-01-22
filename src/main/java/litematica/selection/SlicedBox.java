@@ -1,7 +1,8 @@
 package litematica.selection;
 
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.MathHelper;
+
+import malilib.util.MathUtils;
 
 public class SlicedBox extends CornerDefinedBox
 {
@@ -59,12 +60,12 @@ public class SlicedBox extends CornerDefinedBox
 
     public void setSliceStart(int sliceStart)
     {
-        this.sliceStart = MathHelper.clamp(sliceStart, 0, this.getMaxSliceLength() - 1);
+        this.sliceStart = MathUtils.clamp(sliceStart, 0, this.getMaxSliceLength() - 1);
     }
 
     public void setSliceEnd(int sliceEnd)
     {
-        this.sliceEnd = MathHelper.clamp(sliceEnd, 0, this.getMaxSliceLength() - 1);
+        this.sliceEnd = MathUtils.clamp(sliceEnd, 0, this.getMaxSliceLength() - 1);
     }
 
     public void setSliceRepeatCount(int sliceRepeatCount)

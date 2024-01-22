@@ -20,13 +20,13 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.MathUtils;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
@@ -1184,7 +1184,7 @@ public class PositionUtils
 
     public static float getRotatedYaw(float yaw, Rotation rotation)
     {
-        yaw = MathHelper.wrapDegrees(yaw);
+        yaw = MathUtils.wrapDegrees(yaw);
 
         switch (rotation)
         {
@@ -1205,7 +1205,7 @@ public class PositionUtils
 
     public static float getMirroredYaw(float yaw, Mirror mirror)
     {
-        yaw = MathHelper.wrapDegrees(yaw);
+        yaw = MathUtils.wrapDegrees(yaw);
 
         switch (mirror)
         {

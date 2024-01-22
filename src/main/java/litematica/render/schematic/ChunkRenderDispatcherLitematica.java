@@ -21,9 +21,9 @@ import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.math.MathHelper;
 
 import malilib.render.buffer.VertexBuilder;
+import malilib.util.MathUtils;
 import litematica.Litematica;
 import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
@@ -43,8 +43,8 @@ public class ChunkRenderDispatcherLitematica
     public ChunkRenderDispatcherLitematica()
     {
         int threadLimitMemory = Math.max(1, (int)((double)Runtime.getRuntime().maxMemory() * 0.15D) / 10485760);
-        int threadLimitCPU = Math.max(1, MathHelper.clamp(Runtime.getRuntime().availableProcessors(), 1, threadLimitMemory / 5));
-        this.countRenderBuilders = MathHelper.clamp(threadLimitCPU * 8, 1, threadLimitMemory);
+        int threadLimitCPU = Math.max(1, MathUtils.clamp(Runtime.getRuntime().availableProcessors(), 1, threadLimitMemory / 5));
+        this.countRenderBuilders = MathUtils.clamp(threadLimitCPU * 8, 1, threadLimitMemory);
 
         if (threadLimitCPU > 1)
         {

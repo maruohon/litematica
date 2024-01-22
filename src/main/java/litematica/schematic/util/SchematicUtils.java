@@ -8,9 +8,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 
+import malilib.util.MathUtils;
 import malilib.util.position.LayerRange;
 import litematica.schematic.ISchematic;
 import litematica.schematic.ISchematicRegion;
@@ -55,9 +55,9 @@ public class SchematicUtils
         return boxMinRel;
         */
 
-        return new BlockPos(MathHelper.clamp(startX, 0, size.getX() - 1),
-                            MathHelper.clamp(startY, 0, size.getY() - 1),
-                            MathHelper.clamp(startZ, 0, size.getZ() - 1));
+        return new BlockPos(MathUtils.clamp(startX, 0, size.getX() - 1),
+                            MathUtils.clamp(startY, 0, size.getY() - 1),
+                            MathUtils.clamp(startZ, 0, size.getZ() - 1));
     }
 
     @Nullable

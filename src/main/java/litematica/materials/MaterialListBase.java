@@ -9,10 +9,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.util.math.MathHelper;
-
 import malilib.config.value.BaseOptionListConfigValue;
 import malilib.listener.TaskCompletionListener;
+import malilib.util.MathUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.datadump.DataDump;
 import litematica.util.value.BlockInfoListType;
@@ -214,7 +213,7 @@ public abstract class MaterialListBase implements IMaterialList
 
     public void setMultiplier(int multiplier)
     {
-        this.multiplier = MathHelper.clamp(multiplier, 1, Integer.MAX_VALUE);
+        this.multiplier = MathUtils.clamp(multiplier, 1, Integer.MAX_VALUE);
     }
 
     public void updateCounts()

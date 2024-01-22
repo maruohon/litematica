@@ -31,13 +31,13 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.ShapeRenderUtils;
 import malilib.render.buffer.VertexBuilder;
+import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
 import malilib.util.position.ChunkSectionPos;
 import malilib.util.position.IntBoundingBox;
@@ -392,7 +392,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                         if (type.getRenderPriority() > typeAdj.getRenderPriority() ||
                             stateSchematic.getBlockFaceShape(this.schematicWorldView, pos, side) != BlockFaceShape.SOLID)
                         {
-                            long rand = MathHelper.getPositionRandom(pos);
+                            long rand = MathUtils.getPositionRandom(pos);
                             RenderUtils.drawBlockModelQuadOverlayBatched(bakedModel, stateSchematic, this.chunkRelPos, side, overlayColor, 0, rand, quadBuilder);
                         }
                     }

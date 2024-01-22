@@ -17,11 +17,11 @@ import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 
 import malilib.render.buffer.VertexBuilder;
+import malilib.util.MathUtils;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 
@@ -40,7 +40,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
                                IBlockAccess worldIn, VertexBuilder builder)
     {
         boolean ao = Minecraft.isAmbientOcclusionEnabled() && stateIn.getLightValue() == 0 && modelIn.isAmbientOcclusion();
-        long rand = MathHelper.getPositionRandom(posIn);
+        long rand = MathUtils.getPositionRandom(posIn);
 
         try
         {
