@@ -11,14 +11,14 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
+import malilib.util.position.Vec3i;
 import litematica.Litematica;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
 import litematica.schematic.container.LitematicaBlockStateContainerFull;
@@ -31,7 +31,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
     protected final List<EntityInfo> entities = new ArrayList<>();
     protected ILitematicaBlockStateContainer blockContainer;
     protected BlockPos regionPos = BlockPos.ORIGIN;
-    private Vec3i regionSize = Vec3i.NULL_VECTOR;
+    private Vec3i regionSize = Vec3i.ZERO;
 
     public SingleRegionSchematic(Path file)
     {

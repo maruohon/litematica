@@ -3,10 +3,6 @@ package litematica.gui;
 import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
 
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.widget.BaseTextFieldWidget;
@@ -16,8 +12,10 @@ import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
 import malilib.util.StringUtils;
+import malilib.util.position.BlockMirror;
+import malilib.util.position.BlockPos;
+import malilib.util.position.BlockRotation;
 import malilib.util.position.Coordinate;
-import malilib.util.position.PositionUtils;
 import litematica.Reference;
 import litematica.data.DataManager;
 import litematica.schematic.ISchematic;
@@ -205,7 +203,7 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
     protected boolean mirror(int mouseButton, GenericButton button)
     {
         boolean reverse = mouseButton == 1;
-        Mirror mirror = PositionUtils.cycleMirror(this.subRegion.getMirror(), reverse);
+        BlockMirror mirror = this.subRegion.getMirror().cycle(reverse);
         this.manager.setSubRegionMirror(this.placement,this.subRegion.getName(), mirror);
         return true;
     }
@@ -213,7 +211,7 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
     protected boolean rotate(int mouseButton, GenericButton button)
     {
         boolean reverse = mouseButton == 1;
-        Rotation rotation = PositionUtils.cycleRotation(this.subRegion.getRotation(), reverse);
+        BlockRotation rotation = this.subRegion.getRotation().cycle(reverse);
         this.manager.setSubRegionRotation(this.placement, this.subRegion.getName(), rotation);
         return true;
     }
@@ -236,14 +234,14 @@ public class SchematicPlacementSubRegionSettingsScreen extends BaseScreen
 
     protected String getMirrorButtonLabel()
     {
-        String val = litematica.util.PositionUtils.getMirrorName(this.subRegion.getMirror());
+        String val = this.subRegion.getMirror().getDisplayName();
         String key = "litematica.button.schematic_placement_settings.mirror_value";
         return StringUtils.translate(key, val);
     }
 
     protected String getRotateButtonLabel()
     {
-        String val = litematica.util.PositionUtils.getRotationNameShort(this.subRegion.getRotation());
+        String val = this.subRegion.getRotation().getDisplayName();
         String key = "litematica.button.schematic_placement_settings.rotation_value";
         return StringUtils.translate(key, val);
     }

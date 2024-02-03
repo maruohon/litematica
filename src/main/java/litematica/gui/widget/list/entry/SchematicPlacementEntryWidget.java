@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.icon.Icon;
@@ -22,6 +19,8 @@ import malilib.overlay.message.MessageHelpers;
 import malilib.render.text.StyledTextLine;
 import malilib.util.FileNameUtils;
 import malilib.util.StringUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3i;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.gui.SaveSchematicPlacementScreen;
@@ -33,7 +32,6 @@ import litematica.schematic.SchematicMetadata;
 import litematica.schematic.SchematicType;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.placement.SchematicPlacementManager;
-import litematica.util.PositionUtils;
 
 public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWidget<SchematicPlacement>
 {
@@ -218,9 +216,9 @@ public class SchematicPlacementEntryWidget extends BaseOrderableListEditEntryWid
         BlockPos o = placement.getPosition();
         StyledTextLine.translate(lines, "litematica.hover.placement_list.origin", o.getX(), o.getY(), o.getZ());
         StyledTextLine.translate(lines, "litematica.hover.placement_list.rotation",
-                                 PositionUtils.getRotationNameShort(placement.getRotation()));
+                                 placement.getRotation().getDisplayName());
         StyledTextLine.translate(lines, "litematica.hover.placement_list.mirror",
-                                 PositionUtils.getMirrorName(placement.getMirror()));
+                                 placement.getMirror().getDisplayName());
 
         if (metadata != null)
         {

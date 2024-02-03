@@ -1,8 +1,8 @@
 package litematica.scheduler.tasks;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.BlockPos;
 
+import malilib.util.position.BlockPos;
 import litematica.materials.IMaterialList;
 import litematica.selection.AreaSelection;
 

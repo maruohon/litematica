@@ -10,11 +10,11 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.Vec3i;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileUtils;
 import malilib.util.nbt.NbtUtils;
+import malilib.util.position.Vec3i;
 import litematica.Litematica;
 
 public interface ISchematic

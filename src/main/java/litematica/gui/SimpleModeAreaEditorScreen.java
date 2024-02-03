@@ -1,7 +1,5 @@
 package litematica.gui;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.gui.widget.BaseTextFieldWidget;
 import malilib.gui.widget.BlockPosEditWidget;
 import malilib.gui.widget.CheckBoxWidget;
@@ -10,6 +8,7 @@ import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
 import malilib.util.StringUtils;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.BlockPos;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.selection.AreaSelection;

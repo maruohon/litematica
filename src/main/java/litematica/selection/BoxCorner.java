@@ -3,7 +3,7 @@ package litematica.selection;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import net.minecraft.util.math.BlockPos;
+import malilib.util.position.BlockPos;
 
 public enum BoxCorner
 {

@@ -6,14 +6,14 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import malilib.listener.TaskCompletionListener;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.HitResult;
 import malilib.util.position.LayerRange;
 import litematica.config.Configs;
 import litematica.data.DataManager;
@@ -55,11 +55,11 @@ public class ToolUtils
 
         if (wrapper != null)
         {
-            RayTraceResult trace = wrapper.getRayTraceResult();
+            HitResult trace = wrapper.getRayTraceResult();
 
-            if (trace != null)
+            if (trace != null && trace.type == HitResult.Type.BLOCK)
             {
-                BlockPos pos = trace.getBlockPos();
+                BlockPos pos = trace.blockPos;
 
                 if (wrapper.getHitType() == HitType.SCHEMATIC_BLOCK)
                 {
@@ -237,7 +237,7 @@ public class ToolUtils
 
         if (area != null && area.getBoxCount() > 0)
         {
-            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(cameraEntity), amount);
+            BlockPos pos = area.getEffectiveOrigin().offset(EntityWrap.getClosestLookingDirection(cameraEntity), amount);
             moveCurrentlySelectedWorldRegionTo(pos);
         }
     }

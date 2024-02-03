@@ -12,7 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.play.client.CPacketEntityAction;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
@@ -55,11 +54,6 @@ public class EntityUtils
         }
 
         return false;
-    }
-
-    public static EnumFacing getClosestLookingDirection(Entity entity)
-    {
-        return EntityWrap.getClosestLookingDirection(entity, 60F);
     }
 
     public static boolean setFakedSneakingState(boolean sneaking)

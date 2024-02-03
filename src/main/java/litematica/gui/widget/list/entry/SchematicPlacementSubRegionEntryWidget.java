@@ -3,9 +3,6 @@ package litematica.gui.widget.list.entry;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.icon.DefaultIcons;
 import malilib.gui.widget.IconWidget;
@@ -15,6 +12,8 @@ import malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import malilib.render.text.StyledTextLine;
 import malilib.util.StringUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3i;
 import litematica.data.DataManager;
 import litematica.gui.SchematicPlacementSubRegionSettingsScreen;
 import litematica.schematic.ISchematicRegion;
@@ -128,9 +127,9 @@ public class SchematicPlacementSubRegionEntryWidget extends BaseDataListEntryWid
         }
 
         lines.add(StringUtils.translate("litematica.hover.placement_list.rotation",
-                                        PositionUtils.getRotationNameShort(this.data.getRotation())));
+                                        this.data.getRotation().getDisplayName()));
         lines.add(StringUtils.translate("litematica.hover.placement_list.mirror",
-                                        PositionUtils.getMirrorName(this.data.getMirror())));
+                                        this.data.getMirror().getDisplayName()));
 
         BlockPos relativeOrigin = this.data.getPosition();
         BlockPos o = PositionUtils.getTransformedBlockPos(relativeOrigin, this.placement.getMirror(),

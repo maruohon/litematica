@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
 
-import net.minecraft.util.math.Vec3i;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.icon.BaseIcon;
 import malilib.gui.icon.DefaultIcons;
@@ -20,6 +18,7 @@ import malilib.render.text.StyledText;
 import malilib.render.text.StyledTextLine;
 import malilib.render.text.StyledTextUtils;
 import malilib.util.StringUtils;
+import malilib.util.position.Vec3i;
 import litematica.config.Configs;
 import litematica.gui.SchematicInfoConfigScreen;
 import litematica.gui.util.AbstractSchematicInfoCache;

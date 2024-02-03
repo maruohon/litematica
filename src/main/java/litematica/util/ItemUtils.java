@@ -11,11 +11,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.NbtWrap;
+import malilib.util.position.BlockPos;
 
 public class ItemUtils
 {

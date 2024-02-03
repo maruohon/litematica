@@ -1,7 +1,7 @@
 package litematica.schematic;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3i;
 
 public class SubRegion
 {

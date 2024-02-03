@@ -1,9 +1,9 @@
 package litematica.schematic;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.Vec3d;
 
 import malilib.util.game.wrap.NbtWrap;
+import malilib.util.position.Vec3d;
 
 public class EntityInfo
 {

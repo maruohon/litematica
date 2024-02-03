@@ -15,14 +15,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileNameUtils;
 import malilib.util.FileUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.EnabledCondition;
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.BlockPos;
 import malilib.util.position.IntBoundingBox;
 import litematica.Litematica;
 import litematica.data.SchematicHolder;

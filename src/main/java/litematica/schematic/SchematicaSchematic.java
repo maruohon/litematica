@@ -13,13 +13,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.nbt.NbtUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3i;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
 import litematica.schematic.container.ILitematicaBlockStatePalette;
 

@@ -10,8 +10,6 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 import malilib.config.value.HorizontalAlignment;
@@ -28,7 +26,10 @@ import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.inventory.InventoryView;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
 import malilib.util.position.IntBoundingBox;
+import malilib.util.position.Vec3i;
 import litematica.config.Configs;
 import litematica.config.Hotkeys;
 import litematica.util.PositionUtils;
@@ -520,7 +521,7 @@ public class RenderUtils
     {
         long rand = MathUtils.getPositionRandom(pos);
 
-        for (final EnumFacing side : PositionUtils.FACING_ALL)
+        for (final EnumFacing side : PositionUtils.ALL_DIRECTIONS)
         {
             renderModelQuadOutlines(pos, color, model.getQuads(state, side, rand), builder);
         }
@@ -570,7 +571,7 @@ public class RenderUtils
     {
         long rand = MathUtils.getPositionRandom(pos);
 
-        for (final EnumFacing side : PositionUtils.FACING_ALL)
+        for (final EnumFacing side : PositionUtils.ALL_DIRECTIONS)
         {
             renderModelQuadOverlayBatched(pos, color, model.getQuads(state, side, rand), builder);
         }
@@ -579,10 +580,10 @@ public class RenderUtils
     }
 
     public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state,
-                                                        BlockPos pos, EnumFacing side,
+                                                        BlockPos pos, Direction side,
                                                         Color4f color, double expand, long rand, VertexBuilder builder)
     {
-        renderModelQuadOverlayBatched(pos, color, model.getQuads(state, side, rand), builder);
+        renderModelQuadOverlayBatched(pos, color, model.getQuads(state, side.getVanillaDirection(), rand), builder);
     }
 
     private static void renderModelQuadOverlayBatched(BlockPos pos, Color4f color,
@@ -612,7 +613,7 @@ public class RenderUtils
         }
     }
 
-    public static void drawBlockBoxEdgeBatchedLines(BlockPos pos, EnumFacing.Axis axis,
+    public static void drawBlockBoxEdgeBatchedLines(BlockPos pos, Direction.Axis axis,
                                                     int cornerIndex, Color4f color, VertexBuilder builder)
     {
         Vec3i offset = PositionUtils.getEdgeNeighborOffsets(axis, cornerIndex)[cornerIndex];
@@ -620,9 +621,9 @@ public class RenderUtils
         double minX = pos.getX() + offset.getX();
         double minY = pos.getY() + offset.getY();
         double minZ = pos.getZ() + offset.getZ();
-        double maxX = pos.getX() + offset.getX() + (axis == EnumFacing.Axis.X ? 1 : 0);
-        double maxY = pos.getY() + offset.getY() + (axis == EnumFacing.Axis.Y ? 1 : 0);
-        double maxZ = pos.getZ() + offset.getZ() + (axis == EnumFacing.Axis.Z ? 1 : 0);
+        double maxX = pos.getX() + offset.getX() + (axis == Direction.Axis.X ? 1 : 0);
+        double maxY = pos.getY() + offset.getY() + (axis == Direction.Axis.Y ? 1 : 0);
+        double maxZ = pos.getZ() + offset.getZ() + (axis == Direction.Axis.Z ? 1 : 0);
 
         //System.out.printf("pos: %s, axis: %s, ind: %d\n", pos, axis, cornerIndex);
         builder.posColor(minX, minY, minZ, color);
@@ -641,7 +642,7 @@ public class RenderUtils
     public static int renderInventoryOverlay(BlockInfoAlignment align, HorizontalAlignment side,
                                              int offY, World world, BlockPos pos)
     {
-        Pair<InventoryView, InventoryRenderDefinition> pair = InventoryRenderUtils.getInventoryViewFromBlock(pos, world);
+        Pair<InventoryView, InventoryRenderDefinition> pair = InventoryRenderUtils.getInventoryViewFromBlock(world, pos);
 
         if (pair != null)
         {

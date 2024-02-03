@@ -15,14 +15,14 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
 import litematica.config.Configs;
@@ -144,7 +144,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected boolean processBox(ChunkPos pos, IntBoundingBox box,
             WorldSchematic worldSchematic, WorldClient worldClient, EntityPlayerSP player)
     {
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
         Chunk chunkSchematic = worldSchematic.getChunkProvider().getLoadedChunk(pos.x, pos.z);
         Chunk chunkClient = worldClient.getChunkProvider().getLoadedChunk(pos.x, pos.z);
 
@@ -160,7 +160,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         while (this.currentIndex < this.boxVolume)
         {
-            posMutable.setPos(this.currentX, this.currentY, this.currentZ);
+            posMutable.set(this.currentX, this.currentY, this.currentZ);
 
             if (++this.currentY > box.maxY)
             {

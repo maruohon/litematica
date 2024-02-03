@@ -3,10 +3,10 @@ package litematica.scheduler.tasks;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
+import malilib.util.position.Direction;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
 
@@ -28,7 +28,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
 
     protected void countBlocksInChunk(ChunkPos pos)
     {
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
 
         for (IntBoundingBox bb : this.getBoxesInChunk(pos))
         {
@@ -45,7 +45,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
                 {
                     for (int x = startX; x <= endX; ++x)
                     {
-                        posMutable.setPos(x, y, z);
+                        posMutable.set(x, y, z);
                         this.countAtPosition(posMutable);
                     }
                 }
@@ -55,17 +55,17 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
 
     protected void countBlocksInChunkRespectingLayerRange(ChunkPos pos, LayerRange range)
     {
-        EnumFacing.Axis axis = range.getAxis();
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        Direction.Axis axis = range.getAxis();
+        BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
 
         for (IntBoundingBox bb : this.getBoxesInChunk(pos))
         {
-            final int startX = axis == EnumFacing.Axis.X ? Math.max(bb.minX, range.getMinLayerBoundary()) : bb.minX;
-            final int startY = axis == EnumFacing.Axis.Y ? Math.max(bb.minY, range.getMinLayerBoundary()) : bb.minY;
-            final int startZ = axis == EnumFacing.Axis.Z ? Math.max(bb.minZ, range.getMinLayerBoundary()) : bb.minZ;
-            final int endX = axis == EnumFacing.Axis.X ? Math.min(bb.maxX, range.getMaxLayerBoundary()) : bb.maxX;
-            final int endY = axis == EnumFacing.Axis.Y ? Math.min(bb.maxY, range.getMaxLayerBoundary()) : bb.maxY;
-            final int endZ = axis == EnumFacing.Axis.Z ? Math.min(bb.maxZ, range.getMaxLayerBoundary()) : bb.maxZ;
+            final int startX = axis == Direction.Axis.X ? Math.max(bb.minX, range.getMinLayerBoundary()) : bb.minX;
+            final int startY = axis == Direction.Axis.Y ? Math.max(bb.minY, range.getMinLayerBoundary()) : bb.minY;
+            final int startZ = axis == Direction.Axis.Z ? Math.max(bb.minZ, range.getMinLayerBoundary()) : bb.minZ;
+            final int endX = axis == Direction.Axis.X ? Math.min(bb.maxX, range.getMaxLayerBoundary()) : bb.maxX;
+            final int endY = axis == Direction.Axis.Y ? Math.min(bb.maxY, range.getMaxLayerBoundary()) : bb.maxY;
+            final int endZ = axis == Direction.Axis.Z ? Math.min(bb.maxZ, range.getMaxLayerBoundary()) : bb.maxZ;
 
             for (int y = startY; y <= endY; ++y)
             {
@@ -73,7 +73,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
                 {
                     for (int x = startX; x <= endX; ++x)
                     {
-                        posMutable.setPos(x, y, z);
+                        posMutable.set(x, y, z);
                         this.countAtPosition(posMutable);
                     }
                 }

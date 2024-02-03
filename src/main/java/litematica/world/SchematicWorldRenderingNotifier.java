@@ -4,13 +4,13 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.listener.LayerRangeChangeListener;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.ChunkSectionPos;
 import malilib.util.position.LayerRange;
 import litematica.interfaces.IMixinChunkProviderClient;

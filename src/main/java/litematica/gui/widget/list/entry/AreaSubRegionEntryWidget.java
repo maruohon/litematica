@@ -3,9 +3,6 @@ package litematica.gui.widget.list.entry;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.TextInputScreen;
 import malilib.gui.widget.button.GenericButton;
@@ -14,6 +11,8 @@ import malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import malilib.overlay.message.MessageOutput;
 import malilib.render.text.StyledTextLine;
 import malilib.util.StringUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3i;
 import litematica.data.DataManager;
 import litematica.gui.AreaSubRegionEditScreen;
 import litematica.selection.AreaSelection;

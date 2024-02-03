@@ -4,9 +4,9 @@ import java.util.List;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.ChunkPos;
 
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.LayerRange;
 import litematica.data.DataManager;
 import litematica.materials.IMaterialList;

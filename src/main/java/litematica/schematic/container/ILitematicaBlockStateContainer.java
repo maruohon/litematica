@@ -3,7 +3,8 @@ package litematica.schematic.container;
 import java.util.Map;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.Vec3i;
+
+import malilib.util.position.Vec3i;
 
 public interface ILitematicaBlockStateContainer
 {

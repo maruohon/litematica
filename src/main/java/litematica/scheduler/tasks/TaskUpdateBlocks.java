@@ -3,11 +3,11 @@ package litematica.scheduler.tasks;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
 import litematica.render.infohud.InfoHud;
 import litematica.selection.SelectionBox;

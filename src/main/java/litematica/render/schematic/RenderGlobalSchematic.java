@@ -41,7 +41,6 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -52,6 +51,7 @@ import malilib.util.MathUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkSectionPos;
 import malilib.util.position.LayerRange;
 import litematica.data.DataManager;
@@ -86,7 +86,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     private ChunkRenderDispatcherLitematica renderDispatcher;
     private ChunkRenderContainerSchematic renderContainer;
     private IRenderChunkFactory renderChunkFactory;
-    private final BlockPos.MutableBlockPos viewPosSubChunk = new BlockPos.MutableBlockPos();
+    private final BlockPos.MutBlockPos viewPosSubChunk = new BlockPos.MutBlockPos();
     private BlockPos lastSubChunkUpdatePos;
     //private ShaderGroup entityOutlineShader;
     //private boolean entityOutlinesRendered;
@@ -323,7 +323,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         final int centerChunkZ = MathUtils.floor(z) >> 4;
         final int renderDistance = GameUtils.getRenderDistanceChunks();
         ChunkSectionPos viewSubChunk = new ChunkSectionPos(centerChunkX, centerChunkY, centerChunkZ);
-        this.viewPosSubChunk.setPos(centerChunkX << 4, centerChunkY << 4, centerChunkZ << 4);
+        this.viewPosSubChunk.set(centerChunkX << 4, centerChunkY << 4, centerChunkZ << 4);
 
         this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false ||
                 entityX != this.lastViewEntityX ||
@@ -417,7 +417,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             if (renderChunkTmp.needsUpdate() || set.contains(renderChunkTmp))
             {
                 this.displayListEntitiesDirty = true;
-                BlockPos pos = renderChunkTmp.getPosition().add(8, 8, 8);
+                net.minecraft.util.math.BlockPos pos = renderChunkTmp.getPosition().add(8, 8, 8);
                 boolean isNear = pos.distanceSq(x, y, z) < 1024.0D;
 
                 if (renderChunkTmp.needsImmediateUpdate() == false && isNear == false)
@@ -719,7 +719,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             double renderZ = EntityWrap.lerpZ(renderViewEntity, partialTicks);
 
             GameUtils.profilerPush("prepare");
-            TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, renderViewEntity, GameUtils.getHitResult(), partialTicks);
+            TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, renderViewEntity, GameUtils.getHitResult().toVanilla(), partialTicks);
             this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, renderViewEntity, this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
             this.countEntitiesTotal = 0;
             this.countEntitiesRendered = 0;
@@ -735,7 +735,7 @@ public class RenderGlobalSchematic extends RenderGlobal
 
             GameUtils.profilerSwap("regular_entities");
             List<Entity> entitiesMultipass = new ArrayList<>();
-            BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
+            BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
             LayerRange layerRange = DataManager.getRenderLayerRange();
 
             for (RenderChunk renderChunk : this.renderInfos)
@@ -760,7 +760,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                             double eY = EntityWrap.getY(entityTmp);
 
                             if ((entityTmp != this.mc.getRenderViewEntity() || this.mc.gameSettings.thirdPersonView != 0 || sleeping) &&
-                                (eY < 0.0D || eY >= 256.0D || this.world.isBlockLoaded(posMutable.setPos(entityTmp))))
+                                (eY < 0.0D || eY >= 256.0D))// || this.world.isBlockLoaded(posMutable.set(entityTmp))))
                             {
                                 ++this.countEntitiesRendered;
                                 this.renderManager.renderEntityStatic(entityTmp, 0f, false);
@@ -774,8 +774,6 @@ public class RenderGlobalSchematic extends RenderGlobal
                     }
                 }
             }
-
-            posMutable.release();
 
             if (entitiesMultipass.isEmpty() == false)
             {
@@ -877,7 +875,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     }
 
     @Override
-    public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags)
+    public void notifyBlockUpdate(World worldIn, net.minecraft.util.math.BlockPos pos, IBlockState oldState, IBlockState newState, int flags)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -900,14 +898,14 @@ public class RenderGlobalSchematic extends RenderGlobal
         }
     }
 
-    @Override public void notifyLightSet(BlockPos pos) {}
+    @Override public void notifyLightSet(net.minecraft.util.math.BlockPos pos) {}
     @Override public void playSoundToAllNearExcept(@Nullable EntityPlayer player, SoundEvent soundIn, SoundCategory category, double x, double y, double z, float volume, float pitch) {}
-    @Override public void playRecord(SoundEvent soundIn, BlockPos pos) {}
+    @Override public void playRecord(SoundEvent soundIn, net.minecraft.util.math.BlockPos pos) {}
     @Override public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, int... parameters) {}
     @Override public void spawnParticle(int id, boolean ignoreRange, boolean p_190570_3_, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, int... parameters) {}
     @Override public void onEntityAdded(Entity entityIn) {}
     @Override public void onEntityRemoved(Entity entityIn) {}
-    @Override public void broadcastSound(int soundID, BlockPos pos, int data) {}
-    @Override public void playEvent(EntityPlayer player, int type, BlockPos blockPosIn, int data) {}
-    @Override public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) {}
+    @Override public void broadcastSound(int soundID, net.minecraft.util.math.BlockPos pos, int data) {}
+    @Override public void playEvent(EntityPlayer player, int type, net.minecraft.util.math.BlockPos blockPosIn, int data) {}
+    @Override public void sendBlockBreakProgress(int breakerId, net.minecraft.util.math.BlockPos pos, int progress) {}
 }

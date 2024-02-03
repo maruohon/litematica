@@ -15,9 +15,6 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLongArray;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 
 import malilib.mixin.access.NBTTagLongArrayMixin;
@@ -26,6 +23,9 @@ import malilib.util.data.Constants;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.nbt.NbtUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
+import malilib.util.position.Vec3i;
 import litematica.Litematica;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
 import litematica.schematic.container.LitematicaBlockStateContainerFull;
@@ -316,7 +316,7 @@ public class LitematicaSchematic extends SchematicBase
                     NbtWrap.putString(tag, "Block", id);
                     NbtWrap.putInt(tag, "Priority", entry.priority);
                     NbtWrap.putInt(tag, "Time", (int) entry.scheduledTime);
-                    NbtUtils.putVec3i(tag, entry.position);
+                    NbtUtils.putVec3i(tag, BlockPos.of(entry.position));
 
                     NbtWrap.addTag(tagList, tag);
                 }

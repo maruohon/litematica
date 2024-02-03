@@ -3,7 +3,8 @@ package litematica.schematic.container;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.Vec3i;
+
+import malilib.util.position.Vec3i;
 
 public class LitematicaBlockStateContainerSparse extends LitematicaBlockStateContainerBase
 {

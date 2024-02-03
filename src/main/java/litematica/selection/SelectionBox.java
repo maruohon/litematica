@@ -5,10 +5,9 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
 
 public class SelectionBox extends CornerDefinedBox
 {
@@ -52,7 +51,7 @@ public class SelectionBox extends CornerDefinedBox
         this.selectedCorner = corner;
     }
 
-    public void offsetSelectedCorner(EnumFacing direction, int amount)
+    public void offsetSelectedCorner(Direction direction, int amount)
     {
         BoxCorner corner = this.selectedCorner;
 

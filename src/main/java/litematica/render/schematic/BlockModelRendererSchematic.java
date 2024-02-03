@@ -16,12 +16,13 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ReportedException;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 
@@ -71,9 +72,9 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         BitSet bitset = new BitSet(3);
         AmbientOcclusionFace aoFace = new AmbientOcclusionFace();
 
-        for (EnumFacing side : EnumFacing.values())
+        for (Direction side : Direction.ALL_DIRECTIONS)
         {
-            List<BakedQuad> quads = modelIn.getQuads(stateIn, side, rand);
+            List<BakedQuad> quads = modelIn.getQuads(stateIn, side.getVanillaDirection(), rand);
 
             if (quads.isEmpty() == false)
             {
@@ -102,9 +103,9 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
 
-        for (EnumFacing side : EnumFacing.values())
+        for (Direction side : Direction.ALL_DIRECTIONS)
         {
-            List<BakedQuad> quads = modelIn.getQuads(stateIn, side, rand);
+            List<BakedQuad> quads = modelIn.getQuads(stateIn, side.getVanillaDirection(), rand);
 
             if (quads.isEmpty() == false)
             {
@@ -128,11 +129,11 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         return renderedSomething;
     }
 
-    private boolean shouldRenderModelSide(IBlockAccess worldIn, IBlockState stateIn, BlockPos posIn, EnumFacing side)
+    private boolean shouldRenderModelSide(IBlockAccess worldIn, IBlockState stateIn, BlockPos posIn, Direction side)
     {
         return DataManager.getRenderLayerRange().isPositionAtRenderEdgeOnSide(posIn, side) ||
                (Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING.getBooleanValue() && Configs.Visuals.TRANSLUCENT_INNER_SIDES.getBooleanValue()) ||
-               stateIn.shouldSideBeRendered(worldIn, posIn, side);
+               stateIn.shouldSideBeRendered(worldIn, posIn, side.getVanillaDirection());
     }
 
     private void renderQuadsSmooth(IBlockState stateIn, BlockPos posIn, IBlockAccess blockAccessIn,
@@ -198,7 +199,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             if (ownBrightness)
             {
                 this.fillQuadBounds(stateIn, bakedquad.getVertexData(), bakedquad.getFace(), (float[])null, bitSet);
-                BlockPos blockpos = bitSet.get(0) ? posIn.offset(bakedquad.getFace()) : posIn;
+                BlockPos blockpos = bitSet.get(0) ? posIn.offset(Direction.of(bakedquad.getFace())) : posIn;
                 brightnessIn = stateIn.getPackedLightmapCoords(blockAccessIn, blockpos);
             }
 

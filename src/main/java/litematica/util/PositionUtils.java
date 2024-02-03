@@ -15,24 +15,24 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 
 import malilib.overlay.message.MessageDispatcher;
-import malilib.util.MathUtils;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockMirror;
+import malilib.util.position.BlockPos;
+import malilib.util.position.BlockRotation;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.Coordinate;
+import malilib.util.position.Direction;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
+import malilib.util.position.Vec3d;
+import malilib.util.position.Vec3i;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.schematic.ISchematicRegion;
@@ -47,14 +47,9 @@ import litematica.selection.SelectionBox;
 
 public class PositionUtils
 {
-    public static final BlockPosComparator BLOCK_POS_COMPARATOR = new BlockPosComparator();
     public static final ChunkPosComparator CHUNK_POS_COMPARATOR = new ChunkPosComparator();
 
-    public static final EnumFacing.Axis[] AXES_ALL = new EnumFacing.Axis[] { EnumFacing.Axis.X, EnumFacing.Axis.Y, EnumFacing.Axis.Z };
-    public static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
-    public static final EnumFacing[] ADJACENT_SIDES_ZY = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH };
-    public static final EnumFacing[] ADJACENT_SIDES_XY = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.EAST, EnumFacing.WEST };
-    public static final EnumFacing[] ADJACENT_SIDES_XZ = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST };
+    public static final EnumFacing[] ALL_DIRECTIONS = new EnumFacing[] {EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
 
     public static final ICoordinateAccessor BLOCKPOS_X_ACCESSOR = new ICoordinateAccessor()
     {
@@ -128,7 +123,7 @@ public class PositionUtils
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YP_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0,  1,  0), new Vec3i( 0,  0,  1), new Vec3i( 0,  1,  1) };
     private static final Vec3i[][] EDGE_NEIGHBOR_OFFSETS_X = new Vec3i[][] { EDGE_NEIGHBOR_OFFSETS_YN_ZN, EDGE_NEIGHBOR_OFFSETS_YP_ZN, EDGE_NEIGHBOR_OFFSETS_YN_ZP, EDGE_NEIGHBOR_OFFSETS_YP_ZP };
 
-    public static Vec3i[] getEdgeNeighborOffsets(EnumFacing.Axis axis, int cornerIndex)
+    public static Vec3i[] getEdgeNeighborOffsets(Direction.Axis axis, int cornerIndex)
     {
         switch (axis)
         {
@@ -212,7 +207,7 @@ public class PositionUtils
     {
         if (box == null)
         {
-            return Vec3i.NULL_VECTOR;
+            return Vec3i.ZERO;
         }
 
         return new Vec3i(box.maxX - box.minX + 1,
@@ -657,14 +652,14 @@ public class PositionUtils
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public static CornerDefinedBox expandOrShrinkBox(CornerDefinedBox box, int amount, EnumFacing side)
+    public static CornerDefinedBox expandOrShrinkBox(CornerDefinedBox box, int amount, Direction side)
     {
         BlockPos pos1 = box.getCorner1();
         BlockPos pos2 = box.getCorner2();
 
-        EnumFacing.Axis axis = side.getAxis();
-        boolean positiveSide = side.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE;
-        ICoordinateAccessor accessor = axis == EnumFacing.Axis.X ? BLOCKPOS_X_ACCESSOR : (axis == EnumFacing.Axis.Y ? BLOCKPOS_Y_ACCESSOR : BLOCKPOS_Z_ACCESSOR);
+        Direction.Axis axis = side.getAxis();
+        boolean positiveSide = side.getAxisDirection() == Direction.AxisDirection.POSITIVE;
+        ICoordinateAccessor accessor = axis == Direction.Axis.X ? BLOCKPOS_X_ACCESSOR : (axis == Direction.Axis.Y ? BLOCKPOS_Y_ACCESSOR : BLOCKPOS_Z_ACCESSOR);
         int modifyAmount = positiveSide ? amount : -amount; // the amount is inversed when adjusting the negative axis sides
 
         // The corners are at the same position on the targeted axis
@@ -798,39 +793,39 @@ public class PositionUtils
                 int emptySides = 0;
 
                 // Slices along the z axis
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.X, new BlockPos(xMin, yMin, zMin), new BlockPos(xMin, yMax, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.X, new BlockPos(xMin, yMin, zMin), new BlockPos(xMin, yMax, zMax)))
                 {
                     xMin += amount;
                     ++emptySides;
                 }
 
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.X, new BlockPos(xMax, yMin, zMin), new BlockPos(xMax, yMax, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.X, new BlockPos(xMax, yMin, zMin), new BlockPos(xMax, yMax, zMax)))
                 {
                     xMax -= amount;
                     ++emptySides;
                 }
 
                 // Slices along the x/z plane
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Y, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMin, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.Y, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMin, zMax)))
                 {
                     yMin += amount;
                     ++emptySides;
                 }
 
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Y, new BlockPos(xMin, yMax, zMin), new BlockPos(xMax, yMax, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.Y, new BlockPos(xMin, yMax, zMin), new BlockPos(xMax, yMax, zMax)))
                 {
                     yMax -= amount;
                     ++emptySides;
                 }
 
                 // Slices along the x axis
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Z, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMax, zMin)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.Z, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMax, zMin)))
                 {
                     zMin += amount;
                     ++emptySides;
                 }
 
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Z, new BlockPos(xMin, yMin, zMax), new BlockPos(xMax, yMax, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.Z, new BlockPos(xMin, yMin, zMax), new BlockPos(xMax, yMax, zMax)))
                 {
                     zMax -= amount;
                     ++emptySides;
@@ -887,8 +882,8 @@ public class PositionUtils
                 BlockPos corner1 = box.getCorner1().add(originOffset);
                 BlockPos corner2 = box.getCorner2().add(originOffset);
                 BlockPos entityPos = EntityWrap.getEntityBlockPos(entity);
-                EnumFacing entityFrontDirection = entity.getHorizontalFacing();
-                EnumFacing entitySideDirection = malilib.util.position.PositionUtils.getClosestSideDirection(entity);
+                Direction entityFrontDirection = EntityWrap.getClosestHorizontalLookingDirection(entity);
+                Direction entitySideDirection = malilib.util.position.PositionUtils.getClosestSideDirection(entity);
                 Vec3i alignmentFrontOffset = getOffsetToMoveBoxInFrontOfEntityPos(entityPos, entityFrontDirection, corner1, corner2);
                 Vec3i alignmentSideOffset = getOffsetToMoveBoxInFrontOfEntityPos(entityPos, entitySideDirection, corner1, corner2);
 
@@ -899,7 +894,7 @@ public class PositionUtils
         return newOrigin;
     }
 
-    public static Vec3i getOffsetToMoveBoxInFrontOfEntityPos(BlockPos entityPos, EnumFacing entityHorizontalFacing, BlockPos corner1, BlockPos corner2)
+    public static Vec3i getOffsetToMoveBoxInFrontOfEntityPos(BlockPos entityPos, Direction entityHorizontalFacing, BlockPos corner1, BlockPos corner2)
     {
         BlockPos minPos = malilib.util.position.PositionUtils.getMinCorner(corner1, corner2);
         BlockPos maxPos = malilib.util.position.PositionUtils.getMaxCorner(corner1, corner2);
@@ -921,7 +916,7 @@ public class PositionUtils
     /**
      * Mirrors and then rotates the given position around the origin
      */
-    public static BlockPos getTransformedBlockPos(BlockPos pos, Mirror mirror, Rotation rotation)
+    public static BlockPos getTransformedBlockPos(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -931,11 +926,11 @@ public class PositionUtils
         switch (mirror)
         {
             // LEFT_RIGHT is essentially NORTH_SOUTH
-            case LEFT_RIGHT:
+            case Z:
                 z = -z;
                 break;
             // FRONT_BACK is essentially EAST_WEST
-            case FRONT_BACK:
+            case X:
                 x = -x;
                 break;
             default:
@@ -944,18 +939,18 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case CLOCKWISE_90:
+            case CW_90:
                 return new BlockPos(-z, y,  x);
-            case COUNTERCLOCKWISE_90:
+            case CCW_90:
                 return new BlockPos( z, y, -x);
-            case CLOCKWISE_180:
+            case CW_180:
                 return new BlockPos(-x, y, -z);
             default:
                 return isMirrored ? new BlockPos(x, y, z) : pos;
         }
     }
 
-    public static BlockPos getReverseTransformedBlockPos(BlockPos pos, Mirror mirror, Rotation rotation)
+    public static BlockPos getReverseTransformedBlockPos(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -965,15 +960,15 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case CLOCKWISE_90:
+            case CW_90:
                 x = z;
                 z = -tmp;
                 break;
-            case COUNTERCLOCKWISE_90:
+            case CCW_90:
                 x = -z;
                 z = tmp;
                 break;
-            case CLOCKWISE_180:
+            case CW_180:
                 x = -x;
                 z = -z;
                 break;
@@ -984,11 +979,11 @@ public class PositionUtils
         switch (mirror)
         {
             // LEFT_RIGHT is essentially NORTH_SOUTH
-            case LEFT_RIGHT:
+            case Z:
                 z = -z;
                 break;
             // FRONT_BACK is essentially EAST_WEST
-            case FRONT_BACK:
+            case X:
                 x = -x;
                 break;
             default:
@@ -1005,7 +1000,7 @@ public class PositionUtils
      * Does the opposite transform from getTransformedBlockPos(), to return the original,
      * non-transformed position from the transformed position.
      */
-    public static BlockPos getOriginalPositionFromTransformed(BlockPos pos, Mirror mirror, Rotation rotation)
+    public static BlockPos getOriginalPositionFromTransformed(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -1015,15 +1010,15 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case CLOCKWISE_90:
+            case CW_90:
                 tmp = x;
                 x = -z;
                 z = tmp;
-            case COUNTERCLOCKWISE_90:
+            case CCW_90:
                 tmp = x;
                 x = z;
                 z = -tmp;
-            case CLOCKWISE_180:
+            case CW_180:
                 x = -x;
                 z = -z;
             default:
@@ -1032,10 +1027,10 @@ public class PositionUtils
 
         switch (mirror)
         {
-            case LEFT_RIGHT:
+            case Z:
                 z = -z;
                 break;
-            case FRONT_BACK:
+            case X:
                 x = -x;
                 break;
             default:
@@ -1048,7 +1043,7 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
-    public static Vec3d getTransformedPosition(Vec3d originalPos, Mirror mirror, Rotation rotation)
+    public static Vec3d getTransformedPosition(Vec3d originalPos, BlockMirror mirror, BlockRotation rotation)
     {
         double x = originalPos.x;
         double y = originalPos.y;
@@ -1057,10 +1052,10 @@ public class PositionUtils
 
         switch (mirror)
         {
-            case LEFT_RIGHT:
+            case Z:
                 z = 1.0D - z;
                 break;
-            case FRONT_BACK:
+            case X:
                 x = 1.0D - x;
                 break;
             default:
@@ -1069,29 +1064,14 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case COUNTERCLOCKWISE_90:
+            case CCW_90:
                 return new Vec3d(z, y, 1.0D - x);
-            case CLOCKWISE_90:
+            case CW_90:
                 return new Vec3d(1.0D - z, y, x);
-            case CLOCKWISE_180:
+            case CW_180:
                 return new Vec3d(1.0D - x, y, 1.0D - z);
             default:
                 return transformed ? new Vec3d(x, y, z) : originalPos;
-        }
-    }
-
-    public static Rotation getReverseRotation(Rotation rotationIn)
-    {
-        switch (rotationIn)
-        {
-            case COUNTERCLOCKWISE_90:
-                return Rotation.CLOCKWISE_90;
-            case CLOCKWISE_90:
-                return Rotation.COUNTERCLOCKWISE_90;
-            case CLOCKWISE_180:
-                return Rotation.CLOCKWISE_180;
-            default:
-                return rotationIn;
         }
     }
 
@@ -1129,7 +1109,7 @@ public class PositionUtils
      * so that pos1 is in the "front left" corner and pos2 is in the "back right" corner
      * of the area, when looking at the "front" face of the area.
      */
-    public static EnumFacing getFacingFromPositions(BlockPos pos1, BlockPos pos2)
+    public static Direction getFacingFromPositions(BlockPos pos1, BlockPos pos2)
     {
         if (pos1 == null || pos2 == null)
         {
@@ -1139,153 +1119,24 @@ public class PositionUtils
         return getFacingFromPositions(pos1.getX(), pos1.getZ(), pos2.getX(), pos2.getZ());
     }
 
-    private static EnumFacing getFacingFromPositions(int x1, int z1, int x2, int z2)
+    private static Direction getFacingFromPositions(int x1, int z1, int x2, int z2)
     {
         if (x2 == x1)
         {
-            return z2 > z1 ? EnumFacing.SOUTH : EnumFacing.NORTH;
+            return z2 > z1 ? Direction.SOUTH : Direction.NORTH;
         }
 
         if (z2 == z1)
         {
-            return x2 > x1 ? EnumFacing.EAST : EnumFacing.WEST;
+            return x2 > x1 ? Direction.EAST : Direction.WEST;
         }
 
         if (x2 > x1)
         {
-            return z2 > z1 ? EnumFacing.EAST : EnumFacing.NORTH;
+            return z2 > z1 ? Direction.EAST : Direction.NORTH;
         }
 
-        return z2 > z1 ? EnumFacing.SOUTH : EnumFacing.WEST;
-    }
-
-    public static String getRotationNameShort(Rotation rotation)
-    {
-        switch (rotation)
-        {
-            case CLOCKWISE_90:          return "CW_90";
-            case CLOCKWISE_180:         return "CW_180";
-            case COUNTERCLOCKWISE_90:   return "CCW_90";
-            case NONE:
-            default:                    return "NONE";
-        }
-    }
-
-    public static String getMirrorName(Mirror mirror)
-    {
-        switch (mirror)
-        {
-            case FRONT_BACK:    return "FRONT_BACK";
-            case LEFT_RIGHT:    return "LEFT_RIGHT";
-            case NONE:
-            default:            return "NONE";
-        }
-    }
-
-    public static float getRotatedYaw(float yaw, Rotation rotation)
-    {
-        yaw = MathUtils.wrapDegrees(yaw);
-
-        switch (rotation)
-        {
-            case CLOCKWISE_180:
-                yaw += 180.0F;
-                break;
-            case COUNTERCLOCKWISE_90:
-                yaw += 270.0F;
-                break;
-            case CLOCKWISE_90:
-                yaw += 90.0F;
-                break;
-            default:
-        }
-
-        return yaw;
-    }
-
-    public static float getMirroredYaw(float yaw, Mirror mirror)
-    {
-        yaw = MathUtils.wrapDegrees(yaw);
-
-        switch (mirror)
-        {
-            case LEFT_RIGHT:
-                yaw = 180.0F - yaw;
-                break;
-            case FRONT_BACK:
-                yaw = -yaw;
-                break;
-            default:
-        }
-
-        return yaw;
-    }
-
-    public static int getIntBoxValue(IntBoundingBox box, IntBoxCoordType type)
-    {
-        switch (type)
-        {
-            case MIN_X: return box.minX;
-            case MIN_Y: return box.minY;
-            case MIN_Z: return box.minZ;
-            case MAX_X: return box.maxX;
-            case MAX_Y: return box.maxY;
-            case MAX_Z: return box.maxZ;
-        }
-
-        return 0;
-    }
-
-    public static IntBoundingBox setIntBoxValue(IntBoundingBox old, IntBoxCoordType type, int value)
-    {
-        int minX = old.minX;
-        int minY = old.minY;
-        int minZ = old.minZ;
-        int maxX = old.maxX;
-        int maxY = old.maxY;
-        int maxZ = old.maxZ;
-
-        switch (type)
-        {
-            case MIN_X: minX = value; break;
-            case MIN_Y: minY = value; break;
-            case MIN_Z: minZ = value; break;
-            case MAX_X: maxX = value; break;
-            case MAX_Y: maxY = value; break;
-            case MAX_Z: maxZ = value; break;
-        }
-
-        return new IntBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    public static class BlockPosComparator implements Comparator<BlockPos>
-    {
-        private BlockPos posReference = BlockPos.ORIGIN;
-        private boolean closestFirst;
-
-        public void setClosestFirst(boolean closestFirst)
-        {
-            this.closestFirst = closestFirst;
-        }
-
-        public void setReferencePosition(BlockPos pos)
-        {
-            this.posReference = pos;
-        }
-
-        @Override
-        public int compare(BlockPos pos1, BlockPos pos2)
-        {
-            double dist1 = pos1.distanceSq(this.posReference);
-            double dist2 = pos2.distanceSq(this.posReference);
-
-            if (dist1 == dist2)
-            {
-                return 0;
-            }
-
-            return dist1 < dist2 == this.closestFirst ? -1 : 1;
-        }
+        return z2 > z1 ? Direction.SOUTH : Direction.WEST;
     }
 
     public static class ChunkPosComparator implements Comparator<ChunkPos>

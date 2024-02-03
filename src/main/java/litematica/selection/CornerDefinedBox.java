@@ -3,11 +3,10 @@ package litematica.selection;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.BlockPos;
 import malilib.util.position.IntBoundingBox;
+import malilib.util.position.Vec3i;
 import litematica.util.PositionUtils;
 
 public class CornerDefinedBox

@@ -9,12 +9,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
 import litematica.render.infohud.InfoHud;
 import litematica.selection.SelectionBox;
@@ -127,7 +127,7 @@ public class TaskFillArea extends TaskProcessChunkBase
             WorldUtils.setShouldPreventBlockUpdates(this.world, true);
 
             IBlockState barrier = Blocks.BARRIER.getDefaultState();
-            BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+            BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
 
             for (int z = box.minZ; z <= box.maxZ; ++z)
             {
@@ -135,7 +135,7 @@ public class TaskFillArea extends TaskProcessChunkBase
                 {
                     for (int y = box.maxY; y >= box.minY; --y)
                     {
-                        posMutable.setPos(x, y, z);
+                        posMutable.set(x, y, z);
                         IBlockState oldState = this.world.getBlockState(posMutable).getActualState(this.world, posMutable);
 
                         if ((this.replaceState == null && oldState != this.fillState) || oldState == this.replaceState)

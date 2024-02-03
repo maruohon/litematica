@@ -12,14 +12,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.overlay.message.MessageOutput;
 import malilib.util.data.EnabledCondition;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.NbtWrap;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
 import malilib.util.position.IntBoundingBox;
 import litematica.config.Configs;
 import litematica.render.infohud.StatusInfoRenderer;
@@ -330,7 +330,7 @@ public class AreaSelection
         }
     }
 
-    public void moveSelectedElement(EnumFacing direction, int amount)
+    public void moveSelectedElement(Direction direction, int amount)
     {
         if (this.isOriginSelected())
         {

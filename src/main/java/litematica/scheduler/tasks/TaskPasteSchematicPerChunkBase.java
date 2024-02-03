@@ -8,12 +8,12 @@ import com.google.common.collect.ArrayListMultimap;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.ChunkPos;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
 import malilib.util.position.PositionUtils;

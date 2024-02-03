@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.TextInputScreen;
 import malilib.gui.icon.FileBrowserIconProvider;
@@ -21,6 +19,7 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.overlay.message.MessageOutput;
 import malilib.util.StringUtils;
 import malilib.util.data.ResultingStringConsumer;
+import malilib.util.position.BlockPos;
 import litematica.gui.MultiRegionModeAreaEditorScreen;
 import litematica.selection.AreaSelection;
 import litematica.selection.AreaSelectionManager;

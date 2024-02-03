@@ -3,18 +3,18 @@ package litematica.schematic;
 import javax.annotation.Nullable;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.Vec3i;
 
 import malilib.util.data.Constants;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
+import malilib.util.position.Vec3i;
 
 public class SchematicMetadata
 {
     protected String name = "?";
     protected String author = "?";
     protected String description = "";
-    protected Vec3i enclosingSize = Vec3i.NULL_VECTOR;
+    protected Vec3i enclosingSize = Vec3i.ZERO;
     protected long timeCreated;
     protected long timeModified;
     protected long minecraftDataVersion;

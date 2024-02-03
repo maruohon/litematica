@@ -11,14 +11,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-
 import malilib.listener.TaskCompletionListener;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3i;
 import litematica.data.DataManager;
 import litematica.scheduler.TaskScheduler;
 import litematica.schematic.ISchematic;

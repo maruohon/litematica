@@ -6,7 +6,8 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.Vec3i;
+
+import malilib.util.position.Vec3i;
 
 public class LitematicaBlockStateContainerFull extends LitematicaBlockStateContainerBase implements IPaletteResizeHandler
 {

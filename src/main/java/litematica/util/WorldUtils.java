@@ -4,13 +4,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
+import malilib.util.position.Vec3i;
 import litematica.interfaces.IWorldUpdateSuppressor;
 import litematica.world.SchematicWorldHandler;
 import litematica.world.WorldSchematic;
@@ -83,7 +83,7 @@ public class WorldUtils
      * @param pos2
      * @return
      */
-    public static boolean isSliceEmpty(World world, EnumFacing.Axis axis, BlockPos pos1, BlockPos pos2)
+    public static boolean isSliceEmpty(World world, Direction.Axis axis, BlockPos pos1, BlockPos pos2)
     {
         switch (axis)
         {

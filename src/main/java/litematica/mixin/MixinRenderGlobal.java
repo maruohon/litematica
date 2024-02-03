@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import malilib.util.position.BlockPos;
 import litematica.config.Configs;
 import litematica.render.LitematicaRenderer;
 import litematica.schematic.verifier.SchematicVerifierManager;
@@ -35,12 +36,13 @@ public abstract class MixinRenderGlobal
     {
         if (oldState != newState)
         {
-            SchematicVerifierManager.INSTANCE.onBlockChanged(pos);
+            BlockPos bp = BlockPos.of(pos);
+            SchematicVerifierManager.INSTANCE.onBlockChanged(bp);
 
             if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
                 Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue())
             {
-                SchematicWorldRenderingNotifier.markSchematicChunkForRenderUpdate(pos);
+                SchematicWorldRenderingNotifier.markSchematicChunkForRenderUpdate(bp);
             }
         }
     }

@@ -4,14 +4,14 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 import malilib.util.MathUtils;
+import malilib.util.position.BlockMirror;
+import malilib.util.position.BlockPos;
+import malilib.util.position.BlockRotation;
+import malilib.util.position.Direction;
 import malilib.util.position.LayerRange;
+import malilib.util.position.Vec3i;
 import litematica.schematic.ISchematic;
 import litematica.schematic.ISchematicRegion;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
@@ -92,14 +92,16 @@ public class SchematicUtils
 
     @Nullable
     public static Pair<Vec3i, Vec3i> getLayerRangeClampedSubRegion(LayerRange range,
-                                                                   SchematicPlacement schematicPlacement, SubRegionPlacement placement, Vec3i regionSize)
+                                                                   SchematicPlacement schematicPlacement,
+                                                                   SubRegionPlacement placement,
+                                                                   Vec3i regionSize)
     {
-        int minX = range.getClampedValue(-30000000, EnumFacing.Axis.X);
-        int minY = range.getClampedValue(        0, EnumFacing.Axis.Y);
-        int minZ = range.getClampedValue(-30000000, EnumFacing.Axis.Z);
-        int maxX = range.getClampedValue( 30000000, EnumFacing.Axis.X);
-        int maxY = range.getClampedValue(      255, EnumFacing.Axis.Y);
-        int maxZ = range.getClampedValue( 30000000, EnumFacing.Axis.Z);
+        int minX = range.getClampedValue(-30000000, Direction.Axis.X);
+        int minY = range.getClampedValue(        0, Direction.Axis.Y);
+        int minZ = range.getClampedValue(-30000000, Direction.Axis.Z);
+        int maxX = range.getClampedValue( 30000000, Direction.Axis.X);
+        int maxY = range.getClampedValue(      255, Direction.Axis.Y);
+        int maxZ = range.getClampedValue( 30000000, Direction.Axis.Z);
 
         BlockPos posMinRange = new BlockPos(minX, minY, minZ);
         BlockPos posMaxRange = new BlockPos(maxX, maxY, maxZ);
@@ -132,30 +134,30 @@ public class SchematicUtils
 
         if (placement != null)
         {
-            final Rotation rotationCombined = PositionUtils.getReverseRotation(schematicPlacement.getRotation().add(placement.getRotation()));
-            final Mirror mirrorMain = schematicPlacement.getMirror();
-            Mirror mirrorSub = placement.getMirror();
+            final BlockRotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation()).getReverseRotation();
+            final BlockMirror mirrorMain = schematicPlacement.getMirror();
+            BlockMirror mirrorSub = placement.getMirror();
 
-            if (mirrorSub != Mirror.NONE &&
-                (schematicPlacement.getRotation() == Rotation.CLOCKWISE_90 ||
-                 schematicPlacement.getRotation() == Rotation.COUNTERCLOCKWISE_90))
+            if (mirrorSub != BlockMirror.NONE &&
+                (schematicPlacement.getRotation() == BlockRotation.CW_90 ||
+                 schematicPlacement.getRotation() == BlockRotation.CCW_90))
             {
-                mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
+                mirrorSub = mirrorSub == BlockMirror.X ? BlockMirror.Z : BlockMirror.X;
             }
 
-            if (rotationCombined != Rotation.NONE)
+            if (rotationCombined != BlockRotation.NONE)
             {
-                state = state.withRotation(rotationCombined);
+                state = state.withRotation(rotationCombined.getVanillaRotation());
             }
 
-            if (mirrorSub != Mirror.NONE)
+            if (mirrorSub != BlockMirror.NONE)
             {
-                state = state.withMirror(mirrorSub);
+                state = state.withMirror(mirrorSub.getVanillaMirror());
             }
 
-            if (mirrorMain != Mirror.NONE)
+            if (mirrorMain != BlockMirror.NONE)
             {
-                state = state.withMirror(mirrorMain);
+                state = state.withMirror(mirrorMain.getVanillaMirror());
             }
         }
 

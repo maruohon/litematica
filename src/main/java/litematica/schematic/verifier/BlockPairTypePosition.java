@@ -1,7 +1,6 @@
 package litematica.schematic.verifier;
 
-import net.minecraft.util.math.BlockPos;
-
+import malilib.util.position.BlockPos;
 import malilib.util.position.PositionUtils;
 
 public class BlockPairTypePosition
@@ -19,7 +18,7 @@ public class BlockPairTypePosition
 
     public BlockPos getBlockPos()
     {
-        return BlockPos.fromLong(this.posLong);
+        return BlockPos.fromPacked(this.posLong);
     }
 
     public static BlockPairTypePosition of(BlockStatePair pair, long chunkPosLong, int chunkRelativePosition)

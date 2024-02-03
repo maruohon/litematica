@@ -5,12 +5,12 @@ import java.util.Collection;
 import com.google.common.collect.ArrayListMultimap;
 
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.LayerRange;
 import litematica.config.Configs;
 import litematica.schematic.placement.SchematicPlacement;

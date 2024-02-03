@@ -3,17 +3,16 @@ package litematica.schematic.placement;
 import java.util.Objects;
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.math.Vec3i;
-
 import malilib.util.data.json.JsonUtils;
 import malilib.util.position.Coordinate;
+import malilib.util.position.Vec3i;
 
 public class GridSettings
 {
-    protected Vec3i size = Vec3i.NULL_VECTOR;
-    protected Vec3i defaultSize = Vec3i.NULL_VECTOR;
-    protected Vec3i repeatNegative = Vec3i.NULL_VECTOR;
-    protected Vec3i repeatPositive = Vec3i.NULL_VECTOR;
+    protected Vec3i size = Vec3i.ZERO;
+    protected Vec3i defaultSize = Vec3i.ZERO;
+    protected Vec3i repeatNegative = Vec3i.ZERO;
+    protected Vec3i repeatPositive = Vec3i.ZERO;
     protected boolean enabled;
     protected boolean initialized;
 
@@ -29,9 +28,9 @@ public class GridSettings
 
     public boolean isAtDefaultValues()
     {
-        return (this.size.equals(Vec3i.NULL_VECTOR) || this.size.equals(this.defaultSize)) &&
-                this.repeatNegative.equals(Vec3i.NULL_VECTOR) &&
-                this.repeatPositive.equals(Vec3i.NULL_VECTOR);
+        return (this.size.equals(Vec3i.ZERO) || this.size.equals(this.defaultSize)) &&
+                this.repeatNegative.equals(Vec3i.ZERO) &&
+                this.repeatPositive.equals(Vec3i.ZERO);
     }
 
     public Vec3i getSize()
@@ -141,8 +140,8 @@ public class GridSettings
     {
         this.enabled = JsonUtils.getBoolean(obj, "enabled");
         this.size = JsonUtils.getVec3iOrDefault(obj, "size", this.defaultSize);
-        this.repeatNegative = JsonUtils.getVec3iOrDefault(obj, "repeatNegative", Vec3i.NULL_VECTOR);
-        this.repeatPositive = JsonUtils.getVec3iOrDefault(obj, "repeatPositive", Vec3i.NULL_VECTOR);
+        this.repeatNegative = JsonUtils.getVec3iOrDefault(obj, "repeatNegative", Vec3i.ZERO);
+        this.repeatPositive = JsonUtils.getVec3iOrDefault(obj, "repeatPositive", Vec3i.ZERO);
         this.initialized = this.isAtDefaultValues() == false;
     }
 

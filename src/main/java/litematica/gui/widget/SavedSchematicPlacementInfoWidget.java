@@ -6,16 +6,14 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.gui.widget.ContainerWidget;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import malilib.overlay.message.MessageHelpers;
 import malilib.render.text.StyledTextLine;
+import malilib.util.position.BlockPos;
 import litematica.gui.util.SchematicPlacementInfoCache;
 import litematica.schematic.placement.SchematicPlacement;
-import litematica.util.PositionUtils;
 
 public class SavedSchematicPlacementInfoWidget extends ContainerWidget
 {
@@ -93,10 +91,10 @@ public class SavedSchematicPlacementInfoWidget extends ContainerWidget
         stateStr = MessageHelpers.getYesNoColored(placement.isRegionPlacementModified(), false);
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.modified", stateStr);
 
-        String rotationStr = PositionUtils.getRotationNameShort(placement.getRotation());
+        String rotationStr = placement.getRotation().getDisplayName();
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.rotation", rotationStr);
 
-        String mirrorStr = PositionUtils.getMirrorName(placement.getMirror());
+        String mirrorStr = placement.getMirror().getDisplayName();
         StyledTextLine.translate(lines, "litematica.label.saved_placement.info_widget.mirror", mirrorStr);
 
         BlockPos o = placement.getPosition();

@@ -17,8 +17,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import malilib.config.value.HorizontalAlignment;
@@ -38,6 +36,8 @@ import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.HitResult;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.Vec2i;
 import litematica.config.Configs;
@@ -673,8 +673,8 @@ public class OverlayRenderer
 
         if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            RayTraceResult trace = traceWrapper.getRayTraceResult();
-            BlockPos pos = trace.getBlockPos();
+            HitResult trace = traceWrapper.getRayTraceResult();
+            malilib.util.position.BlockPos pos = trace.blockPos;
 
             GlStateManager.depthMask(false);
             GlStateManager.disableLighting();
@@ -684,12 +684,12 @@ public class OverlayRenderer
 
             if (direction)
             {
-                BlockTargetingRenderUtils.render5WayBlockTargetingOverlay(entity, pos, trace.sideHit,
-                                                                          trace.hitVec, color, partialTicks, ctx);
+                BlockTargetingRenderUtils.render5WayBlockTargetingOverlay(entity, pos, trace.side,
+                                                                          trace.pos, color, partialTicks, ctx);
             }
             else
             {
-                BlockTargetingRenderUtils.renderSimpleSquareBlockTargetingOverlay(entity, pos, trace.sideHit,
+                BlockTargetingRenderUtils.renderSimpleSquareBlockTargetingOverlay(entity, pos, trace.side,
                                                                                   color, partialTicks, ctx);
             }
 
@@ -704,12 +704,12 @@ public class OverlayRenderer
     public void renderHoveredSchematicBlock(float tickDelta)
     {
         Minecraft mc = GameUtils.getClient();
-        RayTraceResult hitResult = GameUtils.getHitResult();
+        HitResult hitResult = GameUtils.getHitResult();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
-        if (hitResult != null && hitResult.typeOfHit == RayTraceResult.Type.BLOCK && worldSchematic != null)
+        if (hitResult.type == HitResult.Type.BLOCK && worldSchematic != null)
         {
-            BlockPos pos = hitResult.getBlockPos();
+            BlockPos pos = hitResult.blockPos;
             IBlockState stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
             IBlockState stateSchematic = worldSchematic.getBlockState(pos);
 

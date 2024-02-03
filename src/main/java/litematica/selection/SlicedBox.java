@@ -1,17 +1,16 @@
 package litematica.selection;
 
-import net.minecraft.util.EnumFacing;
-
 import malilib.util.MathUtils;
+import malilib.util.position.Direction;
 
 public class SlicedBox extends CornerDefinedBox
 {
-    private EnumFacing sliceDirection = EnumFacing.EAST;
+    private Direction sliceDirection = Direction.EAST;
     private int sliceStart = 0;
     private int sliceEnd = 1;
     private int sliceRepeatCount;
 
-    public EnumFacing getSliceDirection()
+    public Direction getSliceDirection()
     {
         return this.sliceDirection;
     }
@@ -53,7 +52,7 @@ public class SlicedBox extends CornerDefinedBox
         }
     }
 
-    public void setSliceDirection(EnumFacing sliceDirection)
+    public void setSliceDirection(Direction sliceDirection)
     {
         this.sliceDirection = sliceDirection;
     }

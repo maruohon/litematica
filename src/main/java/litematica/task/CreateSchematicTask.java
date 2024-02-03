@@ -5,11 +5,10 @@ import java.util.Set;
 import java.util.UUID;
 import com.google.common.collect.ImmutableMap;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-
 import malilib.listener.TaskCompletionListener;
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
 import litematica.render.infohud.InfoHud;
 import litematica.scheduler.tasks.TaskProcessChunkBase;

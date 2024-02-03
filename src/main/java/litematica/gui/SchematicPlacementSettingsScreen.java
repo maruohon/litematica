@@ -9,8 +9,6 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.gui.BaseListScreen;
 import malilib.gui.BaseScreen;
 import malilib.gui.ChooseActionScreen;
@@ -30,8 +28,8 @@ import malilib.listener.EventListener;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.BlockPos;
 import malilib.util.position.Coordinate;
-import malilib.util.position.PositionUtils;
 import litematica.Reference;
 import litematica.data.DataManager;
 import litematica.gui.util.LitematicaIcons;
@@ -414,14 +412,14 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
     protected boolean mirror(int mouseButton, GenericButton button)
     {
         boolean reverse = mouseButton == 1;
-        this.manager.setMirror(this.placement, PositionUtils.cycleMirror(this.placement.getMirror(), reverse));
+        this.manager.setMirror(this.placement, this.placement.getMirror().cycle(reverse));
         return true;
     }
 
     protected boolean rotate(int mouseButton, GenericButton button)
     {
         boolean reverse = mouseButton == 1;
-        this.manager.setRotation(this.placement, PositionUtils.cycleRotation(this.placement.getRotation(), reverse));
+        this.manager.setRotation(this.placement, this.placement.getRotation().cycle(reverse));
         return true;
     }
 
@@ -534,14 +532,14 @@ public class SchematicPlacementSettingsScreen extends BaseListScreen<DataListWid
 
     protected String getMirrorButtonLabel()
     {
-        String val = litematica.util.PositionUtils.getMirrorName(this.placement.getMirror());
+        String val = this.placement.getMirror().getDisplayName();
         String key = "litematica.button.schematic_placement_settings.mirror_value";
         return StringUtils.translate(key, val);
     }
 
     protected String getRotateButtonLabel()
     {
-        String val = litematica.util.PositionUtils.getRotationNameShort(this.placement.getRotation());
+        String val = this.placement.getRotation().getDisplayName();
         String key = "litematica.button.schematic_placement_settings.rotation_value";
         return StringUtils.translate(key, val);
     }

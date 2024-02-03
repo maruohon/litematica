@@ -1,7 +1,6 @@
 package litematica.config;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import malilib.input.ActionResult;
@@ -9,6 +8,7 @@ import malilib.input.KeyAction;
 import malilib.input.KeyBind;
 import malilib.input.callback.HotkeyCallback;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
 import litematica.data.DataManager;
 import litematica.selection.AreaSelectionManager;
 import litematica.selection.BoxCorner;

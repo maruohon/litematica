@@ -13,23 +13,24 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.ChunkSectionPos;
+import malilib.util.position.Direction;
+import malilib.util.position.HitResult;
 import malilib.util.position.LayerRange;
 import malilib.util.position.PositionUtils;
+import malilib.util.position.Vec3d;
+import malilib.util.position.Vec3i;
 import litematica.config.Hotkeys;
 import litematica.data.DataManager;
 import litematica.mixin.IMixinItemBlockSpecial;
@@ -136,8 +137,8 @@ public class SchematicEditUtils
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            EnumFacing playerFacingH = GameUtils.getClientPlayer().getHorizontalFacing();
-            EnumFacing direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
+            Direction playerFacingH = EntityWrap.getClosestHorizontalLookingDirection(GameUtils.getClientPlayer());
+            Direction direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
 
             // Center region
             if (direction == info.side)
@@ -170,11 +171,11 @@ public class SchematicEditUtils
         WorldSchematic schematicWorld = SchematicWorldHandler.getSchematicWorld();
         Entity entity = GameUtils.getCameraEntity();
         World world = GameUtils.getClientWorld();
-        RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.ANY, false, 5);
+        HitResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.ANY, false, 5);
 
-        if (schematicWorld != null && trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
+        if (schematicWorld != null && trace != null && trace.type == HitResult.Type.BLOCK)
         {
-            BlockPos pos = trace.getBlockPos();
+            BlockPos pos = trace.blockPos;
             IBlockState stateOriginal = schematicWorld.getBlockState(pos);
             IBlockState stateClient = world.getBlockState(pos).getActualState(world, pos);
 
@@ -198,13 +199,13 @@ public class SchematicEditUtils
 
         if (wrapper != null)
         {
-            RayTraceResult trace = wrapper.getRayTraceResult();
-            BlockPos pos = trace.getBlockPos();
-            EnumFacing playerFacingH = entity.getHorizontalFacing();
-            EnumFacing direction = PositionUtils.getTargetedDirection(trace.sideHit, playerFacingH, pos, trace.hitVec);
+            HitResult trace = wrapper.getRayTraceResult();
+            BlockPos pos = trace.blockPos;
+            Direction playerFacingH = EntityWrap.getClosestHorizontalLookingDirection(entity);
+            Direction direction = PositionUtils.getTargetedDirection(trace.side, playerFacingH, pos, trace.pos);
 
             // Center region
-            if (direction == trace.sideHit)
+            if (direction == trace.side)
             {
                 direction = direction.getOpposite();
             }
@@ -225,7 +226,7 @@ public class SchematicEditUtils
         // The state can be null in 1.13+
         if (wrapper != null)
         {
-            RayTraceResult trace = wrapper.getRayTraceResult();
+            HitResult trace = wrapper.getRayTraceResult();
             BlockPos pos = trace.getBlockPos();
             IBlockState stateOriginal = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
 
@@ -242,8 +243,8 @@ public class SchematicEditUtils
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            EnumFacing playerFacingH = GameUtils.getClientPlayer().getHorizontalFacing();
-            EnumFacing direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
+            Direction playerFacingH = EntityWrap.getClosestHorizontalLookingDirection(GameUtils.getClientPlayer());
+            Direction direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
             BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
 
             if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).getMaterial() == Material.AIR)
@@ -291,23 +292,23 @@ public class SchematicEditUtils
             if (world != null && traceWrapper != null &&
                 traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
             {
-                RayTraceResult trace = traceWrapper.getRayTraceResult();
-                EnumFacing side = trace.sideHit;
-                Vec3d hitVec = trace.hitVec;
+                HitResult trace = traceWrapper.getRayTraceResult();
+                Direction side = trace.side;
+                Vec3d hitVec = trace.pos;
                 int meta = stack.getItem().getMetadata(stack.getMetadata());
-                BlockPos pos = trace.getBlockPos();
+                BlockPos pos = trace.blockPos;
                 IBlockState stateOriginal = world.getBlockState(pos);
                 IBlockState stateNew = Blocks.AIR.getDefaultState();
 
                 if (stack.getItem() instanceof ItemBlock)
                 {
                     stateNew = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
-                                    side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, meta, player);
+                                    side.getVanillaDirection(), (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, meta, player);
                 }
                 else if (stack.getItem() instanceof ItemBlockSpecial)
                 {
                     stateNew = ((IMixinItemBlockSpecial) stack.getItem()).getBlock()
-                                .getStateForPlacement(world, pos.offset(side), side,
+                                .getStateForPlacement(world, pos.offset(side).toVanillaPos(), side.getVanillaDirection(),
                                                       (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, 0, player);
                 }
                 else if (ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null)
@@ -322,27 +323,27 @@ public class SchematicEditUtils
         return null;
     }
 
-    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, EnumFacing direction)
+    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, Direction direction)
     {
         return getReplacementBoxEndPos(startPos, direction, 10000);
     }
 
-    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, EnumFacing direction, int maxBlocks)
+    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, Direction direction, int maxBlocks)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
         LayerRange range = DataManager.getRenderLayerRange();
         IBlockState stateStart = world.getBlockState(startPos);
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(startPos);
+        BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos(startPos);
 
         while (maxBlocks-- > 0)
         {
-            posMutable.move(direction);
+            posMutable.offset(direction);
 
             if (range.isPositionWithinRange(posMutable) == false ||
                 WorldUtils.isClientChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4, world) == false ||
                 world.getBlockState(posMutable) != stateStart)
             {
-                posMutable.move(direction.getOpposite());
+                posMutable.offset(direction.getOpposite());
                 break;
             }
         }
@@ -358,8 +359,8 @@ public class SchematicEditUtils
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            RayTraceResult trace = traceWrapper.getRayTraceResult();
-            BlockPos pos = trace.getBlockPos();
+            HitResult trace = traceWrapper.getRayTraceResult();
+            BlockPos pos = trace.blockPos;
             return setTargetedSchematicBlockState(pos, state);
         }
 
@@ -438,7 +439,7 @@ public class SchematicEditUtils
     {
         if (posStart != null && posEnd != null)
         {
-            ChunkSectionPos cpos = new ChunkSectionPos(posStart);
+            ChunkSectionPos cpos = ChunkSectionPos.ofBlockPos(posStart);
             List<PlacementPart> list = DataManager.getSchematicPlacementManager().getAllPlacementsTouchingSubChunk(cpos);
 
             if (list.isEmpty() == false)
@@ -526,7 +527,7 @@ public class SchematicEditUtils
     {
         if (posStart != null)
         {
-            ChunkSectionPos cpos = new ChunkSectionPos(posStart);
+            ChunkSectionPos cpos = ChunkSectionPos.ofBlockPos(posStart);
             SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             List<PlacementPart> list = manager.getAllPlacementsTouchingSubChunk(cpos);
 
@@ -673,12 +674,12 @@ public class SchematicEditUtils
     private static class ReplacementInfo
     {
         public final BlockPos pos;
-        public final EnumFacing side;
+        public final Direction side;
         public final Vec3d hitVec;
         public final IBlockState stateOriginal;
         public final IBlockState stateNew;
 
-        public ReplacementInfo(BlockPos pos, EnumFacing side, Vec3d hitVec, IBlockState stateOriginal, IBlockState stateNew)
+        public ReplacementInfo(BlockPos pos, Direction side, Vec3d hitVec, IBlockState stateOriginal, IBlockState stateNew)
         {
             this.pos = pos;
             this.side = side;

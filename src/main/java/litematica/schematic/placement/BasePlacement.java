@@ -2,14 +2,13 @@ package litematica.schematic.placement;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.Color4f;
 import malilib.util.data.EnabledCondition;
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.BlockMirror;
+import malilib.util.position.BlockPos;
+import malilib.util.position.BlockRotation;
 import malilib.util.position.Coordinate;
 import litematica.util.PositionUtils;
 
@@ -17,8 +16,8 @@ public class BasePlacement
 {
     protected String name;
     protected BlockPos position;
-    protected Rotation rotation = Rotation.NONE;
-    protected Mirror mirror = Mirror.NONE;
+    protected BlockRotation rotation = BlockRotation.NONE;
+    protected BlockMirror mirror = BlockMirror.NONE;
     protected Color4f boundingBoxColor = Color4f.WHITE;
     protected boolean enabled = true;
     protected boolean ignoreEntities;
@@ -56,12 +55,12 @@ public class BasePlacement
         return this.position;
     }
 
-    public Rotation getRotation()
+    public BlockRotation getRotation()
     {
         return this.rotation;
     }
 
-    public Mirror getMirror()
+    public BlockMirror getMirror()
     {
         return this.mirror;
     }
@@ -96,12 +95,12 @@ public class BasePlacement
         this.ignoreEntities = ! this.ignoreEntities;
     }
 
-    void setRotation(Rotation rotation)
+    void setRotation(BlockRotation rotation)
     {
         this.rotation = rotation;
     }
 
-    void setMirror(Mirror mirror)
+    void setMirror(BlockMirror mirror)
     {
         this.mirror = mirror;
     }
@@ -148,8 +147,8 @@ public class BasePlacement
         obj.add("pos", JsonUtils.blockPosToJson(this.position));
 
         // Only add the properties that have changed from the default values
-        JsonUtils.addIfNotEqual(obj, "rotation", this.rotation, Rotation.NONE);
-        JsonUtils.addIfNotEqual(obj, "mirror", this.mirror, Mirror.NONE);
+        JsonUtils.addIfNotEqual(obj, "rotation", this.rotation, BlockRotation.NONE);
+        JsonUtils.addIfNotEqual(obj, "mirror", this.mirror, BlockMirror.NONE);
         JsonUtils.addIfNotEqual(obj, "enabled", this.enabled, true);
         JsonUtils.addIfNotEqual(obj, "ignore_entities", this.ignoreEntities, false);
         JsonUtils.addIfNotEqual(obj, "render_enclosing_box", this.renderEnclosingBox, false);

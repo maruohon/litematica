@@ -1,13 +1,12 @@
 package litematica.gui.widget.list.entry;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.icon.Icon;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import malilib.listener.EventListener;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.BlockPos;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.data.SchematicHolder;

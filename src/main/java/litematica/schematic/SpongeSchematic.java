@@ -11,15 +11,15 @@ import java.util.Set;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.Constants;
 import malilib.util.game.BlockUtils;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3d;
+import malilib.util.position.Vec3i;
 import litematica.schematic.container.ILitematicaBlockStatePalette;
 import litematica.schematic.container.LitematicaBlockStateContainerFull;
 

@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 
+import malilib.util.position.BlockPos;
+import malilib.util.position.Vec3i;
 import litematica.schematic.container.ILitematicaBlockStateContainer;
 
 public interface ISchematicRegion

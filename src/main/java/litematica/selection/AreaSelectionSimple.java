@@ -5,9 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.BlockPos;
 
 public class AreaSelectionSimple extends AreaSelection
 {

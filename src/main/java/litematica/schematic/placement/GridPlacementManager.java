@@ -10,12 +10,12 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
 import malilib.util.position.IntBoundingBox;
+import malilib.util.position.Vec3i;
 import litematica.render.OverlayRenderer;
 import litematica.util.PositionUtils;
 

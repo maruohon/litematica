@@ -15,7 +15,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import malilib.gui.BaseScreen;
@@ -26,6 +25,7 @@ import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.inventory.InventoryUtils;
+import malilib.util.position.BlockPos;
 import litematica.config.Configs;
 import litematica.materials.MaterialCache;
 import litematica.render.RenderUtils;

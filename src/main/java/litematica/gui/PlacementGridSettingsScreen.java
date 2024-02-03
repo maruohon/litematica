@@ -1,12 +1,11 @@
 package litematica.gui;
 
-import net.minecraft.util.math.Vec3i;
-
 import malilib.gui.BaseScreen;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.Vec3iEditWidget;
 import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
+import malilib.util.position.Vec3i;
 import litematica.data.DataManager;
 import litematica.schematic.placement.GridSettings;
 import litematica.schematic.placement.SchematicPlacement;

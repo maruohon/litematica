@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.gui.BaseListScreen;
 import malilib.gui.BaseScreen;
 import malilib.gui.TextInputScreen;
@@ -17,6 +15,7 @@ import malilib.gui.widget.button.GenericButton;
 import malilib.gui.widget.button.OnOffButton;
 import malilib.gui.widget.list.DataListWidget;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.position.BlockPos;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.gui.util.LitematicaIcons;

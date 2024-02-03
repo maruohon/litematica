@@ -6,13 +6,12 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
 
-import net.minecraft.util.math.BlockPos;
-
 import malilib.gui.widget.ContainerWidget;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import malilib.render.text.StyledTextLine;
 import malilib.util.StringUtils;
+import malilib.util.position.BlockPos;
 import litematica.data.DataManager;
 import litematica.schematic.projects.SchematicProject;
 import litematica.schematic.projects.SchematicVersion;

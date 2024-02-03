@@ -1,7 +1,6 @@
 package litematica.config;
 
 import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
 
 import malilib.config.value.LayerMode;
 import malilib.input.ActionResult;
@@ -12,6 +11,8 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.util.ListUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.BlockRotation;
 import litematica.data.DataManager;
 import litematica.input.MouseScrollHandlerImpl;
 import litematica.scheduler.TaskScheduler;
@@ -258,7 +259,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
 
             if (placement != null)
             {
-                manager.rotateBy(placement, Rotation.CLOCKWISE_90);
+                manager.rotateBy(placement, BlockRotation.CW_90);
                 return ActionResult.SUCCESS;
             }
         }
@@ -269,7 +270,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
 
             if (placement != null)
             {
-                manager.rotateBy(placement, Rotation.COUNTERCLOCKWISE_90);
+                manager.rotateBy(placement, BlockRotation.CCW_90);
                 return ActionResult.SUCCESS;
             }
         }

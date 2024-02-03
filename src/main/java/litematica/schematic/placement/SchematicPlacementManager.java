@@ -21,12 +21,6 @@ import it.unimi.dsi.fastutil.longs.LongSet;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import malilib.config.value.LayerMode;
@@ -38,7 +32,13 @@ import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockMirror;
+import malilib.util.position.BlockPos;
+import malilib.util.position.BlockRotation;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.ChunkSectionPos;
+import malilib.util.position.Direction;
+import malilib.util.position.HitResult;
 import malilib.util.position.IntBoundingBox;
 import litematica.config.Configs;
 import litematica.config.Hotkeys;
@@ -730,7 +730,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void setRotation(SchematicPlacement placement, Rotation rotation)
+    public void setRotation(SchematicPlacement placement, BlockRotation rotation)
     {
         if (placement.isLocked())
         {
@@ -743,12 +743,12 @@ public class SchematicPlacementManager
         this.onPlacementModified(placement);
     }
 
-    public void rotateBy(SchematicPlacement placement, Rotation rotation)
+    public void rotateBy(SchematicPlacement placement, BlockRotation rotation)
     {
         this.setRotation(placement, placement.getRotation().add(rotation));
     }
 
-    public void setMirror(SchematicPlacement placement, Mirror mirror)
+    public void setMirror(SchematicPlacement placement, BlockMirror mirror)
     {
         if (placement.isLocked())
         {
@@ -808,12 +808,12 @@ public class SchematicPlacementManager
         this.modifyPlacementRegion(placement, regionName, SubRegionPlacement::toggleIgnoreEntities, false);
     }
 
-    public void setSubRegionRotation(SchematicPlacement placement, String regionName, Rotation rotation)
+    public void setSubRegionRotation(SchematicPlacement placement, String regionName, BlockRotation rotation)
     {
         this.modifyPlacementRegion(placement, regionName, reg -> reg.rotation = rotation, true);
     }
 
-    public void setSubRegionMirror(SchematicPlacement placement, String regionName, Mirror mirror)
+    public void setSubRegionMirror(SchematicPlacement placement, String regionName, BlockMirror mirror)
     {
         this.modifyPlacementRegion(placement, regionName, reg -> reg.mirror = mirror, true);
     }
@@ -1035,19 +1035,19 @@ public class SchematicPlacementManager
         if (schematicPlacement != null)
         {
             Entity entity = GameUtils.getCameraEntity();
-            RayTraceResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(GameUtils.getClientWorld(), entity, RayTraceFluidHandling.NONE, false, maxDistance);
+            HitResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(GameUtils.getClientWorld(), entity, RayTraceFluidHandling.NONE, false, maxDistance);
 
-            if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+            if (trace.type != HitResult.Type.BLOCK)
             {
                 return;
             }
 
-            BlockPos pos = trace.getBlockPos();
+            BlockPos pos = trace.blockPos;
 
             // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
             if (GameUtils.getClientPlayer().isSneaking() == false)
             {
-                pos = pos.offset(trace.sideHit);
+                pos = pos.offset(trace.side);
             }
 
             this.setPositionOfCurrentSelectionTo(pos);
@@ -1093,7 +1093,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void nudgePositionOfCurrentSelection(EnumFacing direction, int amount)
+    public void nudgePositionOfCurrentSelection(Direction direction, int amount)
     {
         SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 

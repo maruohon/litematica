@@ -3,11 +3,10 @@ package litematica.schematic.placement;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-
 import malilib.util.data.json.JsonUtils;
+import malilib.util.position.BlockMirror;
+import malilib.util.position.BlockPos;
+import malilib.util.position.BlockRotation;
 import litematica.Litematica;
 
 public class SubRegionPlacement extends BasePlacement
@@ -63,8 +62,8 @@ public class SubRegionPlacement extends BasePlacement
     {
         return this.enabled == false ||
                this.ignoreEntities ||
-               this.mirror != Mirror.NONE ||
-               this.rotation != Rotation.NONE ||
+               this.mirror != BlockMirror.NONE ||
+               this.rotation != BlockRotation.NONE ||
                this.position.equals(defaultPosition) == false;
     }
 
@@ -77,8 +76,8 @@ public class SubRegionPlacement extends BasePlacement
     void resetToOriginalValues()
     {
         this.position = this.defaultPos;
-        this.rotation = Rotation.NONE;
-        this.mirror = Mirror.NONE;
+        this.rotation = BlockRotation.NONE;
+        this.mirror = BlockMirror.NONE;
         this.enabled = true;
         this.ignoreEntities = false;
     }

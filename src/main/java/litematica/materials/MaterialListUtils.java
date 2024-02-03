@@ -10,7 +10,6 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3i;
 
 import malilib.gui.BaseScreen;
 import malilib.gui.StringListSelectionScreen;
@@ -18,6 +17,7 @@ import malilib.util.data.ItemType;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.inventory.InventoryUtils;
+import malilib.util.position.Vec3i;
 import litematica.config.Configs;
 import litematica.data.DataManager;
 import litematica.gui.MaterialListScreen;

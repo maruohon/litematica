@@ -2,8 +2,7 @@ package litematica.schematic.verifier;
 
 import java.util.Comparator;
 
-import net.minecraft.util.math.BlockPos;
-
+import malilib.util.position.BlockPos;
 import malilib.util.position.PositionUtils;
 
 class BlockPairTypePositionComparator implements Comparator<BlockPairTypePosition>

@@ -5,9 +5,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-
+import malilib.util.position.BlockPos;
+import malilib.util.position.ChunkPos;
 import litematica.data.DataManager;
 import litematica.schematic.placement.SchematicPlacement;
 

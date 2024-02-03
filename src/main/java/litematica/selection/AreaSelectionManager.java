@@ -12,8 +12,6 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import malilib.gui.BaseScreen;
@@ -25,6 +23,8 @@ import malilib.util.FileUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
 import malilib.util.position.PositionUtils;
 import litematica.Litematica;
 import litematica.config.Configs;
@@ -478,7 +478,7 @@ public class AreaSelectionManager
         return area != null && area.isOriginSelected();
     }
 
-    public void moveSelectedElement(EnumFacing direction, int amount)
+    public void moveSelectedElement(Direction direction, int amount)
     {
         AreaSelection area = this.getCurrentSelection();
 

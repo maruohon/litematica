@@ -1,13 +1,14 @@
 package litematica.input;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 
 import malilib.gui.util.GuiUtils;
 import malilib.input.MouseScrollHandler;
 import malilib.overlay.message.MessageDispatcher;
+import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.BlockPos;
+import malilib.util.position.Direction;
 import litematica.config.Configs;
 import litematica.config.Hotkeys;
 import litematica.data.DataManager;
@@ -41,7 +42,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
         final int amount = deltaY > 0 ? 1 : -1;
         ToolMode mode = DataManager.getToolMode();
         Entity cameraEntity = GameUtils.getCameraEntity();
-        EnumFacing direction = malilib.util.position.PositionUtils.getClosestLookingDirection(cameraEntity);
+        Direction direction = EntityWrap.getClosestLookingDirection(cameraEntity);
 
         if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())
         {
@@ -56,7 +57,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
             {
                 AreaSelection area = sm.getCurrentSelection();
                 BlockPos old = area.getEffectiveOrigin();
-                area.moveEntireAreaSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(cameraEntity), amount), false);
+                area.moveEntireAreaSelectionTo(old.offset(EntityWrap.getClosestLookingDirection(cameraEntity), amount), false);
                 return true;
             }
             else if (mode == ToolMode.MOVE)
@@ -98,12 +99,12 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
     {
         if (mode.getUsesAreaSelection())
         {
-            DataManager.getAreaSelectionManager().moveSelectedElement(EntityUtils.getClosestLookingDirection(entity), amount);
+            DataManager.getAreaSelectionManager().moveSelectedElement(EntityWrap.getClosestLookingDirection(entity), amount);
             return true;
         }
         else if (mode.getUsesSchematic())
         {
-            EnumFacing direction = EntityUtils.getClosestLookingDirection(entity);
+            Direction direction = EntityWrap.getClosestLookingDirection(entity);
             DataManager.getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
             return true;
         }
@@ -111,7 +112,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
         return false;
     }
 
-    private boolean modifySelectionBox(int amount, ToolMode mode, EnumFacing direction, IBoxEditor editor)
+    private boolean modifySelectionBox(int amount, ToolMode mode, Direction direction, IBoxEditor editor)
     {
         AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
@@ -141,6 +142,6 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
 
     private interface IBoxEditor
     {
-        CornerDefinedBox editBox(CornerDefinedBox boxIn, int amount, EnumFacing side);
+        CornerDefinedBox editBox(CornerDefinedBox boxIn, int amount, Direction side);
     }
 }

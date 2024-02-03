@@ -8,13 +8,13 @@ import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
 
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 import malilib.config.value.LayerMode;
 import malilib.util.StringUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
 import litematica.render.infohud.InfoHud;
