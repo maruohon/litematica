@@ -337,13 +337,13 @@ public class SchematicEditUtils
 
         while (maxBlocks-- > 0)
         {
-            posMutable.offset(direction);
+            posMutable.move(direction);
 
             if (range.isPositionWithinRange(posMutable) == false ||
                 WorldUtils.isClientChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4, world) == false ||
                 world.getBlockState(posMutable) != stateStart)
             {
-                posMutable.offset(direction.getOpposite());
+                posMutable.move(direction.getOpposite());
                 break;
             }
         }

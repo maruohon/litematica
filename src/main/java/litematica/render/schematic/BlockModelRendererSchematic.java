@@ -22,6 +22,7 @@ import net.minecraft.world.IBlockAccess;
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
 import malilib.util.position.BlockPos;
+import malilib.util.position.BlockPos.MutBlockPos;
 import malilib.util.position.Direction;
 import litematica.config.Configs;
 import litematica.data.DataManager;
@@ -102,6 +103,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
     {
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
+        BlockPos.MutBlockPos sidePos = new MutBlockPos(posIn);
 
         for (Direction side : Direction.ALL_DIRECTIONS)
         {
@@ -111,7 +113,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             {
                 if (this.shouldRenderModelSide(worldIn, stateIn, posIn, side))
                 {
-                    int lightMapCoords = stateIn.getPackedLightmapCoords(worldIn, posIn.offset(side));
+                    int lightMapCoords = stateIn.getPackedLightmapCoords(worldIn, sidePos.setOffset(posIn, side));
                     this.renderQuadsFlat(stateIn, posIn, worldIn, lightMapCoords, false, quads, bitset, builder);
                     renderedSomething = true;
                 }
@@ -191,6 +193,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         double y = (double) (posIn.getY() & 0xF) + modelOffset.y;
         double z = (double) (posIn.getZ() & 0xF) + modelOffset.z;
         int i = 0;
+        BlockPos.MutBlockPos sidePos = new MutBlockPos(posIn);
 
         for (int j = list.size(); i < j; ++i)
         {
@@ -199,7 +202,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             if (ownBrightness)
             {
                 this.fillQuadBounds(stateIn, bakedquad.getVertexData(), bakedquad.getFace(), (float[])null, bitSet);
-                BlockPos blockpos = bitSet.get(0) ? posIn.offset(Direction.of(bakedquad.getFace())) : posIn;
+                BlockPos blockpos = bitSet.get(0) ? sidePos.setOffset(posIn, bakedquad.getFace()) : posIn;
                 brightnessIn = stateIn.getPackedLightmapCoords(blockAccessIn, blockpos);
             }
 
