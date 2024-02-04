@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
 
 import malilib.util.StringUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import litematica.data.DataManager;
 
 public enum ToolMode
@@ -101,7 +101,7 @@ public enum ToolMode
     public ToolMode cycle(boolean forward)
     {
         ToolMode[] values = ToolMode.values();
-        final boolean isCreative = GameUtils.isCreativeMode();
+        final boolean isCreative = GameWrap.isCreativeMode();
         final int numModes = values.length;
         final int inc = forward ? 1 : -1;
         int nextId = this.ordinal() + inc;

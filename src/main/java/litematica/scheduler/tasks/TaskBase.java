@@ -10,9 +10,9 @@ import net.minecraft.client.multiplayer.WorldClient;
 
 import malilib.listener.TaskCompletionListener;
 import malilib.util.StringUtils;
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.ChunkPos;
 import litematica.config.Configs;
 import litematica.render.infohud.IInfoHudRenderer;
@@ -112,7 +112,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     {
         if (radius <= 0)
         {
-            return WorldUtils.isClientChunkLoaded(pos.x, pos.z, world);
+            return WorldWrap.isClientChunkLoaded(pos.x, pos.z, world);
         }
 
         int chunkX = pos.x;
@@ -122,7 +122,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
         {
             for (int cz = chunkZ - radius; cz <= chunkZ + radius; ++cz)
             {
-                if (WorldUtils.isClientChunkLoaded(cx, cz, world) == false)
+                if (WorldWrap.isClientChunkLoaded(cx, cz, world) == false)
                 {
                     return false;
                 }
@@ -136,7 +136,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     {
         List<String> hudLines = new ArrayList<>();
 
-        if (GameUtils.getClientPlayer() != null && requiredChunks.isEmpty() == false)
+        if (GameWrap.getClientPlayer() != null && requiredChunks.isEmpty() == false)
         {
             List<ChunkPos> list = new ArrayList<>(requiredChunks);
             PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(EntityWrap.getPlayerBlockPos());

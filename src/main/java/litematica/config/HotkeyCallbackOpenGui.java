@@ -7,7 +7,7 @@ import malilib.input.KeyAction;
 import malilib.input.KeyBind;
 import malilib.input.callback.HotkeyCallback;
 import malilib.overlay.message.MessageDispatcher;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import litematica.Reference;
 import litematica.data.DataManager;
 import litematica.gui.AreaSelectionBrowserScreen;
@@ -34,7 +34,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
     @Override
     public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
-        if (GameUtils.getClientPlayer() == null || GameUtils.getClientWorld() == null)
+        if (GameWrap.getClientPlayer() == null || GameWrap.getClientWorld() == null)
         {
             return ActionResult.FAIL;
         }

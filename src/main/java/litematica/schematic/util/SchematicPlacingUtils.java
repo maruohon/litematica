@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
 import malilib.util.position.BlockMirror;
@@ -104,13 +104,13 @@ public class SchematicPlacingUtils
                                                boolean changedBlocksOnly,
                                                boolean printMessage)
     {
-        if (GameUtils.isCreativeMode())
+        if (GameWrap.isCreativeMode())
         {
             if (placements.isEmpty() == false)
             {
                 LayerRange range = DataManager.getRenderLayerRange().copy();
 
-                if (GameUtils.isSinglePlayer())
+                if (GameWrap.isSinglePlayer())
                 {
                     TaskPasteSchematicPerChunkDirect task = new TaskPasteSchematicPerChunkDirect(placements, range, changedBlocksOnly);
                     TaskScheduler.getInstanceServer().scheduleTask(task, 20);

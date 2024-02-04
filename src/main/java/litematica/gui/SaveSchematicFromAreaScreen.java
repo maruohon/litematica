@@ -11,7 +11,7 @@ import malilib.gui.widget.button.BooleanConfigButton;
 import malilib.gui.widget.button.OnOffButton;
 import malilib.gui.widget.button.OptionListConfigButton;
 import malilib.overlay.message.MessageDispatcher;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import litematica.config.Configs;
 import litematica.data.SchematicHolder;
 import litematica.network.SchematicSavePacketHandler;
@@ -67,7 +67,7 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
 
         String hoverKey;
 
-        if (GameUtils.isSinglePlayer())
+        if (GameWrap.isSinglePlayer())
         {
             hoverKey = "litematica.hover.button.schematic_save.save_side.single_player";
             this.saveSideButton.getHoverInfoFactory().removeAll();
@@ -155,7 +155,7 @@ public class SaveSchematicFromAreaScreen extends BaseSaveSchematicScreen
         SaveSide side = this.saveSide.getValue();
         boolean supportsServerSideSaving = false; // TODO
 
-        if (GameUtils.isSinglePlayer() == false &&
+        if (GameWrap.isSinglePlayer() == false &&
             (side == SaveSide.SERVER || (side == SaveSide.AUTO && supportsServerSideSaving)))
         {
             this.saveSchematicOnServer(settings, file, overwrite);

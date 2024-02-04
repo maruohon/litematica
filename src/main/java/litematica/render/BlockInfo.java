@@ -15,7 +15,7 @@ import malilib.render.text.StyledText;
 import malilib.render.text.TextRenderer;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.game.wrap.RenderWrap;
 import litematica.util.ItemUtils;
@@ -64,7 +64,7 @@ public class BlockInfo
     {
         if (this.state != null)
         {
-            Minecraft mc = GameUtils.getClient();
+            Minecraft mc = GameWrap.getClient();
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;
 

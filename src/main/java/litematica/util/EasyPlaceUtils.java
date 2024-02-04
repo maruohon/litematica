@@ -25,7 +25,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import malilib.input.Keys;
@@ -36,7 +35,7 @@ import malilib.util.game.BlockUtils;
 import malilib.util.game.PlacementUtils;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkSectionPos;
@@ -45,7 +44,6 @@ import malilib.util.position.HitPosition;
 import malilib.util.position.HitResult;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
-import malilib.util.position.PositionUtils;
 import malilib.util.position.Vec3d;
 import litematica.Litematica;
 import litematica.config.Configs;
@@ -127,7 +125,7 @@ public class EasyPlaceUtils
         if (isHandling == false &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
             shouldDoEasyPlaceActions() &&
-            Keys.isKeyDown(GameUtils.getOptions().keyBindUseItem.getKeyCode()))
+            Keys.isKeyDown(GameWrap.getOptions().keyBindUseItem.getKeyCode()))
         {
             isHandling = true;
             handleEasyPlace();
@@ -176,8 +174,8 @@ public class EasyPlaceUtils
 
         if (overriddenPos != null)
         {
-            double reach = Math.max(6, GameUtils.getInteractionManager().getBlockReachDistance());
-            Entity entity = GameUtils.getCameraEntity();
+            double reach = Math.max(6, GameWrap.getInteractionManager().getBlockReachDistance());
+            Entity entity = GameWrap.getCameraEntity();
             HitResult trace = RayTraceUtils.traceToPositions(Collections.singletonList(overriddenPos), entity, reach);
             BlockPos pos = overriddenPos;
             Vec3d hitPos;
@@ -208,9 +206,9 @@ public class EasyPlaceUtils
     @Nullable
     private static HitPosition getAdjacentClickPosition(final BlockPos targetPos)
     {
-        World world = GameUtils.getClientWorld();
-        double reach = Math.max(6, GameUtils.getInteractionManager().getBlockReachDistance());
-        Entity entity = GameUtils.getCameraEntity();
+        World world = GameWrap.getClientWorld();
+        double reach = Math.max(6, GameWrap.getInteractionManager().getBlockReachDistance());
+        Entity entity = GameWrap.getCameraEntity();
         HitResult traceVanilla = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (traceVanilla.type == HitResult.Type.BLOCK)
@@ -275,7 +273,7 @@ public class EasyPlaceUtils
     {
         BlockSlab slab = (BlockSlab) stateSchematic.getBlock();
         BlockPos targetBlockPos = targetPosition.getBlockPos();
-        World worldClient = GameUtils.getClientWorld();
+        World worldClient = GameWrap.getClientWorld();
         boolean isDouble = slab.isDouble();
 
         if (isDouble)
@@ -388,9 +386,9 @@ public class EasyPlaceUtils
 
     private static EnumActionResult handleEasyPlace()
     {
-        Entity entity = GameUtils.getCameraEntity();
-        WorldClient world = GameUtils.getClientWorld();
-        double reach = Math.max(6, GameUtils.getInteractionManager().getBlockReachDistance());
+        Entity entity = GameWrap.getCameraEntity();
+        WorldClient world = GameWrap.getClientWorld();
+        double reach = Math.max(6, GameWrap.getInteractionManager().getBlockReachDistance());
         RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(world, entity, reach, true, RayTraceFluidHandling.ANY);
         HitPosition targetPosition = getTargetPosition(traceWrapper);
 
@@ -455,15 +453,15 @@ public class EasyPlaceUtils
         stateClient = world.getBlockState(clickPos);
         boolean needsSneak = hasUseAction(stateClient.getBlock());
         boolean didFakeSneak = needsSneak && EntityUtils.setFakedSneakingState(true);
-        EntityPlayerSP player = GameUtils.getClientPlayer();
+        EntityPlayerSP player = GameWrap.getClientPlayer();
 
-        if (GameUtils.getInteractionManager().processRightClickBlock(player, world, clickPos, side.getVanillaDirection(), hitPos.toVanilla(), hand) == EnumActionResult.SUCCESS)
+        if (GameWrap.getInteractionManager().processRightClickBlock(player, world, clickPos, side.getVanillaDirection(), hitPos.toVanilla(), hand) == EnumActionResult.SUCCESS)
         {
             // Mark that this position has been handled (use the non-offset position that is checked above)
             cacheEasyPlacePosition(targetBlockPos);
 
             player.swingArm(hand);
-            GameUtils.getClient().entityRenderer.itemRenderer.resetEquippedProgress(hand);
+            GameWrap.getClient().entityRenderer.itemRenderer.resetEquippedProgress(hand);
 
             if (isSlab && ((BlockSlab) stateSchematic.getBlock()).isDouble())
             {
@@ -474,7 +472,7 @@ public class EasyPlaceUtils
                     side = stateClient.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP ? Direction.DOWN : Direction.UP;
                     hitPos = new Vec3d(targetBlockPos.getX(), targetBlockPos.getY() + 0.5, targetBlockPos.getZ());
                     //System.out.printf("slab - pos: %s side: %s, hit: %s\n", pos, side, hitPos);
-                    GameUtils.getInteractionManager().processRightClickBlock(player, world, targetBlockPos, side.getVanillaDirection(), hitPos.toVanilla(), hand);
+                    GameWrap.getInteractionManager().processRightClickBlock(player, world, targetBlockPos, side.getVanillaDirection(), hitPos.toVanilla(), hand);
                 }
             }
         }
@@ -599,9 +597,9 @@ public class EasyPlaceUtils
      */
     private static boolean placementRestrictionInEffect()
     {
-        Entity entity = GameUtils.getCameraEntity();
-        World world = GameUtils.getClientWorld();
-        double reach = GameUtils.getInteractionManager().getBlockReachDistance();
+        Entity entity = GameWrap.getCameraEntity();
+        World world = GameWrap.getClientWorld();
+        double reach = GameWrap.getInteractionManager().getBlockReachDistance();
         HitResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (trace.type == HitResult.Type.BLOCK)
@@ -641,7 +639,7 @@ public class EasyPlaceUtils
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
-            return ItemWrap.isEmpty(stack) || EntityWrap.getUsedHandForItem(GameUtils.getClientPlayer(), stack, true) == null;
+            return ItemWrap.isEmpty(stack) || EntityWrap.getUsedHandForItem(GameWrap.getClientPlayer(), stack, true) == null;
         }
 
         return false;

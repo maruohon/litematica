@@ -22,7 +22,7 @@ import net.minecraft.world.border.WorldBorder;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockMirror;
 import malilib.util.position.BlockPos;
 import malilib.util.position.BlockRotation;
@@ -754,7 +754,7 @@ public class PositionUtils
     {
         AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
 
         if (area == null || world == null)
         {
@@ -859,7 +859,7 @@ public class PositionUtils
 
     public static BlockPos getPlacementPositionOffsetToInFrontOfPlayer(BlockPos newOrigin, @Nullable SchematicPlacement placement)
     {
-        Entity entity = GameUtils.getCameraEntity();
+        Entity entity = GameWrap.getCameraEntity();
 
         if (Configs.Generic.PLACEMENTS_INFRONT.getBooleanValue() && placement != null && entity != null)
         {

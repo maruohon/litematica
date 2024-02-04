@@ -45,9 +45,9 @@ import net.minecraft.world.chunk.Chunk;
 
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkSectionPos;
@@ -226,7 +226,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             }
 
             this.displayListEntitiesDirty = true;
-            this.renderDistanceChunks = GameUtils.getRenderDistanceChunks();
+            this.renderDistanceChunks = GameWrap.getRenderDistanceChunks();
 
             boolean vboEnabledPrevious = this.vboEnabled;
             this.vboEnabled = RenderWrap.useVbo();
@@ -254,7 +254,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                 this.setTileEntities.clear();
             }
 
-            this.viewFrustum = new ViewFrustum(world, GameUtils.getRenderDistanceChunks(), this, this.renderChunkFactory);
+            this.viewFrustum = new ViewFrustum(world, GameWrap.getRenderDistanceChunks(), this, this.renderChunkFactory);
 
             Entity entity = this.mc.getRenderViewEntity();
 
@@ -278,14 +278,14 @@ public class RenderGlobalSchematic extends RenderGlobal
     public void setupTerrain(Entity viewEntity, double partialTicks, ICamera camera, int frameCount, boolean playerSpectator)
     {
         WorldClient world = this.world;
-        GameUtils.profilerPush("setup_terrain");
+        GameWrap.profilerPush("setup_terrain");
 
-        if (this.viewFrustum == null || GameUtils.getRenderDistanceChunks() != this.renderDistanceChunks)
+        if (this.viewFrustum == null || GameWrap.getRenderDistanceChunks() != this.renderDistanceChunks)
         {
             this.loadRenderers();
         }
 
-        GameUtils.profilerPush("camera");
+        GameWrap.profilerPush("camera");
 
         double entityX = EntityWrap.getX(viewEntity);
         double entityY = EntityWrap.getY(viewEntity);
@@ -308,18 +308,18 @@ public class RenderGlobalSchematic extends RenderGlobal
             this.viewFrustum.updateChunkPositions(entityX, entityZ);
         }
 
-        GameUtils.profilerSwap("renderlist_camera");
+        GameWrap.profilerSwap("renderlist_camera");
         double x = EntityWrap.lerpX(viewEntity, (float) partialTicks);
         double y = EntityWrap.lerpY(viewEntity, (float) partialTicks);
         double z = EntityWrap.lerpZ(viewEntity, (float) partialTicks);
         this.renderContainer.initialize(x, y, z);
         y = y + (double) viewEntity.getEyeHeight();
 
-        GameUtils.profilerSwap("culling");
+        GameWrap.profilerSwap("culling");
         final int centerChunkX = MathUtils.floor(x) >> 4;
         final int centerChunkY = MathUtils.floor(y) >> 4;
         final int centerChunkZ = MathUtils.floor(z) >> 4;
-        final int renderDistance = GameUtils.getRenderDistanceChunks();
+        final int renderDistance = GameWrap.getRenderDistanceChunks();
         ChunkSectionPos viewSubChunk = new ChunkSectionPos(centerChunkX, centerChunkY, centerChunkZ);
         this.viewPosSubChunk.set(centerChunkX << 4, centerChunkY << 4, centerChunkZ << 4);
 
@@ -335,11 +335,11 @@ public class RenderGlobalSchematic extends RenderGlobal
         this.lastViewEntityPitch = EntityWrap.getPitch(viewEntity);
         this.lastViewEntityYaw = EntityWrap.getYaw(viewEntity);
 
-        GameUtils.profilerSwap("update");
+        GameWrap.profilerSwap("update");
 
         if (this.displayListEntitiesDirty)
         {
-            GameUtils.profilerPush("fetch");
+            GameWrap.profilerPush("fetch");
 
             this.displayListEntitiesDirty = false;
             this.renderInfos.clear();
@@ -370,7 +370,7 @@ public class RenderGlobalSchematic extends RenderGlobal
 
             //if (GuiBase.isCtrlDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
-            GameUtils.profilerSwap("iteration");
+            GameWrap.profilerSwap("iteration");
 
             //while (queuePositions.isEmpty() == false)
             for (int i = 0; i < this.subChunksWithinRenderRange.size(); ++i)
@@ -382,7 +382,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                 // have been already properly loaded on the client
                 if (Math.abs(subChunk.getX() - centerChunkX) <= renderDistance &&
                     Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance &&
-                    WorldUtils.isClientChunkLoaded(subChunk.getX(), subChunk.getZ(), world))
+                    WorldWrap.isClientChunkLoaded(subChunk.getX(), subChunk.getZ(), world))
                 {
                     BlockPos subChunkCornerPos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
                     RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(subChunkCornerPos);
@@ -403,10 +403,10 @@ public class RenderGlobalSchematic extends RenderGlobal
                 }
             }
 
-            GameUtils.profilerPop();
+            GameWrap.profilerPop();
         }
 
-        GameUtils.profilerSwap("rebuild_near");
+        GameWrap.profilerSwap("rebuild_near");
         Set<RenderChunkSchematicVbo> set = this.chunksToUpdate;
         this.chunksToUpdate = new LinkedHashSet<>();
 
@@ -425,20 +425,20 @@ public class RenderGlobalSchematic extends RenderGlobal
                 else
                 {
                     //if (GuiBase.isCtrlDown()) System.out.printf("====== update now\n");
-                    GameUtils.profilerPush("build_near");
+                    GameWrap.profilerPush("build_near");
 
                     this.renderDispatcher.updateChunkNow(renderChunkTmp);
                     renderChunkTmp.clearNeedsUpdate();
 
-                    GameUtils.profilerPop();
+                    GameWrap.profilerPop();
                 }
             }
         }
 
         this.chunksToUpdate.addAll(set);
 
-        GameUtils.profilerPop();
-        GameUtils.profilerPop();
+        GameWrap.profilerPop();
+        GameWrap.profilerPop();
     }
 
     @Override
@@ -483,13 +483,13 @@ public class RenderGlobalSchematic extends RenderGlobal
 
     public int renderBlockLayer(BlockRenderLayer blockLayerIn, double partialTicks, Entity entityIn)
     {
-        GameUtils.profilerPush("render_block_layer_" + blockLayerIn);
+        GameWrap.profilerPush("render_block_layer_" + blockLayerIn);
 
         RenderWrap.disableItemLighting();
 
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
-            GameUtils.profilerPush("translucent_sort");
+            GameWrap.profilerPush("translucent_sort");
             double entityX = EntityWrap.getX(entityIn);
             double entityY = EntityWrap.getY(entityIn);
             double entityZ = EntityWrap.getZ(entityIn);
@@ -514,10 +514,10 @@ public class RenderGlobalSchematic extends RenderGlobal
                 }
             }
 
-            GameUtils.profilerPop();
+            GameWrap.profilerPop();
         }
 
-        GameUtils.profilerPush("filter_empty");
+        GameWrap.profilerPush("filter_empty");
         boolean reverse = blockLayerIn == BlockRenderLayer.TRANSLUCENT;
         int startIndex = reverse ? this.renderInfos.size() - 1 : 0;
         int stopIndex = reverse ? -1 : this.renderInfos.size();
@@ -535,12 +535,12 @@ public class RenderGlobalSchematic extends RenderGlobal
             }
         }
 
-        GameUtils.profilerSwap("render");
+        GameWrap.profilerSwap("render");
 
         this.renderBlockLayer(blockLayerIn);
 
-        GameUtils.profilerPop();
-        GameUtils.profilerPop();
+        GameWrap.profilerPop();
+        GameWrap.profilerPop();
 
         return count;
     }
@@ -598,8 +598,8 @@ public class RenderGlobalSchematic extends RenderGlobal
 
     private void renderBlockOverlay(OverlayRenderType type)
     {
-        GameUtils.profilerPush("overlay_" + type.name());
-        GameUtils.profilerPush("filter_empty");
+        GameWrap.profilerPush("overlay_" + type.name());
+        GameWrap.profilerPush("filter_empty");
 
         for (int i = this.renderInfos.size() - 1; i >= 0; --i)
         {
@@ -616,12 +616,12 @@ public class RenderGlobalSchematic extends RenderGlobal
             }
         }
 
-        GameUtils.profilerSwap("render");
+        GameWrap.profilerSwap("render");
 
         this.renderBlockOverlayBuffers(type);
 
-        GameUtils.profilerPop();
-        GameUtils.profilerPop();
+        GameWrap.profilerPop();
+        GameWrap.profilerPop();
     }
 
     private void renderBlockOverlayBuffers(OverlayRenderType type)
@@ -716,8 +716,8 @@ public class RenderGlobalSchematic extends RenderGlobal
             double renderY = EntityWrap.lerpY(renderViewEntity, partialTicks);
             double renderZ = EntityWrap.lerpZ(renderViewEntity, partialTicks);
 
-            GameUtils.profilerPush("prepare");
-            TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, renderViewEntity, GameUtils.getHitResult().toVanilla(), partialTicks);
+            GameWrap.profilerPush("prepare");
+            TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, renderViewEntity, GameWrap.getHitResult().toVanilla(), partialTicks);
             this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, renderViewEntity, this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
             this.countEntitiesTotal = 0;
             this.countEntitiesRendered = 0;
@@ -731,7 +731,7 @@ public class RenderGlobalSchematic extends RenderGlobal
 
             this.countEntitiesTotal = this.world.getLoadedEntityList().size();
 
-            GameUtils.profilerSwap("regular_entities");
+            GameWrap.profilerSwap("regular_entities");
             List<Entity> entitiesMultipass = new ArrayList<>();
             BlockPos.MutBlockPos posMutable = new BlockPos.MutBlockPos();
             LayerRange layerRange = DataManager.getRenderLayerRange();
@@ -821,7 +821,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             }
             */
 
-            GameUtils.profilerSwap("block_entities");
+            GameWrap.profilerSwap("block_entities");
             RenderWrap.enableItemLighting();
 
             for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
@@ -846,7 +846,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             }
 
             this.mc.entityRenderer.disableLightmap();
-            GameUtils.profilerPop();
+            GameWrap.profilerPop();
         }
     }
 

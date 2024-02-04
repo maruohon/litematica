@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import malilib.listener.LayerRangeChangeListener;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkPos;
 import malilib.util.position.ChunkSectionPos;
@@ -30,7 +30,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public void updateBetweenX(int minX, int maxX)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        WorldClient clientWorld = GameUtils.getClientWorld();
+        WorldClient clientWorld = GameWrap.getClientWorld();
 
         if (world != null && clientWorld != null)
         {
@@ -60,7 +60,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public void updateBetweenY(int minY, int maxY)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        WorldClient clientWorld = GameUtils.getClientWorld();
+        WorldClient clientWorld = GameWrap.getClientWorld();
 
         if (world != null && clientWorld != null)
         {
@@ -83,7 +83,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public void updateBetweenZ(int minZ, int maxZ)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        WorldClient clientWorld = GameUtils.getClientWorld();
+        WorldClient clientWorld = GameWrap.getClientWorld();
 
         if (world != null && clientWorld != null)
         {
@@ -112,7 +112,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public static void markSchematicChunkForRenderUpdate(ChunkSectionPos chunkPos)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        WorldClient clientWorld = GameUtils.getClientWorld();
+        WorldClient clientWorld = GameWrap.getClientWorld();
 
         if (world != null && clientWorld != null)
         {
@@ -132,7 +132,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public static void markSchematicChunksForRenderUpdate(int chunkX, int chunkZ)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        WorldClient clientWorld = GameUtils.getClientWorld();
+        WorldClient clientWorld = GameWrap.getClientWorld();
 
         if (world != null && clientWorld != null)
         {
@@ -152,7 +152,7 @@ public class SchematicWorldRenderingNotifier implements LayerRangeChangeListener
     public static void markSchematicChunkForRenderUpdate(BlockPos pos)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        WorldClient clientWorld = GameUtils.getClientWorld();
+        WorldClient clientWorld = GameWrap.getClientWorld();
 
         if (world != null && clientWorld != null)
         {

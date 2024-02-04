@@ -18,9 +18,9 @@ import net.minecraft.world.World;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkPos;
@@ -53,7 +53,7 @@ public class SchematicEditUtils
 {
     public static boolean rebuildHandleBlockBreak()
     {
-        if (GameUtils.getClientPlayer() != null &&
+        if (GameWrap.getClientPlayer() != null &&
             DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
@@ -76,7 +76,7 @@ public class SchematicEditUtils
 
     public static boolean rebuildHandleBlockPlace()
     {
-        if (GameUtils.getClientPlayer() != null &&
+        if (GameWrap.getClientPlayer() != null &&
             DataManager.getToolMode() == ToolMode.SCHEMATIC_EDIT &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
@@ -137,7 +137,7 @@ public class SchematicEditUtils
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            Direction playerFacingH = EntityWrap.getClosestHorizontalLookingDirection(GameUtils.getClientPlayer());
+            Direction playerFacingH = EntityWrap.getClosestHorizontalLookingDirection(GameWrap.getClientPlayer());
             Direction direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
 
             // Center region
@@ -169,8 +169,8 @@ public class SchematicEditUtils
     public static boolean rebuildAcceptReplacement()
     {
         WorldSchematic schematicWorld = SchematicWorldHandler.getSchematicWorld();
-        Entity entity = GameUtils.getCameraEntity();
-        World world = GameUtils.getClientWorld();
+        Entity entity = GameWrap.getCameraEntity();
+        World world = GameWrap.getClientWorld();
         HitResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.ANY, false, 5);
 
         if (schematicWorld != null && trace != null && trace.type == HitResult.Type.BLOCK)
@@ -194,8 +194,8 @@ public class SchematicEditUtils
 
     private static boolean breakSchematicBlocks()
     {
-        Entity entity = GameUtils.getCameraEntity();
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(GameUtils.getClientWorld(), entity, 20);
+        Entity entity = GameWrap.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(GameWrap.getClientWorld(), entity, 20);
 
         if (wrapper != null)
         {
@@ -220,8 +220,8 @@ public class SchematicEditUtils
 
     private static boolean breakAllIdenticalSchematicBlocks()
     {
-        Entity entity = GameUtils.getCameraEntity();
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(GameUtils.getClientWorld(), entity, 20);
+        Entity entity = GameWrap.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(GameWrap.getClientWorld(), entity, 20);
 
         // The state can be null in 1.13+
         if (wrapper != null)
@@ -243,7 +243,7 @@ public class SchematicEditUtils
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            Direction playerFacingH = EntityWrap.getClosestHorizontalLookingDirection(GameUtils.getClientPlayer());
+            Direction playerFacingH = EntityWrap.getClosestHorizontalLookingDirection(GameWrap.getClientPlayer());
             Direction direction = PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
             BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
 
@@ -278,15 +278,15 @@ public class SchematicEditUtils
     @Nullable
     private static ReplacementInfo getTargetInfo()
     {
-        World clientWorld = GameUtils.getClientWorld();
-        EntityPlayer player = GameUtils.getClientPlayer();
+        World clientWorld = GameWrap.getClientWorld();
+        EntityPlayer player = GameWrap.getClientPlayer();
         ItemStack stack = player.getHeldItemMainhand();
 
         if ((ItemWrap.notEmpty(stack) && (stack.getItem() instanceof ItemBlock || stack.getItem() instanceof ItemBlockSpecial)) ||
             (ItemWrap.isEmpty(stack) && ToolMode.SCHEMATIC_EDIT.getPrimaryBlock() != null))
         {
             WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-            Entity entity = GameUtils.getCameraEntity();
+            Entity entity = GameWrap.getCameraEntity();
             RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(clientWorld, entity, 20, true);
 
             if (world != null && traceWrapper != null &&
@@ -340,7 +340,7 @@ public class SchematicEditUtils
             posMutable.move(direction);
 
             if (range.isPositionWithinRange(posMutable) == false ||
-                WorldUtils.isClientChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4, world) == false ||
+                WorldWrap.isClientChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4, world) == false ||
                 world.getBlockState(posMutable) != stateStart)
             {
                 posMutable.move(direction.getOpposite());
@@ -354,8 +354,8 @@ public class SchematicEditUtils
     private static boolean setTargetedSchematicBlockState(IBlockState state)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-        Entity entity = GameUtils.getCameraEntity();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(GameUtils.getClientWorld(), entity, 20, true);
+        Entity entity = GameWrap.getCameraEntity();
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(GameWrap.getClientWorld(), entity, 20, true);
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {

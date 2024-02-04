@@ -7,7 +7,7 @@ import malilib.input.ActionResult;
 import malilib.input.KeyAction;
 import malilib.input.KeyBind;
 import malilib.input.callback.HotkeyCallback;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import litematica.data.DataManager;
 import litematica.selection.AreaSelectionManager;
@@ -23,9 +23,9 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
     @Override
     public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
 
-        if (GameUtils.getClientPlayer() == null || world == null)
+        if (GameWrap.getClientPlayer() == null || world == null)
         {
             return ActionResult.FAIL;
         }
@@ -66,7 +66,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
 
                     if (grabModifier && mode == ToolMode.MOVE)
                     {
-                        Entity entity = GameUtils.getCameraEntity();
+                        Entity entity = GameWrap.getCameraEntity();
                         BlockPos pos = RayTraceUtils.getTargetedPosition(world, entity, maxDistance, false);
 
                         if (pos != null)
@@ -93,7 +93,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
             }
             else if (isToolSelect)
             {
-                Entity entity = GameUtils.getCameraEntity();
+                Entity entity = GameWrap.getCameraEntity();
 
                 if (mode.getUsesAreaSelection() || projectMode)
                 {

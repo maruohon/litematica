@@ -8,8 +8,8 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 
 import malilib.overlay.message.MessageDispatcher;
-import malilib.util.game.WorldUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.WorldWrap;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.ChunkPos;
 import malilib.util.position.LayerRange;
 import litematica.config.Configs;
@@ -42,12 +42,12 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     @Override
     public boolean canExecute()
     {
-        if (super.canExecute() == false || GameUtils.isSinglePlayer() == false)
+        if (super.canExecute() == false || GameWrap.isSinglePlayer() == false)
         {
             return false;
         }
 
-        World world = WorldUtils.getBestWorld();
+        World world = WorldWrap.getBestWorld();
         return world != null && world.isRemote == false;
     }
 
@@ -55,8 +55,8 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     public boolean execute()
     {
         WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        WorldClient worldClient = GameUtils.getClientWorld();
-        World world = WorldUtils.getBestWorld();
+        WorldClient worldClient = GameWrap.getClientWorld();
+        World world = WorldWrap.getBestWorld();
         int processed = 0;
 
         this.sortChunkList();

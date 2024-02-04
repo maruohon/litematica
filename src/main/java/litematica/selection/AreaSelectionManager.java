@@ -22,7 +22,7 @@ import malilib.util.FileNameUtils;
 import malilib.util.FileUtils;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
 import malilib.util.position.PositionUtils;
@@ -499,9 +499,9 @@ public class AreaSelectionManager
 
             if (movingCorner || movingOrigin)
             {
-                Entity entity = GameUtils.getCameraEntity();
+                Entity entity = GameWrap.getCameraEntity();
                 // TODO: Add a new ray trace method that internally fetches the entity, either the camera or the player, depending on some config option
-                BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
+                BlockPos pos = RayTraceUtils.getTargetedPosition(GameWrap.getClientWorld(), entity, maxDistance, true);
 
                 if (pos == null)
                 {
@@ -561,8 +561,8 @@ public class AreaSelectionManager
         {
             if (selection.isOriginSelected())
             {
-                Entity entity = GameUtils.getCameraEntity();
-                BlockPos newOrigin = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
+                Entity entity = GameWrap.getCameraEntity();
+                BlockPos newOrigin = RayTraceUtils.getTargetedPosition(GameWrap.getClientWorld(), entity, maxDistance, true);
 
                 if (newOrigin != null)
                 {
@@ -588,8 +588,8 @@ public class AreaSelectionManager
 
         if (area != null && area.getSelectedSelectionBox() != null)
         {
-            Entity entity = GameUtils.getCameraEntity();
-            BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
+            Entity entity = GameWrap.getCameraEntity();
+            BlockPos pos = RayTraceUtils.getTargetedPosition(GameWrap.getClientWorld(), entity, maxDistance, true);
 
             if (pos != null)
             {
@@ -605,8 +605,8 @@ public class AreaSelectionManager
 
         if (sel != null && sel.getSelectedSelectionBox() != null)
         {
-            Entity entity = GameUtils.getCameraEntity();
-            BlockPos pos = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, maxDistance, true);
+            Entity entity = GameWrap.getCameraEntity();
+            BlockPos pos = RayTraceUtils.getTargetedPosition(GameWrap.getClientWorld(), entity, maxDistance, true);
 
             if (pos != null)
             {

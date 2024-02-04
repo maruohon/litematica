@@ -31,9 +31,9 @@ import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.EnabledCondition;
 import malilib.util.game.BlockUtils;
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
@@ -111,7 +111,7 @@ public class OverlayRenderer
 
     public void renderBoxes(RenderContext ctx, float partialTicks)
     {
-        Entity renderViewEntity = GameUtils.getCameraEntity();
+        Entity renderViewEntity = GameWrap.getCameraEntity();
         AreaSelectionManager sm = DataManager.getAreaSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         boolean renderAreas = currentSelection != null && Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue();
@@ -326,7 +326,7 @@ public class OverlayRenderer
                 if (list.isEmpty() == false)
                 {
                     List<BlockPairTypePosition> posList = verifier.getClosestSelectedPositions(cameraPos);
-                    Entity entity = GameUtils.getCameraEntity();
+                    Entity entity = GameWrap.getCameraEntity();
                     BlockPairTypePosition lookPos = RayTraceUtils.traceToVerifierResultPositions(posList, entity, 128);
                     this.renderSchematicMismatches(list, lookPos, partialTicks, ctx);
                 }
@@ -345,7 +345,7 @@ public class OverlayRenderer
 
         RenderWrap.lineWidth(2f);
 
-        Entity entity = GameUtils.getCameraEntity();
+        Entity entity = GameWrap.getCameraEntity();
         BlockPairTypePosition lookedEntry = null;
         BlockPairTypePosition prevEntry = null;
         long lookPosLong = lookPos != null ? lookPos.posLong : -1;
@@ -423,9 +423,9 @@ public class OverlayRenderer
 
     public void renderHoverInfo(RenderContext ctx)
     {
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
 
-        if (world != null && GameUtils.getClientPlayer() != null)
+        if (world != null && GameWrap.getClientPlayer() != null)
         {
             boolean infoOverlayKeyActive = Hotkeys.RENDER_BLOCK_INFO_OVERLAY.getKeyBind().isKeyBindHeld();
             boolean verifierOverlayRendered = false;
@@ -443,7 +443,7 @@ public class OverlayRenderer
 
             if (renderBlockInfoLines || renderInfoOverlay)
             {
-                Entity entity = GameUtils.getCameraEntity();
+                Entity entity = GameWrap.getCameraEntity();
                 traceWrapper = RayTraceUtils.getGenericTrace(world, entity, 10, true);
             }
 
@@ -497,7 +497,7 @@ public class OverlayRenderer
 
             for (SchematicVerifier verifier : activeVerifiers)
             {
-                Entity entity = GameUtils.getCameraEntity();
+                Entity entity = GameWrap.getCameraEntity();
                 List<BlockPairTypePosition> posList = verifier.getClosestSelectedPositions(cameraPos);
                 BlockPairTypePosition lookPos = RayTraceUtils.traceToVerifierResultPositions(posList, entity, 32);
 
@@ -510,7 +510,7 @@ public class OverlayRenderer
                     widget.renderAt(this.blockInfoX, this.blockInfoY, 0, new ScreenContext(0, 0, 0, false));
 
                     World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-                    World worldClient = WorldUtils.getBestWorld();
+                    World worldClient = WorldWrap.getBestWorld();
                     BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
                     RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic,
                                                         worldClient, lookPos.getBlockPos());
@@ -527,8 +527,8 @@ public class OverlayRenderer
     {
         IBlockState air = Blocks.AIR.getDefaultState();
         World schematicWorld = SchematicWorldHandler.getSchematicWorld();
-        World clientWorld = GameUtils.getClientWorld();
-        World bestWorld = WorldUtils.getBestWorld();
+        World clientWorld = GameWrap.getClientWorld();
+        World bestWorld = WorldWrap.getBestWorld();
         BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
 
         IBlockState stateClient = clientWorld.getBlockState(pos);
@@ -605,7 +605,7 @@ public class OverlayRenderer
     {
         this.blockInfoLines.clear();
 
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
         BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
         IBlockState stateClient = world.getBlockState(pos);
         stateClient = stateClient.getActualState(world, pos);
@@ -645,8 +645,8 @@ public class OverlayRenderer
     public void renderSchematicRebuildTargetingOverlay(float partialTicks, RenderContext ctx)
     {
         RayTraceWrapper traceWrapper = null;
-        Entity entity = GameUtils.getCameraEntity();
-        World world = GameUtils.getClientWorld();
+        Entity entity = GameWrap.getCameraEntity();
+        World world = GameWrap.getClientWorld();
         Color4f color = null;
         boolean direction = false;
 
@@ -705,8 +705,8 @@ public class OverlayRenderer
 
     public void renderHoveredSchematicBlock(RenderContext ctx, float tickDelta)
     {
-        Minecraft mc = GameUtils.getClient();
-        HitResult hitResult = GameUtils.getHitResult();
+        Minecraft mc = GameWrap.getClient();
+        HitResult hitResult = GameWrap.getHitResult();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
         if (hitResult.type == HitResult.Type.BLOCK && worldSchematic != null)
@@ -717,7 +717,7 @@ public class OverlayRenderer
 
             if (stateClient != stateSchematic && stateClient.getMaterial() != Material.AIR)
             {
-                Entity entity = GameUtils.getCameraEntity();
+                Entity entity = GameWrap.getCameraEntity();
                 double dx = EntityWrap.lerpX(entity, tickDelta);
                 double dy = EntityWrap.lerpY(entity, tickDelta);
                 double dz = EntityWrap.lerpZ(entity, tickDelta);

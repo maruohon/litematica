@@ -26,8 +26,8 @@ import malilib.gui.widget.util.DirectoryCache;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
 import malilib.util.data.json.JsonUtils;
-import malilib.util.game.WorldUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.WorldWrap;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.LayerRange;
@@ -385,7 +385,7 @@ public class DataManager implements DirectoryCache
     private static String getStorageFileName(boolean globalData)
     {
         return globalData ? "data_common.json" : "data_dim_" +
-                            WorldUtils.getDimensionIdAsString(GameUtils.getClientWorld()) + ".json";
+                            WorldWrap.getDimensionIdAsString(GameWrap.getClientWorld()) + ".json";
     }
 
     public static void setToolItem(String itemNameIn)
@@ -444,7 +444,7 @@ public class DataManager implements DirectoryCache
 
     public static void setHeldItemAsTool()
     {
-        EntityPlayer player = GameUtils.getClientPlayer();
+        EntityPlayer player = GameWrap.getClientPlayer();
 
         if (player != null)
         {

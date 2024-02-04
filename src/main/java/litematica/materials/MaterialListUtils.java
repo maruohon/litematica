@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import malilib.gui.BaseScreen;
 import malilib.gui.StringListSelectionScreen;
 import malilib.util.data.ItemType;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.inventory.InventoryUtils;
 import malilib.util.position.Vec3i;
@@ -99,7 +99,7 @@ public class MaterialListUtils
             convertStatesToStacks(countsMissing, itemTypesMissing, cache);
             convertStatesToStacks(countsMismatch, itemTypesMismatch, cache);
 
-            IInventory playerInv = GameUtils.getPlayerInventory();
+            IInventory playerInv = GameWrap.getPlayerInventory();
             Object2IntOpenHashMap<ItemType> playerInvItems = playerInv != null ? InventoryUtils.getInventoryItemCounts(playerInv) : new Object2IntOpenHashMap<>();
 
             for (ItemType type : itemTypesTotal.keySet())
@@ -146,7 +146,7 @@ public class MaterialListUtils
 
     public static void updateAvailableCounts(List<MaterialListEntry> list)
     {
-        Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(GameUtils.getClientPlayer().inventory);
+        Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(GameWrap.getClientPlayer().inventory);
 
         for (MaterialListEntry entry : list)
         {

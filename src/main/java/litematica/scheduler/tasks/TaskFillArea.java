@@ -11,7 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 
 import malilib.overlay.message.MessageDispatcher;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkPos;
@@ -84,7 +84,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     @Override
     protected boolean canProcessChunk(ChunkPos pos)
     {
-        return GameUtils.getClientPlayer() != null &&
+        return GameWrap.getClientPlayer() != null &&
                this.areSurroundingChunksLoaded(pos, this.worldClient, 1);
     }
 
@@ -93,7 +93,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (this.isClientWorld && this.chunkCount == 0)
         {
-            GameUtils.sendCommand("/gamerule sendCommandFeedback false");
+            GameWrap.sendCommand("/gamerule sendCommandFeedback false");
         }
 
         for (IntBoundingBox box : this.getBoxesInChunk(pos))
@@ -172,14 +172,14 @@ public class TaskFillArea extends TaskProcessChunkBase
                         box.minX               , box.minY               , box.minZ,
                         box.maxX - box.minX + 1, box.maxY - box.minY + 1, box.maxZ - box.minZ + 1);
 
-                GameUtils.sendCommand(killCmd);
+                GameWrap.sendCommand(killCmd);
             }
         }
 
         String fillCmd = String.format("/fill %d %d %d %d %d %d %s",
                 box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, this.blockString);
 
-        GameUtils.sendCommand(fillCmd);
+        GameWrap.sendCommand(fillCmd);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class TaskFillArea extends TaskProcessChunkBase
 
         if (this.isClientWorld)
         {
-            GameUtils.sendCommand("/gamerule sendCommandFeedback true");
+            GameWrap.sendCommand("/gamerule sendCommandFeedback true");
         }
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);

@@ -11,7 +11,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
@@ -116,7 +116,7 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
 
     protected boolean canProcessChunk(ChunkPos pos, WorldSchematic worldSchematic, WorldClient worldClient)
     {
-        if (WorldUtils.isClientChunkLoaded(pos.x, pos.z, worldSchematic) == false ||
+        if (WorldWrap.isClientChunkLoaded(pos.x, pos.z, worldSchematic) == false ||
             DataManager.getSchematicPlacementManager().hasPendingRebuildForChunk(pos.x, pos.z))
         {
             return false;

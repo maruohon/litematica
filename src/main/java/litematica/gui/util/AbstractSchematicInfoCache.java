@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 
 import malilib.util.data.Identifier;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import litematica.schematic.SchematicMetadata;
 
 public abstract class AbstractSchematicInfoCache<T>
@@ -44,7 +44,7 @@ public abstract class AbstractSchematicInfoCache<T>
         {
             if (info != null && info.texture != null)
             {
-                GameUtils.getClient().getTextureManager().deleteTexture(info.iconName);
+                GameWrap.getClient().getTextureManager().deleteTexture(info.iconName);
             }
         }
 
@@ -68,7 +68,7 @@ public abstract class AbstractSchematicInfoCache<T>
                     //buf.setRGB(0, 0, size, size, previewImageData, 0, size);
 
                     DynamicTexture tex = new DynamicTexture(size, size);
-                    GameUtils.getClient().getTextureManager().loadTexture(iconName, tex);
+                    GameWrap.getClient().getTextureManager().loadTexture(iconName, tex);
 
                     System.arraycopy(previewImageData, 0, tex.getTextureData(), 0, previewImageData.length);
                     tex.updateDynamicTexture();

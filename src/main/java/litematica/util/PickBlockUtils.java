@@ -22,7 +22,7 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.registry.Registry;
 import malilib.util.game.PlacementUtils;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.inventory.InventoryUtils;
 import malilib.util.position.BlockPos;
@@ -96,9 +96,9 @@ public class PickBlockUtils
      */
     public static boolean pickBlockFirst()
     {
-        double reach = GameUtils.getPlayerReachDistance();
-        Entity entity = GameUtils.getCameraEntity();
-        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(GameUtils.getClientWorld(), entity, reach);
+        double reach = GameWrap.getPlayerReachDistance();
+        Entity entity = GameWrap.getCameraEntity();
+        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(GameWrap.getClientWorld(), entity, reach);
 
         if (pos != null)
         {
@@ -112,14 +112,14 @@ public class PickBlockUtils
     @Nullable
     public static EnumHand pickBlockLast()
     {
-        World world = GameUtils.getClientWorld();
+        World world = GameWrap.getClientWorld();
         BlockPos pos = Registry.BLOCK_PLACEMENT_POSITION_HANDLER.getCurrentPlacementPosition();
 
         // No overrides by other mods
         if (pos == null)
         {
-            double reach = GameUtils.getPlayerReachDistance();
-            Entity entity = GameUtils.getCameraEntity();
+            double reach = GameWrap.getPlayerReachDistance();
+            Entity entity = GameWrap.getCameraEntity();
             pos = RayTraceUtils.getPickBlockLastTrace(world, entity, reach, true);
         }
 
@@ -134,7 +134,7 @@ public class PickBlockUtils
     @Nullable
     public static EnumHand doPickBlockForStack(ItemStack stack)
     {
-        EntityPlayer player = GameUtils.getClientPlayer();
+        EntityPlayer player = GameWrap.getClientPlayer();
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
         EnumHand hand = EntityWrap.getUsedHandForItem(player, stack, ignoreNbt);
 
@@ -162,18 +162,18 @@ public class PickBlockUtils
 
         if (ItemWrap.notEmpty(stack))
         {
-            EnumHand hand = EntityWrap.getUsedHandForItem(GameUtils.getClientPlayer(), stack, ignoreNbt);
+            EnumHand hand = EntityWrap.getUsedHandForItem(GameWrap.getClientPlayer(), stack, ignoreNbt);
 
             if (hand == null)
             {
-                if (GameUtils.isCreativeMode() && BaseScreen.isCtrlDown())
+                if (GameWrap.isCreativeMode() && BaseScreen.isCtrlDown())
                 {
                     TileEntity te = world.getTileEntity(pos);
 
                     // The creative mode pick block with NBT only works correctly
                     // if the server world doesn't have a TileEntity in that position.
                     // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (te != null && GameUtils.getClientWorld().isAirBlock(pos))
+                    if (te != null && GameWrap.getClientWorld().isAirBlock(pos))
                     {
                         stack = stack.copy();
                         ItemUtils.storeBlockEntityInStack(stack, te);
@@ -278,10 +278,10 @@ public class PickBlockUtils
             return false;
         }
 
-        EntityPlayer player = GameUtils.getClientPlayer();
-        InventoryPlayer inventory = GameUtils.getPlayerInventory();
-        Container container = GameUtils.getCurrentInventoryContainer();
-        boolean isCreativeMode = GameUtils.isCreativeMode();
+        EntityPlayer player = GameWrap.getClientPlayer();
+        InventoryPlayer inventory = GameWrap.getPlayerInventory();
+        Container container = GameWrap.getCurrentInventoryContainer();
+        boolean isCreativeMode = GameWrap.isCreativeMode();
         int slotWithItem = InventoryUtils.findSlotWithItemToPickBlock(container, stack, ignoreNbt);
 
         if (slotWithItem == -1 && Configs.Generic.PICK_BLOCK_SHULKER_BOXES.getBooleanValue())
@@ -343,7 +343,7 @@ public class PickBlockUtils
 
             InventoryUtils.setSelectedHotbarSlot(hotbarSlot);
             inventory.mainInventory.set(hotbarSlot, stack.copy());
-            GameUtils.getInteractionManager().sendSlotPacket(stack.copy(), slotNum);
+            GameWrap.getInteractionManager().sendSlotPacket(stack.copy(), slotNum);
 
             return true;
         }

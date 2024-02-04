@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 import malilib.listener.TaskCompletionListener;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.HitResult;
 import malilib.util.position.LayerRange;
@@ -48,9 +48,9 @@ public class ToolUtils
     public static void setToolModeBlockState(ToolMode mode, boolean primary)
     {
         IBlockState state = Blocks.AIR.getDefaultState();
-        Entity entity = GameUtils.getCameraEntity();
-        World world = GameUtils.getClientWorld();
-        double reach = GameUtils.getInteractionManager().getBlockReachDistance();
+        Entity entity = GameWrap.getCameraEntity();
+        World world = GameWrap.getClientWorld();
+        double reach = GameWrap.getInteractionManager().getBlockReachDistance();
         RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(world, entity, reach, true);
 
         if (wrapper != null)
@@ -84,7 +84,7 @@ public class ToolUtils
 
     public static void fillSelectionVolumes(IBlockState state, @Nullable IBlockState stateToReplace)
     {
-        if (GameUtils.getClientPlayer() != null && GameUtils.isCreativeMode())
+        if (GameWrap.getClientPlayer() != null && GameWrap.isCreativeMode())
         {
             final AreaSelection area = DataManager.getAreaSelectionManager().getCurrentSelection();
 
@@ -144,7 +144,7 @@ public class ToolUtils
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities,
                                               @Nullable TaskCompletionListener listener)
     {
-        if (GameUtils.getClientPlayer() != null && GameUtils.isCreativeMode())
+        if (GameWrap.getClientPlayer() != null && GameWrap.isCreativeMode())
         {
             if (area == null)
             {
@@ -202,7 +202,7 @@ public class ToolUtils
 
     public static void updateSelectionVolumes(@Nullable final AreaSelection area)
     {
-        if (GameUtils.getClientPlayer() != null && GameUtils.isCreativeMode() && GameUtils.isSinglePlayer())
+        if (GameWrap.getClientPlayer() != null && GameWrap.isCreativeMode() && GameWrap.isSinglePlayer())
         {
             if (area == null)
             {
@@ -244,7 +244,7 @@ public class ToolUtils
 
     public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos)
     {
-        if (GameUtils.isCreativeMode() == false)
+        if (GameWrap.isCreativeMode() == false)
         {
             MessageDispatcher.error("litematica.error.generic.creative_mode_only");
             return;
@@ -310,7 +310,7 @@ public class ToolUtils
         LayerRange range = DataManager.getRenderLayerRange().copy();
         TaskBase taskPaste;
 
-        if (GameUtils.isSinglePlayer())
+        if (GameWrap.isSinglePlayer())
         {
             taskPaste = new TaskPasteSchematicDirect(placement, range);
         }
@@ -370,8 +370,8 @@ public class ToolUtils
         }
         else
         {
-            Entity entity = GameUtils.getCameraEntity();
-            origin = RayTraceUtils.getTargetedPosition(GameUtils.getClientWorld(), entity, 6, false);
+            Entity entity = GameWrap.getCameraEntity();
+            origin = RayTraceUtils.getTargetedPosition(GameWrap.getClientWorld(), entity, 6, false);
 
             if (origin == null)
             {
@@ -388,7 +388,7 @@ public class ToolUtils
         manager.addSchematicPlacement(placement, false);
         manager.setSelectedSchematicPlacement(placement);
 
-        if (GameUtils.isCreativeMode())
+        if (GameWrap.isCreativeMode())
         {
             DataManager.setToolMode(ToolMode.PASTE_SCHEMATIC);
         }

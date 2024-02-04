@@ -29,9 +29,9 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.util.data.EnabledCondition;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.RayTraceUtils.RayTraceFluidHandling;
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockMirror;
 import malilib.util.position.BlockPos;
 import malilib.util.position.BlockRotation;
@@ -141,7 +141,7 @@ public class SchematicPlacementManager
         //System.out.printf("processQueuedChunks, size: %d\n", this.chunksToRebuild.size());
         if (this.chunksToRebuild.isEmpty() == false)
         {
-            WorldClient clientWorld = GameUtils.getClientWorld();
+            WorldClient clientWorld = GameWrap.getClientWorld();
 
             if (clientWorld == null)
             {
@@ -171,20 +171,20 @@ public class SchematicPlacementManager
                 int chunkZ = malilib.util.position.PositionUtils.getChunkPosZ(chunkPosLong);
 
                 if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() ||
-                    WorldUtils.isClientChunkLoaded(chunkX, chunkZ, clientWorld))
+                    WorldWrap.isClientChunkLoaded(chunkX, chunkZ, clientWorld))
                 {
                     // Wipe the old chunk if it exists
-                    if (WorldUtils.isClientChunkLoaded(chunkX, chunkZ, schematicWorld))
+                    if (WorldWrap.isClientChunkLoaded(chunkX, chunkZ, schematicWorld))
                     {
                         //System.out.printf("wiping chunk at %s\n", pos);
                         this.unloadSchematicChunk(schematicWorld, chunkX, chunkZ);
                     }
 
                     //System.out.printf("loading chunk at %s\n", pos);
-                    WorldUtils.loadClientChunk(chunkX, chunkZ, schematicWorld);
+                    WorldWrap.loadClientChunk(chunkX, chunkZ, schematicWorld);
                 }
 
-                if (WorldUtils.isClientChunkLoaded(chunkX, chunkZ, schematicWorld))
+                if (WorldWrap.isClientChunkLoaded(chunkX, chunkZ, schematicWorld))
                 {
                     //System.out.printf("placing at %s\n", pos);
                     List<SchematicPlacement> placements = this.placementsTouchingChunk.get(chunkPosLong);
@@ -239,12 +239,12 @@ public class SchematicPlacementManager
 
     protected void unloadSchematicChunk(WorldSchematic worldSchematic, int chunkX, int chunkZ)
     {
-        if (WorldUtils.isClientChunkLoaded(chunkX, chunkZ, worldSchematic))
+        if (WorldWrap.isClientChunkLoaded(chunkX, chunkZ, worldSchematic))
         {
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
             worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4) - 1 ,   0, (chunkZ << 4) - 1,
                                                          (chunkX << 4) + 16, 256, (chunkZ << 4) + 16);
-            WorldUtils.unloadClientChunk(chunkX, chunkZ, worldSchematic);
+            WorldWrap.unloadClientChunk(chunkX, chunkZ, worldSchematic);
         }
     }
 
@@ -1034,8 +1034,8 @@ public class SchematicPlacementManager
 
         if (schematicPlacement != null)
         {
-            Entity entity = GameUtils.getCameraEntity();
-            HitResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(GameUtils.getClientWorld(), entity, RayTraceFluidHandling.NONE, false, maxDistance);
+            Entity entity = GameWrap.getCameraEntity();
+            HitResult trace = malilib.util.game.RayTraceUtils.getRayTraceFromEntity(GameWrap.getClientWorld(), entity, RayTraceFluidHandling.NONE, false, maxDistance);
 
             if (trace.type != HitResult.Type.BLOCK)
             {
@@ -1045,7 +1045,7 @@ public class SchematicPlacementManager
             BlockPos pos = trace.blockPos;
 
             // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
-            if (GameUtils.getClientPlayer().isSneaking() == false)
+            if (GameWrap.getClientPlayer().isSneaking() == false)
             {
                 pos = pos.offset(trace.side);
             }

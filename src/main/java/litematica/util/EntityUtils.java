@@ -16,7 +16,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.NbtWrap;
 import litematica.data.DataManager;
@@ -32,7 +32,7 @@ public class EntityUtils
     {
         // If the configured tool item has NBT data, then the NBT is compared, otherwise it's ignored
 
-        EntityLivingBase entity = GameUtils.getClientPlayer();
+        EntityLivingBase entity = GameWrap.getClientPlayer();
         ItemStack toolItem = DataManager.getToolItem();
 
         if (ItemWrap.isEmpty(toolItem))
@@ -58,7 +58,7 @@ public class EntityUtils
 
     public static boolean setFakedSneakingState(boolean sneaking)
     {
-        EntityPlayerSP player = GameUtils.getClientPlayer();
+        EntityPlayerSP player = GameWrap.getClientPlayer();
 
         if (player != null && player.isSneaking() != sneaking)
         {

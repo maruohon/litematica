@@ -15,7 +15,7 @@ import net.minecraft.util.BlockRenderLayer;
 
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import litematica.Litematica;
 import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
@@ -54,7 +54,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Batching chunks");
-                GameUtils.getClient().crashed(GameUtils.getClient().addGraphicsAndWorldToCrashReport(crashreport));
+                GameWrap.getClient().crashed(GameWrap.getClient().addGraphicsAndWorldToCrashReport(crashreport));
                 return;
             }
         }
@@ -83,7 +83,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             generator.getLock().unlock();
         }
 
-        Entity entity = GameUtils.getCameraEntity();
+        Entity entity = GameWrap.getCameraEntity();
 
         if (entity == null)
         {
@@ -223,7 +223,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
                     if ((throwable instanceof CancellationException) == false && (throwable instanceof InterruptedException) == false)
                     {
-                        GameUtils.getClient().crashed(CrashReport.makeCrashReport(throwable, "Rendering Litematica chunk"));
+                        GameWrap.getClient().crashed(CrashReport.makeCrashReport(throwable, "Rendering Litematica chunk"));
                     }
                 }
             });

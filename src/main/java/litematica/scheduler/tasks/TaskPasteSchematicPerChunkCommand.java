@@ -19,7 +19,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkPos;
@@ -62,7 +62,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (this.sentCommandsTotal == 0)
         {
-            GameUtils.getClientPlayer().sendChatMessage("/gamerule sendCommandFeedback false");
+            GameWrap.sendChatMessage("/gamerule sendCommandFeedback false");
         }
 
         while (this.chunks.isEmpty() == false)
@@ -193,7 +193,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                         continue;
                     }
 
-                    this.sendSetBlockCommand(posMutable.getX(), posMutable.getY(), posMutable.getZ(), stateSchematicOrig, player);
+                    this.sendSetBlockCommand(posMutable.getX(), posMutable.getY(), posMutable.getZ(), stateSchematicOrig);
 
                     if (++this.sentCommandsThisTick >= this.maxCommandsPerTick)
                     {
@@ -205,7 +205,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (this.currentIndex >= this.boxVolume)
         {
-            this.summonEntities(box, worldSchematic, player);
+            this.summonEntities(box, worldSchematic);
             this.boxInProgress = false;
 
             return true;
@@ -214,7 +214,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         return false;
     }
 
-    private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, EntityPlayerSP player)
+    private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic)
     {
         AxisAlignedBB bb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
         List<Entity> entities = worldSchematic.getEntitiesWithinAABBExcludingEntity(null, bb);
@@ -241,12 +241,12 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                 System.out.printf("nbt: %s\n", nbtString);
                 */
 
-                player.sendChatMessage(strCommand);
+                GameWrap.sendChatMessage(strCommand);
             }
         }
     }
 
-    private void sendSetBlockCommand(int x, int y, int z, IBlockState state, EntityPlayerSP player)
+    private void sendSetBlockCommand(int x, int y, int z, IBlockState state)
     {
         Block block = state.getBlock();
         String blockName = RegistryUtils.getBlockIdStr(block);
@@ -259,7 +259,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         String cmdName = Configs.Generic.COMMAND_NAME_SETBLOCK.getValue();
         String strCommand = String.format("/%s %d %d %d %s %d", cmdName, x, y, z, blockName, block.getMetaFromState(state));
 
-        player.sendChatMessage(strCommand);
+        GameWrap.sendChatMessage(strCommand);
         ++this.sentCommandsTotal;
     }
 
@@ -278,7 +278,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             MessageDispatcher.error().screenOrActionbar().translate("litematica.message.error.schematic_paste_failed");
         }
 
-        GameUtils.sendCommand("/gamerule sendCommandFeedback true");
+        GameWrap.sendCommand("/gamerule sendCommandFeedback true");
 
         super.stop();
     }

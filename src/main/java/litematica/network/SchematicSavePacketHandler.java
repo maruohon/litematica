@@ -15,7 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import malilib.network.PacketSplitter;
 import malilib.network.message.BasePacketHandler;
 import malilib.overlay.message.MessageDispatcher;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.NbtWrap;
 import malilib.util.nbt.NbtUtils;
 import litematica.scheduler.TaskScheduler;
@@ -93,7 +93,7 @@ public class SchematicSavePacketHandler extends BasePacketHandler
                                         String saveMethod,
                                         Consumer<ISchematic> listener)
     {
-        NetHandlerPlayClient handler = GameUtils.getClient().getConnection();
+        NetHandlerPlayClient handler = GameWrap.getClient().getConnection();
         UUID taskId = UUID.randomUUID();
 
         if (handler != null && this.sendSaveRequestPacket(selection, settings, taskId, saveMethod, handler))

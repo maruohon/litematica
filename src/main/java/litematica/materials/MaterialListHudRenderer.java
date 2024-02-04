@@ -20,7 +20,7 @@ import malilib.render.buffer.VertexBuilder;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.ItemType;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.RenderWrap;
 import malilib.util.inventory.InventoryScreenUtils;
 import litematica.config.Configs;
@@ -74,7 +74,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     {
         long currentTime = System.nanoTime();
 
-        if (currentTime - this.lastUpdateTime > refreshInterval * 1000000L && GameUtils.getClientPlayer() != null)
+        if (currentTime - this.lastUpdateTime > refreshInterval * 1000000L && GameWrap.getClientPlayer() != null)
         {
             MaterialListUtils.updateAvailableCounts(this.materialList.getAllMaterials());
             List<MaterialListEntry> list = this.materialList.getMissingMaterials(true);
@@ -95,7 +95,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             return 0;
         }
 
-        FontRenderer font = GameUtils.getClient().fontRenderer;
+        FontRenderer font = GameWrap.getClient().fontRenderer;
         final double scale = Configs.InfoOverlays.MATERIAL_LIST_HUD_SCALE.getDoubleValue();
         final int maxLines = Configs.InfoOverlays.MATERIAL_LIST_HUD_MAX_LINES.getIntegerValue();
         int bgMargin = 2;
@@ -145,7 +145,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         }
 
         posY = GuiUtils.getHudPosY(posY, yOffset, contentHeight, scale, alignment);
-        posY += GuiUtils.getHudOffsetForPotions(alignment, scale, GameUtils.getClientPlayer());
+        posY += GuiUtils.getHudOffsetForPotions(alignment, scale, GameWrap.getClientPlayer());
 
         if (scale != 1d)
         {
@@ -209,7 +209,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         for (int i = 0; i < size; ++i)
         {
-            GameUtils.getClient().getRenderItem().renderItemAndEffectIntoGUI(GameUtils.getClientPlayer(), list.get(i).getStack(), x, y);
+            GameWrap.getClient().getRenderItem().renderItemAndEffectIntoGUI(GameWrap.getClientPlayer(), list.get(i).getStack(), x, y);
             y += lineHeight;
         }
 

@@ -28,7 +28,7 @@ import malilib.overlay.message.MessageDispatcher;
 import malilib.util.StringUtils;
 import malilib.util.data.ResultingStringConsumer;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.nbt.NbtUtils;
 import malilib.util.position.BlockPos;
 import malilib.util.position.IntBoundingBox;
@@ -137,7 +137,7 @@ public class SchematicCreationUtils
     public static void setSchematicMetadataOnCreation(ISchematic schematic, String schematicName)
     {
         long time = System.currentTimeMillis();
-        schematic.getMetadata().setAuthor(GameUtils.getPlayerName());
+        schematic.getMetadata().setAuthor(GameWrap.getPlayerName());
         schematic.getMetadata().setName(schematicName);
         schematic.getMetadata().setTimeCreated(time);
         schematic.getMetadata().setTimeModified(time);

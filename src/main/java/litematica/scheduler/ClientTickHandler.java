@@ -1,7 +1,7 @@
 package litematica.scheduler;
 
 import malilib.gui.util.GuiUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import litematica.data.DataManager;
 import litematica.schematic.verifier.SchematicVerifierManager;
 import litematica.util.EasyPlaceUtils;
@@ -13,12 +13,12 @@ public class ClientTickHandler implements malilib.event.ClientTickHandler
     @Override
     public void onClientTick()
     {
-        if (GameUtils.getClientPlayer() == null || GameUtils.getClientWorld() == null)
+        if (GameWrap.getClientPlayer() == null || GameWrap.getClientWorld() == null)
         {
             return;
         }
 
-        DataManager.getRenderLayerRange().followPlayerIfEnabled(GameUtils.getClientPlayer());
+        DataManager.getRenderLayerRange().followPlayerIfEnabled(GameWrap.getClientPlayer());
         DataManager.getSchematicPlacementManager().processQueuedChunks();
         TaskScheduler.getInstanceClient().runTasks();
 

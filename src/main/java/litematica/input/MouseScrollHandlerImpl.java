@@ -6,7 +6,7 @@ import malilib.gui.util.GuiUtils;
 import malilib.input.MouseScrollHandler;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
 import litematica.config.Configs;
@@ -30,8 +30,8 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
                               Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
         if (GuiUtils.isScreenOpen() ||
-            GameUtils.getClientWorld() == null ||
-            GameUtils.getClientPlayer() == null ||
+            GameWrap.getClientWorld() == null ||
+            GameWrap.getClientPlayer() == null ||
             deltaY == 0 ||
             toolEnabled == false ||
             EntityUtils.hasToolItem() == false)
@@ -41,7 +41,7 @@ public class MouseScrollHandlerImpl implements MouseScrollHandler
 
         final int amount = deltaY > 0 ? 1 : -1;
         ToolMode mode = DataManager.getToolMode();
-        Entity cameraEntity = GameUtils.getCameraEntity();
+        Entity cameraEntity = GameWrap.getCameraEntity();
         Direction direction = EntityWrap.getClosestLookingDirection(cameraEntity);
 
         if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())

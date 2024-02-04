@@ -3,8 +3,8 @@ package litematica.scheduler.tasks;
 import net.minecraft.world.WorldServer;
 
 import malilib.overlay.message.MessageDispatcher;
-import malilib.util.game.WorldUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.WorldWrap;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.LayerRange;
 import litematica.schematic.placement.SchematicPlacement;
 import litematica.schematic.util.SchematicPlacingUtils;
@@ -24,15 +24,15 @@ public class TaskPasteSchematicDirect extends TaskBase
     public boolean canExecute()
     {
         return this.placement.isValid() && this.placement.isSchematicLoaded() &&
-               GameUtils.getClientWorld() != null &&
-               GameUtils.getClientPlayer() != null &&
-               GameUtils.isSinglePlayer();
+               GameWrap.getClientWorld() != null &&
+               GameWrap.getClientPlayer() != null &&
+               GameWrap.isSinglePlayer();
     }
 
     @Override
     public boolean execute()
     {
-        WorldServer world = WorldUtils.getServerWorldForClientWorld();
+        WorldServer world = WorldWrap.getServerWorldForClientWorld();
 
         if (world != null && SchematicPlacingUtils.placeToWorld(this.placement, world, this.range, false))
         {

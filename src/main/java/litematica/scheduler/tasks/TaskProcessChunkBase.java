@@ -12,8 +12,8 @@ import net.minecraft.world.World;
 
 import malilib.config.value.LayerMode;
 import malilib.util.StringUtils;
-import malilib.util.game.WorldUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.WorldWrap;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
 import malilib.util.position.LayerRange;
@@ -33,8 +33,8 @@ public abstract class TaskProcessChunkBase extends TaskBase
     {
         super();
 
-        this.worldClient = GameUtils.getClientWorld();
-        this.world = WorldUtils.getBestWorld();
+        this.worldClient = GameWrap.getClientWorld();
+        this.world = WorldWrap.getBestWorld();
         this.isClientWorld = (this.world == this.mc.world);
         this.name = StringUtils.translate(nameOnHud);
 

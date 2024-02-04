@@ -1,7 +1,5 @@
 package litematica.config;
 
-import net.minecraft.util.Rotation;
-
 import malilib.config.value.LayerMode;
 import malilib.input.ActionResult;
 import malilib.input.KeyAction;
@@ -10,7 +8,7 @@ import malilib.input.callback.HotkeyCallback;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.ListUtils;
 import malilib.util.game.wrap.EntityWrap;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.BlockRotation;
 import litematica.data.DataManager;
@@ -38,7 +36,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
     @Override
     public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
-        if (GameUtils.getCameraEntity() == null || GameUtils.getClientWorld() == null)
+        if (GameWrap.getCameraEntity() == null || GameWrap.getClientWorld() == null)
         {
             return ActionResult.FAIL;
         }
@@ -173,7 +171,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.LAYER_SET_HERE.getKeyBind())
         {
-            DataManager.getRenderLayerRange().setSingleBoundaryToPosition(GameUtils.getCameraEntity());
+            DataManager.getRenderLayerRange().setSingleBoundaryToPosition(GameWrap.getCameraEntity());
             return ActionResult.SUCCESS;
         }
         else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeyBind())
@@ -211,7 +209,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
                  key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeyBind())
         {
             int amount = key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeyBind() ? 1 : -1;
-            MouseScrollHandlerImpl.nudgeSelection(amount, mode, GameUtils.getCameraEntity());
+            MouseScrollHandlerImpl.nudgeSelection(amount, mode, GameWrap.getCameraEntity());
             return ActionResult.SUCCESS;
         }
         else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeyBind())

@@ -12,7 +12,7 @@ import malilib.config.value.HudAlignment;
 import malilib.overlay.message.MessageHelpers;
 import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.game.wrap.ItemWrap;
 import malilib.util.game.wrap.RegistryUtils;
 import malilib.util.position.BlockPos;
@@ -228,7 +228,7 @@ public class ToolHud extends InfoHud
                                             or.getX(), or.getY(), or.getZ()));
 
             IBlockState state = mode.getPrimaryBlock();
-            ItemStack stack = GameUtils.getClientPlayer().getHeldItemMainhand();
+            ItemStack stack = GameWrap.getClientPlayer().getHeldItemMainhand();
 
             if (state != null && mode == ToolMode.SCHEMATIC_EDIT &&
                 (ItemWrap.isEmpty(stack) || EntityUtils.hasToolItem()))

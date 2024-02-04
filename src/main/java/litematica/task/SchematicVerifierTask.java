@@ -8,7 +8,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.chunk.Chunk;
 
-import malilib.util.game.WorldUtils;
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkPos;
 import malilib.util.position.IntBoundingBox;
@@ -66,7 +66,7 @@ public class SchematicVerifierTask extends TaskProcessChunkBase
     {
         int radius = Configs.Generic.REQUIRE_ADJACENT_CHUNKS.getBooleanValue() ? 1 : 0;
         return this.areSurroundingChunksLoaded(pos, this.worldClient, radius) &&
-               WorldUtils.isClientChunkLoaded(pos.x, pos.z, this.schematicWorld);
+               WorldWrap.isClientChunkLoaded(pos.x, pos.z, this.schematicWorld);
     }
 
     @Override

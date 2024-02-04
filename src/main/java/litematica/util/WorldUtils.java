@@ -8,6 +8,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
+import malilib.util.game.wrap.WorldWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
 import malilib.util.position.Vec3i;
@@ -41,7 +42,7 @@ public class WorldUtils
         {
             for (int cx = cxMin; cx <= cxMax; ++cx)
             {
-                malilib.util.game.WorldUtils.loadClientChunk(cx, cz, world);
+                WorldWrap.loadClientChunk(cx, cz, world);
             }
         }
     }

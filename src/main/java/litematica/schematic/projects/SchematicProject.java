@@ -15,7 +15,7 @@ import malilib.listener.TaskCompletionListener;
 import malilib.overlay.message.MessageDispatcher;
 import malilib.util.FileUtils;
 import malilib.util.data.json.JsonUtils;
-import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.GameWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Vec3i;
 import litematica.data.DataManager;
@@ -239,7 +239,7 @@ public class SchematicProject
     {
         if (this.currentPlacement != null)
         {
-            if (GameUtils.getClientPlayer() == null || GameUtils.isCreativeMode() == false)
+            if (GameWrap.getClientPlayer() == null || GameWrap.isCreativeMode() == false)
             {
                 MessageDispatcher.error().translate("litematica.error.generic.creative_mode_only");
                 return;
@@ -524,7 +524,7 @@ public class SchematicProject
             return false;
         }
 
-        if (GameUtils.getClientPlayer() == null)
+        if (GameWrap.getClientPlayer() == null)
         {
             MessageDispatcher.error().translate("litematica.error.schematic_projects.null_player");
             return false;
