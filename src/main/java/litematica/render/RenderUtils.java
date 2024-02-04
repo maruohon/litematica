@@ -4,7 +4,6 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.entity.Entity;
@@ -25,6 +24,7 @@ import malilib.util.MathUtils;
 import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.game.wrap.EntityWrap;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.inventory.InventoryView;
 import malilib.util.position.BlockPos;
 import malilib.util.position.Direction;
@@ -79,7 +79,7 @@ public class RenderUtils
                                           Entity renderViewEntity,
                                           float partialTicks)
     {
-        GlStateManager.glLineWidth(lineWidth);
+        RenderWrap.lineWidth(lineWidth);
 
         AxisAlignedBB aabb = createAABB(pos.getX(), pos.getY(), pos.getZ(), expand, partialTicks, renderViewEntity);
         drawBoundingBoxEdges(aabb, color, color, color);
@@ -157,7 +157,7 @@ public class RenderUtils
         final double maxY = pos.getY() - dy + expand + 1;
         final double maxZ = pos.getZ() - dz + expand + 1;
 
-        GlStateManager.glLineWidth(lineWidth);
+        RenderWrap.lineWidth(lineWidth);
 
         VertexBuilder builder = VanillaWrappingVertexBuilder.coloredLines();
 
@@ -207,7 +207,7 @@ public class RenderUtils
                                          Color4f colorX, Color4f colorY, Color4f colorZ,
                                          Entity renderViewEntity, float partialTicks)
     {
-        GlStateManager.glLineWidth(lineWidth);
+        RenderWrap.lineWidth(lineWidth);
 
         AxisAlignedBB aabb = createAABB(box.minX, box.minY, box.minZ,
                                         box.maxX + 1, box.maxY + 1, box.maxZ + 1,
@@ -287,15 +287,15 @@ public class RenderUtils
     public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color,
                                        Entity renderViewEntity, float partialTicks)
     {
-        GlStateManager.enableBlend();
-        GlStateManager.disableCull();
+        RenderWrap.enableBlend();
+        RenderWrap.disableCull();
 
         VertexBuilder builder = VanillaWrappingVertexBuilder.coloredQuads();
         renderAreaSidesBatched(pos1, pos2, color, 0.002, renderViewEntity, partialTicks, builder);
         builder.draw();
 
-        GlStateManager.enableCull();
-        GlStateManager.disableBlend();
+        RenderWrap.enableCull();
+        RenderWrap.disableBlend();
     }
 
     public static void renderAreaSides(IntBoundingBox box, Color4f color,
@@ -315,9 +315,9 @@ public class RenderUtils
         VertexBuilder builder = VanillaWrappingVertexBuilder.coloredQuads();
         ShapeRenderUtils.renderBoxSideQuads(minX, minY, minZ, maxX, maxY, maxZ, color, builder);
 
-        GlStateManager.disableCull();
+        RenderWrap.disableCull();
         builder.draw();
-        GlStateManager.enableCull();
+        RenderWrap.enableCull();
     }
 
     /**
@@ -509,7 +509,7 @@ public class RenderUtils
             builder.posColor(maxX + 1, maxY + 1, end   + dzMax, colorZ);
         }
 
-        GlStateManager.glLineWidth(lineWidth);
+        RenderWrap.lineWidth(lineWidth);
         builder.draw();
     }
 

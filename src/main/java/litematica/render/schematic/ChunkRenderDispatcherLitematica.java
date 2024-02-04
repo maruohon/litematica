@@ -16,7 +16,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
@@ -24,6 +23,7 @@ import net.minecraft.util.BlockRenderLayer;
 
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
+import malilib.util.game.wrap.RenderWrap;
 import litematica.Litematica;
 import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
@@ -261,7 +261,7 @@ public class ChunkRenderDispatcherLitematica
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
         {
             //if (GuiBase.isCtrlDown()) System.out.printf("uploadChunkBlocks()\n");
-            if (OpenGlHelper.useVbo())
+            if (RenderWrap.useVbo())
             {
                 this.uploadVertexBuffer(builder, renderChunk.getVertexBufferByLayer(layer.ordinal()));
             }
@@ -297,7 +297,7 @@ public class ChunkRenderDispatcherLitematica
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
         {
             //if (GuiBase.isCtrlDown()) System.out.printf("uploadChunkOverlay()\n");
-            if (OpenGlHelper.useVbo())
+            if (RenderWrap.useVbo())
             {
                 this.uploadVertexBuffer(builder, renderChunk.getOverlayVertexBuffer(type));
             }

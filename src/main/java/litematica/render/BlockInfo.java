@@ -5,11 +5,9 @@ import java.util.List;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 
 import malilib.render.RenderContext;
-import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.buffer.VanillaWrappingVertexBuilder;
 import malilib.render.buffer.VertexBuilder;
@@ -19,6 +17,7 @@ import malilib.util.StringUtils;
 import malilib.util.game.BlockUtils;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
+import malilib.util.game.wrap.RenderWrap;
 import litematica.util.ItemUtils;
 
 public class BlockInfo
@@ -69,7 +68,7 @@ public class BlockInfo
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;
 
-            GlStateManager.pushMatrix();
+            RenderWrap.pushMatrix(ctx);
 
             VertexBuilder builder = VanillaWrappingVertexBuilder.coloredQuads();
 
@@ -87,8 +86,8 @@ public class BlockInfo
 
             y += 12;
 
-            GlStateManager.disableLighting();
-            RenderUtils.enableGuiItemLighting();
+            RenderWrap.disableLighting();
+            RenderWrap.enableGuiItemLighting(ctx);
 
             float origZ = mc.getRenderItem().zLevel;
             mc.getRenderItem().zLevel = zLevel + 1;
@@ -96,8 +95,8 @@ public class BlockInfo
             mc.getRenderItem().renderItemOverlayIntoGUI(textRenderer, this.stack, x1, y, null);
             mc.getRenderItem().zLevel = origZ;
 
-            //GlStateManager.disableBlend();
-            RenderUtils.disableItemLighting();
+            //RenderWrap.disableBlend();
+            RenderWrap.disableItemLighting();
 
             TextRenderer.INSTANCE.renderText(x1 + 20, y + 4, 0, 0xFFFFFFFF, true, StyledText.parse(this.stackName), ctx);
 
@@ -107,7 +106,7 @@ public class BlockInfo
 
             TextRenderer.INSTANCE.renderText(x1, y, 0, 0xFFB0B0B0, true, StyledText.parseList(this.props), ctx);
 
-            GlStateManager.popMatrix();
+            RenderWrap.popMatrix(ctx);
         }
     }
 }

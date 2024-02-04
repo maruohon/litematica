@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.renderer.EntityRenderer;
 
+import malilib.render.RenderContext;
 import litematica.config.Configs;
 import litematica.render.LitematicaRenderer;
 
@@ -53,7 +54,7 @@ public abstract class MixinEntityRenderer
                      "Lnet/minecraft/util/BlockRenderLayer;DILnet/minecraft/entity/Entity;)I", ordinal = 3, shift = Shift.AFTER))
     private void renderTranslucent(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
-        LitematicaRenderer.getInstance().piecewiseRenderTranslucent(this.renderCollidingSchematicBlocks, partialTicks);
+        LitematicaRenderer.getInstance().piecewiseRenderTranslucent(this.renderCollidingSchematicBlocks, partialTicks, RenderContext.DUMMY);
     }
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE",

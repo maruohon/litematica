@@ -8,14 +8,12 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 
 import malilib.config.value.HudAlignment;
 import malilib.gui.util.GuiUtils;
 import malilib.render.RenderContext;
-import malilib.render.RenderUtils;
 import malilib.render.ShapeRenderUtils;
 import malilib.render.buffer.VanillaWrappingVertexBuilder;
 import malilib.render.buffer.VertexBuilder;
@@ -23,6 +21,7 @@ import malilib.util.StringUtils;
 import malilib.util.data.Color4f;
 import malilib.util.data.ItemType;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.inventory.InventoryScreenUtils;
 import litematica.config.Configs;
 import litematica.data.DataManager;
@@ -150,8 +149,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         if (scale != 1d)
         {
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(scale, scale, scale);
+            RenderWrap.pushMatrix(ctx);
+            RenderWrap.scale(scale, scale, scale, ctx);
         }
 
         if (useBackground)
@@ -204,9 +203,9 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         x = posX;
         y = posY;
 
-        GlStateManager.enableRescaleNormal();
-        RenderUtils.setupBlend();
-        RenderUtils.enableGuiItemLighting();
+        RenderWrap.enableRescaleNormal();
+        RenderWrap.setupBlendSeparate();
+        RenderWrap.enableGuiItemLighting(ctx);
 
         for (int i = 0; i < size; ++i)
         {
@@ -214,13 +213,13 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             y += lineHeight;
         }
 
-        RenderUtils.disableItemLighting();
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.disableBlend();
+        RenderWrap.disableItemLighting();
+        RenderWrap.disableRescaleNormal();
+        RenderWrap.disableBlend();
 
         if (scale != 1d)
         {
-            GlStateManager.popMatrix();
+            RenderWrap.popMatrix(ctx);
         }
 
         return contentHeight + 4;
@@ -271,8 +270,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
                 if (highlightedSlots.isEmpty() == false)
                 {
-                    GlStateManager.disableTexture2D();
-                    RenderUtils.setupBlend();
+                    RenderWrap.disableTexture2D();
+                    RenderWrap.setupBlendSeparate();
                     int guiX = InventoryScreenUtils.getGuiPosX(gui);
                     int guiY = InventoryScreenUtils.getGuiPosY(gui);
                     VertexBuilder builder = VanillaWrappingVertexBuilder.coloredQuads();
@@ -286,7 +285,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                     }
 
                     builder.draw();
-                    GlStateManager.enableTexture2D();
+                    RenderWrap.enableTexture2D();
                 }
             }
         }

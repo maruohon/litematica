@@ -4,6 +4,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.util.BlockRenderLayer;
 
+import malilib.render.RenderContext;
+import malilib.util.game.wrap.RenderWrap;
 import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public class RenderListSchematic extends ChunkRenderContainerSchematic
@@ -13,16 +15,18 @@ public class RenderListSchematic extends ChunkRenderContainerSchematic
     {
         if (this.initialized)
         {
+            RenderContext ctx = RenderContext.DUMMY;
+
             for (RenderChunk renderChunk : this.renderChunks)
             {
                 RenderChunkSchematicList listedrenderchunk = (RenderChunkSchematicList) renderChunk;
-                GlStateManager.pushMatrix();
+                RenderWrap.pushMatrix(ctx);
                 this.preRenderChunk(renderChunk);
                 GlStateManager.callList(listedrenderchunk.getDisplayList(layer, listedrenderchunk.getChunkRenderData()));
-                GlStateManager.popMatrix();
+                RenderWrap.popMatrix(ctx);
             }
 
-            GlStateManager.resetColor();
+            RenderWrap.resetColor();
             this.renderChunks.clear();
         }
     }
@@ -32,17 +36,19 @@ public class RenderListSchematic extends ChunkRenderContainerSchematic
     {
         if (this.initialized)
         {
+            RenderContext ctx = RenderContext.DUMMY;
+
             for (RenderChunkSchematicVbo renderChunk : this.overlayRenderChunks)
             {
                 RenderChunkSchematicList listedRenderChunk = (RenderChunkSchematicList) renderChunk;
 
-                GlStateManager.pushMatrix();
+                RenderWrap.pushMatrix(ctx);
                 this.preRenderChunk(renderChunk);
                 GlStateManager.callList(listedRenderChunk.getOverlayDisplayList(type, listedRenderChunk.getChunkRenderData()));
-                GlStateManager.popMatrix();
+                RenderWrap.popMatrix(ctx);
             }
 
-            GlStateManager.resetColor();
+            RenderWrap.resetColor();
             this.overlayRenderChunks.clear();
         }
     }

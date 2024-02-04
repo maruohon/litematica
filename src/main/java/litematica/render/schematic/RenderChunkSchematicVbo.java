@@ -15,7 +15,6 @@ import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
@@ -35,6 +34,7 @@ import malilib.render.ShapeRenderUtils;
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
 import malilib.util.data.Color4f;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkSectionPos;
 import malilib.util.position.Direction;
@@ -95,7 +95,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         this.chunkRenderDataLock = new ReentrantLock();
         this.schematicChunkRenderData = CompiledChunkSchematic.EMPTY;
 
-        if (OpenGlHelper.useVbo())
+        if (RenderWrap.useVbo())
         {
             for (int i = 0; i < OverlayRenderType.values().length; ++i)
             {

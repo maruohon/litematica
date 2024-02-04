@@ -16,8 +16,6 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -45,12 +43,12 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-import malilib.render.RenderUtils;
 import malilib.render.buffer.VertexBuilder;
 import malilib.util.MathUtils;
 import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.ChunkSectionPos;
 import malilib.util.position.LayerRange;
@@ -110,7 +108,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         this.mc = mc;
         this.renderManager = mc.getRenderManager();
 
-        this.vboEnabled = OpenGlHelper.useVbo();
+        this.vboEnabled = RenderWrap.useVbo();
 
         if (this.vboEnabled)
         {
@@ -231,7 +229,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             this.renderDistanceChunks = GameUtils.getRenderDistanceChunks();
 
             boolean vboEnabledPrevious = this.vboEnabled;
-            this.vboEnabled = OpenGlHelper.useVbo();
+            this.vboEnabled = RenderWrap.useVbo();
 
             if (this.vboEnabled == false && vboEnabledPrevious)
             {
@@ -487,7 +485,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     {
         GameUtils.profilerPush("render_block_layer_" + blockLayerIn);
 
-        RenderUtils.disableItemLighting();
+        RenderWrap.disableItemLighting();
 
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
@@ -551,20 +549,20 @@ public class RenderGlobalSchematic extends RenderGlobal
     {
         this.mc.entityRenderer.enableLightmap();
 
-        if (OpenGlHelper.useVbo())
+        if (RenderWrap.useVbo())
         {
-            GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-            OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
-            GlStateManager.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-            OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapTexUnit);
-            GlStateManager.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-            OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
-            GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
+            RenderWrap.enableClientState(GL11.GL_VERTEX_ARRAY);
+            RenderWrap.setClientActiveTexture(RenderWrap.DEFAULT_TEX_UNIT);
+            RenderWrap.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+            RenderWrap.setClientActiveTexture(RenderWrap.LIGHTMAP_TEX_UNIT);
+            RenderWrap.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+            RenderWrap.setClientActiveTexture(RenderWrap.DEFAULT_TEX_UNIT);
+            RenderWrap.enableClientState(GL11.GL_COLOR_ARRAY);
         }
 
         this.renderContainer.renderChunkLayer(layer);
 
-        if (OpenGlHelper.useVbo())
+        if (RenderWrap.useVbo())
         {
             for (VertexFormatElement vertexformatelement : DefaultVertexFormats.BLOCK.getElements())
             {
@@ -574,16 +572,16 @@ public class RenderGlobalSchematic extends RenderGlobal
                 switch (vertexformatelement$enumusage)
                 {
                     case POSITION:
-                        GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                        RenderWrap.disableClientState(GL11.GL_VERTEX_ARRAY);
                         break;
                     case UV:
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + index);
-                        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        RenderWrap.setClientActiveTexture(RenderWrap.DEFAULT_TEX_UNIT + index);
+                        RenderWrap.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        RenderWrap.setClientActiveTexture(RenderWrap.DEFAULT_TEX_UNIT);
                         break;
                     case COLOR:
-                        GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
-                        GlStateManager.resetColor();
+                        RenderWrap.disableClientState(GL11.GL_COLOR_ARRAY);
+                        RenderWrap.resetColor();
                     default:
                 }
             }
@@ -630,15 +628,15 @@ public class RenderGlobalSchematic extends RenderGlobal
     {
         this.mc.entityRenderer.enableLightmap();
 
-        if (OpenGlHelper.useVbo())
+        if (RenderWrap.useVbo())
         {
-            GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-            GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
+            RenderWrap.enableClientState(GL11.GL_VERTEX_ARRAY);
+            RenderWrap.enableClientState(GL11.GL_COLOR_ARRAY);
         }
 
         this.renderContainer.renderBlockOverlays(type);
 
-        if (OpenGlHelper.useVbo())
+        if (RenderWrap.useVbo())
         {
             for (VertexFormatElement element : DefaultVertexFormats.POSITION_COLOR.getElements())
             {
@@ -647,16 +645,16 @@ public class RenderGlobalSchematic extends RenderGlobal
                 switch (usage)
                 {
                     case POSITION:
-                        GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                        RenderWrap.disableClientState(GL11.GL_VERTEX_ARRAY);
                         break;
                     case UV:
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + element.getIndex());
-                        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        RenderWrap.setClientActiveTexture(RenderWrap.DEFAULT_TEX_UNIT + element.getIndex());
+                        RenderWrap.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        RenderWrap.setClientActiveTexture(RenderWrap.DEFAULT_TEX_UNIT);
                         break;
                     case COLOR:
-                        GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
-                        GlStateManager.resetColor();
+                        RenderWrap.disableClientState(GL11.GL_COLOR_ARRAY);
+                        RenderWrap.resetColor();
                     default:
                 }
             }
@@ -824,7 +822,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             */
 
             GameUtils.profilerSwap("block_entities");
-            RenderUtils.enableItemLighting();
+            RenderWrap.enableItemLighting();
 
             for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
             {

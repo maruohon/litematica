@@ -27,14 +27,14 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
             if (Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() != invert &&
                 Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() == false)
             {
-                LitematicaRenderer.getInstance().renderSchematicWorld(tickDelta);
+                LitematicaRenderer.getInstance().renderSchematicWorld(ctx, tickDelta);
             }
 
-            OverlayRenderer.getInstance().renderBoxes(tickDelta);
+            OverlayRenderer.getInstance().renderBoxes(ctx, tickDelta);
 
             if (Configs.InfoOverlays.VERIFIER_OVERLAY_RENDERING.getBooleanValue())
             {
-                OverlayRenderer.getInstance().renderSchematicVerifierMismatches(tickDelta);
+                OverlayRenderer.getInstance().renderSchematicVerifierMismatches(ctx, tickDelta);
             }
 
             if (Configs.Visuals.RENDER_COLLIDING_BLOCK_AT_CURSOR.getBooleanValue())
@@ -44,7 +44,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 
                 if (render)
                 {
-                    OverlayRenderer.getInstance().renderHoveredSchematicBlock(tickDelta);
+                    OverlayRenderer.getInstance().renderHoveredSchematicBlock(ctx, tickDelta);
                 }
             }
 

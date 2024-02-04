@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -36,6 +35,7 @@ import malilib.util.game.WorldUtils;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
 import malilib.util.game.wrap.RegistryUtils;
+import malilib.util.game.wrap.RenderWrap;
 import malilib.util.position.BlockPos;
 import malilib.util.position.HitResult;
 import malilib.util.position.IntBoundingBox;
@@ -109,7 +109,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderBoxes(float partialTicks)
+    public void renderBoxes(RenderContext ctx, float partialTicks)
     {
         Entity renderViewEntity = GameUtils.getCameraEntity();
         AreaSelectionManager sm = DataManager.getAreaSelectionManager();
@@ -123,18 +123,18 @@ public class OverlayRenderer
 
         if (renderAreas || renderPlacements || isProjectMode)
         {
-            GlStateManager.depthMask(true);
-            GlStateManager.disableLighting();
-            GlStateManager.disableTexture2D();
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
-            GlStateManager.pushMatrix();
-            malilib.render.RenderUtils.setupBlend();
+            RenderWrap.depthMask(true);
+            RenderWrap.disableLighting();
+            RenderWrap.disableTexture2D();
+            RenderWrap.alphaFunc(GL11.GL_GREATER, 0.01F);
+            RenderWrap.pushMatrix(ctx);
+            RenderWrap.setupBlendSeparate();
 
             if (renderAreas)
             {
-                GlStateManager.enablePolygonOffset();
-                GlStateManager.doPolygonOffset(-1.2f, -0.2f);
-                GlStateManager.depthMask(false);
+                RenderWrap.enablePolygonOffset();
+                RenderWrap.polygonOffset(-1.2f, -0.2f);
+                RenderWrap.depthMask(false);
 
                 CornerDefinedBox currentBox = currentSelection.getSelectedSelectionBox();
 
@@ -158,9 +158,9 @@ public class OverlayRenderer
                     RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
                 }
 
-                GlStateManager.depthMask(true);
-                GlStateManager.doPolygonOffset(0f, 0f);
-                GlStateManager.disablePolygonOffset();
+                RenderWrap.depthMask(true);
+                RenderWrap.polygonOffset(0f, 0f);
+                RenderWrap.disablePolygonOffset();
             }
 
             if (renderPlacements)
@@ -210,10 +210,10 @@ public class OverlayRenderer
                 }
             }
 
-            GlStateManager.popMatrix();
-            GlStateManager.enableTexture2D();
-            GlStateManager.enableCull();
-            GlStateManager.depthMask(true);
+            RenderWrap.popMatrix(ctx);
+            RenderWrap.enableTexture2D();
+            RenderWrap.enableCull();
+            RenderWrap.depthMask(true);
         }
     }
 
@@ -311,7 +311,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSchematicVerifierMismatches(float partialTicks)
+    public void renderSchematicVerifierMismatches(RenderContext ctx, float partialTicks)
     {
         List<SchematicVerifier> activeVerifiers = SchematicVerifierManager.INSTANCE.getActiveVerifiers();
 
@@ -328,20 +328,22 @@ public class OverlayRenderer
                     List<BlockPairTypePosition> posList = verifier.getClosestSelectedPositions(cameraPos);
                     Entity entity = GameUtils.getCameraEntity();
                     BlockPairTypePosition lookPos = RayTraceUtils.traceToVerifierResultPositions(posList, entity, 128);
-                    this.renderSchematicMismatches(list, lookPos, partialTicks);
+                    this.renderSchematicMismatches(list, lookPos, partialTicks, ctx);
                 }
             }
         }
     }
 
-    private void renderSchematicMismatches(List<BlockPairTypePosition> posList, @Nullable BlockPairTypePosition lookPos, float partialTicks)
+    private void renderSchematicMismatches(List<BlockPairTypePosition> posList,
+                                           @Nullable BlockPairTypePosition lookPos,
+                                           float partialTicks, RenderContext ctx)
     {
-        GlStateManager.disableDepth();
-        GlStateManager.depthMask(false);
-        GlStateManager.disableLighting();
-        GlStateManager.pushMatrix();
+        RenderWrap.disableDepthTest();
+        RenderWrap.depthMask(false);
+        RenderWrap.disableLighting();
+        RenderWrap.pushMatrix(ctx);
 
-        GlStateManager.glLineWidth(2f);
+        RenderWrap.lineWidth(2f);
 
         Entity entity = GameUtils.getCameraEntity();
         BlockPairTypePosition lookedEntry = null;
@@ -386,7 +388,7 @@ public class OverlayRenderer
             lineBuilder.draw();
             lineBuilder.start();
 
-            GlStateManager.glLineWidth(6f);
+            RenderWrap.lineWidth(6f);
             RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPosLong, color, 0.002, lineBuilder, entity, partialTicks);
         }
 
@@ -394,8 +396,8 @@ public class OverlayRenderer
 
         if (Configs.Visuals.VERIFIER_HIGHLIGHT_SIDES.getBooleanValue())
         {
-            GlStateManager.enableBlend();
-            GlStateManager.disableCull();
+            RenderWrap.enableBlend();
+            RenderWrap.disableCull();
 
             VertexBuilder quadBuilder = VanillaWrappingVertexBuilder.coloredQuads();
             float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HIGHLIGHT_ALPHA.getDoubleValue();
@@ -409,14 +411,14 @@ public class OverlayRenderer
 
             quadBuilder.draw();
 
-            GlStateManager.disableBlend();
+            RenderWrap.disableBlend();
         }
 
-        GlStateManager.popMatrix();
-        GlStateManager.enableTexture2D();
-        GlStateManager.enableCull();
-        GlStateManager.depthMask(true);
-        GlStateManager.enableDepth();
+        RenderWrap.popMatrix(ctx);
+        RenderWrap.enableTexture2D();
+        RenderWrap.enableCull();
+        RenderWrap.depthMask(true);
+        RenderWrap.enableDepthTest();
     }
 
     public void renderHoverInfo(RenderContext ctx)
@@ -674,13 +676,13 @@ public class OverlayRenderer
         if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
             HitResult trace = traceWrapper.getRayTraceResult();
-            malilib.util.position.BlockPos pos = trace.blockPos;
+            BlockPos pos = trace.blockPos;
 
-            GlStateManager.depthMask(false);
-            GlStateManager.disableLighting();
-            GlStateManager.disableCull();
-            GlStateManager.disableTexture2D();
-            malilib.render.RenderUtils.setupBlend();
+            RenderWrap.depthMask(false);
+            RenderWrap.disableLighting();
+            RenderWrap.disableCull();
+            RenderWrap.disableTexture2D();
+            RenderWrap.setupBlendSeparate();
 
             if (direction)
             {
@@ -693,15 +695,15 @@ public class OverlayRenderer
                                                                                   color, partialTicks, ctx);
             }
 
-            GlStateManager.enableTexture2D();
-            //GlStateManager.enableDepth();
-            GlStateManager.disableBlend();
-            GlStateManager.enableCull();
-            GlStateManager.depthMask(true);
+            RenderWrap.enableTexture2D();
+            //RenderWrap.enableDepth();
+            RenderWrap.disableBlend();
+            RenderWrap.enableCull();
+            RenderWrap.depthMask(true);
         }
     }
 
-    public void renderHoveredSchematicBlock(float tickDelta)
+    public void renderHoveredSchematicBlock(RenderContext ctx, float tickDelta)
     {
         Minecraft mc = GameUtils.getClient();
         HitResult hitResult = GameUtils.getHitResult();
@@ -720,13 +722,13 @@ public class OverlayRenderer
                 double dy = EntityWrap.lerpY(entity, tickDelta);
                 double dz = EntityWrap.lerpZ(entity, tickDelta);
 
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(-dx, -dy, -dz);
-                GlStateManager.enablePolygonOffset();
-                GlStateManager.doPolygonOffset(-0.8f, -0.4f);
-                malilib.render.RenderUtils.setupBlend();
-                GlStateManager.disableDepth();
-                GlStateManager.depthMask(false);
+                RenderWrap.pushMatrix(ctx);
+                RenderWrap.translate(-dx, -dy, -dz, ctx);
+                RenderWrap.enablePolygonOffset();
+                RenderWrap.polygonOffset(-0.8f, -0.4f);
+                RenderWrap.setupBlendSeparate();
+                RenderWrap.disableDepthTest();
+                RenderWrap.depthMask(false);
 
                 LitematicaRenderer.enableAlphaShader(Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING.getFloatValue());
 
@@ -736,11 +738,11 @@ public class OverlayRenderer
 
                 LitematicaRenderer.disableAlphaShader();
 
-                GlStateManager.depthMask(true);
-                GlStateManager.enableDepth();
-                GlStateManager.doPolygonOffset(0f, 0f);
-                GlStateManager.disablePolygonOffset();
-                GlStateManager.popMatrix();
+                RenderWrap.depthMask(true);
+                RenderWrap.enableDepthTest();
+                RenderWrap.polygonOffset(0f, 0f);
+                RenderWrap.disablePolygonOffset();
+                RenderWrap.popMatrix(ctx);
             }
         }
     }

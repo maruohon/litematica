@@ -6,7 +6,6 @@ import org.lwjgl.opengl.GL20;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -14,10 +13,11 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
 
-import malilib.render.RenderUtils;
+import malilib.render.RenderContext;
 import malilib.render.shader.ShaderProgram;
 import malilib.util.game.wrap.EntityWrap;
 import malilib.util.game.wrap.GameUtils;
+import malilib.util.game.wrap.RenderWrap;
 import litematica.config.Configs;
 import litematica.config.Hotkeys;
 import litematica.render.schematic.RenderGlobalSchematic;
@@ -91,7 +91,7 @@ public class LitematicaRenderer
         }
     }
 
-    public void renderSchematicWorld(float partialTicks)
+    public void renderSchematicWorld(RenderContext ctx, float partialTicks)
     {
         if (this.mc.skipRenderWorld == false)
         {
@@ -102,30 +102,30 @@ public class LitematicaRenderer
                 this.mc.setRenderViewEntity(this.mc.player);
             }
 
-            GlStateManager.pushMatrix();
-            GlStateManager.enableDepth();
+            RenderWrap.pushMatrix(ctx);
+            RenderWrap.enableDepthTest();
 
             this.calculateFinishTime();
-            this.renderWorld(partialTicks, this.finishTimeNano);
+            this.renderWorld(partialTicks, this.finishTimeNano, ctx);
             this.cleanup();
 
-            GlStateManager.popMatrix();
+            RenderWrap.popMatrix(ctx);
 
             GameUtils.profilerPop();
         }
     }
 
-    private void renderWorld(float partialTicks, long finishTimeNano)
+    private void renderWorld(float partialTicks, long finishTimeNano, RenderContext ctx)
     {
         GameUtils.profilerPush("culling");
         Entity entity = this.mc.getRenderViewEntity();
         ICamera icamera = this.createCamera(entity, partialTicks);
 
-        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+        RenderWrap.shadeModel(GL11.GL_SMOOTH);
 
         GameUtils.profilerSwap("prepare_terrain");
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        RenderUtils.disableItemLighting();
+        RenderWrap.disableItemLighting();
 
         RenderGlobalSchematic renderGlobal = this.getWorldRenderer();
 
@@ -136,22 +136,22 @@ public class LitematicaRenderer
         renderGlobal.updateChunks(finishTimeNano);
 
         GameUtils.profilerSwap("terrain");
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-        GlStateManager.disableAlpha();
+        RenderWrap.matrixMode(GL11.GL_MODELVIEW);
+        RenderWrap.disableAlpha();
 
         if (Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue())
         {
-            GlStateManager.pushMatrix();
+            RenderWrap.pushMatrix(ctx);
 
             if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
             {
-                GlStateManager.enablePolygonOffset();
-                GlStateManager.doPolygonOffset(-0.2f, -0.4f);
+                RenderWrap.enablePolygonOffset();
+                RenderWrap.polygonOffset(-0.2f, -0.4f);
             }
 
             this.startShaderIfEnabled();
 
-            RenderUtils.setupBlend();
+            RenderWrap.setupBlendSeparate();
 
             renderGlobal.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, entity);
 
@@ -163,65 +163,65 @@ public class LitematicaRenderer
 
             if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
             {
-                GlStateManager.doPolygonOffset(0f, 0f);
-                GlStateManager.disablePolygonOffset();
+                RenderWrap.polygonOffset(0f, 0f);
+                RenderWrap.disablePolygonOffset();
             }
 
-            GlStateManager.disableBlend();
-            GlStateManager.shadeModel(GL11.GL_FLAT);
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
+            RenderWrap.disableBlend();
+            RenderWrap.shadeModel(GL11.GL_FLAT);
+            RenderWrap.alphaFunc(GL11.GL_GREATER, 0.01F);
 
-            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-            GlStateManager.popMatrix();
+            RenderWrap.matrixMode(GL11.GL_MODELVIEW);
+            RenderWrap.popMatrix(ctx);
 
             GameUtils.profilerSwap("entities");
 
-            GlStateManager.pushMatrix();
+            RenderWrap.pushMatrix(ctx);
 
-            RenderUtils.enableItemLighting();
-            RenderUtils.setupBlend();
+            RenderWrap.enableItemLighting();
+            RenderWrap.setupBlendSeparate();
 
             renderGlobal.renderEntities(entity, icamera, partialTicks);
 
-            GlStateManager.disableFog(); // Fixes Structure Blocks breaking all rendering
-            GlStateManager.disableBlend();
-            RenderUtils.disableItemLighting();
+            RenderWrap.disableFog(); // Fixes Structure Blocks breaking all rendering
+            RenderWrap.disableBlend();
+            RenderWrap.disableItemLighting();
 
-            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-            GlStateManager.popMatrix();
+            RenderWrap.matrixMode(GL11.GL_MODELVIEW);
+            RenderWrap.popMatrix(ctx);
 
-            GlStateManager.enableCull();
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+            RenderWrap.enableCull();
+            RenderWrap.alphaFunc(GL11.GL_GREATER, 0.1F);
             this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-            GlStateManager.shadeModel(GL11.GL_SMOOTH);
+            RenderWrap.shadeModel(GL11.GL_SMOOTH);
 
             GameUtils.profilerSwap("translucent");
-            GlStateManager.depthMask(false);
+            RenderWrap.depthMask(false);
 
-            GlStateManager.pushMatrix();
+            RenderWrap.pushMatrix(ctx);
 
-            RenderUtils.setupBlend();
+            RenderWrap.setupBlendSeparate();
 
             renderGlobal.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, entity);
 
-            GlStateManager.popMatrix();
+            RenderWrap.popMatrix(ctx);
 
             this.disableShader();
         }
 
         GameUtils.profilerSwap("overlay");
-        this.renderSchematicOverlay();
+        this.renderSchematicOverlay(ctx);
 
-        GlStateManager.enableAlpha();
-        GlStateManager.disableBlend();
-        GlStateManager.depthMask(true);
-        GlStateManager.shadeModel(GL11.GL_FLAT);
-        GlStateManager.enableCull();
+        RenderWrap.enableAlpha();
+        RenderWrap.disableBlend();
+        RenderWrap.depthMask(true);
+        RenderWrap.shadeModel(GL11.GL_FLAT);
+        RenderWrap.enableCull();
 
         GameUtils.profilerPop();
     }
 
-    public void renderSchematicOverlay()
+    public void renderSchematicOverlay(RenderContext ctx)
     {
         boolean invert = Hotkeys.INVERT_OVERLAY_RENDER_STATE.getKeyBind().isKeyBindHeld();
 
@@ -230,29 +230,29 @@ public class LitematicaRenderer
             boolean renderThrough = Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue() || Hotkeys.RENDER_OVERLAY_THROUGH_BLOCKS.getKeyBind().isKeyBindHeld();
             float lineWidth = (float) (renderThrough ? Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH.getDoubleValue() : Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
 
-            GlStateManager.pushMatrix();
-            GlStateManager.disableTexture2D();
-            GlStateManager.disableCull();
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.001F);
-            GlStateManager.enablePolygonOffset();
-            GlStateManager.doPolygonOffset(-0.4f, -0.8f);
-            RenderUtils.setupBlend();
-            GlStateManager.glLineWidth(lineWidth);
-            RenderUtils.color(1f, 1f, 1f, 1f);
+            RenderWrap.pushMatrix(ctx);
+            RenderWrap.disableTexture2D();
+            RenderWrap.disableCull();
+            RenderWrap.alphaFunc(GL11.GL_GREATER, 0.001F);
+            RenderWrap.enablePolygonOffset();
+            RenderWrap.polygonOffset(-0.4f, -0.8f);
+            RenderWrap.setupBlendSeparate();
+            RenderWrap.color(1f, 1f, 1f, 1f);
+            RenderWrap.lineWidth(lineWidth);
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 
             if (renderThrough)
             {
-                GlStateManager.disableDepth();
+                RenderWrap.disableDepthTest();
             }
 
             this.getWorldRenderer().renderBlockOverlays();
 
-            GlStateManager.enableDepth();
-            GlStateManager.doPolygonOffset(0f, 0f);
-            GlStateManager.disablePolygonOffset();
-            GlStateManager.enableTexture2D();
-            GlStateManager.popMatrix();
+            RenderWrap.enableDepthTest();
+            RenderWrap.polygonOffset(0f, 0f);
+            RenderWrap.disablePolygonOffset();
+            RenderWrap.enableTexture2D();
+            RenderWrap.popMatrix(ctx);
         }
     }
 
@@ -333,8 +333,8 @@ public class LitematicaRenderer
 
             if (renderColliding)
             {
-                GlStateManager.enablePolygonOffset();
-                GlStateManager.doPolygonOffset(-0.3f, -0.6f);
+                RenderWrap.enablePolygonOffset();
+                RenderWrap.polygonOffset(-0.3f, -0.6f);
             }
 
             this.startShaderIfEnabled();
@@ -345,8 +345,8 @@ public class LitematicaRenderer
 
             if (renderColliding)
             {
-                GlStateManager.doPolygonOffset(0f, 0f);
-                GlStateManager.disablePolygonOffset();
+                RenderWrap.polygonOffset(0f, 0f);
+                RenderWrap.disablePolygonOffset();
             }
 
             GameUtils.profilerPop();
@@ -361,8 +361,8 @@ public class LitematicaRenderer
 
             if (renderColliding)
             {
-                GlStateManager.enablePolygonOffset();
-                GlStateManager.doPolygonOffset(-0.3f, -0.6f);
+                RenderWrap.enablePolygonOffset();
+                RenderWrap.polygonOffset(-0.3f, -0.6f);
             }
 
             this.startShaderIfEnabled();
@@ -373,8 +373,8 @@ public class LitematicaRenderer
 
             if (renderColliding)
             {
-                GlStateManager.doPolygonOffset(0f, 0f);
-                GlStateManager.disablePolygonOffset();
+                RenderWrap.polygonOffset(0f, 0f);
+                RenderWrap.disablePolygonOffset();
             }
 
             GameUtils.profilerPop();
@@ -389,8 +389,8 @@ public class LitematicaRenderer
 
             if (renderColliding)
             {
-                GlStateManager.enablePolygonOffset();
-                GlStateManager.doPolygonOffset(-0.3f, -0.6f);
+                RenderWrap.enablePolygonOffset();
+                RenderWrap.polygonOffset(-0.3f, -0.6f);
             }
 
             this.startShaderIfEnabled();
@@ -401,15 +401,15 @@ public class LitematicaRenderer
 
             if (renderColliding)
             {
-                GlStateManager.doPolygonOffset(0f, 0f);
-                GlStateManager.disablePolygonOffset();
+                RenderWrap.polygonOffset(0f, 0f);
+                RenderWrap.disablePolygonOffset();
             }
 
             GameUtils.profilerPop();
         }
     }
 
-    public void piecewiseRenderTranslucent(boolean renderColliding, float partialTicks)
+    public void piecewiseRenderTranslucent(boolean renderColliding, float partialTicks, RenderContext ctx)
     {
         if (this.renderPiecewisePrepared)
         {
@@ -419,8 +419,8 @@ public class LitematicaRenderer
 
                 if (renderColliding)
                 {
-                    GlStateManager.enablePolygonOffset();
-                    GlStateManager.doPolygonOffset(-0.3f, -0.6f);
+                    RenderWrap.enablePolygonOffset();
+                    RenderWrap.polygonOffset(-0.3f, -0.6f);
                 }
 
                 this.startShaderIfEnabled();
@@ -431,8 +431,8 @@ public class LitematicaRenderer
 
                 if (renderColliding)
                 {
-                    GlStateManager.doPolygonOffset(0f, 0f);
-                    GlStateManager.disablePolygonOffset();
+                    RenderWrap.polygonOffset(0f, 0f);
+                    RenderWrap.disablePolygonOffset();
                 }
 
                 GameUtils.profilerPop();
@@ -442,7 +442,7 @@ public class LitematicaRenderer
             {
                 GameUtils.profilerPush("litematica_overlay");
 
-                this.renderSchematicOverlay();
+                this.renderSchematicOverlay(ctx);
 
                 GameUtils.profilerPop();
             }
@@ -457,15 +457,11 @@ public class LitematicaRenderer
         {
             GameUtils.profilerPush("litematica_entities");
 
-            RenderUtils.setupBlend();
-
+            RenderWrap.setupBlendSeparate();
             this.startShaderIfEnabled();
-
             this.getWorldRenderer().renderEntities(this.entity, this.camera, partialTicks);
-
             this.disableShader();
-
-            GlStateManager.disableBlend();
+            RenderWrap.disableBlend();
 
             GameUtils.profilerPop();
         }

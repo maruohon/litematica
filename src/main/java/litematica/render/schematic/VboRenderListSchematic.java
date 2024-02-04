@@ -2,12 +2,12 @@ package litematica.render.schematic;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.util.BlockRenderLayer;
 
+import malilib.render.RenderContext;
+import malilib.util.game.wrap.RenderWrap;
 import litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public class VboRenderListSchematic extends ChunkRenderContainerSchematic
@@ -19,11 +19,11 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
         {
             for (RenderChunk renderChunk : this.renderChunks)
             {
-                this.renderBlocks(renderChunk.getVertexBufferByLayer(layer.ordinal()), renderChunk);
+                this.renderBlocks(renderChunk.getVertexBufferByLayer(layer.ordinal()), renderChunk, RenderContext.DUMMY);
             }
 
-            OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);
-            GlStateManager.resetColor();
+            RenderWrap.bindBuffer(RenderWrap.GL_ARRAY_BUFFER, 0);
+            RenderWrap.resetColor();
 
             this.renderChunks.clear();
         }
@@ -36,19 +36,19 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
         {
             for (RenderChunkSchematicVbo renderChunk : this.overlayRenderChunks)
             {
-                this.renderOverlay(renderChunk.getOverlayVertexBuffer(type), renderChunk, type.getGlMode());
+                this.renderOverlay(renderChunk.getOverlayVertexBuffer(type), renderChunk, type.getGlMode(), RenderContext.DUMMY);
             }
 
-            OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);
-            GlStateManager.resetColor();
+            RenderWrap.bindBuffer(RenderWrap.GL_ARRAY_BUFFER, 0);
+            RenderWrap.resetColor();
 
             this.overlayRenderChunks.clear();
         }
     }
 
-    private void renderBlocks(VertexBuffer vertexBuffer, RenderChunk renderChunk)
+    private void renderBlocks(VertexBuffer vertexBuffer, RenderChunk renderChunk, RenderContext ctx)
     {
-        GlStateManager.pushMatrix();
+        RenderWrap.pushMatrix(ctx);
 
         this.preRenderChunk(renderChunk);
         //renderChunk.multModelviewMatrix();
@@ -56,12 +56,12 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
         this.setupArrayPointersBlocks();
         vertexBuffer.drawArrays(GL11.GL_QUADS);
 
-        GlStateManager.popMatrix();
+        RenderWrap.popMatrix(ctx);
     }
 
-    private void renderOverlay(VertexBuffer vertexBuffer, RenderChunk renderChunk, int glMode)
+    private void renderOverlay(VertexBuffer vertexBuffer, RenderChunk renderChunk, int glMode, RenderContext ctx)
     {
-        GlStateManager.pushMatrix();
+        RenderWrap.pushMatrix(ctx);
 
         this.preRenderChunk(renderChunk);
         //renderChunk.multModelviewMatrix();
@@ -69,22 +69,22 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
         this.setupArrayPointersOverlay();
         vertexBuffer.drawArrays(glMode);
 
-        GlStateManager.popMatrix();
+        RenderWrap.popMatrix(ctx);
     }
 
     private void setupArrayPointersBlocks()
     {
-        GlStateManager.glVertexPointer(3, GL11.GL_FLOAT, 28, 0);
-        GlStateManager.glColorPointer(4, GL11.GL_UNSIGNED_BYTE, 28, 12);
-        GlStateManager.glTexCoordPointer(2, GL11.GL_FLOAT, 28, 16);
-        OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapTexUnit);
-        GlStateManager.glTexCoordPointer(2, GL11.GL_SHORT, 28, 24);
-        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+        RenderWrap.vertexPointer(3, GL11.GL_FLOAT, 28, 0);
+        RenderWrap.colorPointer(4, GL11.GL_UNSIGNED_BYTE, 28, 12);
+        RenderWrap.texCoordPointer(2, GL11.GL_FLOAT, 28, 16);
+        RenderWrap.setClientActiveTexture(RenderWrap.LIGHTMAP_TEX_UNIT);
+        RenderWrap.texCoordPointer(2, GL11.GL_SHORT, 28, 24);
+        RenderWrap.setClientActiveTexture(RenderWrap.DEFAULT_TEX_UNIT);
     }
 
     private void setupArrayPointersOverlay()
     {
-        GlStateManager.glVertexPointer(3, GL11.GL_FLOAT, 16, 0);
-        GlStateManager.glColorPointer(4, GL11.GL_UNSIGNED_BYTE, 16, 12);
+        RenderWrap.vertexPointer(3, GL11.GL_FLOAT, 16, 0);
+        RenderWrap.colorPointer(4, GL11.GL_UNSIGNED_BYTE, 16, 12);
     }
 }
