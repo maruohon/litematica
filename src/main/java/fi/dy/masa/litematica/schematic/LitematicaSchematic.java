@@ -1418,7 +1418,7 @@ public class LitematicaSchematic
         return blockEntities;
     }
 
-    protected List<EntityInfo> readSpongeEntitiesFromTag(NbtCompound tag)
+    protected List<EntityInfo> readSpongeEntitiesFromTag(NbtCompound tag, Vec3i offset)
     {
         List<EntityInfo> entities = new ArrayList<>();
         NbtList tagList = tag.getList("Entities", Constants.NBT.TAG_COMPOUND);
@@ -1431,6 +1431,7 @@ public class LitematicaSchematic
 
             if (pos != null && entityData.isEmpty() == false)
             {
+                pos = new Vec3d(pos.x - offset.getX(), pos.y - offset.getY(), pos.z - offset.getZ());
                 entityData.putString("id", entityData.getString("Id"));
 
                 // Remove the Sponge tags from the data that is kept in memory
@@ -1457,8 +1458,13 @@ public class LitematicaSchematic
             return false;
         }
 
+        Vec3i offset = NbtUtils.readVec3iFromIntArray(tag, "Offset");
+
+        if (offset == null)
+            offset = Vec3i.ZERO;
+
         this.tileEntities.put(name, this.readSpongeBlockEntitiesFromTag(tag));
-        this.entities.put(name, this.readSpongeEntitiesFromTag(tag));
+        this.entities.put(name, this.readSpongeEntitiesFromTag(tag, offset));
 
         if (tag.contains("author", Constants.NBT.TAG_STRING))
         {
