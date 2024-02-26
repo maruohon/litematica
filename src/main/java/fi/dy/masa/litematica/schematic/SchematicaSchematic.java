@@ -143,7 +143,7 @@ public class SchematicaSchematic
 
                                 try
                                 {
-                                    te.readNbt(teNBT);
+                                    te.readNbt(teNBT, null);
                                 }
                                 catch (Exception e)
                                 {
@@ -276,7 +276,7 @@ public class SchematicaSchematic
 
                                         try
                                         {
-                                            te.readNbt(teNBT);
+                                            te.readNbt(teNBT, null);
                                         }
                                         catch (Exception e)
                                         {
@@ -373,7 +373,7 @@ public class SchematicaSchematic
                     {
                         try
                         {
-                            NbtCompound nbt = te.createNbtWithId();
+                            NbtCompound nbt = te.createNbtWithId(null);
                             BlockPos pos = new BlockPos(relX, relY, relZ);
                             NBTUtils.writeBlockPosToTag(pos, nbt);
 

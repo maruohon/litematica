@@ -447,7 +447,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
             try
             {
-                Set<String> keys = new HashSet<>(be.createNbt().getKeys());
+                Set<String> keys = new HashSet<>(be.createNbt(null).getKeys());
                 keys.remove("id");
                 keys.remove("x");
                 keys.remove("y");
@@ -486,7 +486,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (be instanceof SignBlockEntity signBe)
         {
-            NbtCompound tag = be.createNbt();
+            NbtCompound tag = be.createNbt(null);
 
             if (tag != null)
             {
@@ -549,7 +549,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected BlockPos placeNbtPickedBlock(BlockPos pos, BlockState state, BlockEntity be,
                                            World schematicWorld, ClientWorld clientWorld)
     {
-        double reach = this.mc.interactionManager.getReachDistance();
+        double reach = 5.0; //this.mc.interactionManager.getReachDistance();
         BlockPos placementPos = this.findEmptyNearbyPosition(clientWorld, this.mc.player.getPos(), 4, reach);
 
         if (placementPos != null && preparePickedStack(pos, state, be, schematicWorld, this.mc))
@@ -1003,7 +1003,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
     public static void addBlockEntityNbt(ItemStack stack, BlockEntity be)
     {
-        NbtCompound tag = be.createNbt();
+        NbtCompound tag = be.createNbt(null);
 
         if (stack.getItem() instanceof PlayerHeadItem && tag.contains("SkullOwner"))
         {
