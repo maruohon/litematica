@@ -8,6 +8,12 @@ import fi.dy.masa.litematica.schematic.conversion.SchematicConversionMaps;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 
+import net.minecraft.network.packet.UnknownCustomPayload;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.util.Identifier;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import fi.dy.masa.litematica.Reference;
+
 public class WorldLoadListener implements IWorldLoadListener
 {
     @Override
@@ -33,6 +39,14 @@ public class WorldLoadListener implements IWorldLoadListener
         else
         {
             DataManager.clear();
+        }
+
+        // Send hello message
+        ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
+        if (networkHandler != null)
+        {
+            Identifier identifier = new Identifier(Reference.MOD_ID, "hello");
+            networkHandler.sendPacket(new CustomPayloadC2SPacket(new UnknownCustomPayload(identifier)));
         }
     }
 }
