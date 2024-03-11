@@ -228,7 +228,6 @@ public class LitematicaRenderer
 
             this.getWorldRenderer().renderBlockOverlays(matrices, this.getCamera(), projMatrix);
 
-            RenderSystem.enableDepthTest();
             RenderSystem.polygonOffset(0f, 0f);
             RenderSystem.disablePolygonOffset();
             RenderSystem.enableCull();
