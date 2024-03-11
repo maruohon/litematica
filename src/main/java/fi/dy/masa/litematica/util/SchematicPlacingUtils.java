@@ -11,6 +11,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.decoration.painting.PaintingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.Inventory;
@@ -449,6 +450,11 @@ public class SchematicPlacingUtils
                     }
 
                     EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
+
+                    if (entity instanceof DisplayEntity)
+                    {
+                        entity.tick(); // Required to set the full data for rendering
+                    }
                 }
             }
         }
