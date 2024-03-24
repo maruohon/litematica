@@ -117,9 +117,6 @@ public class ItemUtils
 
     public static ItemStack storeTEInStack(ItemStack stack, BlockEntity te)
     {
-        NbtCompound nbt = te.createNbtWithId(null);
-
-
         if (te instanceof SkullBlockEntity sbe && stack.getItem() instanceof BlockItem &&
             ((BlockItem) stack.getItem()).getBlock() instanceof AbstractSkullBlock)
         {
