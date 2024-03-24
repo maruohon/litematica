@@ -56,7 +56,7 @@ public class EntityUtils
 
         if (ItemStack.areItemsEqual(toolItem, stackHand))
         {
-            return toolItem.hasNbt() == false || ItemUtils.areTagsEqualIgnoreDamage(toolItem, stackHand);
+            return toolItem.getComponents().isEmpty() || ItemUtils.areTagsEqualIgnoreDamage(toolItem, stackHand);
         }
 
         return false;
@@ -87,19 +87,9 @@ public class EntityUtils
         return hand;
     }
 
-    public static boolean areStacksEqualIgnoreDurability(ItemStack stack1, ItemStack stack2)
-    {
-        return ItemStack.areItemsEqual(stack1, stack2); // && ItemStack.canCombine(stack1, stack2);
-    }
-
     public static Direction getHorizontalLookingDirection(Entity entity)
     {
         return Direction.fromRotation(entity.getYaw());
-    }
-
-    public static Direction getVerticalLookingDirection(Entity entity)
-    {
-        return entity.getPitch() > 0 ? Direction.DOWN : Direction.UP;
     }
 
     public static Direction getClosestLookingDirection(Entity entity)
@@ -114,25 +104,6 @@ public class EntityUtils
         }
 
         return getHorizontalLookingDirection(entity);
-    }
-
-    @Nullable
-    public static <T extends Entity> T findEntityByUUID(List<T> list, UUID uuid)
-    {
-        if (uuid == null)
-        {
-            return null;
-        }
-
-        for (T entity : list)
-        {
-            if (entity.getUuid().equals(uuid))
-            {
-                return entity;
-            }
-        }
-
-        return null;
     }
 
     @Nullable
@@ -234,18 +205,6 @@ public class EntityUtils
             //livingBase.renderYawOffset = yaw;
             //livingBase.prevRenderYawOffset = yaw;
         }
-    }
-
-    public static List<Entity> getEntitiesWithinSubRegion(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement)
-    {
-        // These are the untransformed relative positions
-        BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        BlockPos posEndAbs = PositionUtils.getTransformedPlacementPosition(regionSize.add(-1, -1, -1), schematicPlacement, placement).add(regionPosRelTransformed).add(origin);
-        BlockPos regionPosAbs = regionPosRelTransformed.add(origin);
-        Box bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
-
-        return world.getOtherEntities(null, bb, EntityUtils.NOT_PLAYER);
     }
 
     public static boolean shouldPickBlock(PlayerEntity player)

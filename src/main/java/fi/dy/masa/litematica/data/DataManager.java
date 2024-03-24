@@ -46,7 +46,6 @@ public class DataManager implements IDirectoryCache
 {
     private static final DataManager INSTANCE = new DataManager();
 
-    private static final Pattern PATTERN_ITEM_NBT = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)(?<nbt>\\{.*\\})$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
     private static final ArrayList<ToBooleanFunction<Text>> CHAT_LISTENERS = new ArrayList<>();
@@ -519,18 +518,11 @@ public class DataManager implements IDirectoryCache
 
         try
         {
-            Matcher matcherNbt = PATTERN_ITEM_NBT.matcher(itemNameIn);
             Matcher matcherBase = PATTERN_ITEM_BASE.matcher(itemNameIn);
 
             String itemName = null;
-            NbtCompound nbt = null;
 
-            if (matcherNbt.matches())
-            {
-                itemName = matcherNbt.group("name");
-                nbt = (new StringNbtReader(new StringReader(matcherNbt.group("nbt")))).parseCompound();
-            }
-            else if (matcherBase.matches())
+            if (matcherBase.matches())
             {
                 itemName = matcherBase.group("name");
             }
@@ -542,7 +534,6 @@ public class DataManager implements IDirectoryCache
                 if (item != null && item != Items.AIR)
                 {
                     toolItem = new ItemStack(item);
-                    toolItem.setNbt(nbt);
                     return;
                 }
             }

@@ -211,7 +211,7 @@ public class BlockModelRendererSchematic
         }
 
         vertexConsumer.quad(matrixEntry, quad, new float[]{ brightness0, brightness1, brightness2, brightness3 },
-                            r, g, b, new int[]{ light0, light1, light2, light3 }, overlay, true);
+                            r, g, b, 1.0f, new int[]{ light0, light1, light2, light3 }, overlay, true);
     }
 
     protected void getQuadDimensions(BlockRenderView world, BlockState state, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] box, BitSet flags)

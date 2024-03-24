@@ -20,6 +20,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CarpetBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import net.minecraft.fluid.Fluid;
@@ -461,7 +462,7 @@ public class LitematicaSchematic
 
                             try
                             {
-                                te.readNbt(teNBT, null);
+                                te.readNbt(teNBT, MinecraftClient.getInstance().getServer().getRegistryManager());
 
                                 if (ignoreInventories && te instanceof Inventory)
                                 {
@@ -702,7 +703,7 @@ public class LitematicaSchematic
                             {
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
-                                NbtCompound tag = te.createNbtWithId(null);
+                                NbtCompound tag = te.createNbtWithId(MinecraftClient.getInstance().getServer().getRegistryManager());
                                 NBTUtils.writeBlockPosToTag(pos, tag);
                                 tileEntityMap.put(pos, tag);
                             }
@@ -946,7 +947,7 @@ public class LitematicaSchematic
                             {
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
-                                NbtCompound tag = te.createNbtWithId(null);
+                                NbtCompound tag = te.createNbtWithId(MinecraftClient.getInstance().getServer().getRegistryManager());
                                 NBTUtils.writeBlockPosToTag(pos, tag);
                                 tileEntityMap.put(pos, tag);
                             }

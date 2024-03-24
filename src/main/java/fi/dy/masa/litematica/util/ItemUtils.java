@@ -1,14 +1,19 @@
 package fi.dy.masa.litematica.util;
 
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Set;
-import net.minecraft.block.AbstractSkullBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SlabBlock;
+import java.util.*;
+
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.enums.SlabType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
+import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -16,6 +21,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -26,30 +32,13 @@ public class ItemUtils
 
     public static boolean areTagsEqualIgnoreDamage(ItemStack stackReference, ItemStack stackToCheck)
     {
-        NbtCompound tagReference = stackReference.getNbt();
-        NbtCompound tagToCheck = stackToCheck.getNbt();
-
-        if (tagReference != null && tagToCheck != null)
-        {
-            Set<String> keysReference = new HashSet<>(tagReference.getKeys());
-
-            for (String key : keysReference)
-            {
-                if (key.equals("Damage"))
-                {
-                    continue;
-                }
-
-                if (tagReference.get(key).equals(tagToCheck.get(key)) == false)
-                {
-                    return false;
-                }
+        return stackReference.getComponents().stream().allMatch(component -> {
+            DataComponentType<?> key = component.type();
+            if (key == DataComponentTypes.DAMAGE) {
+                return true;
             }
-
-            return true;
-        }
-
-        return (tagReference == null) && (tagToCheck == null);
+            return component.value().equals(stackToCheck.getComponents().get(key));
+        });
     }
 
     public static ItemStack getItemForState(BlockState state)
@@ -130,42 +119,21 @@ public class ItemUtils
     {
         NbtCompound nbt = te.createNbtWithId(null);
 
-        if (nbt.contains("Owner") && stack.getItem() instanceof BlockItem &&
+
+        if (te instanceof SkullBlockEntity sbe && stack.getItem() instanceof BlockItem &&
             ((BlockItem) stack.getItem()).getBlock() instanceof AbstractSkullBlock)
         {
-            NbtCompound tagOwner = nbt.getCompound("Owner");
-            NbtCompound tagSkull = new NbtCompound();
-
-            tagSkull.put("SkullOwner", tagOwner);
-            stack.setNbt(tagSkull);
-
+            stack.set(DataComponentTypes.PROFILE, new ProfileComponent(sbe.getOwner().gameProfile()));
             return stack;
         }
         else
         {
-            NbtCompound tagLore = new NbtCompound();
-            NbtList tagList = new NbtList();
-
-            tagList.add(NbtString.of("(+NBT)"));
-            tagLore.put("Lore", tagList);
-            stack.setSubNbt("display", tagLore);
-            stack.setSubNbt("BlockEntityTag", nbt);
-
+            stack.set(DataComponentTypes.LORE, new LoreComponent(
+                    List.of(
+                            Text.literal("(+NBT)")
+                    )
+            ));
             return stack;
         }
-    }
-
-    public static String getStackString(ItemStack stack)
-    {
-        if (stack.isEmpty() == false)
-        {
-            Identifier rl = Registries.ITEM.getId(stack.getItem());
-
-            return String.format("[%s - display: %s - NBT: %s] (%s)",
-                                 rl != null ? rl.toString() : "null", stack.getName().getString(),
-                                 stack.getNbt() != null ? stack.getNbt().toString() : "<no NBT>", stack);
-        }
-
-        return "<empty>";
     }
 }
