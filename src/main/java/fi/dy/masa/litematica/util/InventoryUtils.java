@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -167,10 +168,10 @@ public class InventoryUtils
             return true;
         }
 
-        return (Configs.Generic.PICK_BLOCK_AVOID_DAMAGEABLE.getBooleanValue() == false ||
-                stack.getItem().isDamageable() == false) &&
-               (Configs.Generic.PICK_BLOCK_AVOID_TOOLS.getBooleanValue() == false ||
-                (stack.getItem() instanceof ToolItem) == false);
+        return (!Configs.Generic.PICK_BLOCK_AVOID_DAMAGEABLE.getBooleanValue() ||
+                !stack.getItem().getComponents().contains(DataComponentTypes.MAX_DAMAGE)) &&
+               (!Configs.Generic.PICK_BLOCK_AVOID_TOOLS.getBooleanValue() ||
+                       !(stack.getItem() instanceof ToolItem));
     }
 
     private static int getPickBlockTargetSlot(PlayerEntity player)

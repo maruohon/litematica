@@ -611,7 +611,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     private static void renderQuad(BakedQuad quad, float[] brightness, int[] light,
                                    MatrixStack.Entry matrixEntry, VertexConsumer vertexConsumer)
     {
-        vertexConsumer.quad(matrixEntry, quad, brightness, 1.0f, 1.0f, 1.0f, light, OverlayTexture.DEFAULT_UV, true);
+        vertexConsumer.quad(matrixEntry, quad, brightness, 1.0f, 1.0f, 1.0f, 1.0f, light, OverlayTexture.DEFAULT_UV, true);
     }
 
     private static class ButtonListener implements IButtonActionListener

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.component.type.MapIdComponent;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
@@ -194,21 +195,21 @@ public class WorldSchematic extends World
 
     @Override
     @Nullable
-    public MapState getMapState(String id)
+    public MapState getMapState(MapIdComponent id)
     {
         return null;
     }
 
     @Override
-    public void putMapState(String name, MapState mapState)
+    public void putMapState(MapIdComponent id, MapState mapState)
     {
         // NO-OP
     }
 
     @Override
-    public int getNextMapId()
+    public MapIdComponent getNextMapId()
     {
-        return 0;
+        return new MapIdComponent(0);
     }
 
     @Override
@@ -418,7 +419,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public void emitGameEvent(GameEvent event, Vec3d pos, @Nullable GameEvent.Emitter emitter)
+    public void emitGameEvent(RegistryEntry<GameEvent> event, Vec3d pos, @Nullable GameEvent.Emitter emitter)
     {
         // NO-OP
     }
@@ -436,7 +437,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public void emitGameEvent(@Nullable Entity entity, GameEvent event, BlockPos pos)
+    public void emitGameEvent(@Nullable Entity entity, RegistryEntry<GameEvent> event, BlockPos pos)
     {
         // NO-OP
     }

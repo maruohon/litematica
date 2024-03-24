@@ -14,9 +14,12 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.argument.BlockArgumentParser;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
@@ -330,20 +333,6 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             Identifier itemId = Registries.ITEM.getId(stack.getItem());
             int facingId = itemFrame.getHorizontalFacing().getId();
             String nbtStr = String.format(" {Facing:%db,Item:{id:\"%s\",Count:1b}}", facingId, itemId);
-            NbtCompound tag = stack.getNbt();
-
-            if (tag != null)
-            {
-                String itemNbt = tag.toString();
-                String tmp = String.format(" {Facing:%db,Item:{id:\"%s\",Count:1b,tag:%s}}",
-                                           facingId, itemId, itemNbt);
-
-                if (originalCommand.length() + tmp.length() < 255)
-                {
-                    nbtStr = tmp;
-                }
-            }
-
             return originalCommand + nbtStr;
         }
 
@@ -447,7 +436,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
             try
             {
-                Set<String> keys = new HashSet<>(be.createNbt().getKeys());
+                Set<String> keys = new HashSet<>(be.createNbt(null).getKeys());
                 keys.remove("id");
                 keys.remove("x");
                 keys.remove("y");
@@ -486,7 +475,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
         if (be instanceof SignBlockEntity signBe)
         {
-            NbtCompound tag = be.createNbt();
+            NbtCompound tag = be.createNbt(null);
 
             if (tag != null)
             {
@@ -549,7 +538,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected BlockPos placeNbtPickedBlock(BlockPos pos, BlockState state, BlockEntity be,
                                            World schematicWorld, ClientWorld clientWorld)
     {
-        double reach = this.mc.interactionManager.getReachDistance();
+        double reach = 5.0; //this.mc.interactionManager.getReachDistance();
         BlockPos placementPos = this.findEmptyNearbyPosition(clientWorld, this.mc.player.getPos(), 4, reach);
 
         if (placementPos != null && preparePickedStack(pos, state, be, schematicWorld, this.mc))
@@ -1003,16 +992,68 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
     public static void addBlockEntityNbt(ItemStack stack, BlockEntity be)
     {
-        NbtCompound tag = be.createNbt();
-
-        if (stack.getItem() instanceof PlayerHeadItem && tag.contains("SkullOwner"))
+        if (stack.getItem() instanceof PlayerHeadItem && be instanceof SkullBlockEntity sbe)
         {
-            NbtCompound ownerTag = tag.getCompound("SkullOwner");
-            stack.getOrCreateNbt().put("SkullOwner", ownerTag);
+            stack.set(DataComponentTypes.PROFILE, sbe.getOwner());
         }
         else
         {
-            stack.setSubNbt("BlockEntityTag", tag);
+            var map = be.createComponentMap();
+            stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, map.get(DataComponentTypes.ATTRIBUTE_MODIFIERS));
+            stack.set(DataComponentTypes.BANNER_PATTERNS, map.get(DataComponentTypes.BANNER_PATTERNS));
+            stack.set(DataComponentTypes.BASE_COLOR, map.get(DataComponentTypes.BASE_COLOR));
+            stack.set(DataComponentTypes.BEES, map.get(DataComponentTypes.BEES));
+            stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, map.get(DataComponentTypes.BLOCK_ENTITY_DATA));
+            stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, map.get(DataComponentTypes.BLOCK_ENTITY_DATA));
+            stack.set(DataComponentTypes.BLOCK_STATE, map.get(DataComponentTypes.BLOCK_STATE));
+            stack.set(DataComponentTypes.BUCKET_ENTITY_DATA, map.get(DataComponentTypes.BUCKET_ENTITY_DATA));
+            stack.set(DataComponentTypes.BUNDLE_CONTENTS, map.get(DataComponentTypes.BUNDLE_CONTENTS));
+            stack.set(DataComponentTypes.CAN_BREAK, map.get(DataComponentTypes.CAN_BREAK));
+            stack.set(DataComponentTypes.CAN_PLACE_ON, map.get(DataComponentTypes.CAN_PLACE_ON));
+            stack.set(DataComponentTypes.CHARGED_PROJECTILES, map.get(DataComponentTypes.CHARGED_PROJECTILES));
+            stack.set(DataComponentTypes.CONTAINER, map.get(DataComponentTypes.CONTAINER));
+            stack.set(DataComponentTypes.CONTAINER_LOOT, map.get(DataComponentTypes.CONTAINER_LOOT));
+            stack.set(DataComponentTypes.CREATIVE_SLOT_LOCK, map.get(DataComponentTypes.CREATIVE_SLOT_LOCK));
+            stack.set(DataComponentTypes.CUSTOM_DATA, map.get(DataComponentTypes.CUSTOM_DATA));
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, map.get(DataComponentTypes.CUSTOM_MODEL_DATA));
+            stack.set(DataComponentTypes.CUSTOM_NAME, map.get(DataComponentTypes.CUSTOM_NAME));
+            stack.set(DataComponentTypes.DAMAGE, map.get(DataComponentTypes.DAMAGE));
+            stack.set(DataComponentTypes.DEBUG_STICK_STATE, map.get(DataComponentTypes.DEBUG_STICK_STATE));
+            stack.set(DataComponentTypes.DYED_COLOR, map.get(DataComponentTypes.DYED_COLOR));
+            stack.set(DataComponentTypes.ENCHANTMENTS, map.get(DataComponentTypes.ENCHANTMENTS));
+            stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, map.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE));
+            stack.set(DataComponentTypes.ENTITY_DATA, map.get(DataComponentTypes.ENTITY_DATA));
+            stack.set(DataComponentTypes.FIREWORKS, map.get(DataComponentTypes.FIREWORKS));
+            stack.set(DataComponentTypes.FIREWORK_EXPLOSION, map.get(DataComponentTypes.FIREWORK_EXPLOSION));
+            stack.set(DataComponentTypes.FIRE_RESISTANT, map.get(DataComponentTypes.FIRE_RESISTANT));
+            stack.set(DataComponentTypes.FOOD, map.get(DataComponentTypes.FOOD));
+            stack.set(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP, map.get(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP));
+            stack.set(DataComponentTypes.HIDE_TOOLTIP, map.get(DataComponentTypes.HIDE_TOOLTIP));
+            stack.set(DataComponentTypes.INSTRUMENT, map.get(DataComponentTypes.INSTRUMENT));
+            stack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, map.get(DataComponentTypes.INTANGIBLE_PROJECTILE));
+            stack.set(DataComponentTypes.LOCK, map.get(DataComponentTypes.LOCK));
+            stack.set(DataComponentTypes.LODESTONE_TRACKER, map.get(DataComponentTypes.LODESTONE_TRACKER));
+            stack.set(DataComponentTypes.LORE, map.get(DataComponentTypes.LORE));
+            stack.set(DataComponentTypes.MAP_COLOR, map.get(DataComponentTypes.MAP_COLOR));
+            stack.set(DataComponentTypes.MAP_DECORATIONS, map.get(DataComponentTypes.MAP_DECORATIONS));
+            stack.set(DataComponentTypes.MAP_ID, map.get(DataComponentTypes.MAP_ID));
+            stack.set(DataComponentTypes.MAP_POST_PROCESSING, map.get(DataComponentTypes.MAP_POST_PROCESSING));
+            stack.set(DataComponentTypes.MAX_DAMAGE, map.get(DataComponentTypes.MAX_DAMAGE));
+            stack.set(DataComponentTypes.MAX_STACK_SIZE, map.get(DataComponentTypes.MAX_STACK_SIZE));
+            stack.set(DataComponentTypes.NOTE_BLOCK_SOUND, map.get(DataComponentTypes.NOTE_BLOCK_SOUND));
+            stack.set(DataComponentTypes.POTION_CONTENTS, map.get(DataComponentTypes.POTION_CONTENTS));
+            stack.set(DataComponentTypes.POT_DECORATIONS, map.get(DataComponentTypes.POT_DECORATIONS));
+            stack.set(DataComponentTypes.PROFILE, map.get(DataComponentTypes.PROFILE));
+            stack.set(DataComponentTypes.RARITY, map.get(DataComponentTypes.RARITY));
+            stack.set(DataComponentTypes.RECIPES, map.get(DataComponentTypes.RECIPES));
+            stack.set(DataComponentTypes.REPAIR_COST, map.get(DataComponentTypes.REPAIR_COST));
+            stack.set(DataComponentTypes.STORED_ENCHANTMENTS, map.get(DataComponentTypes.STORED_ENCHANTMENTS));
+            stack.set(DataComponentTypes.SUSPICIOUS_STEW_EFFECTS, map.get(DataComponentTypes.SUSPICIOUS_STEW_EFFECTS));
+            stack.set(DataComponentTypes.TOOL, map.get(DataComponentTypes.TOOL));
+            stack.set(DataComponentTypes.TRIM, map.get(DataComponentTypes.TRIM));
+            stack.set(DataComponentTypes.UNBREAKABLE, map.get(DataComponentTypes.UNBREAKABLE));
+            stack.set(DataComponentTypes.WRITABLE_BOOK_CONTENT, map.get(DataComponentTypes.WRITABLE_BOOK_CONTENT));
+            stack.set(DataComponentTypes.WRITTEN_BOOK_CONTENT, map.get(DataComponentTypes.WRITTEN_BOOK_CONTENT));
         }
     }
 }
