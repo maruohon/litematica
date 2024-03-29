@@ -144,7 +144,7 @@ public class SchematicaSchematic
 
                                 try
                                 {
-                                    te.readNbt(teNBT, MinecraftClient.getInstance().getServer().getRegistryManager());
+                                    te.read(teNBT, MinecraftClient.getInstance().getServer().getRegistryManager());
                                 }
                                 catch (Exception e)
                                 {
@@ -277,7 +277,7 @@ public class SchematicaSchematic
 
                                         try
                                         {
-                                            te.readNbt(teNBT, MinecraftClient.getInstance().getServer().getRegistryManager());
+                                            te.read(teNBT, MinecraftClient.getInstance().getServer().getRegistryManager());
                                         }
                                         catch (Exception e)
                                         {
