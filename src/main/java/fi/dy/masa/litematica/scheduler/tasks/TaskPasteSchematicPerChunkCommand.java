@@ -22,6 +22,7 @@ import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ItemFrameEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.nbt.NbtCompound;
@@ -538,7 +539,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected BlockPos placeNbtPickedBlock(BlockPos pos, BlockState state, BlockEntity be,
                                            World schematicWorld, ClientWorld clientWorld)
     {
-        double reach = 5.0; //this.mc.interactionManager.getReachDistance();
+        double reach = this.mc.player.getBlockInteractionRange();
         BlockPos placementPos = this.findEmptyNearbyPosition(clientWorld, this.mc.player.getPos(), 4, reach);
 
         if (placementPos != null && preparePickedStack(pos, state, be, schematicWorld, this.mc))
