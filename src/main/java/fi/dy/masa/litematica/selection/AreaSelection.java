@@ -276,8 +276,8 @@ public class AreaSelection
                 double syncPosZ = (int) (pos[1]);
 
                 box = new Box();
-                BlockPos pos1 = new BlockPos((int) curX, cor1.getY(), (int) curZ);
-                BlockPos pos2 = new BlockPos((int) syncPosX, cor1.getY(), (int) syncPosZ);
+                BlockPos pos1 = new BlockPos((int) curX, (int)c1y, (int) curZ);
+                BlockPos pos2 = new BlockPos((int) syncPosX, (int)c2y, (int) syncPosZ);
                 // 添加到多选区域列表中
                 String name = "z" + curZ;
                 box.setSelectedCorner(Corner.CORNER_1);
