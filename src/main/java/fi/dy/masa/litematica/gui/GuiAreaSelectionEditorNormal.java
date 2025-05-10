@@ -3,6 +3,8 @@ package fi.dy.masa.litematica.gui;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+
+import fi.dy.masa.malilib.MaLiLib;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -35,6 +37,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.util.math.Vec3i;
 
 public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
                                           implements ISelectionListener<String>
@@ -48,7 +51,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int yNext;
     protected int xOrigin;
     @Nullable protected String selectionId;
-
+    protected boolean circleMode = false;
+    protected BlockPos cor1 = BlockPos.ORIGIN;
+    protected BlockPos cor2 = BlockPos.ORIGIN;
     public GuiAreaSelectionEditorNormal(AreaSelection selection)
     {
         super(8, 116);
@@ -240,6 +245,35 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         return y;
     }
 
+    protected void updateCircleModeParams(CoordinateType coordType, Corner corner, String text) {
+        if (corner == Corner.NONE) {
+            return;
+        }
+        BlockPos pos = corner == Corner.CORNER_1 ? cor1 : cor2;
+        int value;
+        try {
+            value = Integer.parseInt(text);
+        } catch (Exception e) {
+            return;
+        }
+        switch (coordType) {
+            case X:
+                pos = new BlockPos(value, pos.getY(), pos.getZ());
+                break;
+            case Y:
+                pos = new BlockPos(pos.getX(), value, pos.getZ());
+                break;
+            case Z:
+                pos = new BlockPos(pos.getX(), pos.getY(), value);
+                break;
+        }
+        if (corner == Corner.CORNER_1) {
+            cor1 = pos;
+        } else if (corner == Corner.CORNER_2) {
+            cor2 = pos;
+        }
+    }
+
     protected void createCoordinateInput(int x, int y, int width, CoordinateType coordType, Corner corner)
     {
         String label = coordType.name() + ":";
@@ -266,6 +300,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                 type = ButtonListener.Type.NUDGE_COORD_Z;
                 break;
         }
+
+        // 创建的时候更新角点的坐标值
+        updateCircleModeParams(coordType, corner, text);
 
         GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y, width, 16, this.textRenderer);
         TextFieldListener listener = new TextFieldListener(coordType, corner, this);
@@ -536,6 +573,16 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                         this.parent.selection.setExplicitOrigin(null);
                     }
                     break;
+                case TOGGLE_GENERATE_CIRCLE:
+                    MaLiLib.logger.error("click TOGGLE_GENERATE_CIRCLE " + this.parent.circleMode);
+                    if (this.parent.circleMode) {
+                        this.parent.selection.createNewSubRegionBoxBatch(this.parent.cor1, this.parent.cor2);
+                    }
+                    break;
+                case TOGGLE_CIRCLE_ENABLED:
+                    MaLiLib.logger.error("click TOGGLE_CIRCLE_ENABLED");
+                    this.parent.circleMode = !this.parent.circleMode;
+                    break;
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
@@ -546,6 +593,8 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             SET_SELECTION_NAME      ("litematica.gui.button.area_editor.set_selection_name"),
             SET_BOX_NAME            ("litematica.gui.button.area_editor.set_box_name"),
             TOGGLE_ORIGIN_ENABLED   ("litematica.gui.button.area_editor.origin_enabled"),
+            TOGGLE_CIRCLE_ENABLED   ("litematica.gui.button.area_editor.circle_enabled"),
+            TOGGLE_GENERATE_CIRCLE   ("litematica.gui.button.area_editor.generate_circle"),
             CREATE_SUB_REGION       ("litematica.gui.button.area_editor.create_sub_region"),
             CREATE_SCHEMATIC        ("litematica.gui.button.area_editor.create_schematic"),
             ANALYZE_AREA            ("litematica.gui.button.area_editor.analyze_area"),
@@ -598,7 +647,11 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         @Override
         public boolean onTextChange(GuiTextFieldGeneric textField)
         {
-            this.parent.updatePosition(textField.getText(), this.corner, this.type);
+            if (this.parent.circleMode) {
+                // todo nothing
+            } else {
+                this.parent.updatePosition(textField.getText(), this.corner, this.type);
+            }
             return false;
         }
     }

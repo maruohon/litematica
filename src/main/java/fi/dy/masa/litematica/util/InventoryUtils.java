@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 
+import fi.dy.masa.malilib.MaLiLib;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
@@ -113,11 +114,12 @@ public class InventoryUtils
     public static void schematicWorldPickBlock(ItemStack stack, BlockPos pos,
                                                World schematicWorld, MinecraftClient mc)
     {
+        MaLiLib.logger.error("schematicWorldPickBlock stack.isEmpty() {} ", stack.isEmpty());
         if (stack.isEmpty() == false)
         {
             PlayerInventory inv = mc.player.getInventory();
             stack = stack.copy();
-
+            MaLiLib.logger.error("schematicWorldPickBlock EntityUtils.isCreativeMode(mc.player) {} ", EntityUtils.isCreativeMode(mc.player));
             if (EntityUtils.isCreativeMode(mc.player))
             {
                 BlockEntity te = schematicWorld.getBlockEntity(pos);
@@ -138,7 +140,9 @@ public class InventoryUtils
             }
             else
             {
+                MaLiLib.logger.error("schematicWorldPickBlock getSlotWithStack invoking {} {}", stack.toString(), pos.toString());
                 int slot = inv.getSlotWithStack(stack);
+                MaLiLib.logger.error("schematicWorldPickBlock getSlotWithStack ret slot {} selected slot {}", slot, inv.selectedSlot);
                 boolean shouldPick = inv.selectedSlot != slot;
 
                 if (shouldPick && slot != -1)
@@ -147,8 +151,9 @@ public class InventoryUtils
                 }
                 else if (slot == -1 && Configs.Generic.PICK_BLOCK_SHULKERS.getBooleanValue())
                 {
-                    slot = findSlotWithBoxWithItem(mc.player.playerScreenHandler, stack, false);
 
+                    slot = findSlotWithBoxWithItem(mc.player.playerScreenHandler, stack, false);
+                    MaLiLib.logger.error("schematicWorldPickBlock findSlotWithBoxWithItem ret slot {}", slot);
                     if (slot != -1)
                     {
                         ItemStack boxStack = mc.player.playerScreenHandler.slots.get(slot).getStack();

@@ -65,6 +65,9 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
         }
 
         x = this.createButton(22, nextY, -1, ButtonListener.Type.CREATE_SCHEMATIC) + 26;
+        x = this.createButton(22, nextY + 22, -1, ButtonListener.Type.TOGGLE_GENERATE_CIRCLE);
+        nextY += 22;
+        this.createButtonOnOff(22, nextY + 22, -1, this.circleMode, ButtonListener.Type.TOGGLE_CIRCLE_ENABLED);
 
         this.addRenderingDisabledWarning(250, 48);
 

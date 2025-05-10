@@ -533,6 +533,8 @@
     "litematica.gui.button.area_editor.create_schematic": "Save Schematic",
     "litematica.gui.button.area_editor.create_sub_region": "New sub-region",
     "litematica.gui.button.area_editor.origin_enabled": "Manual Origin: %s",
+    "litematica.gui.button.area_editor.generate_circle": "Generate Circle",
+    "litematica.gui.button.area_editor.circle_enabled": "Circle Mode: %s",
     "litematica.gui.button.area_editor.set_box_name": "Set",
     "litematica.gui.button.area_editor.set_selection_name": "Set",
 
@@ -673,6 +675,7 @@
     "litematica.gui.label.area_selection_box_count": "Boxes: %d",
     "litematica.gui.label.area_selection_origin": "Origin: %s",
     "litematica.gui.label.area_selection.mode.normal": "Normal",
+    "litematica.gui.label.area_selection.mode.complex": "Complex",
     "litematica.gui.label.area_selection.mode.simple": "Simple",
 
     "litematica.gui.label.block_info.state_client": "Client World Block State",
@@ -798,6 +801,7 @@
     "litematica.gui.title.area_editor_normal": "Area Editor (Normal/Multi-box mode)",
     "litematica.gui.title.area_editor_normal_schematic_projects": "Area Editor (§6§lSchematic VCS area§r)",
     "litematica.gui.title.area_editor_simple": "Area Editor (Simple mode)",
+    "litematica.gui.title.area_editor_complex": "Area Editor (Complex mode)",
     "litematica.gui.title.area_editor_sub_region": "Area Editor (sub-region)",
     "litematica.gui.title.area_editor.sub_region_name": "Sub-region name",
     "litematica.gui.title.area_selection_manager": "Area Selection Manager",

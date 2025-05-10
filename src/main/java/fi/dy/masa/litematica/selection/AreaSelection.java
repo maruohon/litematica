@@ -1,10 +1,9 @@
 package fi.dy.masa.litematica.selection;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.Nullable;
+
+import fi.dy.masa.malilib.MaLiLib;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -208,6 +207,92 @@ public class AreaSelection
         this.setSubRegionCornerPos(box, Corner.CORNER_2, pos1);
 
         return name;
+    }
+
+
+    private double calculateDistance2(double x1, double z1, double x2, double z2) {
+        return (x1 - x2) * (x1 - x2) + (z1 - z2) * (z1 - z2);
+    }
+
+    @Nullable
+    public String createNewSubRegionBoxBatch(BlockPos cor1, BlockPos cor2) {
+        List<Box> boxList = new ArrayList<>();
+        this.subRegionBoxes.clear();
+        try {
+            double offset = 0.0;
+            double c1x = cor1.getX() + offset;
+            double c1z = cor1.getZ() + offset;
+            double c1y = cor1.getY() + offset;
+            double c2x = cor2.getX() + offset;
+            double c2z = cor2.getZ() + offset;
+            double c2y = cor2.getY() + offset;
+
+            double dis2 = calculateDistance2(c1x, c1z, c2x, c2z);
+            double dis = Math.sqrt(dis2);
+            double startX = c1x;
+            double startZ = c1z + Math.ceil(dis);
+            List<double[]> posList = new ArrayList<>();
+            posList.add(new double[]{startX, startZ});
+            // 1/4圆
+            MaLiLib.logger.error(String.format("startZ:%s, endZ:%s, dis:%s", startZ, c1z, dis));
+            while(startZ > c1z) {
+                double[][] nextPos = {{startX + 1, startZ}, {startX + 1, startZ - 1}, {startX, startZ - 1}};
+                double[] disSquare = new double[3];
+                disSquare[0] = Math.abs(calculateDistance2(nextPos[0][0], nextPos[0][1], c1x, c1z) - dis2);
+                disSquare[1] = Math.abs(calculateDistance2(nextPos[1][0], nextPos[1][1], c1x, c1z) - dis2);
+                disSquare[2] = Math.abs(calculateDistance2(nextPos[2][0], nextPos[2][1], c1x, c1z) - dis2);
+                int minIndex = 0;
+                double minDisSquare = Double.MAX_VALUE;
+                for (int i = 0; i < 3; ++i) {
+                    if (disSquare[i] < minDisSquare) {
+                        minDisSquare = disSquare[i];
+                        minIndex = i;
+                    }
+                }
+                startX = nextPos[minIndex][0];
+                startZ = nextPos[minIndex][1];
+                posList.add(new double[]{startX, startZ});
+            }
+            //关于x轴对称 1/2圆
+            /*
+            ^z
+            |
+            |_____>x
+            (c1x,c1z)
+             */
+            List<double[]> newPosList = new ArrayList<>();
+            for (double[] pos : posList) {
+                double syncPosX = pos[0];
+                double syncPosZ = 2 * c1z - pos[1];
+                newPosList.add(new double[]{syncPosX, syncPosZ});
+            }
+            posList.addAll(newPosList);
+            //关于z轴对称 整个圆
+            Box box = null;
+            for (double[] pos : posList) {
+                double curX = (int) pos[0];
+                double curZ = (int) pos[1];
+                double syncPosX = (int) (2 * c1x - pos[0]);
+                double syncPosZ = (int) (pos[1]);
+
+                box = new Box();
+                BlockPos pos1 = new BlockPos((int) curX, cor1.getY(), (int) curZ);
+                BlockPos pos2 = new BlockPos((int) syncPosX, cor1.getY(), (int) syncPosZ);
+                // 添加到多选区域列表中
+                String name = "z" + curZ;
+                box.setSelectedCorner(Corner.CORNER_1);
+                this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
+                this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
+                this.currentBox = name;
+                this.subRegionBoxes.put(name, box);
+                boxList.add(box);
+                MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));
+            }
+            MaLiLib.logger.error(String.format("boxList size: %s", boxList.size()));
+        } catch (Exception e) {
+            MaLiLib.logger.error("createNewSubRegionBoxBatch ", e);
+        }
+        return "createNewSubRegionBoxBatch";
     }
 
     public void clearCurrentSelectedCorner()

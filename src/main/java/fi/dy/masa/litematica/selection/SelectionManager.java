@@ -718,6 +718,18 @@ public class SelectionManager
                 return null;
             }
         }
+        else if (this.getSelectionMode() == SelectionMode.NORMAL)
+        {
+            if (selection != null)
+            {
+                return new GuiAreaSelectionEditorNormal(selection);
+            }
+            else
+            {
+                InfoUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
+                return null;
+            }
+        }
         else
         {
             return new GuiAreaSelectionEditorSimple(selection);
