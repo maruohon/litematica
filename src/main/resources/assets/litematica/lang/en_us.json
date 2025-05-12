@@ -849,6 +849,7 @@
     "litematica.hud.area_selection.origin": "Origin: %s",
     "litematica.hud.area_selection.selected_area_normal": "Area: %s",
     "litematica.hud.area_selection.selected_area_simple": "Area [§6Simple mode§r]: %s",
+    "litematica.hud.area_selection.selected_area_complex": "Area [§6Complex mode§r]: %s",
     "litematica.hud.area_selection.selected_sub_region": "Sub-region: %s",
     "litematica.hud.area_selection.selection_corners_mode": "Corners Mode: %s",
 

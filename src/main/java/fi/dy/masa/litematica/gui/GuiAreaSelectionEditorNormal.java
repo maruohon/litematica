@@ -51,7 +51,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int yNext;
     protected int xOrigin;
     @Nullable protected String selectionId;
-    protected boolean circleMode = false;
+    protected static boolean circleMode = false;
     protected BlockPos cor1 = BlockPos.ORIGIN;
     protected BlockPos cor2 = BlockPos.ORIGIN;
     public GuiAreaSelectionEditorNormal(AreaSelection selection)
@@ -81,7 +81,6 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     public void initGui()
     {
         super.initGui();
-
         if (this.selection != null)
         {
             this.createSelectionEditFields();
@@ -574,14 +573,14 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     }
                     break;
                 case TOGGLE_GENERATE_CIRCLE:
-                    MaLiLib.logger.error("click TOGGLE_GENERATE_CIRCLE " + this.parent.circleMode);
-                    if (this.parent.circleMode) {
+                    MaLiLib.logger.error("click TOGGLE_GENERATE_CIRCLE " + circleMode);
+                    if (circleMode) {
                         this.parent.selection.createNewSubRegionBoxBatch(this.parent.cor1, this.parent.cor2);
                     }
                     break;
                 case TOGGLE_CIRCLE_ENABLED:
                     MaLiLib.logger.error("click TOGGLE_CIRCLE_ENABLED");
-                    this.parent.circleMode = !this.parent.circleMode;
+                    circleMode = !circleMode;
                     break;
             }
 

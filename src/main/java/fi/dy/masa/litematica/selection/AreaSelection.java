@@ -217,7 +217,10 @@ public class AreaSelection
     @Nullable
     public String createNewSubRegionBoxBatch(BlockPos cor1, BlockPos cor2) {
         List<Box> boxList = new ArrayList<>();
+        String currentBoxName = this.getCurrentSubRegionBoxName();
+        Box curBox = this.getSubRegionBox(currentBox);
         this.subRegionBoxes.clear();
+        this.subRegionBoxes.put(currentBoxName, curBox);// 不删除当前选区
         try {
             double offset = 0.0;
             double c1x = cor1.getX() + offset;
@@ -283,7 +286,6 @@ public class AreaSelection
                 box.setSelectedCorner(Corner.CORNER_1);
                 this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
                 this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
-                this.currentBox = name;
                 this.subRegionBoxes.put(name, box);
                 boxList.add(box);
                 MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));

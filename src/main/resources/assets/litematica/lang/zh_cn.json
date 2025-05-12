@@ -470,6 +470,7 @@
     "litematica.error.area_editor.create_sub_region.exists": "名为'%s' 子区域已经存在",
     "litematica.error.area_editor.no_selection": "无活动区域的选择",
     "litematica.error.area_editor.open_gui.no_selection": "当前处于选择模式：Normal，但当前未选择任何区域",
+    "litematica.error.area_editor.open_gui.no_selection_complex": "当前处于选择模式：Complex，但当前未选择任何区域",
     "litematica.error.area_editor.rename_sub_region.exists": "重命名子区域失败\n已存在子区域名字为 '%s'",
     "litematica.error.area_editor.switch_mode.no_selection": "无法切换到选择模式：Normal，因为当前没有选择区域.\n请在区域选择浏览器中选择一个区域或创建一个新的选择",
 
@@ -675,6 +676,7 @@
     "litematica.gui.label.area_selection_box_count": "框数: %d",
     "litematica.gui.label.area_selection_origin": "原点: %s",
     "litematica.gui.label.area_selection.mode.normal": "正常",
+    "litematica.gui.label.area_selection.mode.complex": "复合",
     "litematica.gui.label.area_selection.mode.simple": "简单",
 
     "litematica.gui.label.block_info.state_client": "客户端世界的方块信息",
@@ -800,6 +802,7 @@
     "litematica.gui.title.area_editor_normal": "区域编辑器（普通/多框模式）",
     "litematica.gui.title.area_editor_normal_schematic_projects": "区域编辑器 (§6§l图形项目区域§r)",
     "litematica.gui.title.area_editor_simple": "区域编辑器 (简单模式)",
+    "litematica.gui.title.area_editor_complex": "区域编辑器 (复合模式)",
     "litematica.gui.title.area_editor_sub_region": "区域编辑器 (子区域)",
     "litematica.gui.title.area_editor.sub_region_name": "子区域名称",
     "litematica.gui.title.area_selection_manager": "区域选择管理器",
@@ -847,6 +850,7 @@
     "litematica.hud.area_selection.origin": "原点: %s",
     "litematica.hud.area_selection.selected_area_normal": "区域: %s",
     "litematica.hud.area_selection.selected_area_simple": "区域 [§6简单模式§r]: %s",
+    "litematica.hud.area_selection.selected_area_complex": "区域 [§6复合模式§r]: %s",
     "litematica.hud.area_selection.selected_sub_region": "子区域: %s",
     "litematica.hud.area_selection.selection_corners_mode": "角点模式: %s",
 
