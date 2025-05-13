@@ -4,15 +4,10 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.MaLiLib;
-import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
-
-import javax.annotation.Nullable;
 
 public class GuiAreaSelectionEditorComplex extends GuiAreaSelectionEditorNormal
 {
@@ -54,22 +49,9 @@ public class GuiAreaSelectionEditorComplex extends GuiAreaSelectionEditorNormal
     protected int addSubRegionFields(int x, int y)
     {
         x = 12;
-//        String label = StringUtils.translate("litematica.gui.label.area_editor.box_name");
-//        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
-//        y += 13;
-
-//        boolean currentlyOn = this.selection.getExplicitOrigin() != null;
-//        this.createButtonOnOff(this.xOrigin, 24, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED);
-//        x += this.createButton(x, y, -1, ButtonListener.Type.CREATE_SUB_REGION) + 4;
-        int width = 202;
-//        this.textFieldBoxName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
-//        this.textFieldBoxName.setText(this.getBox().getName());
-//        this.addTextField(this.textFieldBoxName, new TextFieldListenerDummy());
-//        this.createButton(x + width + 4, y, -1, ButtonListener.Type.SET_BOX_NAME);
         y += 20;
 
-        x = 12;
-        width = 68;
+        int width = 68;
 
         int nextY = 0;
         this.createCoordinateInputs(x, y, width, Corner.CORNER_1);
@@ -78,26 +60,11 @@ public class GuiAreaSelectionEditorComplex extends GuiAreaSelectionEditorNormal
         this.createButton(x + 10, nextY, -1, ButtonListener.Type.ANALYZE_AREA);
         x += width + 42;
 
-        // Manual Origin defined
-//        if (this.selection.getExplicitOrigin() != null)
-//        {
-//            this.createCoordinateInputs(x, y, width, Corner.NONE);
-//        }
-
         x = this.createButton(22, nextY, -1, ButtonListener.Type.CREATE_SCHEMATIC) + 26;
 
         x = this.createButton(22, nextY + 22, -1, ButtonListener.Type.TOGGLE_GENERATE_CIRCLE);
         nextY += 22;
         this.createButtonOnOff(22, nextY + 22, -1, circleMode, ButtonListener.Type.TOGGLE_CIRCLE_ENABLED);
-
-
-//        this.createCoordinateInputs(x, y, width, Corner.CORNER_1);
-//        this.createCoordinateInputs(x, y, width, Corner.CORNER_2);
-//
-//        this.createButton(22, y + 22, -1, ButtonListener.Type.TOGGLE_GENERATE_CIRCLE);
-//        y += 22;
-//        this.createButtonOnOff(22, y + 22, -1, this.circleMode, ButtonListener.Type.TOGGLE_CIRCLE_ENABLED);
-
 
         this.addRenderingDisabledWarning(250, 48);
 

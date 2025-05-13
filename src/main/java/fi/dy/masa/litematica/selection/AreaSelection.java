@@ -233,7 +233,7 @@ public class AreaSelection
             double dis2 = calculateDistance2(c1x, c1z, c2x, c2z);
             double dis = Math.sqrt(dis2);
             double startX = c1x;
-            double startZ = c1z + Math.ceil(dis);
+            double startZ = c1z + Math.round(dis);
             List<double[]> posList = new ArrayList<>();
             posList.add(new double[]{startX, startZ});
             // 1/4圆
@@ -282,8 +282,9 @@ public class AreaSelection
                 BlockPos pos1 = new BlockPos((int) curX, (int)c1y, (int) curZ);
                 BlockPos pos2 = new BlockPos((int) syncPosX, (int)c2y, (int) syncPosZ);
                 // 添加到多选区域列表中
-                String name = "z" + curZ;
+                String name = "z" + (int)curZ;
                 box.setSelectedCorner(Corner.CORNER_1);
+                box.setName(name);
                 this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
                 this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
                 this.subRegionBoxes.put(name, box);
