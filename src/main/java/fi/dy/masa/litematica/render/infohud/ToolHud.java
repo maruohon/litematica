@@ -165,10 +165,6 @@ public class ToolHud extends InfoHud
                 {
                     lines.add(StringUtils.translate("litematica.hud.area_selection.selected_area_normal", name));
                 }
-                else if (sm.getSelectionMode() == SelectionMode.COMPLEX)
-                {
-                    lines.add(StringUtils.translate("litematica.hud.area_selection.selected_area_complex", name));
-                }
                 else
                 {
                     lines.add(StringUtils.translate("litematica.hud.area_selection.selected_area_simple", name));

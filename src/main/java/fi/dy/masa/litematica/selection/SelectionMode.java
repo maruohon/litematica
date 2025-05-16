@@ -5,7 +5,6 @@ import fi.dy.masa.malilib.util.StringUtils;
 public enum SelectionMode
 {
     NORMAL  ("litematica.gui.label.area_selection.mode.normal"),
-    COMPLEX  ("litematica.gui.label.area_selection.mode.complex"),
     SIMPLE  ("litematica.gui.label.area_selection.mode.simple");
 
     private final String translationKey;

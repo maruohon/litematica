@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorComplex;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
@@ -716,18 +715,6 @@ public class SelectionManager
             else
             {
                 InfoUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
-                return null;
-            }
-        }
-        else if (this.getSelectionMode() == SelectionMode.COMPLEX)
-        {
-            if (selection != null)
-            {
-                return new GuiAreaSelectionEditorComplex(selection);
-            }
-            else
-            {
-                InfoUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection_complex");
                 return null;
             }
         }

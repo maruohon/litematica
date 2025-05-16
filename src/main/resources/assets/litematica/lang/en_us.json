@@ -801,7 +801,6 @@
     "litematica.gui.title.area_editor_normal": "Area Editor (Normal/Multi-box mode)",
     "litematica.gui.title.area_editor_normal_schematic_projects": "Area Editor (§6§lSchematic VCS area§r)",
     "litematica.gui.title.area_editor_simple": "Area Editor (Simple mode)",
-    "litematica.gui.title.area_editor_complex": "Area Editor (Complex mode)",
     "litematica.gui.title.area_editor_sub_region": "Area Editor (sub-region)",
     "litematica.gui.title.area_editor.sub_region_name": "Sub-region name",
     "litematica.gui.title.area_selection_manager": "Area Selection Manager",
@@ -849,7 +848,6 @@
     "litematica.hud.area_selection.origin": "Origin: %s",
     "litematica.hud.area_selection.selected_area_normal": "Area: %s",
     "litematica.hud.area_selection.selected_area_simple": "Area [§6Simple mode§r]: %s",
-    "litematica.hud.area_selection.selected_area_complex": "Area [§6Complex mode§r]: %s",
     "litematica.hud.area_selection.selected_sub_region": "Sub-region: %s",
     "litematica.hud.area_selection.selection_corners_mode": "Corners Mode: %s",
 
