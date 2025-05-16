@@ -534,7 +534,8 @@
     "litematica.gui.button.area_editor.create_sub_region": "New sub-region",
     "litematica.gui.button.area_editor.origin_enabled": "Manual Origin: %s",
     "litematica.gui.button.area_editor.generate_circle": "Generate Circle",
-    "litematica.gui.button.area_editor.circle_enabled": "Circle Mode: %s",
+    "litematica.gui.button.area_editor.generate_round": "Generate Round",
+    "litematica.gui.button.area_editor.special_enabled": "Special Mode: %s",
     "litematica.gui.button.area_editor.set_box_name": "Set",
     "litematica.gui.button.area_editor.set_selection_name": "Set",
 

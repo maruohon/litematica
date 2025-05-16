@@ -215,12 +215,7 @@ public class AreaSelection
     }
 
     @Nullable
-    public String createNewSubRegionBoxBatch(BlockPos cor1, BlockPos cor2) {
-        List<Box> boxList = new ArrayList<>();
-        String currentBoxName = this.getCurrentSubRegionBoxName();
-        Box curBox = this.getSubRegionBox(currentBox);
-        this.subRegionBoxes.clear();
-        this.subRegionBoxes.put(currentBoxName, curBox);// 不删除当前选区
+    public String createNewSubRegionBoxRound(BlockPos cor1, BlockPos cor2) {
         try {
             double offset = 0.0;
             double c1x = cor1.getX() + offset;
@@ -271,31 +266,107 @@ public class AreaSelection
             }
             posList.addAll(newPosList);
             //关于z轴对称 整个圆
-            Box box = null;
             for (double[] pos : posList) {
                 double curX = (int) pos[0];
                 double curZ = (int) pos[1];
                 double syncPosX = (int) (2 * c1x - pos[0]);
                 double syncPosZ = (int) (pos[1]);
 
-                box = new Box();
                 BlockPos pos1 = new BlockPos((int) curX, (int)c1y, (int) curZ);
                 BlockPos pos2 = new BlockPos((int) syncPosX, (int)c2y, (int) syncPosZ);
                 // 添加到多选区域列表中
-                String name = "z" + (int)curZ;
-                box.setSelectedCorner(Corner.CORNER_1);
-                box.setName(name);
-                this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
-                this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
-                this.subRegionBoxes.put(name, box);
-                boxList.add(box);
+                String name1 = "z1_" + (int)curZ;
+                String name2 = "z2_" + (int)curZ;
+                addOneBox(pos1,pos1,name1);
+                addOneBox(pos2,pos2,name2);
                 MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));
             }
-            MaLiLib.logger.error(String.format("boxList size: %s", boxList.size()));
+            MaLiLib.logger.error(String.format("createNewSubRegionBoxRound boxList size: %s", posList.size()));
         } catch (Exception e) {
-            MaLiLib.logger.error("createNewSubRegionBoxBatch ", e);
+            MaLiLib.logger.error("createNewSubRegionBoxRound ", e);
         }
-        return "createNewSubRegionBoxBatch";
+        return "createNewSubRegionBoxRound";
+    }
+
+    protected void addOneBox(BlockPos pos1, BlockPos pos2,String name) {
+        Box box = new Box();
+        box.setSelectedCorner(Corner.CORNER_1);
+        box.setName(name);
+        this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
+        this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
+        this.subRegionBoxes.put(name, box);
+    }
+
+    @Nullable
+    public String createNewSubRegionBoxCircle(BlockPos cor1, BlockPos cor2) {
+        try {
+            double offset = 0.0;
+            double c1x = cor1.getX() + offset;
+            double c1z = cor1.getZ() + offset;
+            double c1y = cor1.getY() + offset;
+            double c2x = cor2.getX() + offset;
+            double c2z = cor2.getZ() + offset;
+            double c2y = cor2.getY() + offset;
+
+            double dis2 = calculateDistance2(c1x, c1z, c2x, c2z);
+            double dis = Math.sqrt(dis2);
+            double startX = c1x;
+            double startZ = c1z + Math.round(dis);
+            List<double[]> posList = new ArrayList<>();
+            posList.add(new double[]{startX, startZ});
+            // 1/4圆
+            MaLiLib.logger.error(String.format("startZ:%s, endZ:%s, dis:%s", startZ, c1z, dis));
+            while(startZ > c1z) {
+                double[][] nextPos = {{startX + 1, startZ}, {startX + 1, startZ - 1}, {startX, startZ - 1}};
+                double[] disSquare = new double[3];
+                disSquare[0] = Math.abs(calculateDistance2(nextPos[0][0], nextPos[0][1], c1x, c1z) - dis2);
+                disSquare[1] = Math.abs(calculateDistance2(nextPos[1][0], nextPos[1][1], c1x, c1z) - dis2);
+                disSquare[2] = Math.abs(calculateDistance2(nextPos[2][0], nextPos[2][1], c1x, c1z) - dis2);
+                int minIndex = 0;
+                double minDisSquare = Double.MAX_VALUE;
+                for (int i = 0; i < 3; ++i) {
+                    if (disSquare[i] < minDisSquare) {
+                        minDisSquare = disSquare[i];
+                        minIndex = i;
+                    }
+                }
+                startX = nextPos[minIndex][0];
+                startZ = nextPos[minIndex][1];
+                posList.add(new double[]{startX, startZ});
+            }
+            //关于x轴对称 1/2圆
+            /*
+            ^z
+            |
+            |_____>x
+            (c1x,c1z)
+             */
+            List<double[]> newPosList = new ArrayList<>();
+            for (double[] pos : posList) {
+                double syncPosX = pos[0];
+                double syncPosZ = 2 * c1z - pos[1];
+                newPosList.add(new double[]{syncPosX, syncPosZ});
+            }
+            posList.addAll(newPosList);
+            //关于z轴对称 整个圆
+            for (double[] pos : posList) {
+                double curX = (int) pos[0];
+                double curZ = (int) pos[1];
+                double syncPosX = (int) (2 * c1x - pos[0]);
+                double syncPosZ = (int) (pos[1]);
+
+                BlockPos pos1 = new BlockPos((int) curX, (int)c1y, (int) curZ);
+                BlockPos pos2 = new BlockPos((int) syncPosX, (int)c2y, (int) syncPosZ);
+                // 添加到多选区域列表中
+                String name = "z0_" + (int)curZ;
+                addOneBox(pos1, pos2, name);
+                MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));
+            }
+            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle boxList size: %s", posList.size()));
+        } catch (Exception e) {
+            MaLiLib.logger.error("createNewSubRegionBoxCircle ", e);
+        }
+        return "createNewSubRegionBoxCircle";
     }
 
     public void clearCurrentSelectedCorner()

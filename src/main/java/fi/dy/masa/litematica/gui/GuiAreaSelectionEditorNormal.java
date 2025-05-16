@@ -51,9 +51,10 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int yNext;
     protected int xOrigin;
     @Nullable protected String selectionId;
-    protected static boolean circleMode = false;
+    protected static boolean specialMode = false;
     protected BlockPos cor1 = BlockPos.ORIGIN;
     protected BlockPos cor2 = BlockPos.ORIGIN;
+    protected static final String defaultBoxName = "defaultBoxName";
     public GuiAreaSelectionEditorNormal(AreaSelection selection)
     {
         super(8, 116);
@@ -109,7 +110,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.addLabel(x, y, -1, 16, 0xFFFFFFFF, StringUtils.translate("litematica.gui.label.area_editor.selection_name"));
         y += 13;
 
-        int width = 202;
+        int width = 150;
         this.textFieldSelectionName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
         this.textFieldSelectionName.setText(this.selection.getName());
         this.addTextField(this.textFieldSelectionName, new TextFieldListenerDummy());
@@ -132,12 +133,16 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         xSave += this.createButtonOnOff(xSave, ySave, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED) + 4;
         xSave += this.createButton(xSave, ySave, -1, ButtonListener.Type.CREATE_SCHEMATIC) + 4;
 
+        int offsetForExplicitOrigin = 0;
         // Manual Origin defined
         if (this.selection.getExplicitOrigin() != null)
         {
             x = Math.max(xSave, this.xOrigin);
             this.createCoordinateInputs(x, 5, width, Corner.NONE);
+            offsetForExplicitOrigin = 105;
         }
+        // add special area selection
+        addCurrentSelectCorner(xSave + offsetForExplicitOrigin, 5);
 
         x = 12;
         y = this.getListY() - 12;
@@ -170,6 +175,20 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         return y;
+    }
+
+    protected void addCurrentSelectCorner(int curX, int curY) {
+        int width = 68;
+        this.createCoordinateInputs(curX, curY, width, Corner.CORNER_1);
+        curX += width + 37;
+        this.createCoordinateInputs(curX, curY, width, Corner.CORNER_2);
+        curX += width + 37;
+        this.createButtonOnOff(curX, curY, -1, specialMode, ButtonListener.Type.TOGGLE_SPECIAL_ENABLED);
+        curY += 22;
+        this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_GENERATE_CIRCLE);
+        curY += 22;
+        this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_GENERATE_ROUND);
+
     }
 
     protected void addRenderingDisabledWarning(int x, int y)
@@ -395,7 +414,22 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     @Nullable
     protected Box getBox()
     {
-        return null;
+       // 设置默认位置和名称
+        Box selBox = this.selection.getSelectedSubRegionBox();
+        this.selection.removeSelectedSubRegionBox();
+        if (selBox != null) {
+            selBox.setName(defaultBoxName);
+        } else if (this.mc.player != null) {
+            BlockPos pos = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.mc.player);
+            selBox = new Box(pos, pos, defaultBoxName);
+        } else {
+            MaLiLib.logger.error("can not getSelectedSubRegionBox");
+            selBox = new Box();
+            selBox.setName(defaultBoxName);
+        }
+        this.selection.addSubRegionBox(selBox,false);
+        this.selection.setSelectedSubRegionBox(defaultBoxName);
+        return selBox;
     }
 
     protected void updatePosition(String numberString, Corner corner, CoordinateType type)
@@ -573,14 +607,20 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     }
                     break;
                 case TOGGLE_GENERATE_CIRCLE:
-                    MaLiLib.logger.error("click TOGGLE_GENERATE_CIRCLE " + circleMode);
-                    if (circleMode) {
-                        this.parent.selection.createNewSubRegionBoxBatch(this.parent.cor1, this.parent.cor2);
+                    MaLiLib.logger.error("click TOGGLE_GENERATE_CIRCLE " + specialMode);
+                    if (specialMode) {
+                        this.parent.selection.createNewSubRegionBoxCircle(this.parent.cor1, this.parent.cor2);
                     }
                     break;
-                case TOGGLE_CIRCLE_ENABLED:
-                    MaLiLib.logger.error("click TOGGLE_CIRCLE_ENABLED");
-                    circleMode = !circleMode;
+                case TOGGLE_GENERATE_ROUND:
+                    MaLiLib.logger.error("click TOGGLE_GENERATE_ROUND " + specialMode);
+                    if (specialMode) {
+                        this.parent.selection.createNewSubRegionBoxRound(this.parent.cor1, this.parent.cor2);
+                    }
+                    break;
+                case TOGGLE_SPECIAL_ENABLED:
+                    MaLiLib.logger.error("click TOGGLE_SPECIAL_ENABLED");
+                    specialMode = !specialMode;
                     break;
             }
 
@@ -592,8 +632,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             SET_SELECTION_NAME      ("litematica.gui.button.area_editor.set_selection_name"),
             SET_BOX_NAME            ("litematica.gui.button.area_editor.set_box_name"),
             TOGGLE_ORIGIN_ENABLED   ("litematica.gui.button.area_editor.origin_enabled"),
-            TOGGLE_CIRCLE_ENABLED   ("litematica.gui.button.area_editor.circle_enabled"),
+            TOGGLE_SPECIAL_ENABLED   ("litematica.gui.button.area_editor.special_enabled"),
             TOGGLE_GENERATE_CIRCLE   ("litematica.gui.button.area_editor.generate_circle"),
+            TOGGLE_GENERATE_ROUND   ("litematica.gui.button.area_editor.generate_round"),
             CREATE_SUB_REGION       ("litematica.gui.button.area_editor.create_sub_region"),
             CREATE_SCHEMATIC        ("litematica.gui.button.area_editor.create_schematic"),
             ANALYZE_AREA            ("litematica.gui.button.area_editor.analyze_area"),
@@ -646,7 +687,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         @Override
         public boolean onTextChange(GuiTextFieldGeneric textField)
         {
-            if (this.parent.circleMode) {
+            if (specialMode) {
+//                updateCircleModeParams(coordType, corner, text);
+                this.parent.updatePosition(textField.getText(), this.corner, this.type);
                 // todo nothing
             } else {
                 this.parent.updatePosition(textField.getText(), this.corner, this.type);
