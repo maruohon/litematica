@@ -188,7 +188,8 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_GENERATE_CIRCLE);
         curY += 22;
         this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_GENERATE_ROUND);
-
+        curY += 22;
+        this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_REMOVE_ALL_REGION);
     }
 
     protected void addRenderingDisabledWarning(int x, int y)
@@ -619,8 +620,12 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     }
                     break;
                 case TOGGLE_SPECIAL_ENABLED:
-                    MaLiLib.logger.error("click TOGGLE_SPECIAL_ENABLED");
+                    MaLiLib.logger.error("click TOGGLE_SPECIAL_ENABLED " + specialMode);
                     specialMode = !specialMode;
+                    break;
+                case TOGGLE_REMOVE_ALL_REGION:
+                    MaLiLib.logger.error("click TOGGLE_REMOVE_ALL_REGION " + specialMode);
+                    this.parent.selection.removeAllSubRegionBoxes();
                     break;
             }
 
@@ -635,6 +640,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             TOGGLE_SPECIAL_ENABLED   ("litematica.gui.button.area_editor.special_enabled"),
             TOGGLE_GENERATE_CIRCLE   ("litematica.gui.button.area_editor.generate_circle"),
             TOGGLE_GENERATE_ROUND   ("litematica.gui.button.area_editor.generate_round"),
+            TOGGLE_REMOVE_ALL_REGION   ("litematica.gui.button.area_editor.remove_all_region"),
             CREATE_SUB_REGION       ("litematica.gui.button.area_editor.create_sub_region"),
             CREATE_SCHEMATIC        ("litematica.gui.button.area_editor.create_schematic"),
             ANALYZE_AREA            ("litematica.gui.button.area_editor.analyze_area"),

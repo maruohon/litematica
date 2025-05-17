@@ -535,6 +535,7 @@
     "litematica.gui.button.area_editor.origin_enabled": "手动来源：%s",
     "litematica.gui.button.area_editor.generate_circle": "生成圆圈",
     "litematica.gui.button.area_editor.generate_round": "生成圆面",
+    "litematica.gui.button.area_editor.remove_all_region": "删除所有子区域",
     "litematica.gui.button.area_editor.special_enabled": "特殊模式：%s",
     "litematica.gui.button.area_editor.set_box_name": "set",
     "litematica.gui.button.area_editor.set_selection_name": "set",

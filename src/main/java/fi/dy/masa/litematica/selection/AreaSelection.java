@@ -275,10 +275,8 @@ public class AreaSelection
                 BlockPos pos1 = new BlockPos((int) curX, (int)c1y, (int) curZ);
                 BlockPos pos2 = new BlockPos((int) syncPosX, (int)c2y, (int) syncPosZ);
                 // 添加到多选区域列表中
-                String name1 = "z1_" + (int)curZ;
-                String name2 = "z2_" + (int)curZ;
-                addOneBox(pos1,pos1,name1);
-                addOneBox(pos2,pos2,name2);
+                String name = "z0_" + (int)curZ;
+                addOneBox(pos1,pos2,name);
                 MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));
             }
             MaLiLib.logger.error(String.format("createNewSubRegionBoxRound boxList size: %s", posList.size()));
@@ -292,11 +290,51 @@ public class AreaSelection
         Box box = new Box();
         box.setSelectedCorner(Corner.CORNER_1);
         box.setName(name);
-        this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
-        this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
+        box.setPos1(pos1);
+        box.setPos2(pos2);
+//        this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
+//        this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
         this.subRegionBoxes.put(name, box);
     }
 
+    protected int[][] directions = new int[][]{
+            {1, 1},
+            {1, 0},
+            {1, -1},
+            {0, -1},
+//            {0, 0},
+            {-1, 1},
+            {-1, 0},
+            {-1, 1},
+            {0, 1},
+    };
+    protected int nextCircleBlock(int curX, int curZ, int centerX, int centerZ, double dis2, Set<String> positionSets) {
+        int closestDir = -1;
+        double closestDis = Double.MAX_VALUE;
+        for(int ind = 0; ind < directions.length; ++ind) {
+            int[] dir = directions[ind];
+            int nextX = curX + dir[0];
+            int nextZ = curZ + dir[1];
+            double dis2ToCenter = calculateDistance2(nextX + 0.5, nextZ+0.5, centerX, centerZ);
+            double dis = Math.abs(dis2ToCenter - dis2);
+            System.out.printf("dis: %s dis2:%s nextX:%s nextZ:%s", dis, dis2, nextX, nextZ);
+            if (closestDis > dis && !positionSets.contains(makeKey(nextX, nextZ))) {
+                closestDis = dis;
+                closestDir = ind;
+            }
+        }
+        return closestDir;
+    }
+
+    protected String makeKey(int x, int z) {
+        return String.format("%s#%s", x, z);
+    }
+
+    public void removeAllSubRegion() {
+        Box currentSelected = this.getSelectedSubRegionBox();
+        this.subRegionBoxes.clear();
+        this.addSubRegionBox(currentSelected, false);
+    }
     @Nullable
     public String createNewSubRegionBoxCircle(BlockPos cor1, BlockPos cor2) {
         try {
@@ -309,30 +347,42 @@ public class AreaSelection
             double c2y = cor2.getY() + offset;
 
             double dis2 = calculateDistance2(c1x, c1z, c2x, c2z);
-            double dis = Math.sqrt(dis2);
-            double startX = c1x;
-            double startZ = c1z + Math.round(dis);
+//            double dis = Math.sqrt(dis2);
+//            double startX = c1x;
+//            double startZ = c1z + Math.floor(dis);
             List<double[]> posList = new ArrayList<>();
-            posList.add(new double[]{startX, startZ});
-            // 1/4圆
-            MaLiLib.logger.error(String.format("startZ:%s, endZ:%s, dis:%s", startZ, c1z, dis));
-            while(startZ > c1z) {
-                double[][] nextPos = {{startX + 1, startZ}, {startX + 1, startZ - 1}, {startX, startZ - 1}};
-                double[] disSquare = new double[3];
-                disSquare[0] = Math.abs(calculateDistance2(nextPos[0][0], nextPos[0][1], c1x, c1z) - dis2);
-                disSquare[1] = Math.abs(calculateDistance2(nextPos[1][0], nextPos[1][1], c1x, c1z) - dis2);
-                disSquare[2] = Math.abs(calculateDistance2(nextPos[2][0], nextPos[2][1], c1x, c1z) - dis2);
-                int minIndex = 0;
-                double minDisSquare = Double.MAX_VALUE;
-                for (int i = 0; i < 3; ++i) {
-                    if (disSquare[i] < minDisSquare) {
-                        minDisSquare = disSquare[i];
-                        minIndex = i;
-                    }
+//            posList.add(new double[]{startX, startZ});
+//            // 1/4圆
+//            MaLiLib.logger.error(String.format("startZ:%s, endZ:%s, dis:%s", startZ, c1z, dis));
+
+            // 1/8 circle
+            double R = Math.sqrt(dis2);
+            double pLast = -2 * R + 3;
+            double pNext;
+            double curX = c1x + R;
+            double curZ = c1z;
+            posList.add(new double[]{curX, curZ});
+            while (curX - c1x >= curZ - c1z) {
+                if (pLast >= 0) {
+                    pNext = pLast - 4 * (curX - c1x) + 4 * (curZ - c1z) + 10;
+                    pLast = pNext;
+                    curX = curX - 1;
+                    curZ = curZ + 1;
+                } else {
+                    pNext = pLast + 4 * (curZ - c1z) + 6;
+                    pLast = pNext;
+                    curX = curX;
+                    curZ = curZ + 1;
                 }
-                startX = nextPos[minIndex][0];
-                startZ = nextPos[minIndex][1];
-                posList.add(new double[]{startX, startZ});
+                posList.add(new double[]{curX, curZ});
+            }
+            // 1/4圆
+            int len = posList.size();
+            for (int i = 0; i < len; i++) {
+                double[] curPos = posList.get(i);
+                double nX = curPos[1] - c1z + c1x;
+                double nZ = curPos[0] - c1x + c1z;
+                posList.add(new double[]{nX, nZ});
             }
             //关于x轴对称 1/2圆
             /*
@@ -341,32 +391,37 @@ public class AreaSelection
             |_____>x
             (c1x,c1z)
              */
-            List<double[]> newPosList = new ArrayList<>();
-            for (double[] pos : posList) {
+            len = posList.size();
+            for (int i = 0; i < len; i++) {
+                double[] pos = posList.get(i);
                 double syncPosX = pos[0];
                 double syncPosZ = 2 * c1z - pos[1];
-                newPosList.add(new double[]{syncPosX, syncPosZ});
+                posList.add(new double[]{syncPosX, syncPosZ});
             }
-            posList.addAll(newPosList);
             //关于z轴对称 整个圆
             for (double[] pos : posList) {
-                double curX = (int) pos[0];
-                double curZ = (int) pos[1];
+                curX = pos[0];
+                curZ = pos[1];
                 double syncPosX = (int) (2 * c1x - pos[0]);
                 double syncPosZ = (int) (pos[1]);
-
-                BlockPos pos1 = new BlockPos((int) curX, (int)c1y, (int) curZ);
-                BlockPos pos2 = new BlockPos((int) syncPosX, (int)c2y, (int) syncPosZ);
+                BlockPos pos1 = new BlockPos((int) curX, (int) c1y, (int) curZ);
+                BlockPos pos2 = new BlockPos((int) syncPosX, (int) c2y, (int) syncPosZ);
                 // 添加到多选区域列表中
-                String name = "z0_" + (int)curZ;
-                addOneBox(pos1, pos2, name);
+                addOneBox(pos1, pos1, makeKey((int) curX, (int) curZ));
+                addOneBox(pos2, pos2, makeKey((int) syncPosX, (int) syncPosZ));
                 MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));
             }
-            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle boxList size: %s", posList.size()));
+            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle posList size: %s", posList.size()));
         } catch (Exception e) {
             MaLiLib.logger.error("createNewSubRegionBoxCircle ", e);
         }
         return "createNewSubRegionBoxCircle";
+    }
+
+    public static void main(String[] args) {
+        BlockPos pos1 = new BlockPos(0,0,0);
+        BlockPos pos2 = new BlockPos(0,0,4);
+        new AreaSelection().createNewSubRegionBoxCircle(pos1, pos2);
     }
 
     public void clearCurrentSelectedCorner()
