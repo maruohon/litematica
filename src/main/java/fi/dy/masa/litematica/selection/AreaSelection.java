@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.selection;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import javax.annotation.Nullable;
+
+import fi.dy.masa.malilib.MaLiLib;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -208,6 +208,292 @@ public class AreaSelection
         this.setSubRegionCornerPos(box, Corner.CORNER_2, pos1);
 
         return name;
+    }
+
+
+    private double calculateDistance2(double x1, double z1, double x2, double z2) {
+        return (x1 - x2) * (x1 - x2) + (z1 - z2) * (z1 - z2);
+    }
+
+    @Nullable
+    public String createNewSubRegionBoxCircle(BlockPos cor1, BlockPos cor2, boolean onCircle, boolean expand) {
+        try {
+            double c1x = cor1.getX();
+            double c1z = cor1.getZ();
+            double c1y = cor1.getY();
+            double c2x = cor2.getX();
+            double c2z = cor2.getZ();
+            double c2y = cor2.getY();
+            double dis2 = calculateDistance2(c1x, c1z, c2x, c2z);
+            double dis = Math.sqrt(dis2);
+            MaLiLib.logger.error(String.format("center:%s,%s,%s radius:%s", c1x, c1y, c1z, dis));
+            double startX = c1x;
+            double startZ = c1z + Math.round(dis);
+            List<double[]> posList = new ArrayList<>();
+            posList.add(new double[]{startX, startZ});
+            // 1/4圆
+            while (startZ > c1z) {
+                double[][] nextPos = {{startX + 1, startZ}, {startX + 1, startZ - 1}, {startX, startZ - 1}};
+                double minDisSquare = Double.MAX_VALUE;
+                for (int i = 0; i < 3; i++) {
+                    double disSquare = Math.abs(calculateDistance2(nextPos[i][0], nextPos[i][1], c1x, c1z) - dis2);
+                    if (disSquare < minDisSquare) {
+                        minDisSquare = disSquare;
+                        startX = nextPos[i][0];
+                        startZ = nextPos[i][1];
+                    }
+                }
+                posList.add(new double[]{startX, startZ});
+            }
+            //关于x轴对称 1/2圆
+            int len = posList.size();
+            for (int i = 0; i < len; ++i) {
+                double[] pos = posList.get(i);
+                double syncPosX = pos[0];
+                double syncPosZ = 2 * c1z - pos[1];
+                posList.add(new double[]{syncPosX, syncPosZ});
+            }
+            //关于z轴对称 整个圆
+            Set<Long> seenPosLongSet = new HashSet<>();
+            List<Box> boxList = new ArrayList<>();
+            for (double[] pos : posList) {
+                double curX = (int) pos[0];
+                double curZ = (int) pos[1];
+                double syncPosX = (int) (2 * c1x - pos[0]);
+                double syncPosZ = (int) (pos[1]);
+
+                int c1Y = (int) c1y;
+                int c2Y = (int) c2y;
+
+                BlockPos pos1 = new BlockPos((int) curX, c1Y, (int) curZ);
+                BlockPos pos2 = new BlockPos((int) syncPosX, c2Y, (int) syncPosZ);
+                // 添加到多选区域列表中
+                if (onCircle) {//仅创建圆上节点,考虑y坐标
+                    BlockPos pos11 = new BlockPos(pos1.getX(), c1Y, pos1.getZ());
+                    BlockPos pos12 = new BlockPos(pos1.getX(), c2Y, pos1.getZ());
+                    boxList.add(new Box(pos11, pos12, makeKey(pos1.getX(), pos1.getZ())));
+//                    addOneBox(pos11, pos12, makeKey(pos1.getX(), pos1.getZ()));
+
+                    BlockPos pos21 = new BlockPos(pos2.getX(), c1Y, pos2.getZ());
+                    BlockPos pos22 = new BlockPos(pos2.getX(), c2Y, pos2.getZ());
+                    boxList.add(new Box(pos21, pos22, makeKey(pos2.getX(), pos2.getZ())));
+//                    addOneBox(pos21, pos22, makeKey(pos2.getX(), pos2.getZ()));
+                    if (expand) {
+                        seenPosLongSet.add(pos1.asLong());
+                        seenPosLongSet.add(pos2.asLong());
+                        expandPos(boxList, pos1, c1Y, c2Y,seenPosLongSet);
+                        expandPos(boxList,pos2, c1Y, c2Y,seenPosLongSet);
+                    }
+                } else {
+                    String name = "z_" + (int) curZ;// 按照z轴坐标去重
+                    boxList.add(new Box(pos1, pos2, name));
+//                    addOneBox(pos1, pos2, name);
+                }
+//                MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));
+            }
+            seenPosLongSet.clear();
+            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle boxList size: %s", boxList.size()));
+            Map<String, Box> boxMap = mergeBoxList(boxList,true);
+            Map<String, Box> boxMap2 = mergeBoxList(new ArrayList<>(boxMap.values()),false);
+            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle merged size: %s", boxMap.size()));
+            if (!onCircle) {// 按照z轴两个点去重,
+                Map<String, Box> newBoxMap = new HashMap<>();
+                for (Box box : boxMap2.values()) {
+                    newBoxMap.put(makeKey(box.getPos1().getZ(), box.getPos2().getZ()), box);
+                }
+                this.subRegionBoxes.putAll(newBoxMap);
+            } else { // 圆圈不存在两个box相同不需要去重
+                this.subRegionBoxes.putAll(boxMap2);
+            }
+            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle subRegionBoxes size: %s", this.subRegionBoxes.size()));
+        } catch (Exception e) {
+            MaLiLib.logger.error("createNewSubRegionBoxCircle ", e);
+        }
+        return "createNewSubRegionBoxCircle";
+    }
+
+    protected boolean ifAnyNull(Box box) {
+        return box.getPos1() == null || box.getPos2() == null;
+    }
+
+    protected boolean isBoxAdjX(Box box1, Box box2) {
+        if (Math.abs(box2.getPos1().getX() - box1.getPos2().getX()) > 1 &&
+                Math.abs(box1.getPos1().getX() - box2.getPos2().getX()) > 1
+        ) {
+            return false;
+        }
+        if (box1.getPos1().getZ() != box2.getPos1().getZ()) {
+            return false;
+        }
+        if (box1.getPos2().getZ() != box2.getPos2().getZ()) {
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean isBoxAdjZ(Box box1, Box box2) {
+        if (Math.abs(box2.getPos1().getZ() - box1.getPos2().getZ()) > 1 &&
+                Math.abs(box1.getPos1().getZ() - box2.getPos2().getZ()) > 1
+        ) {
+            return false;
+        }
+        if (box1.getPos1().getX() != box2.getPos1().getX()) {
+            return false;
+        }
+        if (box1.getPos2().getX() != box2.getPos2().getX()) {
+            return false;
+        }
+        return true;
+    }
+    public int multipleMax(int ... args) {
+        int ret = Integer.MIN_VALUE;
+        for (int x: args) {
+            ret = Math.max(ret, x);
+        }
+        return ret;
+    }
+
+    public int multipleMin(int ... args) {
+        int ret = Integer.MAX_VALUE;
+        for (int x: args) {
+            ret = Math.min(ret, x);
+        }
+        return ret;
+    }
+    public List<Integer> getAllCoordinatesByType(CoordinateType type, Box ...boxes) {
+        List<Integer> values = new ArrayList<>();
+        for (Box box: boxes) {
+            values.add(box.getCoordinate(Corner.CORNER_1,type));
+            values.add(box.getCoordinate(Corner.CORNER_2,type));
+        }
+        return values;
+    }
+
+    protected Box mergeTwoBoxes(Box box1, Box box2) {
+        Box box = new Box();
+        /*
+         *   |------|12   |-------|22 |------|12
+         *   |      |     |       |   |      |
+         * 11|------|   21|-------| 11|------|
+         */
+        int p1x = multipleMin(getAllCoordinatesByType(CoordinateType.X, box1, box2).stream().mapToInt(o -> o).toArray());
+        int p1y = multipleMin(getAllCoordinatesByType(CoordinateType.Y, box1, box2).stream().mapToInt(o -> o).toArray());
+        int p1z = multipleMin(getAllCoordinatesByType(CoordinateType.Z, box1, box2).stream().mapToInt(o -> o).toArray());
+
+        int p2x = multipleMax(getAllCoordinatesByType(CoordinateType.X, box1, box2).stream().mapToInt(o -> o).toArray());
+        int p2y = multipleMax(getAllCoordinatesByType(CoordinateType.Y, box1, box2).stream().mapToInt(o -> o).toArray());
+        int p2z = multipleMax(getAllCoordinatesByType(CoordinateType.Z, box1, box2).stream().mapToInt(o -> o).toArray());
+
+        box.setPos1(new BlockPos(p1x, p1y, p1z));
+        box.setPos2(new BlockPos(p2x, p2y, p2z));
+        return box;
+    }
+
+    protected Map<String,Box> mergeBoxList(List<Box> boxList,boolean xFirst) {
+        Map<String, Box> boxMap = new HashMap<>();
+        if (boxList == null || boxList.isEmpty()) {
+            return boxMap;
+        }
+        Comparator<Box> xFirstFunction = (o1, o2) -> {
+            if (ifAnyNull(o1) || ifAnyNull(o2)) {
+                return 0;
+            }
+            if (o1.getPos1().getZ() != o2.getPos1().getZ()) {
+                return o1.getPos1().getZ() - o2.getPos1().getZ();
+            }
+            return o1.getPos1().getX() - o2.getPos1().getX();
+        };
+        Comparator<Box> zFirstFunction = (o1, o2) -> {
+            if (ifAnyNull(o1) || ifAnyNull(o2)) {
+                return 0;
+            }
+            if (o1.getPos1().getX() != o2.getPos1().getX()) {
+                return o1.getPos1().getX() - o2.getPos1().getX();
+            }
+            return o1.getPos1().getZ() - o2.getPos1().getZ();
+        };
+        Queue<Box> priorityQueue = new PriorityQueue<>(xFirst ? xFirstFunction : zFirstFunction);
+        // 坐标归一
+        List<Box> newBoxList = boxList.stream().map(box -> {
+            BlockPos pos1 = box.getPos1();
+            BlockPos pos2 = box.getPos1();
+            if (pos1.getX() > pos2.getX() || pos1.getZ() > pos2.getZ()) {
+                return new Box(pos2, pos1, box.getName());
+            }
+            return box;
+        }).toList();
+        priorityQueue.addAll(newBoxList);// 堆排序
+        String keyFmt = "merge_%s";
+        int ind = 1;
+        while (priorityQueue.size() >= 2) {
+            Box curBox = priorityQueue.remove();// one box
+            Box nextBox = priorityQueue.remove();// next box
+            // x axis, first x equal
+            if (isBoxAdjX(curBox, nextBox)) {
+                Box merged = mergeTwoBoxes(curBox, nextBox);
+                priorityQueue.add(merged);
+            } else if (isBoxAdjZ(curBox, nextBox)) { // z axis, second z equal
+                Box merged = mergeTwoBoxes(curBox, nextBox);
+                priorityQueue.add(merged);
+            } else {
+                priorityQueue.add(nextBox);
+                boxMap.put(keyFmt.formatted(ind), curBox);
+                ++ind;
+            }
+        }
+        while (!priorityQueue.isEmpty()) {
+            Box box = priorityQueue.remove();
+            boxMap.put(keyFmt.formatted(ind), box);
+            ++ind;
+        }
+
+        return boxMap;
+
+    }
+
+    protected int[][] DIRECTIONS = new int[][]{{0,1},{1,0},{0,-1},{-1,0}};
+
+    protected void expandPos(List<Box> boxList, BlockPos pos, int c1Y, int c2Y,Set<Long> seenPosLongSet) {
+        for (int[] dir : DIRECTIONS) {
+            BlockPos nextPos = new BlockPos(pos.getX() + dir[0], pos.getY(), pos.getZ() + dir[1]);
+            if (seenPosLongSet.contains(nextPos.asLong())) {
+                continue;
+            }
+            seenPosLongSet.add(nextPos.asLong());
+            BlockPos pos1 = new BlockPos(nextPos.getX(),c1Y, nextPos.getZ());
+            BlockPos pos2 = new BlockPos(nextPos.getX(),c2Y, nextPos.getZ());
+            boxList.add(new Box(pos1, pos2,makeKey(nextPos.getX(), nextPos.getZ())));
+            //addOneBox(pos1, pos2,makeKey(nextPos.getX(), nextPos.getZ()));
+        }
+    }
+    protected void addOneBox(BlockPos pos1, BlockPos pos2,String name) {
+        Box box = new Box();
+        box.setSelectedCorner(Corner.CORNER_1);
+        box.setName(name);
+        this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
+        this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
+        this.subRegionBoxes.put(name, box);
+    }
+
+
+    protected String makeKey(int x, int y, int z) {
+        return String.format("%s_%s_%s", x, y, z);
+    }
+
+    protected String makeKey(int x,int z) {
+        return String.format("%s_%s", x, z);
+    }
+
+    public void removeAllSubRegion() {
+        Box currentSelected = this.getSelectedSubRegionBox();
+        this.subRegionBoxes.clear();
+        this.addSubRegionBox(currentSelected, false);
+    }
+
+    public static void main(String[] args) {
+        BlockPos pos1 = new BlockPos(0,0,0);
+        BlockPos pos2 = new BlockPos(0,0,500);
+        new AreaSelection().createNewSubRegionBoxCircle(pos1, pos2, false, true);
     }
 
     public void clearCurrentSelectedCorner()

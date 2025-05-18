@@ -3,6 +3,8 @@ package fi.dy.masa.litematica.gui;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+
+import fi.dy.masa.malilib.MaLiLib;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -35,6 +37,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.util.math.Vec3i;
 
 public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
                                           implements ISelectionListener<String>
@@ -48,7 +51,11 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int yNext;
     protected int xOrigin;
     @Nullable protected String selectionId;
-
+    protected static boolean specialMode = false;
+    protected static boolean expandCircle = false;
+    protected BlockPos cor1 = BlockPos.ORIGIN;
+    protected BlockPos cor2 = BlockPos.ORIGIN;
+    protected static final String defaultBoxName = "defaultBoxName";
     public GuiAreaSelectionEditorNormal(AreaSelection selection)
     {
         super(8, 116);
@@ -76,7 +83,6 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     public void initGui()
     {
         super.initGui();
-
         if (this.selection != null)
         {
             this.createSelectionEditFields();
@@ -105,7 +111,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.addLabel(x, y, -1, 16, 0xFFFFFFFF, StringUtils.translate("litematica.gui.label.area_editor.selection_name"));
         y += 13;
 
-        int width = 202;
+        int width = 150;
         this.textFieldSelectionName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
         this.textFieldSelectionName.setText(this.selection.getName());
         this.addTextField(this.textFieldSelectionName, new TextFieldListenerDummy());
@@ -128,12 +134,16 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         xSave += this.createButtonOnOff(xSave, ySave, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED) + 4;
         xSave += this.createButton(xSave, ySave, -1, ButtonListener.Type.CREATE_SCHEMATIC) + 4;
 
+        int offsetForExplicitOrigin = 0;
         // Manual Origin defined
         if (this.selection.getExplicitOrigin() != null)
         {
             x = Math.max(xSave, this.xOrigin);
             this.createCoordinateInputs(x, 5, width, Corner.NONE);
+            offsetForExplicitOrigin = 105;
         }
+        // add special area selection
+        addCurrentSelectCorner(xSave + offsetForExplicitOrigin, 5);
 
         x = 12;
         y = this.getListY() - 12;
@@ -166,6 +176,23 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         return y;
+    }
+
+    protected void addCurrentSelectCorner(int curX, int curY) {
+        int width = 68;
+        this.createCoordinateInputs(curX, curY, width, Corner.CORNER_1);
+        curX += width + 37;
+        this.createCoordinateInputs(curX, curY, width, Corner.CORNER_2);
+        curX += width + 37;
+        this.createButtonOnOff(curX, curY, -1, specialMode, ButtonListener.Type.TOGGLE_SPECIAL_ENABLED);
+        curY += 22;
+        this.createButtonOnOff(curX, curY, -1, expandCircle, ButtonListener.Type.TOGGLE_EXPAND_CIRCLE_ENABLED);
+        curY += 22;
+        this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_GENERATE_CIRCLE);
+        curY += 22;
+        this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_GENERATE_ROUND);
+        curY += 22;
+        this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_REMOVE_ALL_REGION);
     }
 
     protected void addRenderingDisabledWarning(int x, int y)
@@ -240,6 +267,35 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         return y;
     }
 
+    protected void updateCircleModeParams(CoordinateType coordType, Corner corner, String text) {
+        if (corner == Corner.NONE) {
+            return;
+        }
+        BlockPos pos = corner == Corner.CORNER_1 ? cor1 : cor2;
+        int value;
+        try {
+            value = Integer.parseInt(text);
+        } catch (Exception e) {
+            return;
+        }
+        switch (coordType) {
+            case X:
+                pos = new BlockPos(value, pos.getY(), pos.getZ());
+                break;
+            case Y:
+                pos = new BlockPos(pos.getX(), value, pos.getZ());
+                break;
+            case Z:
+                pos = new BlockPos(pos.getX(), pos.getY(), value);
+                break;
+        }
+        if (corner == Corner.CORNER_1) {
+            cor1 = pos;
+        } else if (corner == Corner.CORNER_2) {
+            cor2 = pos;
+        }
+    }
+
     protected void createCoordinateInput(int x, int y, int width, CoordinateType coordType, Corner corner)
     {
         String label = coordType.name() + ":";
@@ -266,6 +322,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                 type = ButtonListener.Type.NUDGE_COORD_Z;
                 break;
         }
+
+        // 创建的时候更新角点的坐标值
+        updateCircleModeParams(coordType, corner, text);
 
         GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y, width, 16, this.textRenderer);
         TextFieldListener listener = new TextFieldListener(coordType, corner, this);
@@ -359,7 +418,22 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     @Nullable
     protected Box getBox()
     {
-        return null;
+       // 设置默认位置和名称
+        Box selBox = this.selection.getSelectedSubRegionBox();
+        this.selection.removeSelectedSubRegionBox();
+        if (selBox != null) {
+            selBox.setName(defaultBoxName);
+        } else if (this.mc.player != null) {
+            BlockPos pos = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.mc.player);
+            selBox = new Box(pos, pos, defaultBoxName);
+        } else {
+            MaLiLib.logger.error("can not getSelectedSubRegionBox");
+            selBox = new Box();
+            selBox.setName(defaultBoxName);
+        }
+        this.selection.addSubRegionBox(selBox,false);
+        this.selection.setSelectedSubRegionBox(defaultBoxName);
+        return selBox;
     }
 
     protected void updatePosition(String numberString, Corner corner, CoordinateType type)
@@ -536,6 +610,30 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                         this.parent.selection.setExplicitOrigin(null);
                     }
                     break;
+                case TOGGLE_GENERATE_CIRCLE:
+                    MaLiLib.logger.error("click TOGGLE_GENERATE_CIRCLE " + specialMode);
+                    if (specialMode) {
+                        this.parent.selection.createNewSubRegionBoxCircle(this.parent.cor1, this.parent.cor2, true, expandCircle);
+                    }
+                    break;
+                case TOGGLE_GENERATE_ROUND:
+                    MaLiLib.logger.error("click TOGGLE_GENERATE_ROUND " + specialMode);
+                    if (specialMode) {
+                        this.parent.selection.createNewSubRegionBoxCircle(this.parent.cor1, this.parent.cor2,false, expandCircle);
+                    }
+                    break;
+                case TOGGLE_SPECIAL_ENABLED:
+                    MaLiLib.logger.error("click TOGGLE_SPECIAL_ENABLED " + specialMode);
+                    specialMode = !specialMode;
+                    break;
+                case TOGGLE_REMOVE_ALL_REGION:
+                    MaLiLib.logger.error("click TOGGLE_REMOVE_ALL_REGION " + specialMode);
+                    this.parent.selection.removeAllSubRegion();
+                    break;
+                case TOGGLE_EXPAND_CIRCLE_ENABLED:
+                    MaLiLib.logger.error("click TOGGLE_EXPAND_CIRCLE_ENABLED " + expandCircle);
+                    expandCircle = !expandCircle;
+                    break;
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
@@ -546,6 +644,11 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             SET_SELECTION_NAME      ("litematica.gui.button.area_editor.set_selection_name"),
             SET_BOX_NAME            ("litematica.gui.button.area_editor.set_box_name"),
             TOGGLE_ORIGIN_ENABLED   ("litematica.gui.button.area_editor.origin_enabled"),
+            TOGGLE_SPECIAL_ENABLED   ("litematica.gui.button.area_editor.special_enabled"),
+            TOGGLE_EXPAND_CIRCLE_ENABLED   ("litematica.gui.button.area_editor.expand_circle_enabled"),
+            TOGGLE_GENERATE_CIRCLE   ("litematica.gui.button.area_editor.generate_circle"),
+            TOGGLE_GENERATE_ROUND   ("litematica.gui.button.area_editor.generate_round"),
+            TOGGLE_REMOVE_ALL_REGION   ("litematica.gui.button.area_editor.remove_all_region"),
             CREATE_SUB_REGION       ("litematica.gui.button.area_editor.create_sub_region"),
             CREATE_SCHEMATIC        ("litematica.gui.button.area_editor.create_schematic"),
             ANALYZE_AREA            ("litematica.gui.button.area_editor.analyze_area"),
@@ -598,7 +701,13 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         @Override
         public boolean onTextChange(GuiTextFieldGeneric textField)
         {
-            this.parent.updatePosition(textField.getText(), this.corner, this.type);
+            if (specialMode) {
+//                updateCircleModeParams(coordType, corner, text);
+                this.parent.updatePosition(textField.getText(), this.corner, this.type);
+                // todo nothing
+            } else {
+                this.parent.updatePosition(textField.getText(), this.corner, this.type);
+            }
             return false;
         }
     }

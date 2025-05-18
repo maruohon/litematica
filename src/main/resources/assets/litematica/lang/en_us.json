@@ -533,6 +533,11 @@
     "litematica.gui.button.area_editor.create_schematic": "Save Schematic",
     "litematica.gui.button.area_editor.create_sub_region": "New sub-region",
     "litematica.gui.button.area_editor.origin_enabled": "Manual Origin: %s",
+    "litematica.gui.button.area_editor.generate_circle": "Generate Circle",
+    "litematica.gui.button.area_editor.generate_round": "Generate Round",
+    "litematica.gui.button.area_editor.remove_all_region": "Remove All SubRegion",
+    "litematica.gui.button.area_editor.special_enabled": "Special Mode: %s",
+    "litematica.gui.button.area_editor.expand_circle_enabled": "Expand Circle: %s",
     "litematica.gui.button.area_editor.set_box_name": "Set",
     "litematica.gui.button.area_editor.set_selection_name": "Set",
 
@@ -673,6 +678,7 @@
     "litematica.gui.label.area_selection_box_count": "Boxes: %d",
     "litematica.gui.label.area_selection_origin": "Origin: %s",
     "litematica.gui.label.area_selection.mode.normal": "Normal",
+    "litematica.gui.label.area_selection.mode.complex": "Complex",
     "litematica.gui.label.area_selection.mode.simple": "Simple",
 
     "litematica.gui.label.block_info.state_client": "Client World Block State",
