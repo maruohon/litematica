@@ -52,6 +52,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int xOrigin;
     @Nullable protected String selectionId;
     protected static boolean specialMode = false;
+    protected static boolean expandCircle = false;
     protected BlockPos cor1 = BlockPos.ORIGIN;
     protected BlockPos cor2 = BlockPos.ORIGIN;
     protected static final String defaultBoxName = "defaultBoxName";
@@ -184,6 +185,8 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.createCoordinateInputs(curX, curY, width, Corner.CORNER_2);
         curX += width + 37;
         this.createButtonOnOff(curX, curY, -1, specialMode, ButtonListener.Type.TOGGLE_SPECIAL_ENABLED);
+        curY += 22;
+        this.createButtonOnOff(curX, curY, -1, expandCircle, ButtonListener.Type.TOGGLE_EXPAND_CIRCLE_ENABLED);
         curY += 22;
         this.createButton(curX, curY, -1, ButtonListener.Type.TOGGLE_GENERATE_CIRCLE);
         curY += 22;
@@ -610,13 +613,13 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                 case TOGGLE_GENERATE_CIRCLE:
                     MaLiLib.logger.error("click TOGGLE_GENERATE_CIRCLE " + specialMode);
                     if (specialMode) {
-                        this.parent.selection.createNewSubRegionBoxCircle(this.parent.cor1, this.parent.cor2);
+                        this.parent.selection.createNewSubRegionBoxCircle(this.parent.cor1, this.parent.cor2, true, expandCircle);
                     }
                     break;
                 case TOGGLE_GENERATE_ROUND:
                     MaLiLib.logger.error("click TOGGLE_GENERATE_ROUND " + specialMode);
                     if (specialMode) {
-                        this.parent.selection.createNewSubRegionBoxRound(this.parent.cor1, this.parent.cor2);
+                        this.parent.selection.createNewSubRegionBoxCircle(this.parent.cor1, this.parent.cor2,false, expandCircle);
                     }
                     break;
                 case TOGGLE_SPECIAL_ENABLED:
@@ -625,7 +628,11 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     break;
                 case TOGGLE_REMOVE_ALL_REGION:
                     MaLiLib.logger.error("click TOGGLE_REMOVE_ALL_REGION " + specialMode);
-                    this.parent.selection.removeAllSubRegionBoxes();
+                    this.parent.selection.removeAllSubRegion();
+                    break;
+                case TOGGLE_EXPAND_CIRCLE_ENABLED:
+                    MaLiLib.logger.error("click TOGGLE_EXPAND_CIRCLE_ENABLED " + expandCircle);
+                    expandCircle = !expandCircle;
                     break;
             }
 
@@ -638,6 +645,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             SET_BOX_NAME            ("litematica.gui.button.area_editor.set_box_name"),
             TOGGLE_ORIGIN_ENABLED   ("litematica.gui.button.area_editor.origin_enabled"),
             TOGGLE_SPECIAL_ENABLED   ("litematica.gui.button.area_editor.special_enabled"),
+            TOGGLE_EXPAND_CIRCLE_ENABLED   ("litematica.gui.button.area_editor.expand_circle_enabled"),
             TOGGLE_GENERATE_CIRCLE   ("litematica.gui.button.area_editor.generate_circle"),
             TOGGLE_GENERATE_ROUND   ("litematica.gui.button.area_editor.generate_round"),
             TOGGLE_REMOVE_ALL_REGION   ("litematica.gui.button.area_editor.remove_all_region"),

@@ -1,9 +1,15 @@
 package fi.dy.masa.litematica.selection;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 import fi.dy.masa.malilib.MaLiLib;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockKeys;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -215,119 +221,116 @@ public class AreaSelection
     }
 
     @Nullable
-    public String createNewSubRegionBoxRound(BlockPos cor1, BlockPos cor2) {
+    public String createNewSubRegionBoxCircle(BlockPos cor1, BlockPos cor2, boolean onCircle, boolean expand) {
         try {
-            double offset = 0.0;
-            double c1x = cor1.getX() + offset;
-            double c1z = cor1.getZ() + offset;
-            double c1y = cor1.getY() + offset;
-            double c2x = cor2.getX() + offset;
-            double c2z = cor2.getZ() + offset;
-            double c2y = cor2.getY() + offset;
-
+            double c1x = cor1.getX();
+            double c1z = cor1.getZ();
+            double c1y = cor1.getY();
+            double c2x = cor2.getX();
+            double c2z = cor2.getZ();
+            double c2y = cor2.getY();
             double dis2 = calculateDistance2(c1x, c1z, c2x, c2z);
             double dis = Math.sqrt(dis2);
+            MaLiLib.logger.error(String.format("center:%s,%s,%s radius:%s", c1x, c1y, c1z, dis));
             double startX = c1x;
             double startZ = c1z + Math.round(dis);
             List<double[]> posList = new ArrayList<>();
             posList.add(new double[]{startX, startZ});
             // 1/4圆
-            MaLiLib.logger.error(String.format("startZ:%s, endZ:%s, dis:%s", startZ, c1z, dis));
-            while(startZ > c1z) {
+            while (startZ > c1z) {
                 double[][] nextPos = {{startX + 1, startZ}, {startX + 1, startZ - 1}, {startX, startZ - 1}};
-                double[] disSquare = new double[3];
-                disSquare[0] = Math.abs(calculateDistance2(nextPos[0][0], nextPos[0][1], c1x, c1z) - dis2);
-                disSquare[1] = Math.abs(calculateDistance2(nextPos[1][0], nextPos[1][1], c1x, c1z) - dis2);
-                disSquare[2] = Math.abs(calculateDistance2(nextPos[2][0], nextPos[2][1], c1x, c1z) - dis2);
-                int minIndex = 0;
                 double minDisSquare = Double.MAX_VALUE;
-                for (int i = 0; i < 3; ++i) {
-                    if (disSquare[i] < minDisSquare) {
-                        minDisSquare = disSquare[i];
-                        minIndex = i;
+                for (int i = 0; i < 3; i++) {
+                    double disSquare = Math.abs(calculateDistance2(nextPos[i][0], nextPos[i][1], c1x, c1z) - dis2);
+                    if (disSquare < minDisSquare) {
+                        minDisSquare = disSquare;
+                        startX = nextPos[i][0];
+                        startZ = nextPos[i][1];
                     }
                 }
-                startX = nextPos[minIndex][0];
-                startZ = nextPos[minIndex][1];
                 posList.add(new double[]{startX, startZ});
             }
             //关于x轴对称 1/2圆
-            /*
-            ^z
-            |
-            |_____>x
-            (c1x,c1z)
-             */
-            List<double[]> newPosList = new ArrayList<>();
-            for (double[] pos : posList) {
+            int len = posList.size();
+            for (int i = 0; i < len; ++i) {
+                double[] pos = posList.get(i);
                 double syncPosX = pos[0];
                 double syncPosZ = 2 * c1z - pos[1];
-                newPosList.add(new double[]{syncPosX, syncPosZ});
+                posList.add(new double[]{syncPosX, syncPosZ});
             }
-            posList.addAll(newPosList);
             //关于z轴对称 整个圆
+            Set<Long> seenPosLongSet = new HashSet<>();
             for (double[] pos : posList) {
                 double curX = (int) pos[0];
                 double curZ = (int) pos[1];
                 double syncPosX = (int) (2 * c1x - pos[0]);
                 double syncPosZ = (int) (pos[1]);
 
-                BlockPos pos1 = new BlockPos((int) curX, (int)c1y, (int) curZ);
-                BlockPos pos2 = new BlockPos((int) syncPosX, (int)c2y, (int) syncPosZ);
+                int c1Y = (int) c1y;
+                int c2Y = (int) c2y;
+
+                BlockPos pos1 = new BlockPos((int) curX, c1Y, (int) curZ);
+                BlockPos pos2 = new BlockPos((int) syncPosX, c2Y, (int) syncPosZ);
                 // 添加到多选区域列表中
-                String name = "z0_" + (int)curZ;
-                addOneBox(pos1,pos2,name);
+                if (onCircle) {//仅创建圆上节点,考虑y坐标
+                    BlockPos pos11 = new BlockPos(pos1.getX(), c1Y, pos1.getZ());
+                    BlockPos pos12 = new BlockPos(pos1.getX(), c2Y, pos1.getZ());
+                    addOneBox(pos11, pos12, makeKey(pos1.getX(), pos1.getZ()));
+
+                    BlockPos pos21 = new BlockPos(pos2.getX(), c1Y, pos2.getZ());
+                    BlockPos pos22 = new BlockPos(pos2.getX(), c2Y, pos2.getZ());
+                    addOneBox(pos21, pos22, makeKey(pos2.getX(), pos2.getZ()));
+                    if (expand) {
+                        seenPosLongSet.add(pos1.asLong());
+                        seenPosLongSet.add(pos2.asLong());
+                        expandPos(pos1, c1Y, c2Y,seenPosLongSet);
+                        expandPos(pos2, c1Y, c2Y,seenPosLongSet);
+                    }
+                } else {
+                    String name = "z_" + (int) curZ;// 按照z轴坐标去重
+                    addOneBox(pos1, pos2, name);
+                }
                 MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));
             }
-            MaLiLib.logger.error(String.format("createNewSubRegionBoxRound boxList size: %s", posList.size()));
+            seenPosLongSet.clear();
+            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle boxList size: %s", posList.size()));
+            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle subRegionBoxes size: %s", this.subRegionBoxes.size()));
         } catch (Exception e) {
-            MaLiLib.logger.error("createNewSubRegionBoxRound ", e);
+            MaLiLib.logger.error("createNewSubRegionBoxCircle ", e);
         }
-        return "createNewSubRegionBoxRound";
+        return "createNewSubRegionBoxCircle";
     }
 
+    protected int[][] DIRECTIONS = new int[][]{{0,1},{1,0},{0,-1},{-1,0}};
+
+    protected void expandPos(BlockPos pos, int c1Y, int c2Y,Set<Long> seenPosLongSet) {
+        for (int[] dir : DIRECTIONS) {
+            BlockPos nextPos = new BlockPos(pos.getX() + dir[0], pos.getY(), pos.getZ() + dir[1]);
+            if (seenPosLongSet.contains(nextPos.asLong())) {
+                continue;
+            }
+            seenPosLongSet.add(nextPos.asLong());
+            BlockPos pos1 = new BlockPos(nextPos.getX(),c1Y, nextPos.getZ());
+            BlockPos pos2 = new BlockPos(nextPos.getX(),c2Y, nextPos.getZ());
+            addOneBox(pos1, pos2,makeKey(nextPos.getX(), nextPos.getZ()));
+        }
+    }
     protected void addOneBox(BlockPos pos1, BlockPos pos2,String name) {
         Box box = new Box();
         box.setSelectedCorner(Corner.CORNER_1);
         box.setName(name);
-        box.setPos1(pos1);
-        box.setPos2(pos2);
-//        this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
-//        this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
+        this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
+        this.setSubRegionCornerPos(box, Corner.CORNER_2, pos2);
         this.subRegionBoxes.put(name, box);
     }
 
-    protected int[][] directions = new int[][]{
-            {1, 1},
-            {1, 0},
-            {1, -1},
-            {0, -1},
-//            {0, 0},
-            {-1, 1},
-            {-1, 0},
-            {-1, 1},
-            {0, 1},
-    };
-    protected int nextCircleBlock(int curX, int curZ, int centerX, int centerZ, double dis2, Set<String> positionSets) {
-        int closestDir = -1;
-        double closestDis = Double.MAX_VALUE;
-        for(int ind = 0; ind < directions.length; ++ind) {
-            int[] dir = directions[ind];
-            int nextX = curX + dir[0];
-            int nextZ = curZ + dir[1];
-            double dis2ToCenter = calculateDistance2(nextX + 0.5, nextZ+0.5, centerX, centerZ);
-            double dis = Math.abs(dis2ToCenter - dis2);
-            System.out.printf("dis: %s dis2:%s nextX:%s nextZ:%s", dis, dis2, nextX, nextZ);
-            if (closestDis > dis && !positionSets.contains(makeKey(nextX, nextZ))) {
-                closestDis = dis;
-                closestDir = ind;
-            }
-        }
-        return closestDir;
+
+    protected String makeKey(int x, int y, int z) {
+        return String.format("%s_%s_%s", x, y, z);
     }
 
-    protected String makeKey(int x, int z) {
-        return String.format("%s#%s", x, z);
+    protected String makeKey(int x,int z) {
+        return String.format("%s_%s", x, z);
     }
 
     public void removeAllSubRegion() {
@@ -335,93 +338,11 @@ public class AreaSelection
         this.subRegionBoxes.clear();
         this.addSubRegionBox(currentSelected, false);
     }
-    @Nullable
-    public String createNewSubRegionBoxCircle(BlockPos cor1, BlockPos cor2) {
-        try {
-            double offset = 0.0;
-            double c1x = cor1.getX() + offset;
-            double c1z = cor1.getZ() + offset;
-            double c1y = cor1.getY() + offset;
-            double c2x = cor2.getX() + offset;
-            double c2z = cor2.getZ() + offset;
-            double c2y = cor2.getY() + offset;
-
-            double dis2 = calculateDistance2(c1x, c1z, c2x, c2z);
-//            double dis = Math.sqrt(dis2);
-//            double startX = c1x;
-//            double startZ = c1z + Math.floor(dis);
-            List<double[]> posList = new ArrayList<>();
-//            posList.add(new double[]{startX, startZ});
-//            // 1/4圆
-//            MaLiLib.logger.error(String.format("startZ:%s, endZ:%s, dis:%s", startZ, c1z, dis));
-
-            // 1/8 circle
-            double R = Math.sqrt(dis2);
-            double pLast = -2 * R + 3;
-            double pNext;
-            double curX = c1x + R;
-            double curZ = c1z;
-            posList.add(new double[]{curX, curZ});
-            while (curX - c1x >= curZ - c1z) {
-                if (pLast >= 0) {
-                    pNext = pLast - 4 * (curX - c1x) + 4 * (curZ - c1z) + 10;
-                    pLast = pNext;
-                    curX = curX - 1;
-                    curZ = curZ + 1;
-                } else {
-                    pNext = pLast + 4 * (curZ - c1z) + 6;
-                    pLast = pNext;
-                    curX = curX;
-                    curZ = curZ + 1;
-                }
-                posList.add(new double[]{curX, curZ});
-            }
-            // 1/4圆
-            int len = posList.size();
-            for (int i = 0; i < len; i++) {
-                double[] curPos = posList.get(i);
-                double nX = curPos[1] - c1z + c1x;
-                double nZ = curPos[0] - c1x + c1z;
-                posList.add(new double[]{nX, nZ});
-            }
-            //关于x轴对称 1/2圆
-            /*
-            ^z
-            |
-            |_____>x
-            (c1x,c1z)
-             */
-            len = posList.size();
-            for (int i = 0; i < len; i++) {
-                double[] pos = posList.get(i);
-                double syncPosX = pos[0];
-                double syncPosZ = 2 * c1z - pos[1];
-                posList.add(new double[]{syncPosX, syncPosZ});
-            }
-            //关于z轴对称 整个圆
-            for (double[] pos : posList) {
-                curX = pos[0];
-                curZ = pos[1];
-                double syncPosX = (int) (2 * c1x - pos[0]);
-                double syncPosZ = (int) (pos[1]);
-                BlockPos pos1 = new BlockPos((int) curX, (int) c1y, (int) curZ);
-                BlockPos pos2 = new BlockPos((int) syncPosX, (int) c2y, (int) syncPosZ);
-                // 添加到多选区域列表中
-                addOneBox(pos1, pos1, makeKey((int) curX, (int) curZ));
-                addOneBox(pos2, pos2, makeKey((int) syncPosX, (int) syncPosZ));
-                MaLiLib.logger.error(String.format("(%s, %s, %s)|(%s, %s, %s)", curX, cor1.getY(), curZ, syncPosX, cor1.getY(), syncPosZ));
-            }
-            MaLiLib.logger.error(String.format("createNewSubRegionBoxCircle posList size: %s", posList.size()));
-        } catch (Exception e) {
-            MaLiLib.logger.error("createNewSubRegionBoxCircle ", e);
-        }
-        return "createNewSubRegionBoxCircle";
-    }
 
     public static void main(String[] args) {
         BlockPos pos1 = new BlockPos(0,0,0);
         BlockPos pos2 = new BlockPos(0,0,4);
-        new AreaSelection().createNewSubRegionBoxCircle(pos1, pos2);
+        new AreaSelection().createNewSubRegionBoxCircle(pos1, pos2, true, true);
     }
 
     public void clearCurrentSelectedCorner()

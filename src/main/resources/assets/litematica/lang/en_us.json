@@ -537,6 +537,7 @@
     "litematica.gui.button.area_editor.generate_round": "Generate Round",
     "litematica.gui.button.area_editor.remove_all_region": "Remove All SubRegion",
     "litematica.gui.button.area_editor.special_enabled": "Special Mode: %s",
+    "litematica.gui.button.area_editor.expand_circle_enabled": "Expand Circle: %s",
     "litematica.gui.button.area_editor.set_box_name": "Set",
     "litematica.gui.button.area_editor.set_selection_name": "Set",
 
