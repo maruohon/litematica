@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.ImmutableMap;
+import fi.dy.masa.malilib.MaLiLib;
 import org.joml.Matrix4f;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
