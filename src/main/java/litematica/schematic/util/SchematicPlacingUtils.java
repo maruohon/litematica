@@ -542,7 +542,7 @@ public class SchematicPlacingUtils
         int endY = Math.max(bounds.minY - ay, bounds.maxY - ay);
         int endZ = Math.max(bounds.minZ - az, bounds.maxZ - az);
 
-        Rotation fullTransform = schematicPlacement.getCombinedRotation(mainRotation, subRegionPlacement);
+        Rotation fullTransform = subRotation.add(mainRotation);
 
         // Reverse transform the container-relative offsets
         posMutable.set(startX, startY, startZ);

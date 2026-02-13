@@ -534,6 +534,8 @@ public class SpongeSchematic extends BaseSchematic
             return convertPackedIntArrayToVarIntByteArray(arrayContainer);
         }
 
+        // TODO FIXME This intermediate container is useless, just go directly from sparse container to the VarInt array.
+        //  But also keep this as a fallback case in case there are any mod-added container types we don't know about.
         int bits = ArrayBlockContainer.getRequiredBitWidth(container.getPalette().getSize());
         AlignedLongBackedIntArray storage = new AlignedLongBackedIntArray(bits, container.getTotalVolume());
         ArrayBlockContainer arrayContainer = new ArrayBlockContainer(container.getSize(), storage);
