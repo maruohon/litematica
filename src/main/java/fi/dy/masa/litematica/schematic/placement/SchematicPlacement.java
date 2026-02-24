@@ -438,6 +438,11 @@ public class SchematicPlacement
 
     public ImmutableMap<String, Box> getSubRegionBoxes(RequiredEnabled required)
     {
+        if (this.matchesRequirement(required) == false)
+        {
+            return ImmutableMap.of();
+        }
+
         ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
         Map<String, BlockPos> areaSizes = this.schematic.getAreaSizes();
 

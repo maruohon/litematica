@@ -128,11 +128,13 @@ public class SchematicPlacementManager
         if (this.chunksToUnload.isEmpty() == false)
         {
             WorldSchematic worldSchematic = this.worldSupplier.get();
+            //System.out.printf("to unload: %d\n", this.chunksToUnload.size());
 
             if (worldSchematic != null)
             {
                 for (long posLong : this.chunksToUnload)
                 {
+                    //System.out.printf("unload: %d, %d\n", ChunkPos.getPackedX(posLong), ChunkPos.getPackedZ(posLong));
                     this.unloadSchematicChunk(worldSchematic, ChunkPos.getPackedX(posLong), ChunkPos.getPackedZ(posLong));
                 }
             }
