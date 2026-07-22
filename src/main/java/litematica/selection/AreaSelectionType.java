@@ -2,9 +2,9 @@ package litematica.selection;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class AreaSelectionType extends BaseOptionListConfigValue
+public class AreaSelectionType extends BaseOptionConfigValue
 {
     public static final AreaSelectionType SIMPLE       = new AreaSelectionType("simple",       "litematica.label.area_selection.selection_type.simple");
     public static final AreaSelectionType MULTI_REGION = new AreaSelectionType("multi_region", "litematica.label.area_selection.selection_type.multi_region");

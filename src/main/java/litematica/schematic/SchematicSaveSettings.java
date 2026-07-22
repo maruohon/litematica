@@ -14,8 +14,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.util.ResourceLocation;
 
-import malilib.config.option.OptionListConfig;
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.option.OptionConfig;
+import malilib.config.value.BaseOptionConfigValue;
 import malilib.util.data.SimpleBooleanStorageWithDefault;
 import malilib.util.data.json.JsonUtils;
 import malilib.util.game.BlockUtils;
@@ -34,8 +34,8 @@ public class SchematicSaveSettings
     public final SimpleBooleanStorageWithDefault obeyIgnoredBlocks       = new SimpleBooleanStorageWithDefault(false);
     public final SimpleBooleanStorageWithDefault obeyIgnoredBlockStates  = new SimpleBooleanStorageWithDefault(false);
     public final SimpleBooleanStorageWithDefault obeyIgnoredEntities     = new SimpleBooleanStorageWithDefault(false);
-    public final OptionListConfig<SchematicSaveWorldSelection> worldSelection = new OptionListConfig<>("-", SchematicSaveWorldSelection.VANILLA_ONLY, SchematicSaveWorldSelection.VALUES);
-    public final OptionListConfig<SaveSide> saveSide = new OptionListConfig<>("-", SaveSide.AUTO, SaveSide.VALUES);
+    public final OptionConfig<SchematicSaveWorldSelection> worldSelection = new OptionConfig<>("-", SchematicSaveWorldSelection.VANILLA_ONLY, SchematicSaveWorldSelection.VALUES);
+    public final OptionConfig<SaveSide> saveSide = new OptionConfig<>("-", SaveSide.AUTO, SaveSide.VALUES);
 
     public final Set<Block> ignoredBlocks = new HashSet<>();
     public final Set<BlockState> ignoredBlockStates = new HashSet<>();
@@ -221,7 +221,7 @@ public class SchematicSaveSettings
         }
     }
 
-    public static class SaveSide extends BaseOptionListConfigValue
+    public static class SaveSide extends BaseOptionConfigValue
     {
         public static final SaveSide AUTO   = new SaveSide("auto",   "litematica.name.save_side.auto");
         public static final SaveSide CLIENT = new SaveSide("client", "litematica.name.save_side.client");

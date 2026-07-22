@@ -2,9 +2,9 @@ package litematica.util.value;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class ReplaceBehavior extends BaseOptionListConfigValue
+public class ReplaceBehavior extends BaseOptionConfigValue
 {
     public static final ReplaceBehavior NONE         = new ReplaceBehavior("none",         "litematica.gui.label.replace_behavior.none");
     public static final ReplaceBehavior ALL          = new ReplaceBehavior("all",          "litematica.gui.label.replace_behavior.all");

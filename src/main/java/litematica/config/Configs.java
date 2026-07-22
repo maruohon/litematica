@@ -14,7 +14,7 @@ import malilib.config.option.DoubleConfig;
 import malilib.config.option.DualColorConfig;
 import malilib.config.option.HotkeyedBooleanConfig;
 import malilib.config.option.IntegerConfig;
-import malilib.config.option.OptionListConfig;
+import malilib.config.option.OptionConfig;
 import malilib.config.option.StringConfig;
 import malilib.config.option.Vec2iConfig;
 import malilib.config.value.FileBrowserColumns;
@@ -73,10 +73,10 @@ public class Configs
         public static final BooleanConfig SHOW_EXTRA_SCHEMATIC_TYPES                = new BooleanConfig("showExtraSchematicTypes", false);
         public static final StringConfig  TOOL_ITEM                                 = new StringConfig( "toolItem", "minecraft:stick");
 
-        public static final OptionListConfig<AreaSelectionType>     DEFAULT_AREA_SELECTION_MODE = new OptionListConfig<>("defaultAreaSelectionMode", AreaSelectionType.SIMPLE, AreaSelectionType.VALUES);
-        public static final OptionListConfig<ReplaceBehavior>       PASTE_REPLACE_BEHAVIOR      = new OptionListConfig<>("pasteReplaceBehavior", ReplaceBehavior.NONE, ReplaceBehavior.VALUES);
-        public static final OptionListConfig<FileBrowserColumns>    SCHEMATIC_BROWSER_COLUMNS   = new OptionListConfig<>("schematicBrowserColumns", FileBrowserColumns.MTIME, FileBrowserColumns.VALUES);
-        public static final OptionListConfig<ToolSelectionMode>     TOOL_SELECTION_MODE         = new OptionListConfig<>("toolSelectionMode", ToolSelectionMode.CORNERS, ToolSelectionMode.VALUES);
+        public static final OptionConfig<AreaSelectionType>  DEFAULT_AREA_SELECTION_MODE  = new OptionConfig<>("defaultAreaSelectionMode", AreaSelectionType.SIMPLE, AreaSelectionType.VALUES);
+        public static final OptionConfig<ReplaceBehavior>    PASTE_REPLACE_BEHAVIOR       = new OptionConfig<>("pasteReplaceBehavior", ReplaceBehavior.NONE, ReplaceBehavior.VALUES);
+        public static final OptionConfig<FileBrowserColumns> SCHEMATIC_BROWSER_COLUMNS    = new OptionConfig<>("schematicBrowserColumns", FileBrowserColumns.MTIME, FileBrowserColumns.VALUES);
+        public static final OptionConfig<ToolSelectionMode>  TOOL_SELECTION_MODE          = new OptionConfig<>("toolSelectionMode", ToolSelectionMode.CORNERS, ToolSelectionMode.VALUES);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 AREAS_PER_WORLD,
@@ -240,11 +240,11 @@ public class Configs
         public static final IntegerConfig VERIFIER_ERROR_HIGHLIGHT_MAX_POSITIONS    = new IntegerConfig("verifierErrorHighlightMaxPositions", 1000, 1, 1000000);
         public static final BooleanConfig WARN_DISABLED_RENDERING                   = new BooleanConfig("warnDisabledRendering", true);
 
-        public static final OptionListConfig<HudAlignment> BLOCK_INFO_LINES_ALIGNMENT           = new OptionListConfig<>("blockInfoLinesAlignment", HudAlignment.TOP_RIGHT, HudAlignment.VALUES);
-        public static final OptionListConfig<BlockInfoAlignment> BLOCK_INFO_OVERLAY_ALIGNMENT   = new OptionListConfig<>("blockInfoOverlayAlignment", BlockInfoAlignment.TOP_CENTER, BlockInfoAlignment.VALUES);
-        public static final OptionListConfig<MessageOutput> EASY_PLACE_WARNINGS                 = new OptionListConfig<>("easyPlaceWarnings", MessageOutput.MESSAGE_OVERLAY, MessageOutput.getValues());
-        public static final OptionListConfig<HudAlignment> INFO_HUD_ALIGNMENT                   = new OptionListConfig<>("infoHudAlignment", HudAlignment.BOTTOM_RIGHT, HudAlignment.VALUES);
-        public static final OptionListConfig<HudAlignment> TOOL_HUD_ALIGNMENT                   = new OptionListConfig<>("toolHudAlignment", HudAlignment.BOTTOM_LEFT, HudAlignment.VALUES);
+        public static final OptionConfig<HudAlignment>       BLOCK_INFO_LINES_ALIGNMENT    = new OptionConfig<>("blockInfoLinesAlignment", HudAlignment.TOP_RIGHT, HudAlignment.VALUES);
+        public static final OptionConfig<BlockInfoAlignment> BLOCK_INFO_OVERLAY_ALIGNMENT  = new OptionConfig<>("blockInfoOverlayAlignment", BlockInfoAlignment.TOP_CENTER, BlockInfoAlignment.VALUES);
+        public static final OptionConfig<MessageOutput>      EASY_PLACE_WARNINGS           = new OptionConfig<>("easyPlaceWarnings", MessageOutput.MESSAGE_OVERLAY, MessageOutput.getValues());
+        public static final OptionConfig<HudAlignment>       INFO_HUD_ALIGNMENT            = new OptionConfig<>("infoHudAlignment", HudAlignment.BOTTOM_RIGHT, HudAlignment.VALUES);
+        public static final OptionConfig<HudAlignment>       TOOL_HUD_ALIGNMENT            = new OptionConfig<>("toolHudAlignment", HudAlignment.BOTTOM_LEFT, HudAlignment.VALUES);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 BLOCK_INFO_LINES_RENDERING,
@@ -347,7 +347,8 @@ public class Configs
         public static final BooleanConfig SAVE_WITH_CUSTOM_SETTINGS     = new BooleanConfig("saveWithCustomSettings", false);
         public static final BooleanConfig SCHEMATIC_LIST_ICON_BUTTONS   = new BooleanConfig("schematicListIconButtons", false);
         public static final StringConfig  SCHEMATIC_SAVE_SETTINGS       = new StringConfig("schematicSaveSettings", "");
-        public static final OptionListConfig<SaveSide> SAVE_SIDE        = new OptionListConfig<>("saveSide", SaveSide.AUTO, SaveSide.VALUES);
+
+        public static final OptionConfig<SaveSide> SAVE_SIDE            = new OptionConfig<>("saveSide", SaveSide.AUTO, SaveSide.VALUES);
 
         public static final BooleanConfig SCHEMATIC_INFO_SHOW_AUTHOR             = new BooleanConfig("schematicInfoShowAuthor", true, null);
         public static final BooleanConfig SCHEMATIC_INFO_SHOW_BLOCK_ENTITY_COUNT = new BooleanConfig("schematicInfoShowBlockEntityCount", true, null);

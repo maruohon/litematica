@@ -2,9 +2,9 @@ package litematica.selection;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class ToolSelectionMode extends BaseOptionListConfigValue
+public class ToolSelectionMode extends BaseOptionConfigValue
 {
     public static final ToolSelectionMode EXPAND  = new ToolSelectionMode("expand",  "litematica.label.area_selection.tool_selection_mode.expand");
     public static final ToolSelectionMode CORNERS = new ToolSelectionMode("corners", "litematica.label.area_selection.tool_selection_mode.corners");

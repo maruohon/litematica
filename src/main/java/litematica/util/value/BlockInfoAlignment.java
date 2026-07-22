@@ -2,10 +2,10 @@ package litematica.util.value;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 import malilib.config.value.VerticalAlignment;
 
-public class BlockInfoAlignment extends BaseOptionListConfigValue
+public class BlockInfoAlignment extends BaseOptionConfigValue
 {
     public static final BlockInfoAlignment CENTER     = new BlockInfoAlignment("center",      "litematica.label.alignment.center",      VerticalAlignment.CENTER);
     public static final BlockInfoAlignment TOP_CENTER = new BlockInfoAlignment("top_center",  "litematica.label.alignment.top_center",  VerticalAlignment.TOP);

@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 import malilib.listener.TaskCompletionListener;
 import malilib.util.MathUtils;
 import malilib.util.data.json.JsonUtils;
@@ -300,7 +300,7 @@ public abstract class MaterialListBase implements IMaterialList
     {
         if (JsonUtils.hasString(obj, "type"))
         {
-            this.setMaterialListType(BaseOptionListConfigValue.findValueByName(JsonUtils.getString(obj, "type"), BlockInfoListType.VALUES));
+            this.setMaterialListType(BaseOptionConfigValue.findValueByName(JsonUtils.getString(obj, "type"), BlockInfoListType.VALUES));
         }
 
         if (JsonUtils.hasString(obj, "sort_criteria"))

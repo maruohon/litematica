@@ -2,9 +2,9 @@ package litematica.util.value;
 
 import com.google.common.collect.ImmutableList;
 
-import malilib.config.value.BaseOptionListConfigValue;
+import malilib.config.value.BaseOptionConfigValue;
 
-public class SchematicSaveWorldSelection extends BaseOptionListConfigValue
+public class SchematicSaveWorldSelection extends BaseOptionConfigValue
 {
     public static final SchematicSaveWorldSelection VANILLA_ONLY         = new SchematicSaveWorldSelection("vanilla_only",         "litematica.gui.label.schematic_save_world.vanilla_only");
     public static final SchematicSaveWorldSelection SCHEMATIC_ONLY       = new SchematicSaveWorldSelection("schematic_only",       "litematica.gui.label.schematic_save_world.schematic_only");
