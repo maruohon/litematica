@@ -20,6 +20,48 @@ public class ChunkSchematic extends Chunk
         this.setLightPopulated(true);
     }
 
+    // The tile entity map in the vanilla Chunk superclass is a plain HashMap.
+    // The schematic world is filled on the main thread (see SchematicPlacementManager),
+    // while the render rebuild worker threads can simultaneously read tile entities
+    // from the same chunk, as one chunk column is shared by all of its 16x16x16
+    // render sections. Thus all access to the tile entity map must be mutually
+    // exclusive, to prevent concurrent modification and map corruption.
+    @Override
+    public TileEntity getTileEntity(BlockPos pos, Chunk.EnumCreateEntityType type)
+    {
+        synchronized (this)
+        {
+            return super.getTileEntity(pos, type);
+        }
+    }
+
+    @Override
+    public void addTileEntity(TileEntity tileEntityIn)
+    {
+        synchronized (this)
+        {
+            super.addTileEntity(tileEntityIn);
+        }
+    }
+
+    @Override
+    public void addTileEntity(BlockPos pos, TileEntity tileEntityIn)
+    {
+        synchronized (this)
+        {
+            super.addTileEntity(pos, tileEntityIn);
+        }
+    }
+
+    @Override
+    public void removeTileEntity(BlockPos pos)
+    {
+        synchronized (this)
+        {
+            super.removeTileEntity(pos);
+        }
+    }
+
     @Override
     public IBlockState setBlockState(BlockPos pos, IBlockState state)
     {
