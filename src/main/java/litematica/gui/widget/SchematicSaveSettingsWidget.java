@@ -18,7 +18,7 @@ import malilib.gui.widget.ContainerWidget;
 import malilib.gui.widget.DropDownListWidget;
 import malilib.gui.widget.LabelWidget;
 import malilib.gui.widget.button.GenericButton;
-import malilib.gui.widget.button.OptionListConfigButton;
+import malilib.gui.widget.button.OptionConfigButton;
 import malilib.gui.widget.list.entry.BlockEntryWidget;
 import malilib.gui.widget.list.entry.BlockStateEntryWidget;
 import malilib.gui.widget.list.entry.EntityEntryWidget;
@@ -33,7 +33,7 @@ public class SchematicSaveSettingsWidget extends ContainerWidget
 {
     protected final SchematicSaveSettings settings;
 
-    protected final OptionListConfigButton saveSideButton;
+    protected final OptionConfigButton saveSideButton;
     protected final BooleanEditWidget saveBlocksWidget;
     protected final BooleanEditWidget saveBlockEntitiesWidget;
     protected final BooleanEditWidget saveBlockTicksWidget;
@@ -57,7 +57,7 @@ public class SchematicSaveSettingsWidget extends ContainerWidget
 
         this.settings = settings;
 
-        this.saveSideButton = new OptionListConfigButton(-1, 16, this.settings.saveSide, "litematica.button.schematic_save.save_side");
+        this.saveSideButton = new OptionConfigButton(-1, 16, this.settings.saveSide, "litematica.button.schematic_save.save_side");
         this.saveBlocksWidget         = new BooleanEditWidget(14, this.settings.saveBlocks,              "litematica.button.schematic_save.save_blocks");
         this.saveBlockEntitiesWidget  = new BooleanEditWidget(14, this.settings.saveBlockEntities,       "litematica.button.schematic_save.save_block_entities");
         this.saveBlockTicksWidget     = new BooleanEditWidget(14, this.settings.saveScheduledBlockTicks, "litematica.button.schematic_save.save_block_ticks");
