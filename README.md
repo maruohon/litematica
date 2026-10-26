@@ -12,8 +12,8 @@ Litematica was started as an alternative for [Schematica](https://minecraft.curs
 for players who don't want to have Forge installed on their client, and that's why it was developed for Liteloader.
 
 For compiled builds (= downloads), see:
-* CurseForge: http://minecraft.curseforge.com/projects/litematica
-* For more up-to-date development builds: https://masa.dy.fi/mcmods/client_mods/
+* CurseForge: [https://www.curseforge.com/minecraft/mc-mods/litematica](https://www.curseforge.com/minecraft/mc-mods/litematica)
+* For more up-to-date development builds: [https://masa.dy.fi/mcmods/client_mods/](https://masa.dy.fi/mcmods/client_mods/)
 * **Note:** Litematica also requires the malilib library mod! But on the other hand Fabric API is not needed.
 
 ## Compiling
